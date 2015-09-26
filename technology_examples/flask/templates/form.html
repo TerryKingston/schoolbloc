@@ -1,0 +1,21 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+
+    <title>Template Page</title>
+</head>
+
+<p>
+This is the GET request of this page
+<p/>
+
+<form action="{{ url_for('post_example') }}" method="POST">
+    {{ form.csrf_token }}
+    <p>{{ form.username.label }}: {{ form.username }}</p>
+    <p>{{ form.notes.label }}: {{ form.notes }}</p>
+    <input type="submit" value="Submit">
+</form>
+</body>
+</html>
