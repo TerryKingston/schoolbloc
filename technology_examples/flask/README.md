@@ -8,7 +8,7 @@ a quick example of working in flask
 * http://webserv.vimalloc.com:5000/test
 * http://webserv.vimalloc.com:5000/redirect
 * http://webserv.vimalloc.com:5000/template
-* http://webserv.vimalloc.com:5000/data/<put-anything-here>
+* http://webserv.vimalloc.com:5000/data/put-anything-here
 * http://webserv.vimalloc.com:5000/forms
 * http://webserv.vimalloc.com:5000/exception
 
