@@ -54,6 +54,9 @@ python app.py
 
 Flask
 -----
+To get a beter idea of the basics of flask, checkout the quickstart quide
+* http://flask.pocoo.org/docs/0.10/quickstart/
+
 This is only a small example of what flask can do, but should give a good idea
 about the modular nature of working in the flask framework. Some additional
 feature of flask we will likely take advantage of are:
