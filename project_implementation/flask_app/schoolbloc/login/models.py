@@ -1,4 +1,5 @@
 import logging
+from flask.ext.login import UserMixin
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm.exc import NoResultFound
 from passlib.hash import pbkdf2_sha512
@@ -14,6 +15,10 @@ class RoleError(Exception):
 
 class UserError(Exception):
     pass
+
+
+# TODO: override the login_required decerator so that it accepts role based
+#       rest endpoint protection
 
 
 # TODO somewhere else we will want to create default roles (setup.py or something?)
@@ -42,9 +47,13 @@ class Role(db.Model):
         db.session.commit()
 
 
-# TODO setup flask-login stuff with this object
-class User(db.Model):
-    """ Object for user database fields, as well as flask-login functionality """
+class User(db.Model, UserMixin):
+    """
+    ORM object for users stored in the database.
+
+    This also inherits from UserMixin, which provides every method required
+    for flask login to work.
+    """
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(20), nullable=False, unique=True)
@@ -66,7 +75,7 @@ class User(db.Model):
             db.session.add(self)
             db.session.commit()
             log.info('added new user: {} <{}>'.format(username, role_type))
-        except IntegrityError as e:
+        except IntegrityError:
             db.session.rollback()
             raise UserError('The user {} already exists in the database'.format(username))
 
@@ -78,4 +87,5 @@ class User(db.Model):
         db.session.commit()
 
     def verify_password(self, password):
-        return pbkdf2_sha512.verify(password, self.hashed_passwd)
+        if not pbkdf2_sha512.verify(password, self.hashed_passwd):
+            raise UserError('Password does not validate')

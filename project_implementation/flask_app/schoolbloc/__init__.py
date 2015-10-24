@@ -46,4 +46,6 @@ def page_not_found(e):
 # code organization, not models that can be toggled like the frontend angular
 # modules). All of our code will be in the modules
 from schoolbloc.blueprint.views import mod as blueprint_module
+from schoolbloc.login.views import mod as login_module
 app.register_blueprint(blueprint_module)
+app.register_blueprint(login_module)
