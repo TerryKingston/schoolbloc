@@ -17,7 +17,7 @@ class ExampleUser(db.Model):
     deleting rows, creating relationships between different tables, creating
     indexes on columns, etc.
     """
-    __tablename__ = 'users'
+    __tablename__ = 'example_users'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(40), nullable=False, unique=True)
     phone = db.Column(db.String(10), nullable=True, default=None)
