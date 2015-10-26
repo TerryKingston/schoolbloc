@@ -7,7 +7,7 @@ file will be different, and need to be kept a secret, as it contains
 the secret keys, database passwords, etc.
 """
 DEBUG = True
-CSRF_ENABLED = True
+CSRF_ENABLED = False  # We are using javascript web tokens, which migate csrf attacks
 SECRET_KEY = 'supersecretkeychangeme'
 SQLALCHEMY_DATABASE_URI = 'sqlite:///../schoolbloc.db'
 SESSION_KEY_BITS = 128
