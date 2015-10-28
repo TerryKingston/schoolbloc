@@ -1,5 +1,4 @@
 import logging
-from flask.ext.login import UserMixin
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm.exc import NoResultFound
 from passlib.hash import pbkdf2_sha512
@@ -15,10 +14,6 @@ class RoleError(Exception):
 
 class UserError(Exception):
     pass
-
-
-# TODO: override the login_required decerator so that it accepts role based
-#       rest endpoint protection
 
 
 # TODO somewhere else we will want to create default roles (setup.py or something?)
@@ -47,12 +42,12 @@ class Role(db.Model):
         db.session.commit()
 
 
-class User(db.Model, UserMixin):
+class User(db.Model):
     """
     ORM object for users stored in the database.
 
     This also inherits from UserMixin, which provides every method required
-    for flask login to work.
+    for flask users to work.
     """
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)

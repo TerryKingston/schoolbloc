@@ -1,11 +1,9 @@
 from functools import wraps
 import logging
-from flask import Flask, url_for, redirect
-from flask.ext.jwt import jwt_required, current_identity, JWT
+from flask import Flask, current_app, jsonify
+from flask.ext.jwt import current_identity, JWT, _jwt_required
 from flask.ext.sqlalchemy import SQLAlchemy
 from sqlalchemy.orm.exc import NoResultFound
-
-from schoolbloc.login.models import User
 
 
 # Create a logger to be used
@@ -21,72 +19,92 @@ app.config.from_object('config')
 db = SQLAlchemy(app)
 
 
-# Create the javascript web tokens auth engine
-jwt = JWT(app)
+# Have to import this after db and app have been declared
+from schoolbloc.users.models import User, UserError
 
 
-@jwt.authentication_handler
 def authenticate(username, password):
     """ Login handler for javascript web token """
     try:
         user = User.query.filter_by(username=username).one()
-        if user.verify_password(password):
-            return user
-        else:
-            return None
-    except NoResultFound:
+        user.verify_password(password)
+        return user
+    except (NoResultFound, UserError):
         return None
 
 
-@jwt.identity_handler
 def identity(payload):
     """ Given the jwt payload, return the authenticated user (or None) """
     user_id = payload['identity']
-    return User.get(user_id)
+    return User.query.get(user_id)
 
 
-@jwt_required()
-def auth_required(func, roles=None):
+# Create the javascript web tokens auth engine
+jwt = JWT(app, authenticate, identity)
+
+
+def auth_required(realm=None, roles=None):
     """
-    Decorator that protects restful endpoints based on roles. By default, any
-    user with authorization (a jwt) can access a protected endpoint, but you
-    can change this behavior with the roles key word argument. This can be
-    a single string (which matches the Roles.role_type string in the database),
-    or a list of roles which can be any number of roles in the database.
-
-    Ex:
-    @auth_required()
-    def foo():
-        ...
-
-    @auth_required(roles='students')
-    def foo2():
-        ...
-
-    @auth_required(roles=['teachers', 'admins'])
-    def foo3():
-        ...
+    I had to do some hacking to get this working, as it was complainging about
+    not being in a context if I tried to chain the jwt_required() decorator
+    together with this role based decorator. The end result is this, which just
+    takes the jwt_required decorator, and append my custom role stuff to the
+    end of it. This works fine, but it does mean that if flask-jwt gets updated
+    this may need to change to match.
     """
-    @wraps(func)
-    def wrapper(*args, **kwargs):
-        # Get role of current user. Raise exception if they don't have a jwt
-        current_user_role = current_identity.role.role_type
+    # TODO look into this more and see if I can get this working with chaining
+    #      decorators. Will be better for dependencies in the long run
+    def wrapper(fn):
+        @wraps(fn)
+        def decorator(*args, **kwargs):
+            # The jwt_required decorator functionality
+            _jwt_required(realm or current_app.config['JWT_DEFAULT_REALM'])
 
-        authorized = False
-        if not roles:
-            authorized = True
-        elif isinstance(roles, str):
-            if current_user_role.lower() == roles.lower():
+            # Verify this user has the correct role
+            current_user_role = current_identity.role.role_type
+            authorized = False
+            if not roles:
                 authorized = True
-        elif isinstance(roles, list):
-            if current_user_role.lower() in roles:
-                authorized = True
+            elif isinstance(roles, str):
+                if current_user_role.lower() == roles.lower():
+                    authorized = True
+            elif isinstance(roles, list):
+                if current_user_role.lower() in [r.lower() for r in roles]:
+                    authorized = True
 
-        if authorized:
-            return func(*args, **kwargs)
-        else:
-            return 'fail'  # TODO Use the results from flask-jwt
+            if authorized:
+                return fn(*args, **kwargs)
+            else:
+                return jsonify({
+                    "description": "User does not have permission to access this",
+                    "error": "Forbidden",
+                    "status_code": 403
+                }), 403
+        return decorator
     return wrapper
+
+
+@app.route('/anyone')
+def anyone():
+    return jsonify({'result': 'anyone'})
+
+
+@app.route('/protected1')
+@auth_required()
+def protected1():
+    return jsonify({'result': 'protected, anyone can see'})
+
+
+@app.route('/protected2')
+@auth_required(roles='Admin')
+def protected2():
+    return jsonify({'result': 'protected, only admins can see'})
+
+
+@app.route('/protected3')
+@auth_required(roles=['admin', 'Student'])
+def protected3():
+    return jsonify({'result': 'protected, admins and students can see'})
 
 
 # We can set 404 or 408 error pages here, but perhaps that should be handled by
@@ -106,6 +124,6 @@ def page_not_found(e):
 # code organization, not models that can be toggled like the frontend angular
 # modules). All of our code will be in the modules
 from schoolbloc.blueprint.views import mod as blueprint_module
-from schoolbloc.login.views import mod as login_module
+from schoolbloc.users.views import mod as login_module
 app.register_blueprint(blueprint_module)
 app.register_blueprint(login_module)
