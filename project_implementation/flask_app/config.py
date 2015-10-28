@@ -12,3 +12,4 @@ SECRET_KEY = 'supersecretkeychangeme'
 SQLALCHEMY_DATABASE_URI = 'sqlite:///../schoolbloc.db'
 SESSION_KEY_BITS = 128
 SESSION_SET_TTL = True
+ERROR_404_HELP = False

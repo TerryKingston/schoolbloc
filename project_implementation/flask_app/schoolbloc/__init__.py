@@ -2,6 +2,7 @@ from functools import wraps
 import logging
 from flask import Flask, current_app, jsonify
 from flask.ext.jwt import current_identity, JWT, _jwt_required
+from flask.ext.restful import abort
 from flask.ext.sqlalchemy import SQLAlchemy
 from sqlalchemy.orm.exc import NoResultFound
 
@@ -72,18 +73,14 @@ def auth_required(realm=None, roles=None):
                 if current_user_role.lower() in [r.lower() for r in roles]:
                     authorized = True
 
-            if authorized:
-                return fn(*args, **kwargs)
-            else:
-                return jsonify({
-                    "description": "User does not have permission to access this",
-                    "error": "Forbidden",
-                    "status_code": 403
-                }), 403
+            if not authorized:
+                abort(403, message="Permission denied")
+            return fn(*args, **kwargs)
         return decorator
     return wrapper
 
 
+# These are just examples. Check out the users/views.py for a better example
 @app.route('/anyone')
 def anyone():
     return jsonify({'result': 'anyone'})
@@ -124,6 +121,6 @@ def page_not_found(e):
 # code organization, not models that can be toggled like the frontend angular
 # modules). All of our code will be in the modules
 from schoolbloc.blueprint.views import mod as blueprint_module
-from schoolbloc.users.views import mod as login_module
+from schoolbloc.users.views import mod as user_module
 app.register_blueprint(blueprint_module)
-app.register_blueprint(login_module)
+app.register_blueprint(user_module)
