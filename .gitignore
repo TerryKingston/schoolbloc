@@ -3,3 +3,4 @@
 .idea
 venv/
 schoolbloc.db
+sftp-config.json
