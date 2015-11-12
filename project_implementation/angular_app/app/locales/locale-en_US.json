@@ -1,0 +1,23 @@
+{
+	"sbRoot.LOADING": "Loading, please wait...",
+	"userAuthContainer.INVALID_USERNAME": "Invalid username.",
+	"userAuthContainer.INVALID_PASSWORD": "Invalid password.",
+	"userAuthContainer.INVALID_PASSWORD_RE": "Did not match password.",
+	"userAuthContainer.INVALID_FULLNAME": "Invalid full name.",
+	"userAuthContainer.DUPLICATE_USERNAME": "Username already exists.",
+	"userAuthContainer.NO_USERNAME": "Username does not exist.",
+	"userAuthContainer.BAD_PASSWORD": "Incorrect password",
+	"userAuthContainer.LOGIN": "Login",
+	"userAuthContainer.REGISTER": "Register",
+	"userAuthContainer.LOGIN_LINK": "Login with an existing account",
+	"userAuthContainer.REGISTER_LINK": "Register a new account",
+	"userAuthContainer.USERNAME": "Username",
+	"userAuthContainer.PASSWORD": "Password",
+	"userAuthContainer.PASSWORD_RE": "Re-enter Password",
+	"userAuthContainer.FULL_NAME": "Full Name",
+	"userAuthContainer.SCHOOL_BLOC": "SchoolBloc",
+	"userAuthContainer.ERROR_REQUIRE_LOGIN": "You must log in to use this application.",
+	"userAuthContainer.FORBIDDEN": "You do not have the necessary privileges to view this application.",
+	"userAuthContainer.SERVER_ERROR": "Something went wrong with the request.",
+	"userAuthContainer.AUTH_NOT_SECURE": "This demo website is not secured. Do NOT enter real information. Do NOT enter a username or password that you use for another website."
+}

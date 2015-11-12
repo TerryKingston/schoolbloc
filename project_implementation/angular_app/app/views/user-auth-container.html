@@ -1,0 +1,45 @@
+<section class="user-auth-error-bar" ng-if="userAuthContainer.authenticationError">
+  <p>{{userAuthContainer.authenticationError}}</p>
+</section>
+<header class="user-auth-header">
+  <h1>{{"userAuthContainer.SCHOOL_BLOC" | translate}}</h1>
+</header>
+<div class="block-break"></div>
+
+
+<section class="user-auth-container">
+  <h3 class="user-auth-form-header">{{userAuthContainer.form.text.title}}</h3>
+  <form class="user-auth-form">
+    <section class="user-auth-input" ng-class="{'user-auth-input-error': userAuthContainer.form.errors.usernameError}">
+      <label for="userAuthUsername">{{"userAuthContainer.USERNAME" | translate}}</label>
+      <input type="text" id="userAuthUsername" ng-model="userAuthContainer.form.username" ng-blur="isValidUsername()">
+      <p class="user-auth-input-error-text" ng-if="userAuthContainer.form.errors.usernameError">{{userAuthContainer.form.errors.usernameError}}</p>
+    </section>
+    <!-- FULLNAME -->
+    <section class="user-auth-input" ng-class="{'user-auth-input-error': userAuthContainer.form.errors.fullNameError}" ng-show="!userAuthContainer.form.isLoginForm">
+      <label for="userAuthFullname">{{"userAuthContainer.FULL_NAME" | translate}}</label>
+      <input type="text" id="userAuthFullname" ng-model="userAuthContainer.form.fullName" ng-blur="isValidFullName()">
+      <p class="user-auth-input-error-text" ng-if="userAuthContainer.form.errors.fullNameError">{{userAuthContainer.form.errors.fullNameError}}</p>
+    </section>
+    <!-- PASSWORD -->
+    <section class="user-auth-input" ng-class="{'user-auth-input-error': userAuthContainer.form.errors.passwordError}">
+      <label for="userAuthPassword">{{"userAuthContainer.PASSWORD" | translate}}</label>
+      <input type="password" id="userAuthPassword" ng-model="userAuthContainer.form.password" ng-blur="isValidPassword()">
+      <p class="user-auth-input-error-text" ng-if="userAuthContainer.form.errors.passwordError">{{userAuthContainer.form.errors.passwordError}}</p>
+    </section>
+    <!-- PASSWORD RE -->
+    <section class="user-auth-input" ng-class="{'user-auth-input-error': userAuthContainer.form.errors.passwordReError}" ng-show="!userAuthContainer.form.isLoginForm">
+      <label for="userAuthPasswordRe">{{"userAuthContainer.PASSWORD_RE" | translate}}</label>
+      <input type="password" id="userAuthPasswordRe" ng-model="userAuthContainer.form.passwordRe" ng-blur="isValidPasswordRe()">
+      <p class="user-auth-input-error-text" ng-if="userAuthContainer.form.errors.passwordReError">{{userAuthContainer.form.errors.passwordReError}}</p>
+    </section>
+    <!-- SUBMIT -->
+    <button type="submit" class="btn-recommended btn-full" ng-click="submitForm()">{{userAuthContainer.form.text.submitButton}}</button>
+  </form>
+  <div class="user-auth-switch">
+    <a href="" ng-click="switchForm()">{{userAuthContainer.form.text.switchLink}}</a>
+  </div>
+  <div class="user-auth-note">
+    <p>{{"userAuthContainer.AUTH_NOT_SECURE" | translate}}</p>
+  </div>
+</section>

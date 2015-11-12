@@ -1,0 +1,7 @@
+{
+	"sbRoot.LOADING": "Stay while and listen...",
+	"userAuthContainer.INVALID_USERNAME": "This is not the user you're looking for",
+	"userAuthContainer.INVALID_PASSWORD": "Password: 1234pass",
+	"userAuthContainer.INVALID_PASSWORD_RE": "Try copy and paste",
+	"userAuthContainer.INVALID_FULLNAME": "Give your hero a name"
+}

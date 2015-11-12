@@ -1,0 +1,62 @@
+<!doctype html>
+<html>
+  <head>
+    <base href="/">
+    <meta charset="utf-8">
+    <title>School Bloc</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width">
+    <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
+    <link rel="stylesheet" href="styles/theme-deepblue.css">
+    <link rel="stylesheet" href="styles/test-styles.css">
+  </head>
+  <body ng-app="sbAngularApp" ng-controller="SbRoot">
+    <!-- template initialization is done in this directive -->
+    <sb-sb-root info="sbRoot" view="'admin'"></sb-sb-root>
+
+    <!-- dependencies -->
+    <!-- GENERAL -->
+    <!-- bower:js -->
+    <script src="bower_components/angular/angular.js"></script>
+    <script src="bower_components/angular-translate/angular-translate.js"></script>
+    <script src="bower_components/angular-translate-loader-static-files/angular-translate-loader-static-files.js"></script>
+    <script src="bower_components/angular-cookies/angular-cookies.js"></script>
+    <script src="bower_components/angular-translate-storage-cookie/angular-translate-storage-cookie.js"></script>
+    <script src="bower_components/angular-translate-storage-local/angular-translate-storage-local.js"></script>
+    <script src="bower_components/angular-animate/angular-animate.js"></script>
+    <script src="bower_components/angular-resource/angular-resource.js"></script>
+    <script src="bower_components/angular-route/angular-route.js"></script>
+    <script src="bower_components/angular-sanitize/angular-sanitize.js"></script>
+    <script src="bower_components/angular-touch/angular-touch.js"></script>
+    <script src="bower_components/angular-translate-handler-log/angular-translate-handler-log.js"></script>
+    <!-- endbower -->
+
+    <!-- custom angular -->
+    <!-- build:js({.tmp,app}) scripts/scripts.js -->
+    <script src="scripts/app.js"></script>
+    <!-- controllers -->
+    <script src="scripts/controllers/user-auth-container.controller.js"></script>
+    <script src="scripts/controllers/sb-root.controller.js"></script>
+
+    <!-- services -->
+    <script src="scripts/services/http-interceptor.service.js"></script>
+    <script src="scripts/services/user-auth.service.js"></script>
+    <script src="scripts/services/locale.service.js"></script>
+    <script src="scripts/services/globals.service.js"></script>
+
+    <!-- directives -->
+    <!-- @TODO: remove later -->
+    <!-- <script src="scripts/directives/language-select.directive.js"></script> -->
+    <!-- endbuild -->
+    <!-- END: GENERAL -->
+
+    <!-- LOGGED-IN ADMIN SPECIFIC -->
+    <!-- controllers -->
+    <script src="scripts/controllers/admin-home-container.controller.js"></script>
+
+    <!-- services -->
+    <script src="scripts/services/common.service.js"></script>
+    
+    <!-- END: LOGGED-IN ADMIN SPECIFIC -->
+</body>
+</html>

@@ -1,0 +1,193 @@
+// bower:scss
+// endbower
+// basic default style for all generalized content on the web app
+@import url(http://fonts.googleapis.com/css?family=Open+Sans:400italic,400,700); 
+@charset "UTF-8";
+
+// fonts
+$default-font: 'Open Sans', sans-serif;
+$default-font-size: 12px;
+
+// colors
+$text-black: #333;
+$alert-red: #F13E01;
+$note-gray: #999;
+$recommend-blue: #36A5E7;
+
+
+/* Meyere's CSS reset
+  CITE: http://meyerweb.com/eric/tools/css/reset/ */
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center, dl, dt, dd, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed, 
+figure, figcaption, footer, header, hgroup, 
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  vertical-align: baseline;
+  font-family: $default-font;
+  color: $text-black;
+  font-size:$default-font-size;
+}
+/* HTML5 display-role reset for older browsers */
+article, aside, details, figcaption, figure, 
+footer, header, hgroup, menu, nav, section {
+  display: block;
+}
+body {
+  line-height: 1;
+}
+ul {
+  /* list-style:none; */
+}
+blockquote, q {
+  quotes: none;
+}
+blockquote:before, blockquote:after,
+q:before, q:after {
+  content: '';
+  content: none;
+}
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+a {
+  outline:none;
+}
+a:link {text-decoration: none}
+a:visited {text-decoration: none}
+a:active {text-decoration: none}
+a:hover {text-decoration: none;}
+/* END: Meyere's CSS reset */
+
+/* Personal preferences for defaults */
+button {
+  outline: none;
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+}
+
+textarea {
+  font-family: $default-font;
+  color: $text-black;
+  font-size:$default-font-size;
+  padding: 5px;
+  outline: none;
+}
+/* END: Personal preferences for defaults */
+
+// NOTE TO DEVELOPERS
+// classes and ids should be named with - and possibly _, but not camelCase.
+// do not directly alter an element like p, div, h1, etc, but try to always alter a class; unless you are guaranteeing that the style will be default across the entire site.
+
+/* User Authorization */
+.user-auth-error-bar {
+  width: 100%;
+  background-color: $alert-red;
+}
+
+.user-auth-error-bar p {
+  text-align:center;
+  padding: 15px;
+  font-size: 16px;
+  color: #FFF;
+}
+
+.user-auth-container {
+  width: 240px;
+  margin: 20px auto 0px auto;
+  padding: 20px;
+}
+
+.user-auth-header {
+  text-align: center;
+}
+
+.user-auth-header h1 {
+  font-size: 50px;
+  line-height: 80px;
+}
+
+.user-auth-header h2 {
+  font-size: 18px;
+  line-height: 24px;
+}
+
+.user-auth-form-header {
+  font-size: 24px;
+  margin-bottom: 20px;
+  line-height: 36px;
+}
+
+.user-auth-form label {
+  display: block;
+  margin-bottom: 7px;
+  font-size: 16px;
+}
+
+.user-auth-form input, .user-auth-form select {
+  width: 100%;
+  font-size: 16px;
+  height: 30px;
+  box-sizing: border-box;
+  border: solid $note-gray 1px;
+  padding: 0 5px;
+}
+
+.user-auth-input {
+  margin-bottom: 20px;
+}
+
+.user-auth-input-error input {
+  border: solid $alert-red 2px;
+}
+
+.user-auth-input-error .user-auth-input-error-text {
+  line-height: 28px;
+  font-size: 14px;
+  padding-left: 10px;
+  background-color: $alert-red;
+  color: #FFF;
+}
+
+.user-auth-switch {
+  margin-top: 10px;
+  text-align: right;
+}
+
+.user-auth-switch a {
+  color: $recommend-blue;
+  font-size: 14px;
+}
+
+.user-auth-switch a:hover {
+  text-decoration: underline;
+}
+
+.user-auth-note {
+  line-height: 20px;
+  margin-top: 20px;
+  text-align: justify;
+}
+/* END: User Authorization */
+
+/* root */
+.root-page-loading {
+  font-size: 24px;
+  text-align: center;
+  margin-top: 100px;
+  color: $recommend-blue;
+}
+/* END root */

@@ -1,0 +1,23 @@
+<!-- Loading of the app -->
+<div class="root-page-loading" ng-if="sbRoot.initialLoading">
+  {{"sbRoot.LOADING" | translate}}
+</div>
+
+<div ng-if="!sbRoot.initialLoading">
+  <!-- Main Page -->
+  <div ng-if="sbRoot.user.authenticated">
+    <div class="admin-home-container-wrapper">
+      <div ng-controller="AdminHomeContainer">
+        <sb-admin-home-container></sb-admin-home-container>
+      </div>
+    </div>
+  </div>
+
+  <!-- Login Page -->
+  <div ng-if="!sbRoot.user.authenticated">
+    <div ng-controller="UserAuthContainer">
+      <sb-user-auth-container info="sbRoot.userAuthContainer"></sb-user-auth-container>
+    </div>
+  </div>
+</div>
+
