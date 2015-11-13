@@ -47,7 +47,7 @@ if __name__ == '__main__':
 	# make sure valid teachers, rooms, courses, and times are assigned
 	# example data below, this data should represent DB object ids
 	teacher_ids = [1, 2, 3, 4, 5, 6, 7]
-	student_ids = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
+	student_ids = range(1, 50)
 	room_ids = [100, 105, 110, 115, 200, 205, 210, 215]
 	course_ids = [1100, 3100, 2010, 2000, 2005, 2200]
 	time_ids = [850, 910, 1025, 1345, 1415, 1455]
@@ -61,7 +61,10 @@ if __name__ == '__main__':
 								 Or([ time(i) == t_id for t_id in time_ids ]))
 					 for i in range(CLASS_COUNT)]
 
-	
+	# make sure valid student IDs are selected
+	x1 = Int('x1')
+	mod_c += [ ForAll(x1, Or([ students(i)[x1] == j for j in student_ids ]) ) for i in range(CLASS_COUNT) ]
+
 	# now make sure two classes aren't in the same room at the same time
 	mod_c += [ If( And( i != j, room(i) == room(j)), 
 							Not( time(i) == time(j) ), # then
@@ -81,6 +84,12 @@ if __name__ == '__main__':
 	# every course must be represented
 	mod_c += [ Or([course(j) == i for j in range(CLASS_COUNT)]) for i in course_ids ]
 
+	# a student can't be in two classes at the same time
+	x2 = Int('x2')
+	x3 = Int('x3')
+	mod_c += [ If ( And( i != j, time(i) == time(j) ), 
+								ForAll([x2, x3], students(i)[x2] != students(j)[x3]), True ) 
+						 for i in range(CLASS_COUNT) for j in range(CLASS_COUNT) ]
 	
 
 	# lets try user defined constraints!
@@ -93,15 +102,22 @@ if __name__ == '__main__':
 	mod_c += [ If( teacher(i) == 5, time(i) > 1200, True ) 
 						 for i in range(CLASS_COUNT) for j in range(CLASS_COUNT) ]
 
-	# course 2000 has min and max class size of 20 and 34 respectively
-	mod_c += [ If( course(i) == 2000, Distinct([ students(i)[j] for j in range(20)]), True) 
+	# course 2000 has min and max class size of 10 and 34 respectively
+	mod_c += [ If( course(i) == 2000, Distinct([ students(i)[j] for j in range(10)]), True) 
 						 for i in range(CLASS_COUNT)]
 
-
+	mod_c += [ If( course(i) == 2000, Not(Distinct([ students(i)[j] for j in range(14)])), True) 
+						 for i in range(CLASS_COUNT)]
+	
 
 	s = Solver()
 	s.add(dist_c + mod_c)
 	if s.check() == sat:
-		print s.model()
+		m = s.model()
+		print m
+		# for i in range(CLASS_COUNT):
+		# 	if str(m.evaluate(course(i))) == '2000':
+		# 		for j in range(20):
+		# 			print m.evaluate(students(i)[j])
 	else:
 		print "No Solution!"
