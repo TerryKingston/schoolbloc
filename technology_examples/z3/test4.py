@@ -108,15 +108,45 @@ if __name__ == '__main__':
 
 	mod_c += [ If( course(i) == 2000, Not(Distinct([ students(i)[j] for j in range(14)])), True) 
 						 for i in range(CLASS_COUNT)]
+
+	# there must be at least two classes with course 2000
+	mod_c += [ Or([ And([ i != j, course(i) == 2000, course(j) == 2000 ]) 
+					 			for i in range(CLASS_COUNT) for j in range(CLASS_COUNT)]) ]
+
+	# course 2000 is required for student group 1
+	# list of student IDs in student group 1
+	student_group_1 = [2, 5, 7, 8, 12, 23, 26, 28, 29, 30, 41, 44, 45]
+	x4 = Int('x4')
+	mod_c += [ Or([ And([ course(i) == 2000, students(i)[j] == s_id]) 
+											  for i in range(CLASS_COUNT) for s_id in student_group_1 ]) ]
+
+	# mod_c += [ If( course(i) == 2000, And([ Or([ students(i)[j] == s_id for s_id in student_group_1 ]) 
+	# 																				for j in range(20)]), True)
+	# 					 for i in range(CLASS_COUNT)]
 	
 
 	s = Solver()
 	s.add(dist_c + mod_c)
 	if s.check() == sat:
 		m = s.model()
-		print m
+		for i in range(CLASS_COUNT):
+			print "Class ", i, \
+						": teacher = ", m.evaluate(teacher(i)), \
+						" room =", m.evaluate(room(i)), \
+						" course =", m.evaluate(course(i)), \
+						" time =", m.evaluate(time(i)) 
+			# now print the student list. we'll collect students until we get a repeat value
+			j = 0
+			s_list = []
+			while int(str(m.evaluate(students(i)[j]))) not in s_list:
+				s_list += [ int(str(m.evaluate(students(i)[j]))) ]
+				j += 1
+				
+			print "Students: ", s_list, "\n"
+		# print m
 		# for i in range(CLASS_COUNT):
 		# 	if str(m.evaluate(course(i))) == '2000':
+		# 		print "Class ", i
 		# 		for j in range(20):
 		# 			print m.evaluate(students(i)[j])
 	else:
