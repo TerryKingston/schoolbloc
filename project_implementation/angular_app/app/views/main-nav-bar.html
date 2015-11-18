@@ -1,0 +1,25 @@
+<section class="main-nav-bar" ng-style="mainNavBar.navBarStyle">
+  <div class="main-nav-bar-open" ng-show="mainNavBar.isOpen">
+    <section class="main-nav-bar-header">
+      <div class="close-icon" ng-click="toggleNavBar(false)"></div>
+      <div class="sb-logo"></div>
+    </section>
+    <section class="main-nav-bar-profile" ng-click="toggleProfileSettings()">
+      <div class="down-arrow-icon"></div>
+      <h4>!!Test User!!</h4>
+      <h5>!!Signed in as Admin!!</h5>
+    </section>
+    <section class="main-nav-bar-main-controls">
+      <a href=""><div class="main-control dashboard-control">{{"mainNavBar.MAIN_DASHBOARD" | translate}}</div></a>
+      <a href=""><div class="main-control">{{"mainNavBar.IMPORT_EXPORT" | translate}}</div></a>
+    </section>
+    <section class="main-nav-bar-module-controls">
+      <h3>{{"mainNavBar.MODULES" | translate}}</h3>
+      <a href=""><div class="main-control main-control-active">{{"mainNavBar.SCHEDULER" | translate}}</div></a>
+      <a href=""><div class="sub-control sub-control-active">{{"mainNavBar.FACTS_CONSTRAINTS" | translate}}</div></a>
+    </section>
+  </div>
+  <div class="main-nav-bar-closed" ng-show="!mainNavBar.isOpen">
+    <div class="hamburger-icon" ng-click="toggleNavBar(true)"></div>
+  </div>
+</section>

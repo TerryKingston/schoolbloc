@@ -2,33 +2,30 @@
 
 /**
  * @ngdoc function
- * @name sbAngularApp.controller:AdminHomeContainer
+ * @name sbAngularApp.controller:SuggestionList
  * @description
  *
+ * USE:
+ * <sb-suggestion-list config="configObject"></sb-suggestion-list>
+ *
+ * configObject = {
+ *   
+ * }
  * 
- * # AdminHomeContainer
+ * # SuggestionList
  * Controller of the sbAngularApp
  */
 angular.module('sbAngularApp')
-.controller('AdminHomeContainer', ['$scope', function($scope) {
+.controller('SuggestionList', ['$scope', function($scope) {
 	this.components = [
 		'HTML5 Boilerplate',
 		'AngularJS',
 		'Karma'
 	];
-	$scope.adminHomeContainer = {
-		viewHeaderConfig: {
-			title: "!!TITLE!!!",
-			subTitle: "!!TEST!!",
-			link: {
-				text: "!!TEST2!!",
-				action: null
-			}
-		}
-	};
+
 
 }])
-.directive('sbAdminHomeContainer', [function() {
+.directive('sbSuggestionList', ['$translate', function($translate) {
 	/**
 	 * For manipulating the DOM
 	 * @param  scope   as configured in the controller
@@ -41,13 +38,16 @@ angular.module('sbAngularApp')
 
 	/**
 	 * restrict: directive is triggered by element (E) name
-	 * scope: isolated scope to $scope.adminHomeContainer only
+	 * scope: isolated scope to $scope.suggestionList only
 	 * templateUrl: where we find the template.html
 	 * link: for manipulating the DOM
 	 */
 	return {
 		restrict: 'E',
-		templateUrl: 'views/admin-home-container.html',
+		scope: {
+			config: '=config'
+		},
+		templateUrl: 'views/suggestion-list.html',
 		link: link
 	};
 }]);

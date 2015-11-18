@@ -1,0 +1,76 @@
+<sb-view-header config="schedulerModule.viewHeaderConfig"></sb-view-header>
+<section class="scheduler-container main-view-content">
+  <sb-suggestion-list config="schedulerModule.suggestionListConfig"></sb-suggestion-list>
+  <!-- @TODO: make a directive for this nonsense... -->
+  <div class="header-input-row">
+    <label>
+      <div>{{"schedulerModule.VIEWING" | translate}}</div>
+      <input type="text">
+    </label>
+  </div>
+  <div class="add-fact-form">
+    <h4>{{"schedulerModule.ADDING_COURSE" | translate}}</h4>
+    <section class="view-sub-content">
+      <div class="input-row">
+        <label>
+          <div>{{"schedulerModule.COURSE_NAME" | translate}}<div class="required">*</div></div>
+          <input type="text">
+        </label>
+      </div>
+      <div class="input-row">
+        <label>
+          <div>{{"schedulerModule.TERM" | translate}}<div class="required">*</div></div>
+          <input type="text">
+        </label>
+      </div>
+      <div class="input-row">
+        <label>
+          <div>{{"schedulerModule.SIZE" | translate}}<div></div></div>
+          <input type="text">
+        </label>
+        <button class="circle-btn circle-btn-add"></button>
+      </div>
+      <div class="input-row">
+        <label>
+          <div>{{"schedulerModule.TIME" | translate}}<div></div></div>
+          <input type="text">
+        </label>
+        <button class="circle-btn circle-btn-add"></button>
+      </div>
+      <div class="input-row">
+        <label>
+          <div>{{"schedulerModule.SUBJECT" | translate}}<div></div></div>
+          <input type="text">
+        </label>
+        <button class="circle-btn circle-btn-add"></button>
+      </div>
+      <div class="input-row">
+        <label>
+          <div>{{"schedulerModule.TEACHER" | translate}}<div></div></div>
+          <input type="text">
+        </label>
+        <button class="circle-btn circle-btn-add"></button>
+      </div>
+      <div class="input-row">
+        <label>
+          <div>{{"schedulerModule.CLASSROOM" | translate}}<div></div></div>
+          <input type="text">
+        </label>
+        <button class="circle-btn circle-btn-add"></button>
+      </div>
+      <div class="icon-option-row">
+        <a href="">
+          <div class="calendar-icon"></div>
+          <div>{{"schedulerModule.SET_REPEAT" | translate}}</div>
+        </a>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-recommended">{{"schedulerModule.SAVE" | translate}}</button>
+        <button class="btn btn-recommended">{{"schedulerModule.SAVE_ANOTHER" | translate}}</button>
+        <button class="btn btn-secondary">{{"schedulerModule.CANCEL" | translate}}</button>
+      </div>
+    </section>
+  </div>
+  <!-- @TODO: make a directive for the table -->
+  <!-- @TODO: figure out angular way to deal with tables -->
+</section>

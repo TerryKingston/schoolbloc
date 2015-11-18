@@ -1,2 +1,6 @@
 /* For testing styles that you don't have time for compass to compile */
 /* NOTE: all styles on here should be transferred to a .scss file ASAP */
+
+.main-nav-bar {
+    height: 100px;
+}

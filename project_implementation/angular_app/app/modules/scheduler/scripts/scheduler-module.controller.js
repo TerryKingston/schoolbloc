@@ -2,33 +2,33 @@
 
 /**
  * @ngdoc function
- * @name sbAngularApp.controller:AdminHomeContainer
+ * @name sbAngularApp.controller:SchedulerModule
  * @description
  *
  * 
- * # AdminHomeContainer
+ * # SchedulerModule
  * Controller of the sbAngularApp
  */
 angular.module('sbAngularApp')
-.controller('AdminHomeContainer', ['$scope', function($scope) {
+.controller('SchedulerModule', ['$scope', function($scope) {
 	this.components = [
 		'HTML5 Boilerplate',
 		'AngularJS',
 		'Karma'
 	];
-	$scope.adminHomeContainer = {
+	$scope.schedulerModule = {
 		viewHeaderConfig: {
-			title: "!!TITLE!!!",
-			subTitle: "!!TEST!!",
+			title: "schedulerModule.TITLE",
+			subTitle: "schedulerModule.SUBTITLE",
 			link: {
-				text: "!!TEST2!!",
+				text: "schedulerModule.SUBTITLE_ACTION",
 				action: null
 			}
 		}
 	};
 
 }])
-.directive('sbAdminHomeContainer', [function() {
+.directive('sbSchedulerModule', [function() {
 	/**
 	 * For manipulating the DOM
 	 * @param  scope   as configured in the controller
@@ -36,18 +36,17 @@ angular.module('sbAngularApp')
 	 * @param  attrs   hash object with key-value pairs of normalized attribute names and their corresponding attribute values.
 	 */
 	function link(scope, element, attrs) {
-		
 	}
 
 	/**
 	 * restrict: directive is triggered by element (E) name
-	 * scope: isolated scope to $scope.adminHomeContainer only
+	 * scope: isolated scope to $scope.schedulerModule only
 	 * templateUrl: where we find the template.html
 	 * link: for manipulating the DOM
 	 */
 	return {
 		restrict: 'E',
-		templateUrl: 'views/admin-home-container.html',
+		templateUrl: 'modules/scheduler/views/scheduler-module.html',
 		link: link
 	};
 }]);

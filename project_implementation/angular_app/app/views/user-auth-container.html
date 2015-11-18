@@ -2,7 +2,12 @@
   <p>{{userAuthContainer.authenticationError}}</p>
 </section>
 <header class="user-auth-header">
-  <h1>{{"userAuthContainer.SCHOOL_BLOC" | translate}}</h1>
+  <div class="logo"></div>
+  <!-- <h1>{{"userAuthContainer.SCHOOL_BLOC" | translate}}</h1> -->
+  <div class="user-auth-sub-header">
+    <h2>{{"userAuthContainer.VANGUARD" | translate}}</h2>
+    <h4>{{"userAuthContainer.LOGIN_INSTRUCTIONS" | translate}}&nbsp;&nbsp;<span class="user-auth-switch"><a href="" ng-click="switchForm()">{{userAuthContainer.form.text.switchLink}}</a></span></h4>
+  </div>
 </header>
 <div class="block-break"></div>
 
@@ -21,6 +26,34 @@
       <input type="text" id="userAuthFullname" ng-model="userAuthContainer.form.fullName" ng-blur="isValidFullName()">
       <p class="user-auth-input-error-text" ng-if="userAuthContainer.form.errors.fullNameError">{{userAuthContainer.form.errors.fullNameError}}</p>
     </section>
+    <!-- BIRTHDATE -->
+    <section class="user-auth-input" ng-class="{'user-auth-input-error': userAuthContainer.form.errors.birthDateError}" ng-show="!userAuthContainer.form.isLoginForm">
+      <label for="userAuthBirthDate">{{"userAuthContainer.BIRTH_DATE" | translate}}</label>
+      <input type="text" id="userAuthBirthDate" ng-model="userAuthContainer.form.birthDate" ng-blur="isValidBirthDate()">
+      <p class="user-auth-input-error-text" ng-if="userAuthContainer.form.errors.birthDateError">{{userAuthContainer.form.errors.birthDateError}}</p>
+    </section>
+    <!-- GENDER -->
+    <section class="user-auth-input" ng-class="{'user-auth-input-error': userAuthContainer.form.errors.genderError}" ng-show="!userAuthContainer.form.isLoginForm">
+      <label for="userAuthGender">{{"userAuthContainer.GENDER" | translate}}</label>
+      <select id="userAuthGender" ng-model="userAuthContainer.form.gender" ng-blur="isValidGender()">
+        <option value="male">{{"userAuthContainer.SELECT_MALE" | translate}}</option>
+        <option value="female">{{"userAuthContainer.SELECT_FEMALE" | translate}}</option>
+        <option value="other">{{"userAuthContainer.SELECT_OTHER" | translate}}</option>
+      </select>
+      <p class="user-auth-input-error-text" ng-if="userAuthContainer.form.errors.genderError">{{userAuthContainer.form.errors.genderError}}</p>
+    </section>
+    <!-- STUDENT ID -->
+    <section class="user-auth-input" ng-class="{'user-auth-input-error': userAuthContainer.form.errors.idError}" ng-show="!userAuthContainer.form.isLoginForm">
+      <label for="userAuthId">{{"userAuthContainer.ID" | translate}}</label>
+      <input type="text" id="userAuthId" ng-model="userAuthContainer.form.id" ng-blur="isValidId()">
+      <p class="user-auth-input-error-text" ng-if="userAuthContainer.form.errors.idError">{{userAuthContainer.form.errors.idError}}</p>
+    </section>
+    <!-- EMAIL -->
+    <section class="user-auth-input" ng-class="{'user-auth-input-error': userAuthContainer.form.errors.emailError}" ng-show="!userAuthContainer.form.isLoginForm">
+      <label for="userAuthEmail">{{"userAuthContainer.EMAIL" | translate}}</label>
+      <input type="text" id="userAuthEmail" ng-model="userAuthContainer.form.id" ng-blur="isValidEmail()">
+      <p class="user-auth-input-error-text" ng-if="userAuthContainer.form.errors.emailError">{{userAuthContainer.form.errors.emailError}}</p>
+    </section>
     <!-- PASSWORD -->
     <section class="user-auth-input" ng-class="{'user-auth-input-error': userAuthContainer.form.errors.passwordError}">
       <label for="userAuthPassword">{{"userAuthContainer.PASSWORD" | translate}}</label>
@@ -34,11 +67,8 @@
       <p class="user-auth-input-error-text" ng-if="userAuthContainer.form.errors.passwordReError">{{userAuthContainer.form.errors.passwordReError}}</p>
     </section>
     <!-- SUBMIT -->
-    <button type="submit" class="btn-recommended btn-full" ng-click="submitForm()">{{userAuthContainer.form.text.submitButton}}</button>
+    <button type="submit" class="btn btn-recommended" ng-click="submitForm()">{{userAuthContainer.form.text.submitButton}}</button>
   </form>
-  <div class="user-auth-switch">
-    <a href="" ng-click="switchForm()">{{userAuthContainer.form.text.switchLink}}</a>
-  </div>
   <div class="user-auth-note">
     <p>{{"userAuthContainer.AUTH_NOT_SECURE" | translate}}</p>
   </div>

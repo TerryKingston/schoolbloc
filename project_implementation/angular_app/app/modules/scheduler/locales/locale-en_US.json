@@ -1,0 +1,18 @@
+{
+	"schedulerModule.TITLE": "Scheduler - Admin View",
+	"schedulerModule.SUBTITLE": "Vieweing the facts & constraints for {0} Term.",
+	"schedulerModule.SUBTITLE_ACTION": "Change Term",
+	"schedulerModule.VIEWING": "You are viewing:",
+	"schedulerModule.ADDING_COURSE": "Adding a course",
+	"schedulerModule.COURSE_NAME": "Course name",
+	"schedulerModule.TERM": "Term",
+	"schedulerModule.SIZE": "Size",
+	"schedulerModule.TIME": "Time",
+	"schedulerModule.SUBJECT": "Subject",
+	"schedulerModule.TEACHER": "Teacher",
+	"schedulerModule.CLASSROOM": "Classroom",
+	"schedulerModule.SET_REPEAT": "Change term or set repeat",
+	"schedulerModule.SAVE": "Save",
+	"schedulerModule.SAVE_ANOTHER": "Save & Add Another",
+	"schedulerModule.CANCEL": "Cancel"
+}
