@@ -138,13 +138,79 @@ if __name__ == '__main__':
 	# mod_c += [ Or([ And([ i != j, course(i) == 2000, course(j) == 2000 ]) 
 	# 				 			for i in range(CLASS_COUNT) for j in range(CLASS_COUNT)]) ]
 
+
+	# (define-sort Elt () Int)
+	# (define-sort Set () (Array Elt Bool))
+	# Elt = DeclareSort('Elt')
+	# Set = DeclareSort('Set')
+
+	# # (define-fun smt_set_emp () Set ((as const Set) false))
+	# def emp():
+	# 	return Set()
+
+	# # (define-fun smt_set_mem ((x Elt) (s Set)) Bool (select s x))
+	# def mem(set1, elem):
+	# 	return Select(set1, i)
+
+	# # (define-fun smt_set_add ((s Set) (x Elt)) Set  (store s x true))
+	# def add(set1, elem):
+	# 	return Store(set1, elem, True)
+
+	# # (define-fun smt_set_cap ((s1 Set) (s2 Set)) Set ((_ map and) s1 s2))
+	# def cap(set1, set2):
+	# 	return Map(And, set1, set2)
+
+	# # (define-fun smt_set_cup ((s1 Set) (s2 Set)) Set ((_ map or) s1 s2))
+	# def cup(set1, set2):
+	# 	return Map(Or, set1, set2)
+
+	# # (define-fun smt_set_com ((s Set)) Set ((_ map not) s))
+	# def com(set1):
+	# 	return Map(Not, set1)
+
+	# # (define-fun smt_set_dif ((s1 Set) (s2 Set)) Set (smt_set_cap s1 (smt_set_com s2)))
+	# def dif(set1, set2):
+	# 	return cap(set1, com(set2))
+
+	# # (define-fun smt_set_sub ((s1 Set) (s2 Set)) Bool (= smt_set_emp (smt_set_dif s1 s2)))
+	# def sub(set1, set2):
+	# 	return emp == dif(set1, set2)
+
+	# a = Array('a', IntSort(), IntSort())
+	# b = Array('b', IntSort(), IntSort())
+
+	# mod_c += [ And(a[1] == 1, b[2] == 2) ]
+	# mod_c += [ dif(a, b) == emp() ]
+
 	# course 2000 is required for student group 1
 	# list of student IDs in student group 1
 	student_grp = [2, 5, 7, 8, 12, 23, 26, 28, 29, 30, 41, 44, 45]
-	
-	mod_c += [ And([ Or([ And(course(i) == 2000, students(i)[Int("x_%s_%s" %(i, s_id))] == s_id)
-			   for i in range(CLASS_COUNT) ]) for s_id in student_grp]) ]
+	# s_inds = [ Int("s_ind_%s" % (i+1)) for i in range(len(student_grp)) ]
+	i1 = Int('i1')
+	i2 = Int('i2')
+	i3 = Int('i3')
 
+	mod_c += [ And(i1 >= 0, i1 <= 10, i2 >= 0, i2 <= 10, i3 >= 0, i3 <= 10 ) ]
+
+	# mod_c += [ And(course(0) == 3100, students(0)[i1] == 2) ]
+	
+	mod_c += [ Or([ And(course(i) == 3100, students(i)[i1] == 2) for i in range(CLASS_COUNT) ]) ]
+
+	# mod_c += [ Or([ And(course(i) == 3100, students(i)[i2] == 5) 
+	# 			for i in range(CLASS_COUNT) ]) ]
+
+	# mod_c += [ Or([ And(course(i) == 3100, students(i)[i3] == 7) 
+	# 			for i in range(CLASS_COUNT) ]) ]
+
+	# mod_c += [ Or([ And(course(i) == 3100, students(i)[3] == 44) for i in range(CLASS_COUNT) ]) ]
+
+	# mod_c += [ Or([ And(course(i) == 3100, And(students(i)[0] == 45) 
+	# 			for i in range(CLASS_COUNT)]) ]
+	
+
+	# mod_c += [ And([ Or([ And(course(i) == 2000, students(i)[Int("x_%s_%s" %(i, s_id))] == s_id)
+	# 		   for i in range(CLASS_COUNT) ]) for s_id in student_grp]) ]
+	
 
 	
 
@@ -152,6 +218,9 @@ if __name__ == '__main__':
 	s.add(dist_c + mod_c)
 	if s.check() == sat:
 		m = s.model()
+		print "i1: ", m.evaluate(i1)
+		print "i2: ", m.evaluate(i3)
+		print "i3: ", m.evaluate(i2)
 		for i in range(CLASS_COUNT):
 			print "Class ", i, \
 						": teacher = ", m.evaluate(teacher(i)), \
@@ -166,6 +235,7 @@ if __name__ == '__main__':
 				j += 1
 				
 			print "Students: ", s_list, "\n"
+			print [ m.evaluate(students(i)[k]) for k in range(15) ]
 		# print m
 		# for i in range(CLASS_COUNT):
 		# 	if str(m.evaluate(course(i))) == '2000':
