@@ -41,3 +41,18 @@ class Classroom(db.Model):
 	def delete(self):
 		db.session.delete(self)
 		db.session.commit()
+
+class ClassroomsTeacher(db.Model):
+	"""
+	ORM object for linking table between classrooms and teachers tables
+
+	A ClassroomsTeacher describes the relationship constraints 
+	between a classroom and a teacher for the scheduler. 
+
+	The actual assignment of a classroom to a teacher happens in 
+	the Class object.
+	"""
+
+	__tablename__ = 'classrooms_teachers'
+	id = db.Column(db.Integer, primary_key=True)
+	
