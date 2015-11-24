@@ -115,8 +115,8 @@ class ScheduleGenerator:
                   range(CLASS_COUNT)]
 
         # every course must be represented
-        mod_c += [Or([course(j) == i for j in range(CLASS_COUNT)]) for i in
-                  course_ids]
+        # mod_c += [Or([course(j) == i for j in range(CLASS_COUNT)]) for i in
+        #           course_ids]
 
         # a student can't be in two classes at the same time
         x2 = Int('x2')
