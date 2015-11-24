@@ -2,14 +2,14 @@ import logging
 from flask import Blueprint
 from flask.ext.jwt import current_identity
 from schoolbloc import auth_required
-from schoolbloc.users.models import User, UserError
-from flask.ext.restful import Api, Resource, abort
+from schoolbloc.users.models import User, UserError, RoleError
+from flask.ext.restful import Api, Resource, abort, reqparse
 
 # Setup logger
 log = logging.getLogger(__name__)
 
 # Blueprint and restful settings
-mod = Blueprint('user', __name__, template_folder='templates')
+mod = Blueprint('user', __name__)
 api = Api(mod)
 
 
@@ -34,22 +34,49 @@ def get_user_or_abort(user_id):
 
 class UserApi(Resource):
     """ Get/modify/delete a specific user """
+
     @auth_required()
     def get(self, user_id):
         """ Get info on a User """
-        # TODO create serialize method or see if sqlalchemy can automatically jsonify this
         user = get_user_or_abort(user_id)
-        ret = {
-            'id': user.id,
-            'username': user.username,
-            'role': user.role.role_type
-        }
-        return ret
+        return user.jsonify()
 
     @auth_required()
     def put(self, user_id):
-        """ Update settings of a User (password, address, email, etc) """
+        """
+        Update settings of a User (password, address, email, etc)
+
+        Any user can update their own settings, and admins can update any users
+        settings
+        """
+        # Optional data
+        parser = reqparse.RequestParser()
+        parser.add_argument('username')
+        parser.add_argument('password')
+        parser.add_argument('role')
+
+        # Parse data from incoming request
+        args = parser.parse_args()
+        username = args.get('username')
+        password = args.get('password')
+        role_name = args.get('role')
+
+        # Update user information
         user = get_user_or_abort(user_id)
+        try:
+            if username:
+                user.update_username(username)
+            if password:
+                user.update_password(password)
+            if role_name:
+                user.update_role(role_name)
+        except UserError:
+            abort(409, message="A user with that name already exists")
+        except RoleError:
+            abort(404, message="Role not found")
+
+        # TODO find out what ryan wants for successful return data here
+        return {'success': 'user updated successfully'}, 200
 
     @auth_required(roles=['admin'])
     def delete(self, user_id):
