@@ -88,32 +88,37 @@ class User(db.Model):
         if not pbkdf2_sha512.verify(password, self.hashed_passwd):
             raise UserError('Password does not validate')
 
-    def update_password(self, new_password):
+    def update_password(self, new_password, commit=True):
         """ Updates the password of this user """
         self.hashed_passwd = pbkdf2_sha512.encrypt(new_password, rounds=200000, salt_size=16)
-        db.session.add(self)
-        db.session.commit()
+        if commit:
+            db.session.add(self)
+            db.session.commit()
 
-    def update_role(self, new_role):
+    def update_role(self, new_role, commit=True):
         """ Updates the role of this user """
         try:
             role = Role.query.filter_by(role_type=new_role).one()
         except NoResultFound:
             raise RoleError('The role {} does not exist'.format(role_type))
-
         self.role_id = role.id
-        db.session.add(self)
-        db.session.commit()
 
-    def update_username(self, new_username):
-        """ Updates the username of this user """
-        self.username = new_username
-        try:
+        if commit:
             db.session.add(self)
             db.session.commit()
-        except IntegrityError:  # new username already exists on the system
-            db.session.rollback()
-            raise UserError('The user {} already exists in the database'.format(new_username))
+
+    def update_username(self, new_username, commit=True):
+        """ Updates the username of this user """
+        self.username = new_username
+
+        if commit:
+            try:
+                db.session.add(self)
+                db.session.commit()
+            except IntegrityError:  # new username already exists on the system
+                db.session.rollback()
+                raise UserError('The user {} already exists in the database'
+                                .format(new_username))
 
     def jsonify(self):
         """ Serialize by converting this object to json """

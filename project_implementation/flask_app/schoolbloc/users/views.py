@@ -1,7 +1,9 @@
 import logging
 from flask import Blueprint
 from flask.ext.jwt import current_identity
-from schoolbloc import auth_required
+from sqlalchemy.exc import IntegrityError
+
+from schoolbloc import auth_required, db
 from schoolbloc.users.models import User, UserError, RoleError
 from flask.ext.restful import Api, Resource, abort, reqparse
 
@@ -61,19 +63,22 @@ class UserApi(Resource):
         password = args.get('password')
         role_name = args.get('role')
 
-        # Update user information
+        # Update user information and save it to the db. Don't commit the changes
+        # until the end, so that if one thing fails this entire request fails
         user = get_user_or_abort(user_id)
         try:
             if username:
-                user.update_username(username)
+                user.update_username(username, commit=False)
             if password:
-                user.update_password(password)
+                user.update_password(password, commit=False)
             if role_name:
-                user.update_role(role_name)
-        except UserError:
-            abort(409, message="A user with that name already exists")
+                user.update_role(role_name, commit=False)
+            db.session.add(user)
+            db.session.commit()
         except RoleError:
             abort(404, message="Role not found")
+        except IntegrityError:  # new username already exists on the system
+            abort(409, message="A user with that name already exists")
 
         # TODO find out what ryan wants for successful return data here
         return {'success': 'user updated successfully'}, 200
@@ -81,6 +86,7 @@ class UserApi(Resource):
     @auth_required(roles=['admin'])
     def delete(self, user_id):
         """ Delete an existing User (admins only) """
+        # TODO actually delete this user, or just mark it as inactive in the db?
         user = get_user_or_abort(user_id)
         user.delete()
 
@@ -90,7 +96,7 @@ class UserListApi(Resource):
     @auth_required(roles=['teacher', 'admin'])
     def get(self):
         """ Get a list of users """
-        return [user.jsonify for user in User.query.all()]
+        return [user.jsonify() for user in User.query.all()]
 
     @auth_required()
     def post(self):
