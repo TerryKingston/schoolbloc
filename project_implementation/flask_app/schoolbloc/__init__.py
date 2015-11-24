@@ -120,5 +120,19 @@ def page_not_found(e):
 # This is where we take our backend modules (they are modules for the sake of
 # code organization, not models that can be toggled like the frontend angular
 # modules). All of our code will be in the modules
+from schoolbloc.courses.views import mod as course_module
 from schoolbloc.users.views import mod as user_module
+from schoolbloc.teachers.views import mod as teacher_module
+from schoolbloc.subjects.views import mod as subject_module
+from schoolbloc.students.views import mod as student_module
+from schoolbloc.student_groups.views import mod as student_group_module
+from schoolbloc.schedules.views import mod as schedule_module
+from schoolbloc.classrooms.views import mod as classroom_module
+app.register_blueprint(course_module)
 app.register_blueprint(user_module)
+app.register_blueprint(teacher_module)
+app.register_blueprint(subject_module)
+app.register_blueprint(student_module)
+app.register_blueprint(student_group_module)
+app.register_blueprint(schedule_module)
+app.register_blueprint(classroom_module)

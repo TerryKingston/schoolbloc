@@ -116,7 +116,7 @@ class ClassroomsCourse(db.Model):
     """
     __tablename__ = 'classrooms_courses'
     id = db.Column(db.Integer, primary_key=True)
-    classroom_id = db.Column(db.Integer, db.ForeignKey('clasrooms.id'), nullable=False)
+    classroom_id = db.Column(db.Integer, db.ForeignKey('classrooms.id'), nullable=False)
     classroom = db.relationship("Classroom", backref="classrooms_courses")
     course_id = db.Column(db.Integer, db.ForeignKey('courses.id'), nullable=False)
     course = db.relationship("Course", backref="classrooms_courses")
