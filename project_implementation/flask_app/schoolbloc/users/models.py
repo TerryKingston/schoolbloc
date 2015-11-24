@@ -80,6 +80,7 @@ class User(db.Model):
         return "<username={} role_id={}>".format(self.username, self.role_id)
 
     def delete(self):
+        # TODO actually delete this user, or just mark it as inactive in the db?
         db.session.delete(self)
         db.session.commit()
 
@@ -100,7 +101,7 @@ class User(db.Model):
         try:
             role = Role.query.filter_by(role_type=new_role).one()
         except NoResultFound:
-            raise RoleError('The role {} does not exist'.format(role_type))
+            raise RoleError('The role {} does not exist'.format(new_role))
         self.role_id = role.id
 
         if commit:

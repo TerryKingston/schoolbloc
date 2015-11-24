@@ -86,25 +86,34 @@ class UserApi(Resource):
     @auth_required(roles=['admin'])
     def delete(self, user_id):
         """ Delete an existing User (admins only) """
-        # TODO actually delete this user, or just mark it as inactive in the db?
         user = get_user_or_abort(user_id)
         user.delete()
+        return {'success': 'user deleted successfully'}, 200
 
 
 class UserListApi(Resource):
     """ Get all users or create new user """
+
     @auth_required(roles=['teacher', 'admin'])
     def get(self):
         """ Get a list of users """
         return [user.jsonify() for user in User.query.all()]
 
-    @auth_required()
+    # TODO if anyone should be allowed to sign up, we need to remove the auth_required
+    @auth_required(roles='admin')
     def post(self):
         """ Create a new user """
+        parser = reqparse.RequestParser()
+        parser.add_argument('username', required=True)
+        parser.add_argument('password', required=True)
+        parser.add_argument('role', required=True)
+        args = parser.parse_args()
         try:
-            pass  # get args (either parser or wtforms) and attempt to create user
-        except UserError:
-            return {'error': 'The user already exists in the database'}, 409
+            User(username=args['username'], password=args['password'], role_type=args['role'])
+        except UserError as e:
+            return {'error': str(e)}, 409
+
+        return {'success': 'user created successfully'}, 200
 
 
 api.add_resource(UserApi, '/api/users/<int:user_id>')
