@@ -9,6 +9,7 @@ from schoolbloc import app, db
 from datetime import timedelta
 from simplekv.memory import DictStore
 from flask_kvsession import KVSessionExtension
+from schoolbloc.users.models import Role, User
 
 if __name__ == '__main__':
     # Set the log level to debug for development
@@ -16,6 +17,17 @@ if __name__ == '__main__':
 
     # Create the development sqlite databases if they don't already exist
     db.create_all()
+
+    # I'm lazy, just gonna try adding stuff and catching exception if it exists
+    try:
+        Role('admin')
+        Role('teacher')
+        Role('student')
+        User('admin', 'admin', 'admin')
+        User('teacher', 'teacher', 'teacher')
+        User('student', 'student', 'student')
+    except:
+        pass
 
     # Create the in memory session manager. In production, this is redis
     store = DictStore()
