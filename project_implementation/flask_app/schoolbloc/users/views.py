@@ -90,15 +90,7 @@ class UserListApi(Resource):
     @auth_required(roles=['teacher', 'admin'])
     def get(self):
         """ Get a list of users """
-        ret = {}
-        users = User.query.all()
-        print(users)
-        for user in users:
-            ret[user.id] = {
-                'username': user.username,
-                'role': user.role.role_type,
-            }
-        return ret
+        return [user.jsonify for user in User.query.all()]
 
     @auth_required()
     def post(self):
