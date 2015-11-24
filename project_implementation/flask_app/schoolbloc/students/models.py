@@ -23,7 +23,7 @@ class Student(db.Model):
     last_name = db.Column(db.String(128), nullable=False)
     # nullable because students could later be associated with a user account
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-    user = db.relationship("User", backref="user")
+    user = db.relationship("User", backref="student")
 
     def __init__(self, first_name, last_name, user_id=None):
         self.first_name = first_name
