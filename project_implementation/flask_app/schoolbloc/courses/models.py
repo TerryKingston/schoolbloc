@@ -1,239 +1,235 @@
 import logging
 from schoolbloc import db
+from schoolbloc.teachers.models import Teacher
+from schoolbloc.students.models import Student
+from schoolbloc.student_groups.models import StudentGroup
+from schoolbloc.subjects.models import Subject
+
 
 log = logging.getLogger(__name__)
 
+
 class CourseError(Exception):
-	pass
+    pass
+
 
 class Course(db.Model):
-	"""
-	ORM object for courses stored in the database
+    """
+    ORM object for courses stored in the database
 
-	A course is a specific learning area (i.e. Algebra III)
-	"""
+    A course is a specific learning area (i.e. Algebra III)
+    """
+    __tablename__ = 'courses'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(128), nullable=False)
+    max_student_count = db.Column(db.Integer)
+    min_student_count = db.Column(db.Integer)
 
-	__tablename__ = 'courses'
-	id = db.Column(db.Integer, primary_key=True)
-	name = db.Column(db.String(128), nullable=False)
-	max_student_count = db.Column(db.Integer)
-	min_student_count = db.Column(db.Integer)
+    def __init__(self, name, max_student_count=None, min_student_count=None):
+        self.name = name
+        self.max_student_count = max_student_count
+        self.min_student_count = min_student_count
+        db.session.add(self)
+        db.session.commit()
+        log.info('added new course: {}'.format(name))
 
-	def __init__(self, name, **other_params):
+    def __repr__(self):
+        return "<name={} max_student_count={} min_student_count={}>".format(
+            self.name, self.max_student_count, self.min_student_count)
 
-		self.name = name
-		if ('max_student_count' in other_params):
-			self.max_student_count = other_params['max_student_count']
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
 
-		if ('min_student_count' in other_params):
-			self.min_student_count = other_params['min_student_count']
-
-		db.session.add(self)
-		db.session.commit()
-		log.info('added new course: {}'.format(name))
-
-	def __repr__(self):
-		return "<name={} max_student_count={} min_student_count={}>".format(self.name, self.max_student_count, self.min_student_count)
-
-	def delete(self):
-		db.session.delete(self)
-		db.session.commit()
 
 class CoursesStudentError(Exception):
-	pass
+    pass
+
 
 class CoursesStudent(db.Model):
-	"""
-	ORM object for linking table between courses and students tables
+    """
+    ORM object for linking table between courses and students tables
 
-	A CoursesStudent describes the relationship constraints 
-	between a course and a student for the scheduler. 
+    A CoursesStudent describes the relationship constraints
+    between a course and a student for the scheduler.
 
-	The actual assignment of a course to a student happens in 
-	the Class object.
-	"""
+    The actual assignment of a course to a student happens in
+    the Class object.
+    """
+    __tablename__ = 'courses_students'
+    id = db.Column(db.Integer, primary_key=True)
+    course_id = db.Column(db.Integer, db.ForeignKey('courses.id'), nullable=False)
+    student_id = db.Column(db.Integer, db.ForeignKey('students.id'), nullable=False)
+    active = db.Column(db.Boolean, nullable=False, default=True)
+    student = db.relationship("Student", backref="courses_students")
+    course = db.relationship("Course", backref="courses_students")
 
-	__tablename__ = 'courses_students'
-	id = db.Column(db.Integer, primary_key=True)
-	course_id = db.Column(db.Integer, db.ForeignKey('courses.id'), nullable=False)
-	course = db.relationship("Course", backref="courses_students")
-	student_id = db.Column(db.Integer, db.ForeignKey('students.id'), nullable=False)
-	student = db.relationship("Student", backref="courses_students")
-	active = db.Column(db.Boolean, nullable=False, default=True)
+    def __init__(self, course_id, student_id, active=True):
+        # we want to verify the given id's are actually present in the DB
+        if not Course.query.get(course_id):
+            raise CoursesStudentError("The course_id {} does not exist in the "
+                                      "db".format(course_id))
 
-	def __init__(self, course_id, student_id, **other_params):
+        if not Student.query.get(student_id):
+            raise CoursesStudentError("The student_id {} does not exist in the "
+                                      "db".format(student_id))
 
-		# we want to verify the given id's are actually present in the DB
-		if (Course.query.get(course_id) == None):
-			raise CoursesStudentError("The course_id {} does not exist in the db".format(course_id))
+        self.course_id = course_id
+        self.student_id = student_id
+        self.active = active
+        db.session.add(self)
+        db.session.commit()
+        log.info('added new CoursesStudent: {} <--> {} {}'.format(
+                 self.course.room_number, self.student.first_name, self.student.last_name))
 
-		from schoolbloc.students.models import Student
-		student = Student.query.get(student_id)
-		if (student == None):
-			raise CoursesStudentError("The student_id {} does not exist in the db".format(student_id))
+    def __repr__(self):
+        return "<course_id={} student_id={}>".format(self.course_id, self.student_id)
 
-		self.course_id = course_id
-		self.student_id = student_id
-		if ('active' in other_params):
-			self.active = other_params['active']
+    def delete(self):
+        db.sesson.delete(self)
+        db.session.commit()
 
-		db.session.add(self)
-		db.session.commit()
-		log.info('acced new CoursesStudent: {} <--> {} {}'.format(course.room_number, 
-																  student.first_name, 
-																  student.last_name) )
-	def __repr__(self):
-		return "<course_id={} student_id={}>".format(self.course_id, self.student_id)
-
-	def delete(self):
-		db.sesson.delete(self)
-		db.session.commit()
 
 class CoursesTeacherError(Exception):
-	pass
+    pass
+
 
 class CoursesTeacher(db.Model):
-	"""
-	ORM object for linking table between courses and teachers tables
+    """
+    ORM object for linking table between courses and teachers tables
 
-	A CoursesTeacher describes the relationship constraints 
-	between a course and a teacher for the scheduler. 
+    A CoursesTeacher describes the relationship constraints
+    between a course and a teacher for the scheduler.
 
-	The actual assignment of a course to a teacher happens in 
-	the Class object.
-	"""
+    The actual assignment of a course to a teacher happens in
+    the Class object.
+    """
+    __tablename__ = 'courses_teachers'
+    id = db.Column(db.Integer, primary_key=True)
+    course_id = db.Column(db.Integer, db.ForeignKey('courses.id'), nullable=False)
+    teacher_id = db.Column(db.Integer, db.ForeignKey('teachers.id'), nullable=False)
+    active = db.Column(db.Boolean, nullable=False, default=True)
+    teacher = db.relationship("Teacher", backref="courses_teachers")
+    course = db.relationship("Course", backref="courses_teachers")
 
-	__tablename__ = 'courses_teachers'
-	id = db.Column(db.Integer, primary_key=True)
-	course_id = db.Column(db.Integer, db.ForeignKey('courses.id'), nullable=False)
-	course = db.relationship("Course", backref="courses_teachers")
-	teacher_id = db.Column(db.Integer, db.ForeignKey('teachers.id'), nullable=False)
-	teacher = db.relationship("Teacher", backref="courses_teachers")
-	active = db.Column(db.Boolean, nullable=False, default=True)
+    def __init__(self, course_id, teacher_id, active=True):
+        # we want to verify the given id's are actually present in the DB
+        if not Course.query.get(course_id):
+            raise CoursesTeacherError("The course_id {} does not exist in the "
+                                      "db".format(course_id))
 
-	def __init__(self, course_id, teacher_id, **other_params):
+        if not Teacher.query.get(teacher_id):
+            raise CoursesTeacherError("The teacher_id {} does not exist in the "
+                                      "db".format(teacher_id))
 
-		# we want to verify the given id's are actually present in the DB
-		if (Course.query.get(course_id) == None):
-			raise CoursesTeacherError("The course_id {} does not exist in the db".format(course_id))
+        self.course_id = course_id
+        self.teacher_id = teacher_id
+        self.active = active
+        db.session.add(self)
+        db.session.commit()
+        log.info('added new CoursesTeacher: {} <--> {} {}'.format(
+                 self.course.room_number, self.teacher.first_name, self.teacher.last_name))
 
-		from schoolbloc.teachers.models import Teacher
-		teacher = Teacher.query.get(teacher_id)
-		if (teacher == None):
-			raise CoursesTeacherError("The teacher_id {} does not exist in the db".format(teacher_id))
+    def __repr__(self):
+        return "<course_id={} teacher_id={}>".format(self.course_id, self.teacher_id)
 
-		self.course_id = course_id
-		self.teacher_id = teacher_id
-		if ('active' in other_params):
-			self.active = other_params['active']
+    def delete(self):
+        db.sesson.delete(self)
+        db.session.commit()
 
-		db.session.add(self)
-		db.session.commit()
-		log.info('acced new CoursesTeacher: {} <--> {} {}'.format(course.room_number, 
-																  teacher.first_name, 
-																  teacher.last_name) )
-	def __repr__(self):
-		return "<course_id={} teacher_id={}>".format(self.course_id, self.teacher_id)
-
-	
-	def delete(self):
-		db.sesson.delete(self)
-		db.session.commit()
 
 class CoursesStudentGroupError(Exception):
-	pass
+    pass
+
 
 class CoursesStudentGroup(db.Model):
-	"""
-	ORM object for linking table between courses and student groups tables
+    """
+    ORM object for linking table between courses and student groups tables
 
-	A CoursesStudentGroup describes the relationship constraints 
-	between a course and a student group for the scheduler. 
+    A CoursesStudentGroup describes the relationship constraints
+    between a course and a student group for the scheduler.
 
-	The actual assignment of a course to a student group happens in 
-	the Class object.
-	"""
+    The actual assignment of a course to a student group happens in
+    the Class object.
+    """
+    __tablename__ = 'courses_student_groups'
+    id = db.Column(db.Integer, primary_key=True)
+    course_id = db.Column(db.Integer, db.ForeignKey('courses.id'), nullable=False)
+    student_group_id = db.Column(db.Integer, db.ForeignKey('student_groups.id'), nullable=False)
+    active = db.Column(db.Boolean, nullable=False, default=True)
+    student_group = db.relationship("StudentGroup", backref="courses_student_groups")
+    course = db.relationship("Course", backref="courses_student_groups")
 
-	__tablename__ = 'courses_student_groups'
-	id = db.Column(db.Integer, primary_key=True)
-	course_id = db.Column(db.Integer, db.ForeignKey('courses.id'), nullable=False)
-	course = db.relationship("Course", backref="courses_student_groups")
-	student_group_id = db.Column(db.Integer, db.ForeignKey('student_groups.id'), nullable=False)
-	student_group = db.relationship("StudentGroup", backref="courses_student_groups")
-	active = db.Column(db.Boolean, nullable=False, default=True)
+    def __init__(self, course_id, student_group_id, active=True):
+        # we want to verify the given id's are actually present in the DB
+        if not Course.query.get(course_id):
+            raise CoursesStudentGroupError("The course_id {} does not exist in "
+                                           "the db".format(course_id))
 
-	def __init__(self, course_id, student_group_id, **other_params):
+        if not StudentGroup.query.get(student_group_id):
+            raise CoursesStudentGroupError("The student_group_id {} does not exist "
+                                           "in the db".format(student_group_id))
 
-		# we want to verify the given id's are actually present in the DB
-		if (Course.query.get(course_id) == None):
-			raise CoursesStudentGroupError("The course_id {} does not exist in the db".format(course_id))
+        self.course_id = course_id
+        self.student_group_id = student_group_id
+        self.active = active
+        db.session.add(self)
+        db.session.commit()
+        log.info('added new CoursesStudentGroup: {} <--> {} {}'.format(
+                 self.course.room_number, self.student_group.name))
 
-		from schoolbloc.student_groups.models import StudentGroup
-		student_group = StudentGroup.query.get(student_group_id)
-		if (student_group == None):
-			raise CoursesStudentGroupError("The student_group_id {} does not exist in the db".format(student_group_id))
+    def __repr__(self):
+        return "<course_id={} student_group_id={}>".format(self.course_id,
+                                                           self.student_group_id)
 
-		self.course_id = course_id
-		self.student_group_id = student_group_id
-		if ('active' in other_params):
-			self.active = other_params['active']
+    def delete(self):
+        db.sesson.delete(self)
+        db.session.commit()
 
-		db.session.add(self)
-		db.session.commit()
-		log.info('acced new CoursesStudentGroup: {} <--> {} {}'.format(course.room_number, student_group.name) )
-	
-	def __repr__(self):
-		return "<course_id={} student_group_id={}>".format(self.course_id, self.student_group_id)
-
-	def delete(self):
-		db.sesson.delete(self)
-		db.session.commit()
 
 class CoursesSubjectError(Exception):
-	pass
+    pass
+
 
 class CoursesSubject(db.Model):
-	"""
-	ORM object for linking table between courses and subjects tables
+    """
+    ORM object for linking table between courses and subjects tables
 
-	A CoursesSubject describes the relationship constraints 
-	between a course and a subject for the scheduler. 
+    A CoursesSubject describes the relationship constraints
+    between a course and a subject for the scheduler.
 
-	The actual assignment of a course to a subject happens in 
-	the Class object.
-	"""
+    The actual assignment of a course to a subject happens in
+    the Class object.
+    """
+    __tablename__ = 'courses_subjects'
+    id = db.Column(db.Integer, primary_key=True)
+    course_id = db.Column(db.Integer, db.ForeignKey('courses.id'), nullable=False)
+    subject_id = db.Column(db.Integer, db.ForeignKey('subjects.id'), nullable=False)
+    active = db.Column(db.Boolean, nullable=False, default=True)
+    subject = db.relationship("Subject", backref="courses_subjects")
+    course = db.relationship("Course", backref="courses_subjects")
 
-	__tablename__ = 'courses_subjects'
-	id = db.Column(db.Integer, primary_key=True)
-	course_id = db.Column(db.Integer, db.ForeignKey('courses.id'), nullable=False)
-	course = db.relationship("Course", backref="courses_subjects")
-	subject_id = db.Column(db.Integer, db.ForeignKey('subjects.id'), nullable=False)
-	subject = db.relationship("Subject", backref="courses_subjects")
-	active = db.Column(db.Boolean, nullable=False, default=True)
+    def __init__(self, course_id, subject_id, active=True):
+        # we want to verify the given id's are actually present in the DB
+        if not Course.query.get(course_id):
+            raise CoursesSubjectError("The course_id {} does not exist in the "
+                                      "db".format(course_id))
 
-	def __init__(self, course_id, subject_id, **other_params):
+        if not Subject.query.get(subject_id):
+            raise CoursesSubjectError("The subject_id {} does not exist in the "
+                                      "db".format(subject_id))
 
-		# we want to verify the given id's are actually present in the DB
-		if (Course.query.get(course_id) == None):
-			raise CoursesSubjectError("The course_id {} does not exist in the db".format(course_id))
+        self.course_id = course_id
+        self.subject_id = subject_id
+        self.active = active
+        db.session.add(self)
+        db.session.commit()
+        log.info('added new CoursesSubject: {} <--> {} {}'.format(
+                 self.course.room_number, self.subject.name))
 
-		from schoolbloc.subjects.models import Subject
-		subject = Subject.query.get(subject_id)
-		if (subject == None):
-			raise CoursesSubjectError("The subject_id {} does not exist in the db".format(subject_id))
+    def __repr__(self):
+        return "<course_id={} subject_id={}>".format(self.course_id, self.subject_id)
 
-		self.course_id = course_id
-		self.subject_id = subject_id
-		if ('active' in other_params):
-			self.active = other_params['active']
-
-		db.session.add(self)
-		db.session.commit()
-		log.info('acced new CoursesSubject: {} <--> {} {}'.format(course.room_number, subject.name) )
-	
-	def __repr__(self):
-		return "<course_id={} subject_id={}>".format(self.course_id, self.subject_id)
-
-	def delete(self):
-		db.sesson.delete(self)
-		db.session.commit()
+    def delete(self):
+        db.sesson.delete(self)
+        db.session.commit()
