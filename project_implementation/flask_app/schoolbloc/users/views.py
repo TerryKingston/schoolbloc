@@ -80,10 +80,9 @@ class UserApi(Resource):
 
     @auth_required(roles=['admin'])
     def delete(self, user_id):
-        """ Delete an existing User """
-        # TODO probably only let an admin delete users.
-        # TODO don't actually delete the user, just mark it as disabled in the db?
+        """ Delete an existing User (admins only) """
         user = get_user_or_abort(user_id)
+        user.delete()
 
 
 class UserListApi(Resource):
