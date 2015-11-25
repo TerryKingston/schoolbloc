@@ -1,5 +1,7 @@
 import unittest
 from schoolbloc import app, db
+from schoolbloc.teachers.models import Teacher
+from schoolbloc.scheduler import scheduler
 
 class SchedulerTests(unittest.TestCase):
     """ Testing the scheduler """
@@ -20,7 +22,9 @@ class SchedulerTests(unittest.TestCase):
 
     def test_valid_teacher_ids(self):
         """ The selections of the scheduler are only for valid Ids """
-        pass
+        # make the list of teachers
+        [ Teacher("first_name_%s" % i, "last_name_%s" % i) for i in range(3) ]
+        scheduler.make_schedule(10)
 
     def test_valid_room_ids(self):
         """ It assigns only valid classroom Ids from the DB """
