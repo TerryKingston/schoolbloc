@@ -86,7 +86,7 @@ class CoursesStudent(db.Model):
         return "<course_id={} student_id={}>".format(self.course_id, self.student_id)
 
     def delete(self):
-        db.sesson.delete(self)
+        db.session.delete(self)
         db.session.commit()
 
 
