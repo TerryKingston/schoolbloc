@@ -17,11 +17,11 @@ class ScheduledClass(db.Model):
 
     __tablename__ = 'scheduled_classes'
     id = db.Column(db.Integer, primary_key=True)
-    classroom_id = db.Column(db.Integer, nullable=False)
+    classroom_id = db.Column(db.Integer, db.ForeignKey('classrooms.id'), nullable=False)
     classroom = db.relationship("Classroom", backref="scheduled_class")
-    teacher_id = db.Column(db.Integer, nullable=False)
+    teacher_id = db.Column(db.Integer, db.ForeignKey('teachers.id'), nullable=False)
     teacher = db.relationship("Teacher", backref="scheduled_class")
-    course_id = db.Column(db.Integer, nullable=False)
+    course_id = db.Column(db.Integer, db.ForeignKey('courses.id'), nullable=False)
     course = db.relationship("Course", backref="scheduled_class")
 
     def __init__(self, course_id, classroom_id, teacher_id):
@@ -59,9 +59,9 @@ class ScheduledClassesStudent(db.Model):
 
     __tablename__ = 'scheduled_classes_students'
     id = db.Column(db.Integer, primary_key=True)
-    scheduled_class_id = db.Column(db.Integer, nullable=False)
+    scheduled_class_id = db.Column(db.Integer, db.ForeignKey('scheduled_classes.id'), nullable=False)
     scheduled_class = db.relationship("ScheduledClass", backref="scheduled_classes_student")
-    student_id = db.Column(db.Integer, nullable=False)
+    student_id = db.Column(db.Integer, db.ForeignKey('students.id'), nullable=False)
     student = db.relationship("Student", backref="scheduled_classes_student")
 
     def __init__(self, scheduled_class_id, student_id, active=True):
