@@ -1,8 +1,9 @@
 from z3 import *
-from schoolbloc.users.models import *
-from schoolbloc.teachers.models import *
-from schoolbloc.classrooms.models import *
-from schoolbloc.students.models import *
+from schoolbloc.users.models import User
+from schoolbloc.teachers.models import Teacher
+from schoolbloc.classrooms.models import Classroom
+from schoolbloc.students.models import Student
+from schoolbloc.scheduled_class.models import ScheduledClass
 
 # TODO importing * is generally bad form, makes it harder to track where code lives.
 # It is really useful in a REPL (like bpython) but makes life harder in actul code.
@@ -25,43 +26,44 @@ class SchedulerNoSoltuion(Exception):
     # argument to these functions. But I have a feeling this shouldn't be a class
 
 def make_schedule(class_count=10):
-    # make the class z3 data type and define its constructor
-    # a class represents a mapping of teacher, room, course, time, and students
-    # Z3 will choose integers for teacher, room, course, and time. Its our job to
-    # restrict the choices of integer to only valid IDs of correspoding DB objects
-    Class = Datatype('Class')
-    Class.declare('Class', ('teacher', IntSort()),
-                           ('room', IntSort()),
-                           ('time', IntSort()),
-                           ('students'), ArraySort(IntSort(), IntSort()))
-
     # we also need to make a TimeBlock Class because the start and end time properties matter
     # when determining the schedule
     TimeBlock = Datatype('TimeBlock')
     TimeBlock.declare('start_end', ('start', IntSort()), ('end', IntSort()))
 
-    TimeBlock, Class = CreateDatatypes(TimeBlock, Class)
+    # make the class z3 data type and define its constructor
+    # a class represents a mapping of teacher, room, course, time, and students
+    # Z3 will choose integers for teacher, room, course, and time. Its our job to
+    # restrict the choices of integer to only valid IDs of correspoding DB objects
+    SchClass = Datatype('SchClass')
+    SchClass.declare('SchClass', ('teacher', IntSort()),
+                                 ('room', IntSort()),
+                                 ('time', TimeBlock),
+                                 ('course', IntSort()),
+                                 ('students', ArraySort(IntSort(), IntSort())))
+
+    TimeBlock, SchClass = CreateDatatypes(TimeBlock, SchClass)
 
     # Right now, we make more classes than we need so that Z3 can be free to choose
     # the right class for each constraint. later, we'll remove the unused class objects
-    classes = [Const("class_%s" % (i + 1), Class) for i in range(class_count)]
+    classes = [Const("class_%s" % (i + 1), SchClass) for i in range(class_count)]
 
     # We setup some shortcuts to the accessors in the class constructor above just to make
     # coding easier and more readable
     def teacher(i):
-        return Class.teacher(classes[i])
+        return SchClass.teacher(classes[i])
 
     def room(i):
-        return Class.room(classes[i])
+        return SchClass.room(classes[i])
 
     def course(i):
-        return Class.course(classes[i])
+        return SchClass.course(classes[i])
 
     def time(i):
-        return Class.time(classes[i])
+        return SchClass.time(classes[i])
 
     def students(i):
-        return Class.students(classes[i])
+        return SchClass.students(classes[i])
 
     # all classes must be distinct
     # dist_c = [Distinct([classes[i] for i in range(class_count)])]
@@ -127,7 +129,7 @@ def make_schedule(class_count=10):
 
     # Finally, ask the solver to give us a schedule and then parse the results
     s = Solver()
-    s.add(mod_c)
+    # s.add(mod_c)
     if s.check() != sat:
         raise SchedulerNoSoltuion()
 
