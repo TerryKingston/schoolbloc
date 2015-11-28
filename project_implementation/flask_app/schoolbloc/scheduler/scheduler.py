@@ -29,6 +29,11 @@ SchClass.declare('SchClass', ('teacher', IntSort()),
 
 TimeBlock, SchClass = CreateDatatypes(TimeBlock, SchClass)
 
+class_count=10
+# Right now, we make more classes than we need so that Z3 can be free to choose
+# the right class for each constraint. later, we'll remove the unused class objects
+classes = [Const("class_%s" % (i + 1), SchClass) for i in range(class_count)]
+
 # We setup some shortcuts to the accessors in the class constructor above just to make
 # coding easier and more readable
 def teacher(i):
@@ -80,24 +85,24 @@ def ensure_valid_ids():
     teach_list = Teacher.query.all()
     teacher_ids = [teach_list[i].id for i in range(len(teach_list))]
 
-    room_list = Room.query.all()
-    teacher_ids = [room_list[i].id for i in range(len(room_list))]
+    room_list = Classroom.query.all()
+    room_ids = [room_list[i].id for i in range(len(room_list))]
 
     st_list = Student.query.all()
-    teacher_ids = [st_list[i].id for i in range(len(st_list))]
+    student_ids = [st_list[i].id for i in range(len(st_list))]
 
     # this basically loops through each class, and then each of the lists above and makes
     # an 'assert equal' for each. The lists are put in an 'Or' constraint to ensure
     # each entry appears in the respective id list
-    cons = [And(Or([teacher(i) == t_id for t_id in teacher_ids]),
+    cons = [And(Or([teacher(i) == int(t_id) for t_id in teacher_ids]),
                 Or([room(i) == r_id for r_id in room_ids]),
                 Or([course(i) == c_id for c_id in course_ids]))
             for i in range(class_count)]
 
     # make sure valid student IDs are selected. 
-    x = Int(next_int_name())
-    cons += [ForAll(x1, Or([students(i)[x] == j for j in student_ids]))
-              for i in range(class_count)]
+    # x = Int(next_int_name())
+    # cons += [ForAll(x1, Or([students(i)[x] == j for j in student_ids]))
+    #           for i in range(class_count)]
 
     return cons
 
@@ -117,7 +122,7 @@ def prevent_teacher_time_collision():
 
 # prevent a student from being assigned to two classes that occur at the same time
 def prevent_student_time_collision():
-    x2 = Int(next_int_name())
+    x2 = Int(next_int_name())   
     x3 = Int(next_int_name())
     return [If(And(i != j, time(i) == time(j)),
                  ForAll([x2, x3], students(i)[x2] != students(j)[x3]), True)
@@ -130,23 +135,104 @@ def prevent_duplicate_student():
     mod_c += [If(x != y, students(i)[x] != students(i)[y], True) for i in
               range(class_count)]
 
-
-def make_schedule(class_count=10):
+def constrain_course_rooms():
+    """ returns a list of z3 constraints for relationships between courses and rooms. """
     
-    # Right now, we make more classes than we need so that Z3 can be free to choose
-    # the right class for each constraint. later, we'll remove the unused class objects
-    classes = [Const("class_%s" % (i + 1), SchClass) for i in range(class_count)]
+    cons_models = ClassroomsCourse.query.all()
+    cons_list = []
+    # we need to construct a big 'OR' clause for each course that has 
+    # all the available rooms. We'll restructure the data to make this easier
+    mod_map = {}
+    for mod in cons_models:
+        if mod.course_id not in mod_map:
+            mod_map[mod.course_id] = [mod.room_id]
+        else:
+            mod_map[mod.course_id].append(mod.room_id)
 
+    # now we can loop through the map's keys and add the constraints
+    for course_id in mod_map.iterkeys():
+
+        # the rooms aren't grouped in the DB so we look through all the models and 
+        # construct a list of rooms available to this course.
+        cons_list += [ If( course(i) == course_id, 
+                           Or([ room(i) == room_id for room_id in mod_map[course_id] ]), 
+                           True )  
+                        for i in range(CLASS_COUNT) for j in range(CLASS_COUNT) ]
+    return cons_list
+
+def constrain_teacher_time():
+    """ returns a list of z3 constraints for each teacher's available time """
+
+    cons_list = []
+    # if the teacher's start and/or end properties are set than
+    # add constraints, else let the defaults kick in
+    for teach in Teacher.query.all():
+
+        if teach.start_time:
+            cons_list += [ If( teacher(i) == teach.id, 
+                                Time.start(time(i)) >= teach.start_time, 
+                                True ) 
+                            for i in range(CLASS_COUNT) for j in range(CLASS_COUNT) ]
+        if teach.end_time:
+            cons_list += [ If( teacher(i) == teach.id, 
+                                Time.end(time(i)) >= teach.end_time, 
+                                True ) 
+                            for i in range(CLASS_COUNT) for j in range(CLASS_COUNT) ]
+
+    return cons_list
+
+def constrain_course_size():
+    """ returns a list of z3 constraints for min and max student count on each course """
+
+    # The size if the student lists are abstract. Here we basically make sure the list returns
+    # a distinct value for indices up to the min class size, then we make sure anything over 
+    # the max size is NOT distinct. Then when figuring out what students are assigned to this class
+    # we pull students until we start seing duplicates
+    cons_list = []
+    for course in Course.query.all():
+        if course.min_student_count:
+            cons_list += [ If( course(i) == course.id, 
+                               Distinct([ students(i)[j] for j in range(course.min_student_count)]), 
+                               True) 
+                            for i in range(CLASS_COUNT)]
+        if course.max_student_count:
+            cons_list += [ If( course(i) == course.id, 
+                                Not(Distinct([ students(i)[j] for j in range(course.max_student_count)])), 
+                                True) 
+                            for i in range(CLASS_COUNT)]
+    return cons_list
+
+def constrain_student_req_courses():
+    """ returns a list of z3 constraints for courses a student must take """
+
+    cons_list = []
+    # constraints of students to courses can come as direct relationships between students and 
+    # courses, or by the student being a member of a student group that has a constraint 
+    # relationship with the course. 
+    for cs in CoursesStudent.query.all():
+        x = Int(next_int_name())
+        cons_list += [ Or([ And(course(i) == cs.course_id, students(i)[x] == cs.student_id) 
+                       for i in range(CLASS_COUNT) ]) ]
+
+    for c_grp in CoursesStudentGroup.query.all():
+        for stud in c_grp.student_group.students:
+            x = Int(next_int_name())
+            cons_list += [ Or([ And(course(i) == c_grp.course_id, students(i)[x] == stud.id) 
+                           for i in range(CLASS_COUNT) ]) ]
+
+
+def make_schedule():
+    
     # all classes must be distinct
-    # dist_c = [Distinct([classes[i] for i in range(class_count)])]
+    constraints = [Distinct([classes[i] for i in range(class_count)])]
 
     # Now we'll start adding constraints. The first set are implied constraints like
     # a teacher can't be in two places at one time.
-    constraints = ensure_valid_ids()
-    constraints += prevent_room_time_collision()
-    constraints += prevent_teacher_time_collision()
-    constraints += prevent_student_time_collision()
-    constraints += prevent_duplicate_student()
+    # constraints = ensure_valid_ids()
+    # constraints += prevent_room_time_collision()
+    # constraints += prevent_teacher_time_collision()
+    # constraints += prevent_student_time_collision()
+    # constraints += prevent_duplicate_student()
 
   
 
@@ -155,21 +241,21 @@ def make_schedule(class_count=10):
     s.add(constraints)
     if s.check() != sat:
         raise SchedulerNoSoltuion()
-
-    m = s.model()
-    for i in range(class_count):
-        c = ScheduledClass(teacher=m.evaluate(teacher(i)), 
-                           room=m.evaluate(room(i)),
-                           course=m.evaluate(course(i)),
-                           time=m.evaluate(time(i)) )
+    else:
+        m = s.model()
+        for i in range(class_count):
+            m.evaluate(SchClass.room(0))
+        # c = ScheduledClass(teacher=int(m.evaluate(teacher(i))), 
+        #                    room=m.evaluate(room(i)),
+        #                    course=m.evaluate(course(i)),
+        #                    time=m.evaluate(time(i)) )
         
-        # now add the students to the new class. the z3 arrays are undefined length (they will return values
-        # for any index we give them.) we'll pull values until the max class size after that the values should
-        # voilate the unique constraint.
-        for j in range(max_class_size(m.evaluate(course(i)), m.evaluate(room(i)))):
-            ScheduledClassesStudent(student_id=m.evaluate(students(i)[j]), scheduled_class_id=c.id) 
+        # # now add the students to the new class. the z3 arrays are undefined length (they will return values
+        # # for any index we give them.) we'll pull values until the max class size after that the values should
+        # # voilate the unique constraint.
+        # for j in range(max_class_size(m.evaluate(course(i)), m.evaluate(room(i)))):
+        #     ScheduledClassesStudent(student_id=m.evaluate(students(i)[j]), scheduled_class_id=c.id) 
 
-        log.info('added new class: teacher={} {}, room={}, course={}, time={}, students={}'.format(
-            c.teacher_id, c.classroom_id, c.course_id, c.time_id, [ student.id for student in c.students ]))
+        
 
 

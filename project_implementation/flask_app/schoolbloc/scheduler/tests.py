@@ -24,7 +24,7 @@ class SchedulerTests(unittest.TestCase):
         """ The selections of the scheduler are only for valid Ids """
         # make the list of teachers
         [ Teacher("first_name_%s" % i, "last_name_%s" % i) for i in range(3) ]
-        scheduler.make_schedule(10)
+        scheduler.make_schedule()
 
     def test_valid_room_ids(self):
         """ It assigns only valid classroom Ids from the DB """
