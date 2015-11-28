@@ -1,7 +1,12 @@
 import unittest
 from schoolbloc import app, db
 from schoolbloc.teachers.models import Teacher
+from schoolbloc.classrooms.models import Classroom
+from schoolbloc.courses.models import Course
 from schoolbloc.scheduler import scheduler
+from schoolbloc.students.models import Student
+from schoolbloc.scheduled_classes.models import ScheduledClass
+from schoolbloc.scheduled_classes.models import ScheduledClassesStudent
 
 class SchedulerTests(unittest.TestCase):
     """ Testing the scheduler """
@@ -12,6 +17,11 @@ class SchedulerTests(unittest.TestCase):
         db.init_app(app)
         with app.app_context():
             db.create_all()
+        # Make all the DB facts we need for our tests
+        [ Teacher("first_name_%s" % i, "last_name_%s" % i) for i in range(3) ]
+        [ Classroom(i+1) for i in range(3) ]
+        [ Course("course_%s" % i) for i in range(3) ]
+
 
     def tearDown(self):
         """ Ensures that the database is emptied for next unit test """
@@ -20,23 +30,39 @@ class SchedulerTests(unittest.TestCase):
         with app.app_context():
             db.drop_all()
 
+    def test_generate_schedule(self):
+        """ It creates 10 scheduled classes """
+
+        scheduler.make_schedule()
+        self.assertTrue(len(ScheduledClass.query.all()) == 10)
+
     def test_valid_teacher_ids(self):
         """ The selections of the scheduler are only for valid Ids """
-        # make the list of teachers
-        [ Teacher("first_name_%s" % i, "last_name_%s" % i) for i in range(3) ]
+
         scheduler.make_schedule()
+        # now loop through the scheduled classes and make sure all the teachers are valid
+        teacher_ids = [ t.id for t in Teacher.query.all() ]
+        for c in ScheduledClass.query.all():
+            self.assertTrue( c.teacher_id in teacher_ids )
 
     def test_valid_room_ids(self):
         """ It assigns only valid classroom Ids from the DB """
-        pass
+        scheduler.make_schedule()
+        # now loop through the scheduled classes and make sure all the teachers are valid
+        room_ids = [ t.id for t in Classroom.query.all() ]
+        for c in ScheduledClass.query.all():
+            self.assertTrue( c.classroom_id in room_ids )
 
-    def test_valid_time_ids(self):
-        """ It assigns only valid time Ids from the DB """
-        pass
 
     def test_valid_student_ids(self):
         """ It assigns only valid student Ids from the DB """
-        pass
+        scheduler.make_schedule()
+        # now loop through the scheduled classes and make sure all the teachers are valid
+        student_ids = [ s.id for s in Student.query.all() ]
+        for c in ScheduledClass.query.all():
+            for stud in c.students:
+                self.assertTrue(stud.id in student_ids)
+
 
     def test_room_time_collision(self):
         """ It does not assign two classes to a room which occur at the same time """

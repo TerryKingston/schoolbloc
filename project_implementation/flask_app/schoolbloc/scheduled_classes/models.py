@@ -1,6 +1,7 @@
 import logging
 from schoolbloc import db
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.ext.associationproxy import association_proxy
 
 log = logging.getLogger(__name__)
 
@@ -23,8 +24,9 @@ class ScheduledClass(db.Model):
     teacher = db.relationship("Teacher", backref="scheduled_class")
     course_id = db.Column(db.Integer, db.ForeignKey('courses.id'), nullable=False)
     course = db.relationship("Course", backref="scheduled_class")
+    students = association_proxy('scheduled_classes_student', 'student')
 
-    def __init__(self, course_id, classroom_id, teacher_id):
+    def __init__(self, course_id, classroom_id, teacher_id, start_time, end_time):
         
         self.course_id = course_id
         self.classroom_id = classroom_id

@@ -3,6 +3,7 @@ from schoolbloc.users.models import User
 from schoolbloc.teachers.models import Teacher
 from schoolbloc.classrooms.models import Classroom
 from schoolbloc.students.models import Student
+from schoolbloc.courses.models import Course
 from schoolbloc.scheduled_classes.models import ScheduledClass
 
 
@@ -54,11 +55,11 @@ def students(i):
 # integer scope in z3 isn't the same as in python, we have to give each 
 # integer a unique name in the constructor to prevent collisions in the solver.
 # we'll use a helper method to make this easier
-current = 0
+cur_name_int = 0
 def next_int_name():
-    name = "x%s" % current
-    curent += 1
-    return name
+    global cur_name_int
+    cur_name_int += 1
+    return "x%s" % cur_name_int
 
 def max_class_size(course_id=None, classroom_id=None):
     """ 
@@ -82,14 +83,10 @@ def max_class_size(course_id=None, classroom_id=None):
 # ensures the teacher, room, and course ids are valid
 def ensure_valid_ids():
 
-    teach_list = Teacher.query.all()
-    teacher_ids = [teach_list[i].id for i in range(len(teach_list))]
-
-    room_list = Classroom.query.all()
-    room_ids = [room_list[i].id for i in range(len(room_list))]
-
-    st_list = Student.query.all()
-    student_ids = [st_list[i].id for i in range(len(st_list))]
+    teacher_ids = [t.id for t in Teacher.query.all()]
+    room_ids = [r.id for r in Classroom.query.all()]
+    course_ids = [c.id for c in Course.query.all()]
+    student_ids = [s.id for s in Student.query.all()]
 
     # this basically loops through each class, and then each of the lists above and makes
     # an 'assert equal' for each. The lists are put in an 'Or' constraint to ensure
@@ -132,7 +129,7 @@ def prevent_student_time_collision():
 def prevent_duplicate_student():
     x = Int(next_int_name())
     y = Int(next_int_name())
-    mod_c += [If(x != y, students(i)[x] != students(i)[y], True) for i in
+    return [If(x != y, students(i)[x] != students(i)[y], True) for i in
               range(class_count)]
 
 def constrain_course_rooms():
@@ -170,12 +167,12 @@ def constrain_teacher_time():
 
         if teach.start_time:
             cons_list += [ If( teacher(i) == teach.id, 
-                                Time.start(time(i)) >= teach.start_time, 
+                                TimeBlock.start(time(i)) >= teach.start_time, 
                                 True ) 
                             for i in range(CLASS_COUNT) for j in range(CLASS_COUNT) ]
         if teach.end_time:
             cons_list += [ If( teacher(i) == teach.id, 
-                                Time.end(time(i)) >= teach.end_time, 
+                                TimeBlock.end(time(i)) >= teach.end_time, 
                                 True ) 
                             for i in range(CLASS_COUNT) for j in range(CLASS_COUNT) ]
 
@@ -228,11 +225,11 @@ def make_schedule():
 
     # Now we'll start adding constraints. The first set are implied constraints like
     # a teacher can't be in two places at one time.
-    # constraints = ensure_valid_ids()
-    # constraints += prevent_room_time_collision()
-    # constraints += prevent_teacher_time_collision()
-    # constraints += prevent_student_time_collision()
-    # constraints += prevent_duplicate_student()
+    constraints = ensure_valid_ids()
+    constraints += prevent_room_time_collision()
+    constraints += prevent_teacher_time_collision()
+    constraints += prevent_student_time_collision()
+    constraints += prevent_duplicate_student()
 
   
 
@@ -244,11 +241,11 @@ def make_schedule():
     else:
         m = s.model()
         for i in range(class_count):
-            m.evaluate(SchClass.room(0))
-        # c = ScheduledClass(teacher=int(m.evaluate(teacher(i))), 
-        #                    room=m.evaluate(room(i)),
-        #                    course=m.evaluate(course(i)),
-        #                    time=m.evaluate(time(i)) )
+            c = ScheduledClass(int(str(m.evaluate(course(i)))), 
+                               int(str(m.evaluate(room(i)))),
+                               int(str(m.evaluate(teacher(i)))),
+                               int(str(m.evaluate(TimeBlock.start(time(i))))),
+                               int(str(m.evaluate(TimeBlock.end(time(i))))))
         
         # # now add the students to the new class. the z3 arrays are undefined length (they will return values
         # # for any index we give them.) we'll pull values until the max class size after that the values should
