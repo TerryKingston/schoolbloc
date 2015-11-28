@@ -21,6 +21,8 @@ class SchedulerTests(unittest.TestCase):
         [ Teacher("first_name_%s" % i, "last_name_%s" % i) for i in range(3) ]
         [ Classroom(i+1) for i in range(3) ]
         [ Course("course_%s" % i) for i in range(3) ]
+        [ Student("first_name_%s" % i, "last_name_%s" % i) for i in range(3) ]
+
 
 
     def tearDown(self):
@@ -43,7 +45,7 @@ class SchedulerTests(unittest.TestCase):
         # now loop through the scheduled classes and make sure all the teachers are valid
         teacher_ids = [ t.id for t in Teacher.query.all() ]
         for c in ScheduledClass.query.all():
-            self.assertTrue( c.teacher_id in teacher_ids )
+            self.assertIn(c.teacher_id, teacher_ids)
 
     def test_valid_room_ids(self):
         """ It assigns only valid classroom Ids from the DB """
@@ -51,7 +53,7 @@ class SchedulerTests(unittest.TestCase):
         # now loop through the scheduled classes and make sure all the teachers are valid
         room_ids = [ t.id for t in Classroom.query.all() ]
         for c in ScheduledClass.query.all():
-            self.assertTrue( c.classroom_id in room_ids )
+            self.assertIn(c.classroom_id, room_ids)
 
 
     def test_valid_student_ids(self):
@@ -61,9 +63,27 @@ class SchedulerTests(unittest.TestCase):
         student_ids = [ s.id for s in Student.query.all() ]
         for c in ScheduledClass.query.all():
             for stud in c.students:
-                self.assertTrue(stud.id in student_ids)
+                self.assertIn(stud.id, student_ids)
 
 
+    def test_class_duration_default(self):
+        """ It should set the duration of all classes to the default value when a course.duration
+            Is not set """
+        dur = 50 # minutes
+        scheduler.set_default_class_duration(dur)
+        scheduler.make_schedule()
+        for c in ScheduledClass.query.all():
+            self.assertEqual((c.end_time - c.start_time), dur)
+
+    def test_class_duration(self):
+        pass
+
+    def test_lunch_period(self):
+        pass
+
+    def test_break_periods(self):
+        pass
+    
     def test_room_time_collision(self):
         """ It does not assign two classes to a room which occur at the same time """
         pass

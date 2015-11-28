@@ -10,6 +10,18 @@ from schoolbloc.scheduled_classes.models import ScheduledClass
 class SchedulerNoSoltuion(Exception):
     pass
 
+# default config values. Should pull this stuff from a config file
+class_count=10
+day_start_time=815
+day_end_time=1555
+break_length=10 # time between classes
+lunch_start=1105
+lunch_end=1205
+class_duration=50 # minutes
+
+def set_default_class_duration(duration):
+    class_duration=duration
+
 # make the class z3 data type and define its constructor
 # a class represents a mapping of teacher, room, course, time, and students
 # Z3 will choose integers for teacher, room, course, and time. Its our job to
@@ -30,7 +42,6 @@ SchClass.declare('SchClass', ('teacher', IntSort()),
 
 TimeBlock, SchClass = CreateDatatypes(TimeBlock, SchClass)
 
-class_count=10
 # Right now, we make more classes than we need so that Z3 can be free to choose
 # the right class for each constraint. later, we'll remove the unused class objects
 classes = [Const("class_%s" % (i + 1), SchClass) for i in range(class_count)]
@@ -91,22 +102,63 @@ def ensure_valid_ids():
     # this basically loops through each class, and then each of the lists above and makes
     # an 'assert equal' for each. The lists are put in an 'Or' constraint to ensure
     # each entry appears in the respective id list
-    cons = [And(Or([teacher(i) == int(t_id) for t_id in teacher_ids]),
-                Or([room(i) == r_id for r_id in room_ids]),
-                Or([course(i) == c_id for c_id in course_ids]))
-            for i in range(class_count)]
+    cons_list = [ And(Or([teacher(i) == t_id for t_id in teacher_ids]),
+                      Or([room(i) == r_id for r_id in room_ids]),
+                      Or([course(i) == c_id for c_id in course_ids]))
+                  for i in range(class_count)]
 
     # make sure valid student IDs are selected. 
-    # x = Int(next_int_name())
-    # cons += [ForAll(x1, Or([students(i)[x] == j for j in student_ids]))
-    #           for i in range(class_count)]
+    x = Int(next_int_name())
+    cons_list += [ ForAll(x, Or([students(i)[x] == j for j in student_ids]))
+                    for i in range(class_count) ]
 
-    return cons
+    return cons_list
+
+def ensure_valid_class_durations():
+    """ returns a list of z3 constraints to make sure each class is either its
+        specified duration or the default duration """
+    cons_list = []
+    for c in Course.query.all():
+        if c.duration:
+            cons_list += [ If(course(i) == c.id, 
+                              TimeBlock.end(time(i)) - TimeBlock.start(time(i)) == c.duration,
+                              True) for i in range(class_count) ]
+        else:
+            cons_list += [ If(course(i) == c.id, 
+                              TimeBlock.end(time(i)) - TimeBlock.start(time(i)) == class_duration,
+                              True) for i in range(class_count) ] 
+    return cons_list
+
+def ensure_valid_class_start_times():
+    """ returns a list of z3 constraints to make sure each class falls into a valid start time """
+    # calculate the valid start times based on the config vars
+    start_times = []
+    cur_time = day_start_time
+    while cur_time < lunch_start:
+        start_times.append(cur_time)
+        cur_time += class_duration + break_length
+
+    cur_time = lunch_end
+    while cur_time < day_end_time:
+        start_times.append(cur_time)
+        cur_time += class_duration + break_length
+
+    return [ Or([TimeBlock.start(time(i)) == s for s in start_times]) for i in range(class_count) ]
+
+def ensure_lunch_period():
+    """ returns a list of z3 constraints making sure no class falls within the lunch period """
+    return [ Or(TimeBlock.start(time(i)) >= lunch_end, TimeBlock.end(time(i)) <= lunch_start) 
+             for i in range(class_count) ]
 
 # prevent a room from being assigned to two classes that occur at the same time
 def prevent_room_time_collision():
     return [ If(And(i != j, room(i) == room(j)),
-                 Not(time(i) == time(j)),  # then
+                 Not( Or( And( TimeBlock.start(time(i)) <= TimeBlock.start(time(j)), 
+                               TimeBlock.end(time(i)) >= TimeBlock.end(time(j)) ),
+                          And( TimeBlock.start(time(i)) <= TimeBlock.start(time(j)), 
+                               TimeBlock.end(time(i)) >= TimeBlock.start(time(j)) ),
+                          And( TimeBlock.start(time(i)) <= TimeBlock.end(time(j)),
+                               TimeBlock.end(time(i)) >= TimeBlock.end(time(j)) ))),  # then
                  True)  # else
               for i in range(class_count) for j in range(class_count) ]
 
@@ -220,16 +272,23 @@ def constrain_student_req_courses():
 
 def make_schedule():
     
+    constraints = []
     # all classes must be distinct
-    constraints = [Distinct([classes[i] for i in range(class_count)])]
+    # constraints = [Distinct([classes[i] for i in range(class_count)])]
 
     # Now we'll start adding constraints. The first set are implied constraints like
     # a teacher can't be in two places at one time.
-    constraints = ensure_valid_ids()
+    constraints += ensure_valid_ids()
+    constraints += ensure_valid_class_durations()
+    constraints += ensure_valid_class_start_times()
+    constraints += ensure_lunch_period()
     constraints += prevent_room_time_collision()
     constraints += prevent_teacher_time_collision()
     constraints += prevent_student_time_collision()
     constraints += prevent_duplicate_student()
+
+    # next, include the user provided constraints
+
 
   
 

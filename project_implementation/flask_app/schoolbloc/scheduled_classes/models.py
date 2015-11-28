@@ -25,9 +25,16 @@ class ScheduledClass(db.Model):
     course_id = db.Column(db.Integer, db.ForeignKey('courses.id'), nullable=False)
     course = db.relationship("Course", backref="scheduled_class")
     students = association_proxy('scheduled_classes_student', 'student')
+    start_time = db.Column(db.Integer, nullable=False) # time in 24 hr format (i.e. 1454)
+    end_time = db.Column(db.Integer, nullable=False)
 
     def __init__(self, course_id, classroom_id, teacher_id, start_time, end_time):
-        
+        # validate start and end time
+        if start_time < 0 or start_time > 2359 or end_time < 0 or end_time > 2359:
+            raise ScheduledClassError(" start_time and end_time must be between 0 and 2359 ")
+
+        self.start_time = start_time
+        self.end_time = end_time
         self.course_id = course_id
         self.classroom_id = classroom_id
         self.teacher_id = teacher_id
