@@ -26,17 +26,19 @@ class Course(db.Model):
     max_student_count = db.Column(db.Integer)
     min_student_count = db.Column(db.Integer)
 
-    def __init__(self, name, max_student_count=None, min_student_count=None):
+    def __init__(self, name, max_student_count=None, min_student_count=None, duration=None):
         self.name = name
         self.max_student_count = max_student_count
         self.min_student_count = min_student_count
+        self.duration = duration
+
         db.session.add(self)
         db.session.commit()
         log.info('added new course: {}'.format(name))
 
     def __repr__(self):
-        return "<name={} max_student_count={} min_student_count={}>".format(
-            self.name, self.max_student_count, self.min_student_count)
+        return "<name={} max_student_count={} min_student_count={} duration={}>".format(
+            self.name, self.max_student_count, self.min_student_count, self.duration)
 
     def delete(self):
         db.session.delete(self)

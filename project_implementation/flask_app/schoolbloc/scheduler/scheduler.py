@@ -41,9 +41,10 @@ class Scheduler():
                        break_length=None, 
                        lunch_start=None, 
                        lunch_end=None,
-                       class_duration=None):
+                       class_duration=None,
+                       class_count=None):
         
-        self.class_count = 10
+        self.class_count = class_count or 10
         # if values aren't provided, get the defaults from the config file
         self.day_start_time = day_start_time or config.school_start_time
         self.day_end_time = day_end_time or config.school_end_time

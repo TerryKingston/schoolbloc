@@ -140,7 +140,7 @@ class ClassroomsCourse(db.Model):
 
         db.session.add(self)
         db.session.commit()
-        log.info('acced new ClassroomsCourse: {} <--> {} {}'.format(
+        log.info('added new ClassroomsCourse: {} <--> {}'.format(
                  self.classroom.room_number, course.name))
 
     def __repr__(self):
