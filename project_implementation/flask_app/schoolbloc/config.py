@@ -3,12 +3,13 @@ from collections import namedtuple
 
 # Default values
 _defaults = {
-    'school_start_time': 800,
-    'school_end_time': 1500,
-    'block_size': 90,
-    'number_of_blocks': 2,
-    'lunch_time': 45,
-    'time_between_classes': 45,
+    'school_start_time': 815, # 8:15 AM
+    'school_end_time': 1555, # 3:55 PM
+    'block_size': 50, # minutes
+    'number_of_blocks': 7,
+    'lunch_start': 1105, # there is no break between the prev class and lunch
+    'lunch_end': 1205, # there is no break between the end of lunch and the next class
+    'time_between_classes': 10, # amount of minutes between classes 
 }
 
 # Named tuple (read only) which stores config values
@@ -17,7 +18,8 @@ _Config = namedtuple('_Config', [
     'school_end_time',
     'block_size',
     'number_of_blocks',
-    'lunch_time',
+    'lunch_start',
+    'lunch_end',
     'time_between_classes'
 ])
 

@@ -3,7 +3,7 @@ from schoolbloc import app, db
 from schoolbloc.teachers.models import Teacher
 from schoolbloc.classrooms.models import Classroom
 from schoolbloc.courses.models import Course
-from schoolbloc.scheduler import scheduler
+from schoolbloc.scheduler.scheduler import Scheduler
 from schoolbloc.students.models import Student
 from schoolbloc.scheduled_classes.models import ScheduledClass
 from schoolbloc.scheduled_classes.models import ScheduledClassesStudent
@@ -35,12 +35,14 @@ class SchedulerTests(unittest.TestCase):
     def test_generate_schedule(self):
         """ It creates 10 scheduled classes """
 
+        scheduler = Scheduler()
         scheduler.make_schedule()
         self.assertTrue(len(ScheduledClass.query.all()) == 10)
 
     def test_valid_teacher_ids(self):
         """ The selections of the scheduler are only for valid Ids """
 
+        scheduler = Scheduler()
         scheduler.make_schedule()
         # now loop through the scheduled classes and make sure all the teachers are valid
         teacher_ids = [ t.id for t in Teacher.query.all() ]
@@ -49,6 +51,7 @@ class SchedulerTests(unittest.TestCase):
 
     def test_valid_room_ids(self):
         """ It assigns only valid classroom Ids from the DB """
+        scheduler = Scheduler()
         scheduler.make_schedule()
         # now loop through the scheduled classes and make sure all the teachers are valid
         room_ids = [ t.id for t in Classroom.query.all() ]
@@ -58,6 +61,7 @@ class SchedulerTests(unittest.TestCase):
 
     def test_valid_student_ids(self):
         """ It assigns only valid student Ids from the DB """
+        scheduler = Scheduler()
         scheduler.make_schedule()
         # now loop through the scheduled classes and make sure all the teachers are valid
         student_ids = [ s.id for s in Student.query.all() ]
@@ -69,11 +73,10 @@ class SchedulerTests(unittest.TestCase):
     def test_class_duration_default(self):
         """ It should set the duration of all classes to the default value when a course.duration
             Is not set """
-        dur = 50 # minutes
-        scheduler.set_default_class_duration(dur)
+        scheduler = Scheduler(class_duration=60)
         scheduler.make_schedule()
         for c in ScheduledClass.query.all():
-            self.assertEqual((c.end_time - c.start_time), dur)
+            self.assertEqual((c.end_time - c.start_time), 60)
 
     def test_class_duration(self):
         pass
