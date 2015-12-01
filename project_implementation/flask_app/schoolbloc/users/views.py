@@ -4,7 +4,7 @@ from flask.ext.jwt import current_identity
 from sqlalchemy.exc import IntegrityError
 
 from schoolbloc import auth_required, db
-from schoolbloc.users.models import User, UserError, RoleError
+from schoolbloc.users.models import User, UserError
 from flask.ext.restful import Api, Resource, abort, reqparse
 
 # Setup logger
