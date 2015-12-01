@@ -33,8 +33,6 @@
 	"mainNavBar.MAIN_DASHBOARD": "Main Dashboard",
 	"mainNavBar.IMPORT_EXPORT": "Import/Export",
 	"mainNavBar.MODULES": "Modules",
-	"mainNavBar.SCHEDULER": "Scheduler",
-	"mainNavBar.FACTS_CONSTRAINTS": "Facts & Constraints",
 	"importExport.TITLE": "Import/Export - Admin View",
 	"importExport.SUBTITLE": "Import tables and connect them with School Bloc, or export tables to common file types.",
 	"importExport.IMPORT_HEADER": "Import:",
@@ -61,5 +59,7 @@
 	"schedulerModule.SET_REPEAT": "Change term or set repeat",
 	"schedulerModule.SAVE": "Save",
 	"schedulerModule.SAVE_ANOTHER": "Save & Add Another",
-	"schedulerModule.CANCEL": "Cancel"
+	"schedulerModule.CANCEL": "Cancel",
+	"schedulerModule.SCHEDULER": "Scheduler",
+	"schedulerModule.FACTS_CONSTRAINTS": "Facts & Constraints"
 }

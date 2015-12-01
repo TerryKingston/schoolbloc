@@ -1,18 +1,18 @@
 <section class="main-container">
   <div ng-controller="MainNavBar">
-    <sb-main-nav-bar></sb-main-nav-bar>
+    <sb-main-nav-bar config="mainContainer.navBarConfig"></sb-main-nav-bar>
   </div>
 
   <div class="main-views">
-    <!-- <div ng-controller="AdminHomeContainer">
+    <div ng-controller="AdminHomeContainer" ng-if="mainContainer.navBarConfig.view === 'main dashboard'">
       <sb-admin-home-container></sb-admin-home-container>
-    </div> -->
-<!--     <div ng-controller="ImportExportContainer">
+    </div>
+    <div ng-controller="ImportExportContainer" ng-if="mainContainer.navBarConfig.view === 'import export'">
       <sb-import-export-container></sb-import-export-container>
-    </div> -->
+    </div>
     
     <!-- MODULES -->
-    <div ng-controller="SchedulerModule">
+    <div ng-controller="SchedulerModule" ng-if="mainContainer.navBarConfig.view === 'scheduler'">
       <sb-scheduler-module></sb-scheduler-module>
     </div>
   </div>

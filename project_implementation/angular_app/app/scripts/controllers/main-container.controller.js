@@ -16,12 +16,9 @@ angular.module('sbAngularApp')
 		'AngularJS',
 		'Karma'
 	];
-	$scope.mainContainer = {
-		
-	};
 
 }])
-.directive('sbMainContainer', [function() {
+.directive('sbMainContainer', ['$translate', function($translate) {
 	/**
 	 * For manipulating the DOM
 	 * @param  scope   as configured in the controller
@@ -29,6 +26,42 @@ angular.module('sbAngularApp')
 	 * @param  attrs   hash object with key-value pairs of normalized attribute names and their corresponding attribute values.
 	 */
 	function link(scope, element, attrs) {
+		scope.mainContainer = {
+			navBarConfig: {
+				view: "main dashboard",
+				subView : null,
+				profile: {
+					username: "!!Test User",
+					role: "!!Admin"
+				},
+				modules: [
+					{
+						identifier: "scheduler",
+						name: "",
+						submodules: [
+							{
+								identifier: "facts and constraints",
+								name: ""
+							}
+						]
+					}
+				]
+			}
+		};
+
+
+		function getModuleTranslations() {
+			$translate("schedulerModule.SCHEDULER").then(function (translation) {
+				scope.mainContainer.navBarConfig.modules[0].name = translation;
+			});
+
+			$translate("schedulerModule.FACTS_CONSTRAINTS").then(function (translation) {
+				scope.mainContainer.navBarConfig.modules[0].submodules[0].name = translation;
+			});
+		};
+
+		/**** initial setup ****/
+		getModuleTranslations();
 	}
 
 	/**

@@ -6,17 +6,21 @@
     </section>
     <section class="main-nav-bar-profile" ng-click="toggleProfileSettings()">
       <div class="down-arrow-icon"></div>
-      <h4>!!Test User!!</h4>
-      <h5>!!Signed in as Admin!!</h5>
+      <h4>{{config.profile.username}}</h4>
+      <h5>!!Signed in as {{config.profile.role}}</h5>
     </section>
     <section class="main-nav-bar-main-controls">
-      <a href=""><div class="main-control dashboard-control">{{"mainNavBar.MAIN_DASHBOARD" | translate}}</div></a>
-      <a href=""><div class="main-control">{{"mainNavBar.IMPORT_EXPORT" | translate}}</div></a>
+      <a href="" ng-click="changeView('main dashboard')"><div class="main-control" ng-class="{'main-control-active': config.view === 'main dashboard', 'dashboard-control': config.view !== 'main dashboard'}">{{"mainNavBar.MAIN_DASHBOARD" | translate}}</div></a>
+      <a href="" ng-click="changeView('import export')"><div class="main-control" ng-class="{'main-control-active': config.view === 'import export'}">{{"mainNavBar.IMPORT_EXPORT" | translate}}</div></a>
     </section>
     <section class="main-nav-bar-module-controls">
       <h3>{{"mainNavBar.MODULES" | translate}}</h3>
-      <a href=""><div class="main-control main-control-active">{{"mainNavBar.SCHEDULER" | translate}}</div></a>
-      <a href=""><div class="sub-control sub-control-active">{{"mainNavBar.FACTS_CONSTRAINTS" | translate}}</div></a>
+      <div class="modules-list" ng-repeat="module in config.modules">
+        <a href="" ng-click="changeView(module.identifier)"><div class="main-control" ng-class="{'main-control-active': config.view === module.identifier || module.submoduleActive}">{{module.name}}</div></a>
+        <div class="submodules-list" ng-repeat="submodule in module.submodules">
+          <a href="" ng-click="changeSubView(submodule.identifier, module.identifier)"><div class="sub-control" ng-class="{'sub-control-active': config.subView === submodule.identifier}">{{submodule.name}}</div></a>
+        </div>
+      </div>
     </section>
   </div>
   <div class="main-nav-bar-closed" ng-show="!mainNavBar.isOpen">
