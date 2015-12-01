@@ -1,7 +1,8 @@
 import unittest
+import json
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm.exc import NoResultFound
-from schoolbloc import app, db
+import schoolbloc
 from schoolbloc.users.models import Role, RoleError, User
 
 
@@ -10,17 +11,24 @@ class UserRoleTests(unittest.TestCase):
 
     def setUp(self):
         """ Uses an in memory sqlite database for testing """
-        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite://'
-        db.init_app(app)
-        with app.app_context():
-            db.create_all()
+        schoolbloc.app.config.from_object('config')
+        schoolbloc.app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite://'
+        self.app = schoolbloc.app.test_client(use_cookies=False)
+        with schoolbloc.app.app_context():
+            schoolbloc.db.create_all()
 
     def tearDown(self):
         """ Ensures that the database is emptied for next unit test """
-        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite://'
-        db.init_app(app)
-        with app.app_context():
-            db.drop_all()
+        with schoolbloc.app.app_context():
+            schoolbloc.db.drop_all()
+
+    def get_login_token(self, role):
+        Role(role)
+        User('user', 'user', role)
+        a = self.app.post('/auth', data=json.dumps({'username': 'user', 'password': 'user'}),
+                          content_type='application/json')
+        data = json.loads(a.get_data(as_text=True))
+        return data['access_token']
 
     def test_adding_role(self):
         r = Role('admin')
@@ -50,6 +58,8 @@ class UserRoleTests(unittest.TestCase):
         with self.assertRaises(IntegrityError):
             r.delete()
 
+    def test_login(self):
+        self.get_login_token('student')
 
 if __name__ == '__main__':
     unittest.main()

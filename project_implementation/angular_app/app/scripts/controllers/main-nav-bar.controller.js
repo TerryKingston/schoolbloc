@@ -5,6 +5,18 @@
  * @name sbAngularApp.controller:MainNavBar
  * @description
  *
+ *  * USE:
+ * <sb-main-nav-bar config="configObject"></sb-main-nav-bar>
+ *
+ * configObject = {
+ *   view: <the current view string identifier>,
+ *   profile: {
+		username: <string username>,
+		role: <string user role>
+	}
+ * }
+ *
+ * view can be: 'main dashboard' | 'import export' | identifier for a module
  * 
  * # MainNavBar
  * Controller of the sbAngularApp
@@ -16,13 +28,6 @@ angular.module('sbAngularApp')
 		'AngularJS',
 		'Karma'
 	];
-	$scope.mainNavBar = {
-		isOpen: true,
-		// since browsers don't determine height in css form, we need to manually determine it here
-		navBarStyle: {
-			'height': '0px'
-		}
-	};
 
 }])
 .directive('sbMainNavBar', ['$window', function($window) {
@@ -33,6 +38,14 @@ angular.module('sbAngularApp')
 	 * @param  attrs   hash object with key-value pairs of normalized attribute names and their corresponding attribute values.
 	 */
 	function link(scope, element, attrs) {
+
+		scope.mainNavBar = {
+			isOpen: true,
+			navBarStyle: {
+				// since browsers don't determine height in css form, we need to manually determine it here
+				'height': '0px'
+			}
+		};
 
 		/**
 		 * Updates the height of the window as it is resized.
@@ -50,10 +63,20 @@ angular.module('sbAngularApp')
 	        });
 		}
 
+		scope.changeView = function(view) {
+			scope.config.view = view;
+			scope.config.subView = null
+		};
+
+		scope.changeSubView = function(subView, view) {
+			// show active for parent module
+			scope.config.view = view;
+			scope.config.subView = subView;
+		};
 
 		scope.toggleNavBar = function(isOpen) {
 			scope.mainNavBar.isOpen = isOpen;
-		}
+		};
 
 		// check against the current window size when the browser loads.
 		updateWindowSize();
@@ -75,6 +98,9 @@ angular.module('sbAngularApp')
 	 */
 	return {
 		restrict: 'E',
+		scope: {
+			config: '=config'
+		},
 		templateUrl: 'views/main-nav-bar.html',
 		link: link
 	};
