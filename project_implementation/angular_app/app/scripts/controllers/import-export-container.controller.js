@@ -33,6 +33,8 @@ angular.module('sbAngularApp')
 	 * @param  attrs   hash object with key-value pairs of normalized attribute names and their corresponding attribute values.
 	 */
 	function link(scope, element, attrs) {
+
+		scope.fileUploader = new fileUploader()
 	}
 
 	/**

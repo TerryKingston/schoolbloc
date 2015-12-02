@@ -39,6 +39,7 @@
 	"importExport.EXPORT_HEADER": "Export:",
 	"importExport.MODULES_SECTION": "Modules:",
 	"importExport.SCHEDULER_HEADER": "Scheduler:",
+	"importExport.IMPORT_TABLE": "Import to Table",
 	"importExport.EXPORT_TABLE": "Table to export",
 	"importExport.EXPORT_TO": "Export to",
 	"importExport.SCHEDULE": "Schedule",
@@ -61,5 +62,6 @@
 	"schedulerModule.SAVE_ANOTHER": "Save & Add Another",
 	"schedulerModule.CANCEL": "Cancel",
 	"schedulerModule.SCHEDULER": "Scheduler",
-	"schedulerModule.FACTS_CONSTRAINTS": "Facts & Constraints"
+	"schedulerModule.FACTS_CONSTRAINTS": "Facts & Constraints",
+	"schedulerModule.TEACHERS": "Teachers"
 }

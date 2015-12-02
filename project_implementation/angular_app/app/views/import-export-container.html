@@ -2,7 +2,20 @@
 <section class="import-export-container main-view-content">
   <h4>{{"importExport.IMPORT_HEADER" | translate}}</h4>
   <section class="view-sub-content">
-    <button class="btn btn-recommended">{{"importExport.UPLOAD_FILE" | translate}}</button>
+    <div class="input-row">
+      <label>
+        <div>{{"importExport.IMPORT_TABLE" | translate}}</div>
+        <select>
+          <option>Teachers</option>
+          <option>Students</option>
+          <option>Courses</option>
+          <option>Classrooms</option>
+        </select>
+      </label>
+    </div>
+  </section>
+  <section class="view-sub-content">
+    <input type="file" nv-file-select uploader="fileUploader">  
   </section>
   <h4>{{"importExport.EXPORT_HEADER" | translate}}</h4>
   <section class="view-sub-content">
