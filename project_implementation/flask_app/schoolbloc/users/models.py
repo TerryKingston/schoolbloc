@@ -1,7 +1,5 @@
 import logging
 from flask import json
-from sqlalchemy.exc import IntegrityError
-from sqlalchemy.orm.exc import NoResultFound
 from passlib.hash import pbkdf2_sha512
 from schoolbloc import db
 
@@ -9,7 +7,7 @@ from schoolbloc import db
 log = logging.getLogger(__name__)
 
 
-class UserError(Exception):
+class InvalidPasswordError(Exception):
     pass
 
 
@@ -41,28 +39,18 @@ class User(db.Model):
         self.hashed_passwd = pbkdf2_sha512.encrypt(password, rounds=200000, salt_size=16)
         self.role_id = role.id
 
-        try:
-            db.session.add(self)
-            db.session.commit()
-            log.info('added new user: {} <{}>'.format(username, role_type))
-        except IntegrityError:
-            db.session.rollback()
-            raise UserError('The user {} already exists in the database'.format(username))
-
-    def __repr__(self):
-        return "<username={} role_id={}>".format(self.username, self.role_id)
-
     def verify_password(self, password):
         # TODO move to bcrypt, more secure then sha512
         if not pbkdf2_sha512.verify(password, self.hashed_passwd):
-            raise UserError('Password does not validate')
+            raise InvalidPasswordError('Password does not validate')
 
     def update_password(self, new_password, commit=True):
-        """ Updates the password of this user """
+        """
+        Updates the password of this user. NOTE this does not commit changes
+        into the database. You must still add and commit the user yourself
+        after updating the password
+        """
         self.hashed_passwd = pbkdf2_sha512.encrypt(new_password, rounds=200000, salt_size=16)
-        if commit:
-            db.session.add(self)
-            db.session.commit()
 
     def jsonify(self):
         """ Serialize by converting this object to json """

@@ -1,9 +1,6 @@
 import logging
-
 from flask import json
-
 from schoolbloc import db
-from schoolbloc.student_groups.models import StudentGroup
 
 log = logging.getLogger(__name__)
 
@@ -29,7 +26,6 @@ class Student(db.Model):
             'first_name': self.first_name,
             'last_name': self.last_name,
         })
-
 
 
 class StudentsStudentGroup(db.Model):

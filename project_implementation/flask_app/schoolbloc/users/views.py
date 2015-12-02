@@ -4,7 +4,7 @@ from flask.ext.jwt import current_identity
 from sqlalchemy.exc import IntegrityError
 
 from schoolbloc import auth_required, db
-from schoolbloc.users.models import User, UserError
+from schoolbloc.users.models import User, InvalidPasswordError
 from flask.ext.restful import Api, Resource, abort, reqparse
 
 # Setup logger
@@ -75,12 +75,10 @@ class UserApi(Resource):
                 user.update_role(role_name, commit=False)
             db.session.add(user)
             db.session.commit()
-        except RoleError:
-            abort(404, message="Role not found")
-        except IntegrityError:  # new username already exists on the system
-            abort(409, message="A user with that name already exists")
-
-        # TODO find out what ryan wants for successful return data here
+        except IntegrityError:
+            # TODO get better error messages, figure out what constraint was
+            #      actually validated
+            abort(409, message="Error")
         return {'success': 'user updated successfully'}, 200
 
     @auth_required(roles=['admin'])
@@ -99,7 +97,6 @@ class UserListApi(Resource):
         """ Get a list of users """
         return [user.jsonify() for user in User.query.all()]
 
-    # TODO if anyone should be allowed to sign up, we need to remove the auth_required
     @auth_required(roles='admin')
     def post(self):
         """ Create a new user """
@@ -110,7 +107,7 @@ class UserListApi(Resource):
         args = parser.parse_args()
         try:
             User(username=args['username'], password=args['password'], role_type=args['role'])
-        except UserError as e:
+        except InvalidPasswordError as e:
             return {'error': str(e)}, 409
 
         return {'success': 'user created successfully'}, 200
