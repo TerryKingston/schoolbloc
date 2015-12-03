@@ -5,7 +5,7 @@
     <div class="input-row">
       <label>
         <div>{{"importExport.IMPORT_TABLE" | translate}}</div>
-        <select ng-model="uploadTableName" ng-change="setUploadUrl()">
+        <select ng-model="fileUploader.formData.table_name" ng-change="setUploadUrl()">
           <option value="teachers">{{"importExport.TEACHERS" | translate}}</option>
           <option value="students">{{"importExport.STUDENTS" | translate}}</option>
           <option value="courses">{{"importExport.COURSES" | translate}}</option>
@@ -19,9 +19,25 @@
         <input type="file" nv-file-select uploader="fileUploader" style="border:none">  
       </label>
     </div>
+    <table>
+      <tr>
+        <th><div>{{"importExport.TABLE" | translate}}</div></th>
+        <th><div>{{"importExport.FILE" | translate}}</div></th>
+      </tr>
+      <tr ng-repeat="f in fileUploader.queue">
+        <td>{{f.formData.table_name}}</td>
+        <td>{{f.file.name}}</td>
+        <td>
+          <div ng-show="!f.isUploaded && !f.isUploading"><button ng-click="fileUploader.queue.splice(f.index, 1)">x</button>
+          <div ng-show="f.isUploading">{{"importExport.UPLOADING" | translate }}{{f.progress}}</div>
+          <div ng-show="f.isError">!!Upload Error!!</div>
+          <div ng-show="f.isSuccess">!!Upload Success!!</div>
+        </td>
+      </tr>
+    </table>
     <div class="input-row">
       <button class="btn btn-recommended" ng-disabled="fileUploader.isUploading || fileUploader.queue.length == 0" ng-click="uploadSelectedFile()">{{"importExport.UPLOAD_FILE" | translate}}</button>
-      <label ng-show="fileUploader.isUploading">{{"importExport.UPLOADING" | translate }}{{fileUploader.progress}}</label>
+      
     </div>
   </section>
   <h4>{{"importExport.EXPORT_HEADER" | translate}}</h4>

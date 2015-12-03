@@ -25,18 +25,15 @@ angular.module('sbAngularApp')
 	};
 
 	$scope.fileUploader = new FileUploader({
-		queueLimit: 1
+		queueLimit: 10,
+		formData: {table_name: 'students'}	// default to students. can be changed in form
 	});
 
-	
-
 	// the upload URL depends on the selected table, so we'll set that 
-	// when a selection is made. The url also gets added to the 'File' object
-	// when one is selected, so we have to change it also if we want the 
-	// change to reflect in a previously selected file
+	// when a selection is made. 
 	$scope.setUploadUrl = function(){
 		var url = '';
-		switch($scope.uploadTableName){
+		switch($scope.fileUploader.formData.table_name){
 			case 'teachers':
 				url = '.../teachers/...';
 				break;
@@ -53,11 +50,7 @@ angular.module('sbAngularApp')
 				
 		}
 		$scope.fileUploader.url = url;
-		if ($scope.fileUploader.queue.length > 0){
-			$scope.fileUploader.queue[0].url = url			
-		}
 	}
-	$scope.uploadTableName = 'students'
 	$scope.setUploadUrl()
 
 	$scope.uploadSelectedFile = function(){
