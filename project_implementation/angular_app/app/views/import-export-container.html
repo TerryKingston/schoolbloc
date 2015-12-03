@@ -5,17 +5,24 @@
     <div class="input-row">
       <label>
         <div>{{"importExport.IMPORT_TABLE" | translate}}</div>
-        <select>
-          <option>Teachers</option>
-          <option>Students</option>
-          <option>Courses</option>
-          <option>Classrooms</option>
+        <select ng-model="uploadTableName" ng-change="setUploadUrl()">
+          <option value="teachers">{{"importExport.TEACHERS" | translate}}</option>
+          <option value="students">{{"importExport.STUDENTS" | translate}}</option>
+          <option value="courses">{{"importExport.COURSES" | translate}}</option>
+          <option value="classrooms">{{"importExport.CLASSROOMS" | translate}}</option>
         </select>
       </label>
     </div>
-  </section>
-  <section class="view-sub-content">
-    <input type="file" nv-file-select uploader="fileUploader">  
+    <div class="input-row">
+      <label>
+        <div>{{"importExport.FILE" | translate}}</div>
+        <input type="file" nv-file-select uploader="fileUploader" style="border:none">  
+      </label>
+    </div>
+    <div class="input-row">
+      <button class="btn btn-recommended" ng-disabled="fileUploader.isUploading || fileUploader.queue.length == 0" ng-click="uploadSelectedFile()">{{"importExport.UPLOAD_FILE" | translate}}</button>
+      <label ng-show="fileUploader.isUploading">{{"importExport.UPLOADING" | translate }}{{fileUploader.progress}}</label>
+    </div>
   </section>
   <h4>{{"importExport.EXPORT_HEADER" | translate}}</h4>
   <section class="view-sub-content">

@@ -42,9 +42,6 @@ angular.module('sbAngularApp')
 							{
 								identifier: "facts and constraints",
 								name: ""
-							},
-							{ identifier: "teachers",
-								name: ""
 							}
 						]
 					}
@@ -62,9 +59,6 @@ angular.module('sbAngularApp')
 				scope.mainContainer.navBarConfig.modules[0].submodules[0].name = translation;
 			});
 
-			$translate("schedulerModule.TEACHERS").then(function (translation) {
-				scope.mainContainer.navBarConfig.modules[0].submodules[1].name = translation;
-			});
 		};
 
 		/**** initial setup ****/

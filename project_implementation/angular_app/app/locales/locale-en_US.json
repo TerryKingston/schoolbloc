@@ -40,10 +40,16 @@
 	"importExport.MODULES_SECTION": "Modules:",
 	"importExport.SCHEDULER_HEADER": "Scheduler:",
 	"importExport.IMPORT_TABLE": "Import to Table",
+	"importExport.FILE" : "File",
+	"importExport.TEACHERS" : "Teachers",
+	"importExport.STUDENTS" : "Students",
+	"importExport.COURSES" : "Courses",
+	"importExport.CLASSROOMS" : "Classrooms",	
+	"importExport.UPLOADING" : "Uploading...",
 	"importExport.EXPORT_TABLE": "Table to export",
 	"importExport.EXPORT_TO": "Export to",
 	"importExport.SCHEDULE": "Schedule",
-	"importExport.UPLOAD_FILE": "Upload a file",
+	"importExport.UPLOAD_FILE": "Upload file",
 	"importExport.EXPORT_FILE": "Export file",
 	"schedulerModule.TITLE": "Scheduler - Admin View",
 	"schedulerModule.SUBTITLE": "Vieweing the facts & constraints for {0} Term.",
@@ -62,6 +68,5 @@
 	"schedulerModule.SAVE_ANOTHER": "Save & Add Another",
 	"schedulerModule.CANCEL": "Cancel",
 	"schedulerModule.SCHEDULER": "Scheduler",
-	"schedulerModule.FACTS_CONSTRAINTS": "Facts & Constraints",
-	"schedulerModule.TEACHERS": "Teachers"
+	"schedulerModule.FACTS_CONSTRAINTS": "Facts & Constraints"
 }
