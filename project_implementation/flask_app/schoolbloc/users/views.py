@@ -85,7 +85,8 @@ class UserApi(Resource):
     def delete(self, user_id):
         """ Delete an existing User (admins only) """
         user = get_user_or_abort(user_id)
-        user.delete()
+        db.session.delete(user)
+        db.session.commit
         return {'success': 'user deleted successfully'}, 200
 
 
@@ -106,9 +107,12 @@ class UserListApi(Resource):
         parser.add_argument('role', required=True)
         args = parser.parse_args()
         try:
-            User(username=args['username'], password=args['password'], role_type=args['role'])
-        except InvalidPasswordError as e:
-            return {'error': str(e)}, 409
+            u = User(username=args['username'], password=args['password'], role_type=args['role'])
+            db.session.add(u)
+            db.session.commit()
+        except IntegrityError:
+            db.session.rollback()
+            return {'error': 'username already exists'}, 409
 
         return {'success': 'user created successfully'}, 200
 

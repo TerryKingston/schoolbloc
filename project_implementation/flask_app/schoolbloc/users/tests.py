@@ -1,4 +1,7 @@
 import unittest
+
+from sqlalchemy.orm.exc import NoResultFound
+
 from schoolbloc import User, db
 from schoolbloc.testing.testing import BaseTestClass
 
@@ -78,7 +81,7 @@ class UserTests(BaseTestClass):
                                 data={'password': 'new_password'})
         self.assertEqual(response.status_code, 200)
 
-        # Student tries to update admin password
+        # Student tries to update admin password (using his new password)
         key, _ = self.login('student', 'new_password')
         headers = {'Authorization': 'JWT {}'.format(key)}
         response = self.app.put('/api/users/{}'.format(u2.id), headers=headers,
@@ -101,7 +104,38 @@ class UserTests(BaseTestClass):
         self.assertEqual(status_code, 200)
 
     def test_add_user(self):
-        pass
+        db.session.add(User(username='admin', password='admin', role_type='admin'))
+        db.session.add(User(username='student', password='student', role_type='student'))
+        db.session.commit()
+
+        # Admins are allowed to add users
+        key, _ = self.login('admin', 'admin')
+        headers = {'Authorization': 'JWT {}'.format(key)}
+        add_user_data = {
+            'username': 'new_student',
+            'password': 'new_student',
+            'role': 'student'
+        }
+        response = self.app.post('/api/users', headers=headers, data=add_user_data)
+        self.assertEqual(response.status_code, 200)
+        User.query.filter_by(username='new_student').one()  # insure exists in db
+
+        # Adding a duplicate username results in an error
+        response = self.app.post('/api/users', headers=headers, data=add_user_data)
+        self.assertEqual(response.status_code, 409)
+
+        # Student isn't allowed to add a user
+        key, _ = self.login('student', 'student')
+        headers = {'Authorization': 'JWT {}'.format(key)}
+        add_user_data = {
+            'username': 'new_student2',
+            'password': 'new_student2',
+            'role': 'student'
+        }
+        response = self.app.post('/api/users', headers=headers, data=add_user_data)
+        self.assertEqual(response.status_code, 403)
+        with self.assertRaises(NoResultFound):
+            User.query.filter_by(username='new_student2').one()
 
     def test_delete_user(self):
         pass
