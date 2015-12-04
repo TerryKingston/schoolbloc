@@ -19,17 +19,10 @@ class UserTests(BaseTestClass):
 
     def test_get_user(self):
         # setup users
-        u1 = User(username='student', password='student', role_type='student')
-        u2 = User(username='teacher', password='teacher', role_type='teacher')
-        u3 = User(username='admin', password='admin', role_type='admin')
-        db.session.add(u1)
-        db.session.add(u2)
-        db.session.add(u3)
+        db.session.add(User(username='student', password='student', role_type='student'))
+        db.session.add(User(username='teacher', password='teacher', role_type='teacher'))
+        db.session.add(User(username='admin', password='admin', role_type='admin'))
         db.session.commit()
-
-        # Have to re-query them after commit them so the id's properly get attached.
-        # I have a feeling this is a dumb on my part here, and isn't necessary, but
-        # that I am missing something
         u1 = User.query.filter_by(username='student').one()
         u2 = User.query.filter_by(username='teacher').one()
         u3 = User.query.filter_by(username='admin').one()
@@ -64,10 +57,8 @@ class UserTests(BaseTestClass):
 
     def test_update_passwords(self):
         """ Test updating passwords with the put rest method """
-        u1 = User(username='student', password='student', role_type='student')
-        u2 = User(username='admin', password='admin', role_type='admin')
-        db.session.add(u1)
-        db.session.add(u2)
+        db.session.add(User(username='admin', password='admin', role_type='admin'))
+        db.session.add(User(username='student', password='student', role_type='student'))
         db.session.commit()
         u1 = User.query.filter_by(username='student').one()
         u2 = User.query.filter_by(username='admin').one()
@@ -79,14 +70,14 @@ class UserTests(BaseTestClass):
                                 data={'password': 'new_password'})
         self.assertEqual(response.status_code, 200)
 
-        # Student tries to update admin password (using his new password)
+        # Student tries to update someone else's password (using his new password)
         key, _ = self.login('student', 'new_password')
         headers = {'Authorization': 'JWT {}'.format(key)}
         response = self.app.put('/api/users/{}'.format(u2.id), headers=headers,
                                 data={'password': 'new_password'})
         self.assertEqual(response.status_code, 404)
 
-        # Admin update student
+        # Admin updates student password
         key, _ = self.login('admin', 'admin')
         headers = {'Authorization': 'JWT {}'.format(key)}
         response = self.app.put('/api/users/{}'.format(u1.id), headers=headers,
