@@ -26,7 +26,7 @@ class UserTests(BaseTestClass):
         db.session.add(u3)
         db.session.commit()
 
-        # Have to re-query them after commit them so the id's propery get attached.
+        # Have to re-query them after commit them so the id's properly get attached.
         # I have a feeling this is a dumb on my part here, and isn't necessary, but
         # that I am missing something
         u1 = User.query.filter_by(username='student').one()
@@ -54,7 +54,7 @@ class UserTests(BaseTestClass):
         self.assertEqual(data['username'], u1.username)
 
         # Admin getting teacher info
-        key, _ = self.login('teacher', 'teacher')
+        key, _ = self.login('admin', 'admin')
         headers = {'Authorization': 'JWT {}'.format(key)}
         response = self.app.get('/api/users/{}'.format(u2.id), headers=headers)
         data = self.parse_response_json(response)
