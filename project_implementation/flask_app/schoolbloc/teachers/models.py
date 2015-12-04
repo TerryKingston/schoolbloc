@@ -18,3 +18,10 @@ class Teacher(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     user = db.relationship("User", backref="teacher")
 
+    def serialize(self):
+        return {
+            'id': self.id,
+            'first_name': self.first_name,
+            'last_name': self.last_name,
+            'user_id': self.user_id,
+        }
