@@ -4,7 +4,7 @@ from flask.ext.jwt import current_identity
 from sqlalchemy.exc import IntegrityError
 
 from schoolbloc import auth_required, db, User
-from schoolbloc.students.models import Student
+from schoolbloc.students.models import Student, StudentsStudentGroup
 from flask.ext.restful import Api, Resource, abort, reqparse
 
 # Setup logger
@@ -38,18 +38,11 @@ class StudentApi(Resource):
 
     @auth_required()
     def get(self, student_id):
-        """ Get info on a User """
         student = get_student_or_abort(student_id)
-        return student.jsonify()
+        return student.serialize()
 
     @auth_required(roles='admin')
     def put(self, student_id):
-        """
-        Update settings of a User (password, address, email, etc)
-
-        Any user can update their own settings, and admins can update any users
-        settings
-        """
         # Optional data
         parser = reqparse.RequestParser()
         parser.add_argument('first_name')
@@ -69,7 +62,6 @@ class StudentApi(Resource):
             student.last_name = last_name
         db.session.add(student)
         db.session.commit()
-
         return {'success': 'user updated successfully'}, 200
 
     @auth_required(roles='admin')
@@ -87,7 +79,7 @@ class StudentListApi(Resource):
     @auth_required(roles=['teacher', 'admin'])
     def get(self):
         """ Get a list of students """
-        return [student.jsonify() for student in Student.query.all()]
+        return [student.serialize() for student in Student.query.all()]
 
     @auth_required(roles='admin')
     def post(self):
@@ -107,8 +99,80 @@ class StudentListApi(Resource):
         except IntegrityError:
             db.session.rollbacke()
             return {'error': 'unique constraint failed'}, 409
-
         return {'success': 'Student created successfully'}, 200
 
+
+def get_ssg_or_abort(student_group_id):
+    sg = StudentsStudentGroup.query.get(student_group_id)
+    if not sg:
+        abort(404, message="students student group {} doesn't exist".format(student_group_id))
+    return sg
+
+
+class StudentsStudentGroupApi(Resource):
+    @auth_required(roles='admin')
+    def get(self, ssg_id):
+        sg = get_student_or_abort(ssg_id)
+        return sg.serialize()
+
+    @auth_required(roles='admin')
+    def put(self, ssg_id):
+        # Optional data
+        parser = reqparse.RequestParser()
+        parser.add_argument('student_id')
+        parser.add_argument('student_group_id')
+        parser.add_argument('active')
+
+        # Parse data from incoming request
+        args = parser.parse_args()
+        student_id = args.get('student_id')
+        student_group_id = args.get('student_group_id')
+        active = args.get('active')
+
+        # Update user information and save it to the db. Don't commit the changes
+        # until the end, so that if one thing fails this entire request fails
+        ssg = get_ssg_or_abort(ssg_id)
+        if student_id:
+            ssg.student_id = student_id
+        if student_group_id:
+            ssg.student_group_id = student_group_id
+        if active:
+            ssg.active = active
+        db.session.add(ssg)
+        db.session.commit()
+        return {'success': 'ssg updated successfully'}, 200
+
+    @auth_required(roles='admin')
+    def delete(self, ssg_id):
+        """ Delete an existing User (admins only) """
+        ssg = get_ssg_or_abort(ssg_id)
+        db.session.delete(ssg)
+        db.session.commit()
+        return {'success': 'ssg deleted successfully'}, 200
+
+
+class StudentsStudentGroupListApi(Resource):
+    """ Get all users or create new user """
+    @auth_required('admin')
+    def get(self):
+        """ Get a list of students """
+        return [ssg.serialize() for ssg in StudentsStudentGroup.query.all()]
+
+    @auth_required(roles='admin')
+    def post(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('student_id', required=True)
+        parser.add_argument('student_group_id', required=True)
+        parser.add_argument('active', required=True)
+        args = parser.parse_args()
+
+        ssg = StudentsStudentGroup(student_id=args['student_id'], active=args['active'],
+                                   student_group_id=args['student_group_id'])
+        db.session.add(ssg)
+        db.session.commit()
+        return {'success': 'ssg created successfully'}, 200
+
 api.add_resource(StudentApi, '/api/students/<int:student_id>')
-api.add_resource(StudentListApi, '/api/students/')
+api.add_resource(StudentListApi, '/api/students')
+api.add_resource(StudentsStudentGroupApi, '/api/students-student-group/<int:student_id>')
+api.add_resource(StudentsStudentGroupListApi, '/api/students-student-group')

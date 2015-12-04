@@ -19,12 +19,12 @@ class Student(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     user = db.relationship("User", backref="student")
 
-    def jsonify(self):
-        return json.dumps({
+    def serialize(self):
+        return {
             'id': self.id,
             'first_name': self.first_name,
             'last_name': self.last_name,
-        })
+        }
 
 
 class StudentsStudentGroup(db.Model):
@@ -44,3 +44,11 @@ class StudentsStudentGroup(db.Model):
     active = db.Column(db.Boolean, nullable=False, default=True)
     student = db.relationship("Student", backref="students_student_groups")
     student_group = db.relationship("StudentGroup", backref="students_student_groups")
+
+    def serialize(self):
+        return {
+            'id': self.id,
+            'student_id': self.student_id,
+            'student_group_id': self.student_group_id,
+            'active': self.active,
+        }
