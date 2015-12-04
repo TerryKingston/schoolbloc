@@ -55,30 +55,27 @@ class UserApi(Resource):
         parser = reqparse.RequestParser()
         parser.add_argument('username')
         parser.add_argument('password')
-        parser.add_argument('role')
 
         # Parse data from incoming request
         args = parser.parse_args()
         username = args.get('username')
         password = args.get('password')
-        role_name = args.get('role')
 
         # Update user information and save it to the db. Don't commit the changes
         # until the end, so that if one thing fails this entire request fails
         user = get_user_or_abort(user_id)
         try:
             if username:
-                user.update_username(username, commit=False)
+                if user.role.role_type == 'student':
+                    abort(403, message='Students cannot update username')
+                else:
+                    user.username = username
             if password:
-                user.update_password(password, commit=False)
-            if role_name:
-                user.update_role(role_name, commit=False)
+                user.update_password(password)
             db.session.add(user)
             db.session.commit()
         except IntegrityError:
-            # TODO get better error messages, figure out what constraint was
-            #      actually validated
-            abort(409, message="Error")
+            abort(409, message="Duplicate username")
         return {'success': 'user updated successfully'}, 200
 
     @auth_required(roles=['admin'])
