@@ -52,10 +52,10 @@ class User(db.Model):
         """
         self.hashed_passwd = pbkdf2_sha512.encrypt(new_password, rounds=200000, salt_size=16)
 
-    def jsonify(self):
+    def serialize(self):
         """ Serialize by converting this object to json """
-        return json.dumps({
+        return {
             'id': self.id,
             'username': self.username,
             'role': self.role.role_type
-        })
+        }

@@ -1,6 +1,6 @@
 import unittest
 from flask import json
-from schoolbloc import db, app, User
+from schoolbloc import db, app
 from schoolbloc.users.models import Role
 
 
@@ -21,10 +21,7 @@ class BaseTestClass(unittest.TestCase):
     def parse_response_json(self, response):
         # God knows why, but for some reason, sometimes, the first json.loads
         # returns a string instead of a dict/list/whatever. This is a dumb fix
-        data = json.loads(response.get_data(as_text=True))
-        if isinstance(data, str):
-            data = json.loads(data)
-        return data
+        return json.loads(response.get_data(as_text=True))
 
     def login(self, username, password):
         login_data = {'username': username, 'password': password}

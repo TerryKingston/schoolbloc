@@ -41,7 +41,7 @@ class UserApi(Resource):
     def get(self, user_id):
         """ Get info on a User """
         user = get_user_or_abort(user_id)
-        return user.jsonify()
+        return user.serialize()
 
     @auth_required()
     def put(self, user_id):
@@ -95,7 +95,7 @@ class UserListApi(Resource):
     @auth_required(roles=['teacher', 'admin'])
     def get(self):
         """ Get a list of users """
-        return [user.jsonify() for user in User.query.all()]
+        return [user.serialize() for user in User.query.all()]
 
     @auth_required(roles='admin')
     def post(self):
