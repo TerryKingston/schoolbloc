@@ -61,13 +61,52 @@ class UserTests(BaseTestClass):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(data['username'], u2.username)
 
-    def test_update_user(self):
-        pass
+    def test_update_passwords(self):
+        """ Test updating passwords with the put rest method """
+        u1 = User(username='student', password='student', role_type='student')
+        u2 = User(username='admin', password='admin', role_type='admin')
+        db.session.add(u1)
+        db.session.add(u2)
+        db.session.commit()
+        u1 = User.query.filter_by(username='student').one()
+        u2 = User.query.filter_by(username='admin').one()
+
+        # Student update his own password
+        key, _ = self.login('student', 'student')
+        headers = {'Authorization': 'JWT {}'.format(key)}
+        response = self.app.put('/api/users/{}'.format(u1.id), headers=headers,
+                                data={'password': 'new_password'})
+        self.assertEqual(response.status_code, 200)
+
+        # Student tries to update admin password
+        key, _ = self.login('student', 'new_password')
+        headers = {'Authorization': 'JWT {}'.format(key)}
+        response = self.app.put('/api/users/{}'.format(u2.id), headers=headers,
+                                data={'password': 'new_password'})
+        self.assertEqual(response.status_code, 404)
+
+        # Admin update student
+        key, _ = self.login('admin', 'admin')
+        headers = {'Authorization': 'JWT {}'.format(key)}
+        response = self.app.put('/api/users/{}'.format(u1.id), headers=headers,
+                                data={'password': 'new_password2'})
+        self.assertEqual(response.status_code, 200)
+
+        # Verify new password takes affect with student
+        key, status_code = self.login('student', 'student')
+        self.assertEqual(status_code, 401)
+        key, status_code = self.login('student', 'new_password')
+        self.assertEqual(status_code, 401)
+        key, status_code = self.login('student', 'new_password2')
+        self.assertEqual(status_code, 200)
 
     def test_add_user(self):
         pass
 
     def test_delete_user(self):
+        pass
+
+    def test_get_user_list(self):
         pass
 
 if __name__ == '__main__':
