@@ -1,5 +1,4 @@
 import logging
-from flask import json
 from schoolbloc import db
 
 log = logging.getLogger(__name__)

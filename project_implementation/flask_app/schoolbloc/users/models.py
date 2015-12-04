@@ -36,7 +36,8 @@ class User(db.Model):
     def __init__(self, username, password, role_type):
         role = Role.query.filter_by(role_type=role_type).one()
         self.username = username
-        self.hashed_passwd = pbkdf2_sha512.encrypt(password, rounds=200000, salt_size=16)
+        # TODO increase rounds back up when not unit testing
+        self.hashed_passwd = pbkdf2_sha512.encrypt(password, rounds=1, salt_size=16)
         self.role_id = role.id
 
     def verify_password(self, password):
@@ -44,7 +45,7 @@ class User(db.Model):
         if not pbkdf2_sha512.verify(password, self.hashed_passwd):
             raise InvalidPasswordError('Password does not validate')
 
-    def update_password(self, new_password, commit=True):
+    def update_password(self, new_password):
         """
         Updates the password of this user. NOTE this does not commit changes
         into the database. You must still add and commit the user yourself
