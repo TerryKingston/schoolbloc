@@ -1,7 +1,5 @@
 import unittest
-
 from sqlalchemy.orm.exc import NoResultFound
-
 from schoolbloc import User, db
 from schoolbloc.testing.testing import BaseTestClass
 
@@ -138,10 +136,44 @@ class UserTests(BaseTestClass):
             User.query.filter_by(username='new_student2').one()
 
     def test_delete_user(self):
-        pass
+        db.session.add(User(username='admin', password='admin', role_type='admin'))
+        db.session.add(User(username='student', password='student', role_type='student'))
+        db.session.commit()
+        u1 = User.query.filter_by(username='student').one()
+
+        # Student cannot delete himself
+        key, _ = self.login('student', 'student')
+        headers = {'Authorization': 'JWT {}'.format(key)}
+        response = self.app.delete('/api/users/{}'.format(u1.id), headers=headers)
+        self.assertEqual(response.status_code, 403)
+        User.query.filter_by(username='student').one()  # user still exists
+
+        # Admin can delete student
+        key, _ = self.login('admin', 'admin')
+        headers = {'Authorization': 'JWT {}'.format(key)}
+        response = self.app.delete('/api/users/{}'.format(u1.id), headers=headers)
+        self.assertEqual(response.status_code, 200)
+        with self.assertRaises(NoResultFound):
+            User.query.filter_by(username='student').one()
 
     def test_get_user_list(self):
-        pass
+        db.session.add(User(username='admin', password='admin', role_type='admin'))
+        db.session.add(User(username='student', password='student', role_type='student'))
+        db.session.commit()
+
+        # Students can't get this info
+        key, _ = self.login('student', 'student')
+        headers = {'Authorization': 'JWT {}'.format(key)}
+        response = self.app.get('/api/users', headers=headers)
+        self.assertEqual(response.status_code, 403)
+
+        # Admins can get this info
+        key, _ = self.login('admin', 'admin')
+        headers = {'Authorization': 'JWT {}'.format(key)}
+        response = self.app.get('/api/users', headers=headers)
+        self.assertEqual(response.status_code, 200)
+        data = self.parse_response_json(response)
+        self.assertEqual(len(data), 2)
 
 if __name__ == '__main__':
     unittest.main()

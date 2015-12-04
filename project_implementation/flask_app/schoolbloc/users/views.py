@@ -4,7 +4,7 @@ from flask.ext.jwt import current_identity
 from sqlalchemy.exc import IntegrityError
 
 from schoolbloc import auth_required, db
-from schoolbloc.users.models import User, InvalidPasswordError
+from schoolbloc.users.models import User
 from flask.ext.restful import Api, Resource, abort, reqparse
 
 # Setup logger
@@ -86,7 +86,7 @@ class UserApi(Resource):
         """ Delete an existing User (admins only) """
         user = get_user_or_abort(user_id)
         db.session.delete(user)
-        db.session.commit
+        db.session.commit()
         return {'success': 'user deleted successfully'}, 200
 
 

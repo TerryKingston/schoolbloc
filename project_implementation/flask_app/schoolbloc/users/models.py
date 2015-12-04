@@ -50,7 +50,8 @@ class User(db.Model):
         into the database. You must still add and commit the user yourself
         after updating the password
         """
-        self.hashed_passwd = pbkdf2_sha512.encrypt(new_password, rounds=200000, salt_size=16)
+        # TODO increase rounds back up when not unit testing
+        self.hashed_passwd = pbkdf2_sha512.encrypt(new_password, rounds=1, salt_size=16)
 
     def serialize(self):
         """ Serialize by converting this object to json """
