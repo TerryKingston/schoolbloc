@@ -4,10 +4,6 @@ from schoolbloc import db
 log = logging.getLogger(__name__)
 
 
-class StudentGroupError(Exception):
-    pass
-
-
 class StudentGroup(db.Model):
     """
     ORM object for student groups stored in the database
@@ -17,3 +13,9 @@ class StudentGroup(db.Model):
     __tablename__ = 'student_groups'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(128), nullable=False)
+
+    def serialize(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+        }
