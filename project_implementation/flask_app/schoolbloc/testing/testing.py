@@ -36,4 +36,5 @@ class BaseTestClass(unittest.TestCase):
     def _create_roles(self):
         for role in ('admin', 'teacher', 'student'):
             db.session.add(Role(role_type=role))
+        db.session.commit()
 
