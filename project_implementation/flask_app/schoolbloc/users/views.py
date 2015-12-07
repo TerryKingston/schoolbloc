@@ -4,7 +4,7 @@ from flask.ext.jwt import current_identity
 from sqlalchemy.exc import IntegrityError
 
 from schoolbloc import auth_required, db
-from schoolbloc.users.models import User, UserError, RoleError
+from schoolbloc.users.models import User
 from flask.ext.restful import Api, Resource, abort, reqparse
 
 # Setup logger
@@ -41,7 +41,7 @@ class UserApi(Resource):
     def get(self, user_id):
         """ Get info on a User """
         user = get_user_or_abort(user_id)
-        return user.jsonify()
+        return user.serialize()
 
     @auth_required()
     def put(self, user_id):
@@ -55,39 +55,35 @@ class UserApi(Resource):
         parser = reqparse.RequestParser()
         parser.add_argument('username')
         parser.add_argument('password')
-        parser.add_argument('role')
 
         # Parse data from incoming request
         args = parser.parse_args()
         username = args.get('username')
         password = args.get('password')
-        role_name = args.get('role')
 
         # Update user information and save it to the db. Don't commit the changes
         # until the end, so that if one thing fails this entire request fails
         user = get_user_or_abort(user_id)
         try:
             if username:
-                user.update_username(username, commit=False)
+                if user.role.role_type == 'student':
+                    abort(403, message='Students cannot update username')
+                else:
+                    user.username = username
             if password:
-                user.update_password(password, commit=False)
-            if role_name:
-                user.update_role(role_name, commit=False)
+                user.update_password(password)
             db.session.add(user)
             db.session.commit()
-        except RoleError:
-            abort(404, message="Role not found")
-        except IntegrityError:  # new username already exists on the system
-            abort(409, message="A user with that name already exists")
-
-        # TODO find out what ryan wants for successful return data here
+        except IntegrityError:
+            abort(409, message="Duplicate username")
         return {'success': 'user updated successfully'}, 200
 
     @auth_required(roles=['admin'])
     def delete(self, user_id):
         """ Delete an existing User (admins only) """
         user = get_user_or_abort(user_id)
-        user.delete()
+        db.session.delete(user)
+        db.session.commit()
         return {'success': 'user deleted successfully'}, 200
 
 
@@ -97,9 +93,8 @@ class UserListApi(Resource):
     @auth_required(roles=['teacher', 'admin'])
     def get(self):
         """ Get a list of users """
-        return [user.jsonify() for user in User.query.all()]
+        return [user.serialize() for user in User.query.all()]
 
-    # TODO if anyone should be allowed to sign up, we need to remove the auth_required
     @auth_required(roles='admin')
     def post(self):
         """ Create a new user """
@@ -109,9 +104,12 @@ class UserListApi(Resource):
         parser.add_argument('role', required=True)
         args = parser.parse_args()
         try:
-            User(username=args['username'], password=args['password'], role_type=args['role'])
-        except UserError as e:
-            return {'error': str(e)}, 409
+            u = User(username=args['username'], password=args['password'], role_type=args['role'])
+            db.session.add(u)
+            db.session.commit()
+        except IntegrityError:
+            db.session.rollback()
+            return {'error': 'username already exists'}, 409
 
         return {'success': 'user created successfully'}, 200
 
