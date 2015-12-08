@@ -11,6 +11,12 @@ class Schedule(db.Model):
     name = db.Column(db.String(40), nullable=False, unique=True)
     # backref scheduled_classes
 
+    def serialize(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+        }
+
 
 class ScheduledClassError(Exception):
     pass
