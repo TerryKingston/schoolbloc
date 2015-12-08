@@ -16,6 +16,13 @@ class Classroom(db.Model):
     room_number = db.Column(db.Integer, nullable=False, unique=True)  # user assigned room number
     max_student_count = db.Column(db.Integer)
 
+    def serialize(self):
+        return {
+            'id': self.id,
+            'room_number': self.room_number,
+            'max_student_count': self.max_student_count,
+        }
+
 
 class ClassroomsTeacher(db.Model):
     """

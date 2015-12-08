@@ -18,6 +18,15 @@ class Course(db.Model):
     max_student_count = db.Column(db.Integer)
     min_student_count = db.Column(db.Integer)
 
+    def serialize(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'duration': self.duration,
+            'max_student_count': self.max_student_count,
+            'min_student_count': self.min_student_count,
+        }
+
 
 class CoursesStudent(db.Model):
     """
