@@ -3,7 +3,7 @@
 /**
  * Provides a lot of quick and basic functions that are useful and common among many areas of the app.
  */
-angular.module('sbAngularApp').factory('commonService', ['$translate', 'userAuthService', function($translate, userAuthService) {
+angular.module('sbAngularApp').factory('commonService', ['$translate', 'userAuthService', '$location', function($translate, userAuthService, $location) {
 	return {
 
 		/**
@@ -30,6 +30,15 @@ angular.module('sbAngularApp').factory('commonService', ['$translate', 'userAuth
 				return "";
 			}
 			return value.replace(/ /g,"-");
+		},
+
+		/**
+		 * Renders the URL correctly with given port and absolute path if need be
+		 */
+		conformUrl: function(url) {
+			// port of backend
+			var port = "9000";
+			return $location.protocol() + "://" + $location.host() + ":" + port + "/" + url;
 		},
 
 		/**

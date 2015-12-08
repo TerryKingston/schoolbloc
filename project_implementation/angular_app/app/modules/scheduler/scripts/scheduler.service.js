@@ -3,7 +3,7 @@
 /**
  * Main service for back-end calls for the scheduler module
  */
-angular.module('sbAngularApp').factory('schedulerService', ['$q', '$http', function($q, $http) {
+angular.module('sbAngularApp').factory('schedulerService', ['$q', '$http', 'commonService', function($q, $http, commonService) {
 	var SERVER_ROOT = "/module/scheduler";
 
 	return {
@@ -99,9 +99,11 @@ angular.module('sbAngularApp').factory('schedulerService', ['$q', '$http', funct
 		 */
 		debugFlushDB: function() {
 			var deferred = $q.defer();
-			var data;
+			var data, url;
 
 			deferred.resolve(data);
+
+			url = commonService.conformUrl("test");
 			
 			return deferred.promise;
 		}
