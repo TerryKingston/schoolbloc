@@ -28,7 +28,7 @@ angular.module('sbAngularApp')
 	function link(scope, element, attrs) {
 		scope.mainContainer = {
 			navBarConfig: {
-				view: "main dashboard",
+				view: "import export",
 				subView : null,
 				profile: {
 					username: "!!Test User",

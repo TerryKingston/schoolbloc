@@ -30,7 +30,7 @@ angular.module('sbAngularApp')
 	];
 
 }])
-.directive('sbMainNavBar', ['$window', function($window) {
+.directive('sbMainNavBar', ['$window', 'userAuthService', function($window, userAuthService) {
 	/**
 	 * For manipulating the DOM
 	 * @param  scope   as configured in the controller
@@ -44,7 +44,8 @@ angular.module('sbAngularApp')
 			navBarStyle: {
 				// since browsers don't determine height in css form, we need to manually determine it here
 				'height': '0px'
-			}
+			},
+			profileIsOpen: false
 		};
 
 		/**
@@ -76,6 +77,14 @@ angular.module('sbAngularApp')
 
 		scope.toggleNavBar = function(isOpen) {
 			scope.mainNavBar.isOpen = isOpen;
+		};
+
+		scope.toggleProfileSettings = function() {
+			scope.profileIsOpen = !scope.profileIsOpen;
+		};
+
+		scope.logout = function() {
+			userAuthService.logoutUser();
 		};
 
 		// check against the current window size when the browser loads.

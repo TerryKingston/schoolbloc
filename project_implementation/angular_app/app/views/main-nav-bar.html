@@ -4,10 +4,15 @@
       <div class="close-icon" ng-click="toggleNavBar(false)"></div>
       <div class="sb-logo"></div>
     </section>
-    <section class="main-nav-bar-profile" ng-click="toggleProfileSettings()">
-      <div class="down-arrow-icon"></div>
-      <h4>{{config.profile.username}}</h4>
-      <h5>!!Signed in as {{config.profile.role}}</h5>
+    <section class="main-nav-bar-profile" ng-class="{'main-nav-bar-profile-active': profileIsOpen}">
+      <div class="down-arrow-icon" ng-click="toggleProfileSettings()"></div>
+      <a href=""><h4 ng-click="toggleProfileSettings()">{{config.profile.username}}</h4></a>
+      <a href=""><h5 ng-click="toggleProfileSettings()">!!Signed in as {{config.profile.role}}</h5></a>
+      <div class="profile-settings" ng-show="profileIsOpen">  
+          <a href="" ng-click="changeView('profile')"><div class="profile-control" ng-class="{'profile-control-active': config.view === 'profile'}">{{"mainNavBar.PROFILE" | translate}}</div></a>
+          <a href="" ng-click="changeView('settings')"><div class="profile-control" ng-class="{'profile-control-active': config.view === 'settings'}">{{"mainNavBar.SETTINGS" | translate}}</div></a>
+          <a href="" ng-click="logout()"><div class="profile-control" ng-class="{'profile-control-active': config.view === 'logout'}">{{"mainNavBar.LOGOUT" | translate}}</div></a>
+      </div>
     </section>
     <section class="main-nav-bar-main-controls">
       <a href="" ng-click="changeView('main dashboard')"><div class="main-control" ng-class="{'main-control-active': config.view === 'main dashboard', 'dashboard-control': config.view !== 'main dashboard'}">{{"mainNavBar.MAIN_DASHBOARD" | translate}}</div></a>

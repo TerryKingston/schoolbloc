@@ -1,0 +1,29 @@
+<section class="scheduler-container main-view-content">
+  <button class="btn btn-recommended" ng-click="generateSchedule()" ng-show="!config.showSchedule">{{"schedulerModule.GENERATE_SCHEDULE" | translate}}</button>
+  <button class="btn btn-danger" ng-click="deleteSchedule()" ng-show="config.showSchedule">{{"schedulerModule.DELETE_SCHEDULE" | translate}}</button>
+  <button class="btn btn-secondary" ng-click="debugFlushDB()" ng-show="config.showSchedule">!!Flush DB</button>
+
+  <section class="table-wrapper" ng-if="config.showSchedule">
+    <table class="dynamic-table schedule-table">
+      <tr>
+        <th>{{"schedulerModule.COURSE" | translate}}</th>
+        <th>{{"schedulerModule.TEACHER" | translate}}</th>
+        <th>{{"schedulerModule.TIME" | translate}}</th>
+        <th>{{"schedulerModule.CLASSROOM" | translate}}</th>
+        <th>{{"schedulerModule.STUDENTS" | translate}}</th>
+      </tr>
+      <tr ng-repeat="row in schedule track by $index">
+        <td>{{row.course.name}}</td>
+        <td>{{row.teacher.first_name}} {{row.teacher.last_name}}</td>
+        <td>{{row.start_time}}-{{row.end_time}}</td>
+        <td>{{row.classroom.room_number}}</td>
+        <td>
+          <div class="table-cluster">
+            <div ng-repeat="student in row.students">{{student.first_name}} {{student.last_name}}</div>
+          </div>
+        </td>
+      </tr>
+    </table>
+  </section>
+
+</section>
