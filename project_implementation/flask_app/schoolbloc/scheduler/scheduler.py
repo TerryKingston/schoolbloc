@@ -1,10 +1,11 @@
 from z3 import *
+
+from schoolbloc.schedules.models import ScheduledClass
 from schoolbloc.users.models import User
 from schoolbloc.teachers.models import Teacher
 from schoolbloc.classrooms.models import Classroom
 from schoolbloc.students.models import Student
 from schoolbloc.courses.models import Course
-from schoolbloc.scheduled_classes.models import ScheduledClass
 from schoolbloc.config import config
 
 # make the class z3 data type and define its constructor

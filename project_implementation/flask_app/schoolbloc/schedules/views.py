@@ -1,8 +1,9 @@
 import logging
 
 from flask import Blueprint
-from flask.ext.restful import Api, Resource, abort
+from flask.ext.restful import Api, Resource, abort, reqparse
 from schoolbloc import auth_required
+from schoolbloc.scheduler.scheduler import Scheduler
 from schoolbloc.schedules.models import ScheduledClass, ScheduledClassesStudent, \
     Schedule
 
@@ -39,9 +40,16 @@ class ScheduleListApi(Resource):
 
     @auth_required(roles='admin')
     def post(self):
-        # TODO
-        abort(404, message="not yet implemented")
+        # TODO somehow pass the name in and have it saved as that in the db
+        #parser = reqparse.RequestParser()
+        #parser.add_argument('name', required=True)
+        #args = parser.parse_args()
+        scheduler = Scheduler()
+        scheduler.make_schedule()
 
+        # TODO this only allows for one schedule right now
+        schedule = Schedule.query.first()
+        return [sc.serialize() for sc in schedule.scheduled_classes]
 
-api.add_resource(ScheduleApi, '/api/users/<int:user_id>')
-api.add_resource(ScheduleListApi, '/api/users')
+api.add_resource(ScheduleApi, '/api/schedules/<int:schedule_id>')
+api.add_resource(ScheduleListApi, '/api/schedules')
