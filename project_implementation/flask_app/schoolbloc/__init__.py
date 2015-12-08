@@ -21,7 +21,7 @@ db = SQLAlchemy(app)
 
 
 # Have to import this after db and app have been declared
-from schoolbloc.users.models import User, UserError
+from schoolbloc.users.models import User, InvalidPasswordError
 
 
 def authenticate(username, password):
@@ -30,7 +30,7 @@ def authenticate(username, password):
         user = User.query.filter_by(username=username).one()
         user.verify_password(password)
         return user
-    except (NoResultFound, UserError):
+    except (NoResultFound, InvalidPasswordError):
         return None
 
 

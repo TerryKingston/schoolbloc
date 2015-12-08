@@ -20,12 +20,13 @@ if __name__ == '__main__':
 
     # I'm lazy, just gonna try adding stuff and catching exception if it exists
     try:
-        Role('admin')
-        Role('teacher')
-        Role('student')
-        User('admin', 'admin', 'admin')
-        User('teacher', 'teacher', 'teacher')
-        User('student', 'student', 'student')
+        db.session.add(Role(role_type='admin'))
+        db.session.add(Role(role_type='teacher'))
+        db.session.add(Role(role_type='student'))
+        db.session.add(User(username='admin', password='admin', role_type='admin'))
+        db.session.add(User(username='teacher', password='teacher', role_type='teacher'))
+        db.session.add(User(username='student', password='student', role_type='student'))
+        db.session.commit()
     except:
         pass
 

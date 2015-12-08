@@ -1,8 +1,8 @@
 import unittest
-from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm.exc import NoResultFound
 from schoolbloc import app, db
-from schoolbloc.classrooms.models import Classroom, ClassroomError
+from schoolbloc.classrooms.models import Classroom
+
 
 class ClassroomTests(unittest.TestCase):
 
@@ -43,5 +43,6 @@ class ClassroomTests(unittest.TestCase):
         with self.assertRaises(NoResultFound):
             Classroom.query.filter_by(room_number="101").one()    
 
+
 if __name__ == '__main__':
-	unittest.main() 
+    unittest.main()
