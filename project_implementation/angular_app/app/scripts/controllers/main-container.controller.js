@@ -28,7 +28,7 @@ angular.module('sbAngularApp')
 	function link(scope, element, attrs) {
 		scope.mainContainer = {
 			navBarConfig: {
-				view: "main dashboard",
+				view: "import export",
 				subView : null,
 				profile: {
 					username: "!!Test User",
@@ -58,6 +58,7 @@ angular.module('sbAngularApp')
 			$translate("schedulerModule.FACTS_CONSTRAINTS").then(function (translation) {
 				scope.mainContainer.navBarConfig.modules[0].submodules[0].name = translation;
 			});
+
 		};
 
 		/**** initial setup ****/

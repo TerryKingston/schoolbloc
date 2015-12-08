@@ -2,33 +2,23 @@
 
 /**
  * @ngdoc function
- * @name sbAngularApp.controller:SchedulerModule
+ * @name sbAngularApp.controller:FactsConstraints
  * @description
  *
  * 
- * # SchedulerModule
+ * # FactsConstraints
  * Controller of the sbAngularApp
  */
 angular.module('sbAngularApp')
-.controller('SchedulerModule', ['$scope', function($scope) {
+.controller('FactsConstraints', ['$scope', function($scope) {
 	this.components = [
 		'HTML5 Boilerplate',
 		'AngularJS',
 		'Karma'
 	];
 
-	$scope.schedulerModule = {
-		viewHeaderConfig: {
-			title: "schedulerModule.TITLE",
-			subTitle: "schedulerModule.SUBTITLE",
-			link: {
-				text: "schedulerModule.SUBTITLE_ACTION",
-				action: null
-			}
-		}
-	};
 }])
-.directive('sbSchedulerModule', [ function() {
+.directive('sbFactsConstraints', [function() {
 	/**
 	 * For manipulating the DOM
 	 * @param  scope   as configured in the controller
@@ -36,7 +26,6 @@ angular.module('sbAngularApp')
 	 * @param  attrs   hash object with key-value pairs of normalized attribute names and their corresponding attribute values.
 	 */
 	function link(scope, element, attrs) {
-
 	}
 
 	/**
@@ -48,10 +37,9 @@ angular.module('sbAngularApp')
 	return {
 		restrict: 'E',
 		scope: {
-			config: "=config",
-			schedulerModule: "=info"
+			config: "=config"
 		},
-		templateUrl: 'modules/scheduler/views/scheduler-module.html',
+		templateUrl: 'modules/scheduler/views/facts-constraints.html',
 		link: link
 	};
 }]);

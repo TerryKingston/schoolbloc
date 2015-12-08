@@ -2,7 +2,53 @@
 <section class="import-export-container main-view-content">
   <h4>{{"importExport.IMPORT_HEADER" | translate}}</h4>
   <section class="view-sub-content">
-    <button class="btn btn-recommended">{{"importExport.UPLOAD_FILE" | translate}}</button>
+    <div class="input-row">
+      <label>
+        <div>{{"importExport.IMPORT_TABLE" | translate}}</div>
+        <select ng-model="fileUploader.formData.table_name" ng-change="setUploadUrl()">
+          <option value="teachers">{{"importExport.TEACHERS" | translate}}</option>
+          <option value="students">{{"importExport.STUDENTS" | translate}}</option>
+          <option value="courses">{{"importExport.COURSES" | translate}}</option>
+          <option value="classrooms">{{"importExport.CLASSROOMS" | translate}}</option>
+        </select>
+      </label>
+    </div>
+    <div class="input-row">
+      <label>
+        <div>{{"importExport.FILE" | translate}}</div>
+        <div class="input-file-wrapper">
+          <div class="fake-btn btn btn-recommended">{{"importExport.CHOOSE_FILE" | translate}}</div>
+          <input type="file" nv-file-select uploader="fileUploader" class="nv-file-select">
+        </div>
+      </label>
+    </div>
+    <div class="table-wrapper">
+      <table class="dynamic-table input-file-table" ng-if="fileUploader.queue.length">
+        <tr>
+          <th>{{"importExport.TABLE" | translate}}</th>
+          <th>{{"importExport.FILE" | translate}}</th>
+          <th></th>
+          <th>{{"importExport.STATUS" | translate}}</th>
+        </tr>
+        <tr ng-repeat="f in fileUploader.queue track by $index">
+          <td class="table-capitalize">{{f.formData.table_name}}</td>
+          <td>{{f.file.name}}</td>
+          <td class="delete-table-entry table-icon" ng-show="!f.isSuccess" ng-click="deleteTableEntry($index, f.isUploading)">
+            <div></div>
+          </td>
+          <!-- status -->
+          <td>
+            <div ng-show="f.isUploading">{{"importExport.UPLOADING" | translate }} {{f.progress}}%</div>
+            <div ng-show="f.isError">{{"importExport.UPLOAD_ERROR" | translate}}</div>
+            <div ng-show="f.isSuccess">{{"importExport.UPLOAD_SUCCESS" | translate}}</div>
+            <div ng-show="!f.isUploading && !f.isUploaded">{{"importExport.READY" | translate }}</div>
+          </td>
+        </tr>
+      </table>
+    </div>
+    <div class="input-row">
+      <button class="btn btn-recommended" ng-disabled="fileUploader.isUploading || fileUploader.queue.length == 0" ng-click="uploadSelectedFile()">{{"importExport.UPLOAD_FILE" | translate}}</button>
+    </div>
   </section>
   <h4>{{"importExport.EXPORT_HEADER" | translate}}</h4>
   <section class="view-sub-content">

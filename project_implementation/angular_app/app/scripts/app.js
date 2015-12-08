@@ -15,7 +15,8 @@ angular.module('sbAngularApp', [
 	    'ngRoute',
 	    'ngSanitize',
 	    'ngTouch',
-  		'pascalprecht.translate'
+  		'pascalprecht.translate',
+        'angularFileUpload'
 ]).constant('LOCALES', {
 	'locales': {
         'xx_XX': 'Jibberish',
