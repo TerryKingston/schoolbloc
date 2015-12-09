@@ -34,7 +34,7 @@ class ScheduleApi(Resource):
 
 
 class ScheduleListApi(Resource):
-    @auth_required(roles='admin')
+    # @auth_required(roles='admin')
     def get(self):
         return [schedule.serialize() for schedule in Schedule.query.all()]
 

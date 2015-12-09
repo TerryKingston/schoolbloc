@@ -61,11 +61,11 @@ angular.module('sbAngularApp')
 	}
 	$scope.setUploadUrl();
 
-	$scope.uploadSelectedFile = function() {
+	$scope.uploadSelectedFiles = function() {
 		if ($scope.fileUploader.queue.length < 1) {
 			return;
 		}
-		$scope.fileUploader.uploadItem(0);
+		$scope.fileUploader.uploadAll();
 	}
 
 	$scope.deleteTableEntry = function(index, ignore) {

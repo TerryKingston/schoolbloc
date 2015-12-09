@@ -22,7 +22,7 @@ app.config['TMP_FOLDER'] = '///../tmp/' # maybe pick a better place for temp fil
 class DataImportStudent(Resource):
     """ Get all users or create new user """
 
-    @auth_required(roles='admin')
+    # @auth_required(roles='admin')
     def post(self):
         # Check https://gist.github.com/RishabhVerma/7228939
         # parser = reqparse.RequestParser()
@@ -56,7 +56,7 @@ class DataImportStudent(Resource):
 class DataImportTeacher(Resource):
     """ Get all users or create new user """
 
-    @auth_required(roles='admin')
+    # @auth_required(roles='admin')
     def post(self):
         
         csv = request.files['file']
@@ -74,7 +74,7 @@ class DataImportTeacher(Resource):
         csv.save(tmp_filepath)
 
         try:
-            csv_import.teachers_import(filepath)
+            csv_import.teachers_import(tmp_filepath)
             return {'success': 'Teacher data imported successfully'}, 200
         except Exception as e:
             log.exception(e)
@@ -86,7 +86,7 @@ class DataImportTeacher(Resource):
 class DataImportCourse(Resource):
     """ Get all users or create new user """
 
-    @auth_required(roles='admin')
+    # @auth_required(roles='admin')
     def post(self):
 
         csv = request.files['file']
@@ -104,7 +104,7 @@ class DataImportCourse(Resource):
         csv.save(tmp_filepath)
 
         try:
-            csv_import.courses_import(filepath)
+            csv_import.courses_import(tmp_filepath)
             return {'success': 'Course data imported successfully'}, 200
         except Exception as e:
             log.exception(e)
@@ -115,7 +115,7 @@ class DataImportCourse(Resource):
 class DataImportClassroom(Resource):
     """ Get all users or create new user """
 
-    @auth_required(roles='admin')
+    # @auth_required(roles='admin')
     def post(self):
         csv = request.files['file']
 
@@ -132,7 +132,7 @@ class DataImportClassroom(Resource):
         csv.save(tmp_filepath)
 
         try:
-            csv_import.classrooms_import(filepath)
+            csv_import.classrooms_import(tmp_filepath)
             return {'success': 'Classroom data imported successfully'}, 200
         except Exception as e:
             log.exception(e)
