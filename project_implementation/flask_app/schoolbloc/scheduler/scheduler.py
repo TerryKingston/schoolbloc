@@ -1,6 +1,7 @@
 from z3 import *
 
-from schoolbloc.schedules.models import ScheduledClass
+from schoolbloc import db
+from schoolbloc.schedules.models import Schedule, ScheduledClass, ScheduledClassesStudent
 from schoolbloc.users.models import User
 from schoolbloc.teachers.models import Teacher
 from schoolbloc.classrooms.models import Classroom
@@ -99,8 +100,8 @@ class Scheduler():
         classroom = Classroom.query.get(classroom_id)
 
         if course and course.max_student_count:
-            if clasroom and clasroom.max_student_count:
-                return min(course.max_student_count, clasroom.max_student_count)
+            if classroom and classroom.max_student_count:
+                return min(course.max_student_count, classroom.max_student_count)
             else:
                 return course.max_student_count
         else:
@@ -316,19 +317,29 @@ class Scheduler():
             raise SchedulerNoSoltuion()
         else:
             m = s.model()
+            
+            # first, make the schedule object and then assign the classes to it
+            new_schedule = Schedule('sample schedule')
+            db.session.add(new_schedule)
+            db.session.commit() # need to commit here because we need the schedule id
+
             for i in range(self.class_count):
-                c = ScheduledClass(int(str(m.evaluate(self.course(i)))), 
+                c = ScheduledClass(new_schedule.id,
+                                   int(str(m.evaluate(self.course(i)))), 
                                    int(str(m.evaluate(self.room(i)))),
                                    int(str(m.evaluate(self.teacher(i)))),
                                    int(str(m.evaluate(TimeBlock.start(self.time(i))))),
                                    int(str(m.evaluate(TimeBlock.end(self.time(i))))))
-            
-            # # now add the students to the new class. the z3 arrays are undefined length (they will return values
-            # # for any index we give them.) we'll pull values until the max class size after that the values should
-            # # voilate the unique constraint.
-            # for j in range(max_class_size(m.evaluate(course(i)), m.evaluate(room(i)))):
-            #     ScheduledClassesStudent(student_id=m.evaluate(students(i)[j]), scheduled_class_id=c.id) 
+                db.session.add(c)
+                db.session.commit() # need to commit here because we need the ScheduledClass Id to add students
 
+                # # now add the students to the new class. the z3 arrays are undefined length (they will return values
+                # # for any index we give them.) we'll pull values until the max class size after that the values should
+                # # voilate the unique constraint.
+                for j in range(self.max_class_size(int(str(m.evaluate(self.course(i)))), int(str(m.evaluate(self.room(i)))))):
+                    class_student = ScheduledClassesStudent(student_id=int(str(m.evaluate(self.students(i)[j]))), scheduled_class_id=c.id)
+                    db.session.add(class_student) 
+                db.session.commit()
         
 
 

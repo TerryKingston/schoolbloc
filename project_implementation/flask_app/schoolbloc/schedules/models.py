@@ -8,8 +8,11 @@ log = logging.getLogger(__name__)
 class Schedule(db.Model):
     __tablename__ = 'schedules'
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(40), nullable=False, unique=True)
+    name = db.Column(db.String(40), nullable=False)
     # backref scheduled_classes
+
+    def __init__(self, name):
+        self.name = name;
 
     def serialize(self):
         return {

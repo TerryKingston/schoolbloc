@@ -4,7 +4,7 @@ from flask import Blueprint
 from flask.ext.restful import Api, Resource, abort, reqparse
 from schoolbloc import auth_required
 from schoolbloc.scheduler.scheduler import Scheduler
-from schoolbloc.schedules.models import ScheduledClass, ScheduledClassesStudent, \
+from schoolbloc.schedules.models import Schedule, ScheduledClass, ScheduledClassesStudent, \
     Schedule
 
 log = logging.getLogger(__name__)
@@ -38,7 +38,7 @@ class ScheduleListApi(Resource):
     def get(self):
         return [schedule.serialize() for schedule in Schedule.query.all()]
 
-    @auth_required(roles='admin')
+    # @auth_required(roles='admin')
     def post(self):
         # TODO somehow pass the name in and have it saved as that in the db
         #parser = reqparse.RequestParser()
