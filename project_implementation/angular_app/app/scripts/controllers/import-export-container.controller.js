@@ -10,7 +10,13 @@
  * Controller of the sbAngularApp
  */
 angular.module('sbAngularApp')
-.controller('ImportExportContainer', ['$scope', 'FileUploader', function($scope, FileUploader) {
+.controller('ImportExportContainer', ['$scope', 'FileUploader', 'commonService', function($scope, FileUploader, commonService) {
+	var IMPORT_ROOT = "/api/import/",
+		IMPORT_TEACHER_URL = IMPORT_ROOT + 'teacher',
+		IMPORT_STUDENT_URL = IMPORT_ROOT + 'student',
+		IMPORT_COURSE_URL = IMPORT_ROOT + 'course',
+		IMPORT_CLASSROOM_URL = IMPORT_ROOT + 'classroom';
+
 	this.components = [
 		'HTML5 Boilerplate',
 		'AngularJS',
@@ -37,16 +43,16 @@ angular.module('sbAngularApp')
 		var url = '';
 		switch ($scope.fileUploader.formData.table_name) {
 			case 'teachers':
-				url = '.../teachers/...';
+				url = commonService.conformUrl(IMPORT_TEACHER_URL);
 				break;
 			case 'students':
-				url = '.../students/...';
+				url = commonService.conformUrl(IMPORT_STUDENT_URL);
 				break;
 			case 'courses':
-				url = '.../courses/...';
+				url = commonService.conformUrl(IMPORT_COURSE_URL);
 				break;
 			case 'classrooms':
-				url = '.../classrooms/...';
+				url = commonService.conformUrl(IMPORT_CLASSROOM_URL);
 				break;
 			default:
 				break;
