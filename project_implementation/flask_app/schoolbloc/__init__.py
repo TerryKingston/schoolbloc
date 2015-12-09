@@ -128,6 +128,7 @@ from schoolbloc.students.views import mod as student_module
 from schoolbloc.student_groups.views import mod as student_group_module
 from schoolbloc.schedules.views import mod as schedule_module
 from schoolbloc.classrooms.views import mod as classroom_module
+from schoolbloc.data_import.views import mod as import_module
 app.register_blueprint(course_module)
 app.register_blueprint(user_module)
 app.register_blueprint(teacher_module)
@@ -136,3 +137,4 @@ app.register_blueprint(student_module)
 app.register_blueprint(student_group_module)
 app.register_blueprint(schedule_module)
 app.register_blueprint(classroom_module)
+app.register_blueprint(import_module)
