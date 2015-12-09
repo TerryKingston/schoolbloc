@@ -3,10 +3,10 @@
 /**
  * Helps with basic user authentication and registration.
  */
-angular.module('sbAngularApp').factory('userAuthService', ['$q', '$http', '$window', function($q, $http, $window) {
-	var SERVER_ROOT = "/auth",
+angular.module('sbAngularApp').factory('userAuthService', ['$q', '$http', '$window', 'commonService', function($q, $http, $window, commonService) {
+	var SERVER_ROOT = "",
 		REGISTER_URL = SERVER_ROOT + "/register",
-		LOGIN_URL = SERVER_ROOT + "/login";
+		LOGIN_URL = SERVER_ROOT + "auth";
 
 	/**
 	 * Parses a given JWT token so that its claim is in a JSON readable format.
@@ -33,7 +33,7 @@ angular.module('sbAngularApp').factory('userAuthService', ['$q', '$http', '$wind
 		 */
 		registerUser: function(username, password, fullname) {
 			var data;
-			var url = REGISTER_URL;
+			var url = commonService.conformUrl(REGISTER_URL);
 			var deferred = $q.defer();
 
 			data = {
@@ -55,7 +55,7 @@ angular.module('sbAngularApp').factory('userAuthService', ['$q', '$http', '$wind
 		 */
 		loginUser: function(username, password) {
 			var data;
-			var url = LOGIN_URL;
+			var url =  commonService.conformUrl(LOGIN_URL);
 			var deferred = $q.defer();
 
 			data = {

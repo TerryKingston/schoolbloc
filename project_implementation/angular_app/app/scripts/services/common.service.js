@@ -3,7 +3,18 @@
 /**
  * Provides a lot of quick and basic functions that are useful and common among many areas of the app.
  */
-angular.module('sbAngularApp').factory('commonService', ['$translate', 'userAuthService', '$location', function($translate, userAuthService, $location) {
+angular.module('sbAngularApp').factory('commonService', ['$translate', '$window', '$location', function($translate, $window, $location) {
+	
+	/**
+	 * Retreives the JWT token from local storage.
+	 * @return {string} JWT token
+	 */
+	function getJwtToken() {
+		// CITE: https://thinkster.io/angularjs-jwt-auth
+		return $window.localStorage.jwtToken;
+		// END CITE
+	}
+
 	return {
 
 		/**
@@ -37,7 +48,7 @@ angular.module('sbAngularApp').factory('commonService', ['$translate', 'userAuth
 		 */
 		conformUrl: function(url) {
 			// port of backend
-			var port = "9000";
+			var port = "5000";
 			return $location.protocol() + "://" + $location.host() + ":" + port + "/" + url;
 		},
 
