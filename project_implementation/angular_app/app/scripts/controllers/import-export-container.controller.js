@@ -11,7 +11,7 @@
  */
 angular.module('sbAngularApp')
 .controller('ImportExportContainer', ['$scope', 'FileUploader', 'commonService', function($scope, FileUploader, commonService) {
-	var IMPORT_ROOT = "/api/import/",
+	var IMPORT_ROOT = "api/import/",
 		IMPORT_TEACHER_URL = IMPORT_ROOT + 'teacher',
 		IMPORT_STUDENT_URL = IMPORT_ROOT + 'student',
 		IMPORT_COURSE_URL = IMPORT_ROOT + 'course',
