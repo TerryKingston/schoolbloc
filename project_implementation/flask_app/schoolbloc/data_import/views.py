@@ -46,7 +46,7 @@ class DataImportStudent(Resource):
 
         try:
             csv_import.students_import(tmp_filepath)
-            return {'success': 'student data imported successfully'}, 200
+            return {'success': 'Student data imported successfully'}, 200
         except Exception as e:
             log.exception(e)
             return {'error': 'something went wrong'}, 409
@@ -75,7 +75,7 @@ class DataImportTeacher(Resource):
 
         try:
             csv_import.teachers_import(filepath)
-            return {'success': 'user created successfully'}, 200
+            return {'success': 'Teacher data imported successfully'}, 200
         except Exception as e:
             log.exception(e)
             return {'error': 'something went wrong'}, 409
@@ -93,7 +93,7 @@ class DataImportCourse(Resource):
 
         if not csv:
             abort(400, message="Missing import file")
-            
+
         # Verify the file extension is .csv
         extension = csv.filename.rsplit('.', 1)[1].lower()
         if '.' in csv.filename and not extension in app.config['ALLOWED_EXTENSIONS']:
@@ -105,7 +105,7 @@ class DataImportCourse(Resource):
 
         try:
             csv_import.courses_import(filepath)
-            return {'success': 'user created successfully'}, 200
+            return {'success': 'Course data imported successfully'}, 200
         except Exception as e:
             log.exception(e)
             return {'error': 'something went wrong'}, 409
@@ -133,7 +133,7 @@ class DataImportClassroom(Resource):
 
         try:
             csv_import.classrooms_import(filepath)
-            return {'success': 'user created successfully'}, 200
+            return {'success': 'Classroom data imported successfully'}, 200
         except Exception as e:
             log.exception(e)
             return {'error': 'something went wrong'}, 409

@@ -62,7 +62,7 @@ class StudentApi(Resource):
             student.last_name = last_name
         db.session.add(student)
         db.session.commit()
-        return {'success': 'user updated successfully'}, 200
+        return {'success': 'Student updated successfully'}, 200
 
     @auth_required(roles='admin')
     def delete(self, student_id):
