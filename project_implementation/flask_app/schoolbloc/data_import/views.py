@@ -22,7 +22,7 @@ app.config['TMP_FOLDER'] = '///../tmp/' # maybe pick a better place for temp fil
 class DataImportStudent(Resource):
     """ Get all users or create new user """
 
-    @auth_required(roles='admin')
+    #@auth_required(roles='admin')
     def post(self):
         # Check https://gist.github.com/RishabhVerma/7228939
         # parser = reqparse.RequestParser()
@@ -56,7 +56,7 @@ class DataImportStudent(Resource):
 class DataImportTeacher(Resource):
     """ Get all users or create new user """
 
-    @auth_required(roles='admin')
+    #@auth_required(roles='admin')
     def post(self):
         
         csv = request.files['file']
@@ -86,7 +86,7 @@ class DataImportTeacher(Resource):
 class DataImportCourse(Resource):
     """ Get all users or create new user """
 
-    @auth_required(roles='admin')
+    #@auth_required(roles='admin')
     def post(self):
 
         csv = request.files['file']
@@ -115,7 +115,7 @@ class DataImportCourse(Resource):
 class DataImportClassroom(Resource):
     """ Get all users or create new user """
 
-    @auth_required(roles='admin')
+    #@auth_required(roles='admin')
     def post(self):
         csv = request.files['file']
 
