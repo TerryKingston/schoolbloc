@@ -17,7 +17,7 @@ api = Api(mod)
 class ScheduleApi(Resource):
     """ Get/modify/delete a specific user """
 
-    @auth_required(roles='admin')
+    # @auth_required(roles='admin')
     def get(self, schedule_id):
         schedule = Schedule.query.filter_by(id=schedule_id).one()
         return [sc.serialize() for sc in schedule.scheduled_classes]

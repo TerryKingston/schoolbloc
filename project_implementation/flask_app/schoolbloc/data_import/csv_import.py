@@ -15,7 +15,7 @@ def students_import(filepath):
             reader = csv.DictReader(csvfile)
             with db.session.no_autoflush:
                 for row in reader:
-                    u = User(username=row['first_name'], password=row['last_name'],
+                    u = User(username='{}_{}'.format(row['first_name'], row['last_name']), password=row['last_name'],
                              role_type='student')
                     db.session.add(u)
                     db.session.flush()

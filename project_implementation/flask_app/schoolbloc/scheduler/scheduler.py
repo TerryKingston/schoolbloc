@@ -4,10 +4,12 @@ from schoolbloc import db
 from schoolbloc.schedules.models import Schedule, ScheduledClass, ScheduledClassesStudent
 from schoolbloc.users.models import User
 from schoolbloc.teachers.models import Teacher
-from schoolbloc.classrooms.models import Classroom
-from schoolbloc.students.models import Student
-from schoolbloc.courses.models import Course
+from schoolbloc.classrooms.models import Classroom, ClassroomsTeacher, ClassroomsCourse
+from schoolbloc.students.models import Student, StudentsStudentGroup
+from schoolbloc.courses.models import Course, CoursesStudent, CoursesTeacher, CoursesStudentGroup, CoursesSubject
 from schoolbloc.config import config
+
+DEFAULT_MAX_CLASS_SIZE = 30
 
 # make the class z3 data type and define its constructor
 # a class represents a mapping of teacher, room, course, time, and students
@@ -46,7 +48,7 @@ class Scheduler():
                        class_duration=None,
                        class_count=None):
         
-        self.class_count = class_count or 10
+        self.class_count = class_count or 20
         # if values aren't provided, get the defaults from the config file
         self.day_start_time = day_start_time or config.school_start_time
         self.day_end_time = day_end_time or config.school_end_time
@@ -107,7 +109,7 @@ class Scheduler():
         else:
             if classroom and classroom.max_student_count:
                 return classroom.max_student_count
-        return None
+        return DEFAULT_MAX_CLASS_SIZE
 
     # ensures the teacher, room, and course ids are valid
     def ensure_valid_ids(self):
@@ -212,41 +214,41 @@ class Scheduler():
         mod_map = {}
         for mod in cons_models:
             if mod.course_id not in mod_map:
-                mod_map[mod.course_id] = [mod.room_id]
+                mod_map[mod.course_id] = [mod.classroom_id]
             else:
-                mod_map[mod.course_id].append(mod.room_id)
+                mod_map[mod.course_id].append(mod.classroom_id)
 
         # now we can loop through the map's keys and add the constraints
-        for course_id in mod_map.iterkeys():
+        for course_id in mod_map.keys():
 
             # the rooms aren't grouped in the DB so we look through all the models and 
             # construct a list of rooms available to this course.
             cons_list += [ If( self.course(i) == course_id, 
-                               Or([ room(i) == room_id for room_id in mod_map[course_id] ]), 
+                               Or([ self.room(i) == room_id for room_id in mod_map[course_id] ]), 
                                True )  
                             for i in range(self.class_count) for j in range(self.class_count) ]
         return cons_list
 
-    def constrain_teacher_time(self):
-        """ returns a list of z3 constraints for each teacher's available time """
+    # def constrain_teacher_time(self):
+    #     """ returns a list of z3 constraints for each teacher's available time """
 
-        cons_list = []
-        # if the teacher's start and/or end properties are set than
-        # add constraints, else let the defaults kick in
-        for teach in Teacher.query.all():
+    #     cons_list = []
+    #     # if the teacher's start and/or end properties are set than
+    #     # add constraints, else let the defaults kick in
+    #     for teach in Teacher.query.all():
 
-            if teach.start_time:
-                cons_list += [ If( self.teacher(i) == teach.id, 
-                                    TimeBlock.start(self.time(i)) >= teach.start_time, 
-                                    True ) 
-                                for i in range(self.class_count) for j in range(self.class_count) ]
-            if teach.end_time:
-                cons_list += [ If( self.teacher(i) == teach.id, 
-                                    TimeBlock.end(self.time(i)) >= teach.end_time, 
-                                    True ) 
-                                for i in range(self.class_count) for j in range(self.class_count) ]
+    #         if teach.start_time:
+    #             cons_list += [ If( self.teacher(i) == teach.id, 
+    #                                 TimeBlock.start(self.time(i)) >= teach.start_time, 
+    #                                 True ) 
+    #                             for i in range(self.class_count) for j in range(self.class_count) ]
+    #         if teach.end_time:
+    #             cons_list += [ If( self.teacher(i) == teach.id, 
+    #                                 TimeBlock.end(self.time(i)) >= teach.end_time, 
+    #                                 True ) 
+    #                             for i in range(self.class_count) for j in range(self.class_count) ]
 
-        return cons_list
+    #     return cons_list
 
     def constrain_course_size(self):
         """ returns a list of z3 constraints for min and max student count on each course """
@@ -255,18 +257,29 @@ class Scheduler():
         # a distinct value for indices up to the min class size, then we make sure anything over 
         # the max size is NOT distinct. Then when figuring out what students are assigned to this class
         # we pull students until we start seing duplicates
+        # return [ Distinct([ self.students(i)[j] for j in range(self.max_class_size(self.course(i), self.room(i)))]) 
+        #         for i in range(self.class_count)]
+
         cons_list = []
-        for course in Course.query.all():
-            if course.min_student_count:
-                cons_list += [ If( self.course(i) == course.id, 
-                                   Distinct([ self.students(i)[j] for j in range(course.min_student_count)]), 
-                                   True) 
+        course_ids = [ c.id for c in Course.query.all() ]
+        room_ids = [ r.id for r in Classroom.query.all() ]
+        for course_id in course_ids:
+            for room_id in room_ids:
+                cons_list += [ If( And(self.course(i) == course_id, self.room(i) == room_id ),
+                                    Distinct([ self.students(i)[j] for j in range(self.max_class_size(course_id, room_id))]),
+                                    True)
                                 for i in range(self.class_count)]
-            if course.max_student_count:
-                cons_list += [ If( self.course(i) == course.id, 
-                                    Not(Distinct([ self.students(i)[j] for j in range(course.max_student_count)])), 
-                                    True) 
-                                for i in range(self.class_count)]
+        # for course in Course.query.all():
+        #     if course.min_student_count:
+        #         cons_list += [ If( self.course(i) == course.id, 
+        #                            Distinct([ self.students(i)[j] for j in range(max_class_size(self.course(i), self.room(i)))]), 
+        #                            True) 
+        #                         for i in range(self.class_count)]
+            # if course.max_student_count:
+            #     cons_list += [ If( self.course(i) == course.id, 
+            #                         Not(Distinct([ self.students(i)[j] for j in range(course.max_student_count)])), 
+            #                         True) 
+            #                     for i in range(self.class_count)]
         return cons_list
 
     def constrain_student_req_courses(self):
@@ -287,6 +300,8 @@ class Scheduler():
                 cons_list += [ Or([ And(self.course(i) == c_grp.course_id, self.students(i)[x] == stud.id) 
                                for i in range(self.class_count) ]) ]
 
+        return cons_list
+
 
     def make_schedule(self):
         
@@ -306,6 +321,10 @@ class Scheduler():
         constraints += self.prevent_duplicate_student()
 
         # next, include the user provided constraints
+        constraints += self.constrain_course_rooms()
+        # constraints += self.constrain_teacher_time()
+        constraints += self.constrain_course_size()
+        constraints += self.constrain_student_req_courses()
 
 
       
