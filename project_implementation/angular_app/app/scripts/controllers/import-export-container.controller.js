@@ -58,7 +58,7 @@ angular.module('sbAngularApp')
 				break;
 		}
 		$scope.fileUploader.url = url;
-	}
+	};
 	$scope.setUploadUrl();
 
 	$scope.uploadSelectedFiles = function() {
@@ -66,14 +66,14 @@ angular.module('sbAngularApp')
 			return;
 		}
 		$scope.fileUploader.uploadAll();
-	}
+	};
 
 	$scope.deleteTableEntry = function(index, ignore) {
 		if (ignore) {
 			return;
 		}
 		$scope.fileUploader.queue.splice(index, 1);
-	}
+	};
 }])
 .directive('sbImportExportContainer', [function() {
 	/**

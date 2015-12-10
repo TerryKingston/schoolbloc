@@ -4,7 +4,7 @@
  * Main service for back-end calls for the scheduler module
  */
 angular.module('sbAngularApp').factory('schedulerService', ['$q', '$http', 'commonService', function($q, $http, commonService) {
-	var SERVER_ROOT = "/module/scheduler";
+	var GET_SCHEDULES = "api/schedules";
 
 	return {
 		
@@ -14,83 +14,95 @@ angular.module('sbAngularApp').factory('schedulerService', ['$q', '$http', 'comm
 		 */
 		generateSchedule: function() {
 			var deferred = $q.defer();
-			var data = [
-				{ 
-					"teacher": {
-						"id": 1, 
-						"first_name": "Severus", 
-						"last_name": "Snape"
-					}, 
-					"classroom": {
-						"id": 1, 
-						"room_number": "101", 
-						"max_student_count": 15
-					}, 
-					"start_time": "0800", 
-					"end_time": "1000", 
-					"course": {
-						"id": 1, 
-						"name": "Remedial Potions", 
-						"duration": 120, 
-						"max_student_count": 30, 
-						"min_student_count": 10
-					},
-					"students": [ 
-						{
-							"id": 1, 
-							"first_name": "Harry", 
-							"last_name": "Potter"
-						}, 
-						{
-							"id": 2, 
-							"first_name": "Ron", 
-							"last_name": "Weasly"
-						}
-					] 
-				},
-				{ 
-					"teacher": {
-						"id": 1, 
-						"first_name": "Albus", 
-						"last_name": "Dumbledore"
-					}, 
-					"classroom": {
-						"id": 1, 
-						"room_number": "L103", 
-						"max_student_count": 50
-					}, 
-					"start_time": "1400", 
-					"end_time": "1600",
-					"course": {
-						"id": 1, 
-						"name": "Defense Against Dark Arts", 
-						"duration": 120, 
-						"max_student_count": 120, 
-						"min_student_count": 30
-					},
-					"students": [ 
-						{
-							"id": 1, 
-							"first_name": "Harry", 
-							"last_name": "Potter"
-						}, 
-						{
-							"id": 3, 
-							"first_name": "Amos", 
-							"last_name": "Diggory"
-						},
-						{
-							"id": 4, 
-							"first_name": "Fleur", 
-							"last_name": "Delacour"
-						}
-					]
-				}
-			];
+			var url = commonService.conformUrl(GET_SCHEDULES);
 
-			deferred.resolve(data);
+			$http.post(url).then(function(data) {
+				deferred.resolve(data.data);
+				// 	// TODO: for now, return the most recently generated schedule
+				// if (data.data && data.data.length) {
+				// 	deferred.resolve(data.data[data.data.length - 1]);
+				// 	return;
+				// }
+				// deferred.reject("Incorrect format");
+			}, function(data) {
+				deferred.reject(data.data);
+			});
 			
 			return deferred.promise;
+
+			// var data = [ 
+			// 	{ 
+			// 		"teacher": {
+			// 			"id": 1, 
+			// 			"first_name": "Severus", 
+			// 			"last_name": "Snape"
+			// 		}, 
+			// 		"classroom": {
+			// 			"id": 1, 
+			// 			"room_number": "101", 
+			// 			"max_student_count": 15
+			// 		}, 
+			// 		"start_time": "0800", 
+			// 		"end_time": "1000", 
+			// 		"course": {
+			// 			"id": 1, 
+			// 			"name": "Remedial Potions", 
+			// 			"duration": 120, 
+			// 			"max_student_count": 30, 
+			// 			"min_student_count": 10
+			// 		},
+			// 		"students": [ 
+			// 			{
+			// 				"id": 1, 
+			// 				"first_name": "Harry", 
+			// 				"last_name": "Potter"
+			// 			}, 
+			// 			{
+			// 				"id": 2, 
+			// 				"first_name": "Ron", 
+			// 				"last_name": "Weasly"
+			// 			}
+			// 		] 
+			// 	},
+			// 	{ 
+			// 		"teacher": {
+			// 			"id": 1, 
+			// 			"first_name": "Albus", 
+			// 			"last_name": "Dumbledore"
+			// 		}, 
+			// 		"classroom": {
+			// 			"id": 1, 
+			// 			"room_number": "L103", 
+			// 			"max_student_count": 50
+			// 		}, 
+			// 		"start_time": "1400", 
+			// 		"end_time": "1600",
+			// 		"course": {
+			// 			"id": 1, 
+			// 			"name": "Defense Against Dark Arts", 
+			// 			"duration": 120, 
+			// 			"max_student_count": 120, 
+			// 			"min_student_count": 30
+			// 		},
+			// 		"students": [ 
+			// 			{
+			// 				"id": 1, 
+			// 				"first_name": "Harry", 
+			// 				"last_name": "Potter"
+			// 			}, 
+			// 			{
+			// 				"id": 3, 
+			// 				"first_name": "Amos", 
+			// 				"last_name": "Diggory"
+			// 			},
+			// 			{
+			// 				"id": 4, 
+			// 				"first_name": "Fleur", 
+			// 				"last_name": "Delacour"
+			// 			}
+			// 		]
+			// 	}
+			// ];
 		},
 
 		/**

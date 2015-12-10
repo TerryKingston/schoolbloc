@@ -99,7 +99,8 @@ angular.module('sbAngularApp').factory('userAuthService', ['$q', '$http', '$wind
 		getUsername: function() {
 			var self = this;
 			if (self.isUserAuthenticated()) {
-				return parseJwtTokenClaim(self.getJwtToken()).username;
+				// flask-JWT is only returning the identity
+				return parseJwtTokenClaim(self.getJwtToken()).identity;
 			}
 			// @TODO: what do we do if the token has expired or there is no token?
 		},

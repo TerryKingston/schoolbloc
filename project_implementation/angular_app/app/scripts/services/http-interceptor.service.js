@@ -52,12 +52,12 @@ angular.module('sbAngularApp').factory('httpInterceptorService', ['$q', '$window
 			*/
 			// CITE: https://thinkster.io/angularjs-jwt-auth
 			//if (token && (config.url.indexOf("/auth") !== -1 || config.url.indexOf("/app-data") !== -1)) {
-			//	config.headers.Authorization = 'Bearer ' + token;
+			//	config.headers.Authorization = 'JWT ' + token;
 			//}
 			// END CITE
 			
 			if (token) {
-				config.headers.Authorization = 'Bearer ' + token;
+				config.headers.Authorization = 'JWT ' + token;
 			}
 			
 			return config;
@@ -79,9 +79,8 @@ angular.module('sbAngularApp').factory('httpInterceptorService', ['$q', '$window
 		response: function(response) {
 			// NOTE: see request() for more information:
 			//if (response.config.url.indexOf("/auth") !== -1 || response.config.url.indexOf("/app-data") !== -1)
-
-			if (response.data.token) {
-				saveJwtToken(response.data.token);
+			if (response.data.access_token) {
+				saveJwtToken(response.data.access_token);
 			}
 
 			return response;
