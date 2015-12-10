@@ -34,11 +34,11 @@ class ScheduleApi(Resource):
 
 
 class ScheduleListApi(Resource):
-    # @auth_required(roles='admin')
+    @auth_required(roles='admin')
     def get(self):
         return [schedule.serialize() for schedule in Schedule.query.all()]
 
-    # @auth_required(roles='admin')
+    @auth_required(roles='admin')
     def post(self):
         # TODO somehow pass the name in and have it saved as that in the db
         #parser = reqparse.RequestParser()
