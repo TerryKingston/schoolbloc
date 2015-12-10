@@ -5,14 +5,14 @@
 
 <div ng-if="!sbRoot.initialLoading">
   <!-- Main Page -->
-  <div ng-if="!sbRoot.user.authenticated">
+  <div ng-if="sbRoot.user.authenticated">
     <div ng-controller="MainContainer">
       <sb-main-container view="sbView"></sb-main-container>
     </div>
   </div>
 
   <!-- Login Page -->
-  <div ng-if="sbRoot.user.authenticated">
+  <div ng-if="!sbRoot.user.authenticated">
     <div ng-controller="UserAuthContainer">
       <sb-user-auth-container info="sbRoot.userAuthContainer"></sb-user-auth-container>
     </div>

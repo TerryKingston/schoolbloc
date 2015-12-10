@@ -85,6 +85,7 @@ angular.module('sbAngularApp')
 
 		scope.logout = function() {
 			userAuthService.logoutUser();
+			scope.$emit("checkUserAuth");
 		};
 
 		// check against the current window size when the browser loads.
