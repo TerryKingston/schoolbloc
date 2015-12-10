@@ -16,21 +16,21 @@ angular.module('sbAngularApp').factory('schedulerService', ['$q', '$http', 'comm
 			var deferred = $q.defer();
 			var url = commonService.conformUrl(GET_SCHEDULES);
 
-			$http.get(url).then(function(data) {
-				debugger;
-				if (data.data && data.data.length) {
-					// TODO: for now, return the most recently generated schedule
-					deferred.resolve(data.data[data.data.length - 1]);
-					return;
-				}
-				deferred.reject("Incorrect format");
+			$http.post(url).then(function(data) {
+				deferred.resolve(data.data);
+				// 	// TODO: for now, return the most recently generated schedule
+				// if (data.data && data.data.length) {
+				// 	deferred.resolve(data.data[data.data.length - 1]);
+				// 	return;
+				// }
+				// deferred.reject("Incorrect format");
 			}, function(data) {
 				deferred.reject(data.data);
 			});
 			
 			return deferred.promise;
 
-			// var data = [
+			// var data = [ 
 			// 	{ 
 			// 		"teacher": {
 			// 			"id": 1, 

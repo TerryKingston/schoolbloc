@@ -1,7 +1,7 @@
 <section class="scheduler-container main-view-content">
   <button class="btn btn-recommended" ng-click="generateSchedule()" ng-show="!config.showSchedule">{{"schedulerModule.GENERATE_SCHEDULE" | translate}}</button>
   <button class="btn btn-danger" ng-click="deleteSchedule()" ng-show="config.showSchedule">{{"schedulerModule.DELETE_SCHEDULE" | translate}}</button>
-  <button class="btn btn-secondary" ng-click="debugFlushDB()" ng-show="config.showSchedule">!!Flush DB</button>
+  <!-- <button class="btn btn-secondary" ng-click="debugFlushDB()" ng-show="config.showSchedule">!!Flush DB</button> -->
 
   <section class="table-wrapper" ng-if="config.showSchedule">
     <table class="dynamic-table schedule-table">
