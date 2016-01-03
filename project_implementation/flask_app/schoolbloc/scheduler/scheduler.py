@@ -92,6 +92,24 @@ class Scheduler():
         return SchClass.students(self.classes[i])
     
 
+    # We can actually make some decisions before we make the full map of relationships. 
+    # Namely, we can determine how many courses we need of each subject.
+    def calc_course_count(self):
+
+        # look at the course requirements for each student to determine 
+        # how many classes of each course we will need. 
+        course_req_map = {1: 10}
+        for course in Course.query.all():
+            count = 0
+
+            count += CoursesStudent.query.filter_by(course_id=course.id).count()
+            for csg in CoursesStudentGroup.query.filter_by(course_id=course.id):
+                count += StudentsStudentGroup.query.filter_by(course_id=course.id, student_group_id=csg.student_group_id).count()
+            
+            course_req_map[course.id] = count
+
+        return course_req_map
+
     def max_class_size(self, course_id=None, classroom_id=None):
         """ 
         Determines the maximum student count based on the given course and/or classroom.

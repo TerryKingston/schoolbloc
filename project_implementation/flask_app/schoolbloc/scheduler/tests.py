@@ -64,13 +64,23 @@ class SchedulerTests(unittest.TestCase):
 
         db.session.commit()
 
-    def test_generate_schedule(self):
-        """ It creates 10 scheduled classes """
+    # def test_generate_schedule(self):
+    #     """ It creates 10 scheduled classes """
+    #     self.gen_test_data()
+        
+    #     scheduler = Scheduler()
+    #     scheduler.make_schedule()
+    #     self.assertTrue(len(ScheduledClass.query.all()) == 10)
+
+    def test_calc_course_count(self):
+        """ When there are no required classes it returns 0 for every course """
         self.gen_test_data()
         
         scheduler = Scheduler()
-        scheduler.make_schedule()
-        self.assertTrue(len(ScheduledClass.query.all()) == 10)
+        cmap = scheduler.calc_course_count()
+        for key in cmap:
+            self.assertEqual(cmap[key], 0)
+
 
     # def test_valid_teacher_ids(self):
     #     """ The selections of the scheduler are only for valid Ids """
