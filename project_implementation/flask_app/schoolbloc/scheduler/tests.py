@@ -64,13 +64,13 @@ class SchedulerTests(unittest.TestCase):
 
         db.session.commit()
 
-    # def test_generate_schedule(self):
-    #     """ It creates 10 scheduled classes """
-    #     self.gen_test_data()
+    def test_generate_schedule(self):
+        """ It creates 10 scheduled classes """
+        self.gen_test_data()
         
-    #     scheduler = Scheduler()
-    #     scheduler.make_schedule()
-    #     self.assertTrue(len(ScheduledClass.query.all()) == 10)
+        scheduler = Scheduler()
+        scheduler.make_schedule()
+        self.assertTrue(len(ScheduledClass.query.all()) == 10)
 
     # def test_valid_teacher_ids(self):
     #     """ The selections of the scheduler are only for valid Ids """
@@ -257,17 +257,17 @@ class SchedulerTests(unittest.TestCase):
     #             self.assertNotEqual(class1.start_time, class2.start_time)
     #             self.assertNotEqual(class1.end_time, class2.end_time)
 
-    def test_uniq_student(self):
-        """It does not repeat students in a given class student list """
-        self.gen_test_data()
-        scheduler = Scheduler()
-        scheduler.make_schedule()
+    # def test_uniq_student(self):
+    #     """It does not repeat students in a given class student list """
+    #     self.gen_test_data()
+    #     scheduler = Scheduler()
+    #     scheduler.make_schedule()
 
-        for c in ScheduledClass.query.all():
-            stud_ids = []
-            for stud in c.students:
-                self.assertNotIn(stud.id, stud_ids)
-                stud_ids.append(stud.id)
+    #     for c in ScheduledClass.query.all():
+    #         stud_ids = []
+    #         for stud in c.students:
+    #             self.assertNotIn(stud.id, stud_ids)
+    #             stud_ids.append(stud.id)
 
     # def test_student_time_collision(self):
     #     """ It does not assign a student to two classes which occur at the same time """
@@ -312,85 +312,85 @@ class SchedulerTests(unittest.TestCase):
     #             self.assertNotEqual(class1.start_time, class2.start_time)
     #             self.assertNotEqual(class1.end_time, class2.end_time)
 
-    def test_max_students_in_classroom(self):
-        """ It does not assign more students to the course than the maximum for the classroom """
-        pass
+    # def test_max_students_in_classroom(self):
+    #     """ It does not assign more students to the course than the maximum for the classroom """
+    #     pass
 
-    def test_classroom_course_soft_constraint(self):
-        """ It chooses classrooms from a list of those with soft constraint to the course """
-        pass
+    # def test_classroom_course_soft_constraint(self):
+    #     """ It chooses classrooms from a list of those with soft constraint to the course """
+    #     pass
 
-    def test_classroom_course_hard_constraint(self):
-        """ It chooses only the classroom with the hard constraint to assign to the course """
-        pass
+    # def test_classroom_course_hard_constraint(self):
+    #     """ It chooses only the classroom with the hard constraint to assign to the course """
+    #     pass
 
-    def test_classroom_course_no_constraint(self):
-        """ It chooses any classroom for the course """
-        pass
+    # def test_classroom_course_no_constraint(self):
+    #     """ It chooses any classroom for the course """
+    #     pass
 
-    def test_classroom_time_constraint(self):
-        """ it does not schedule the classroom outside of the assigned time constraint """
-        pass
+    # def test_classroom_time_constraint(self):
+    #     """ it does not schedule the classroom outside of the assigned time constraint """
+    #     pass
 
-    def test_classroom_time_no_constraint(self):
-        """ It is free to assign any time to a classroom """
-        pass
+    # def test_classroom_time_no_constraint(self):
+    #     """ It is free to assign any time to a classroom """
+    #     pass
 
-    def test_course_student_hard_constraint(self):
-        """ It requires a student to be assigned the course """
-        pass
+    # def test_course_student_hard_constraint(self):
+    #     """ It requires a student to be assigned the course """
+    #     pass
 
-    def test_course_student_med_constraint(self):
-        """ It sets a preferred course for a student """
-        pass
+    # def test_course_student_med_constraint(self):
+    #     """ It sets a preferred course for a student """
+    #     pass
 
-    def test_course_student_soft_constraint(self):
-        """ It sets the course as available to the student """
-        pass
+    # def test_course_student_soft_constraint(self):
+    #     """ It sets the course as available to the student """
+    #     pass
 
-    def test_course_teacher_hard_constraint(self):
-        """ It requires the course for the teacher """
-        pass
+    # def test_course_teacher_hard_constraint(self):
+    #     """ It requires the course for the teacher """
+    #     pass
 
-    def test_course_teacher_soft_constraint(self):
-        """ It allows the course to be assigned to the teacher """
-        pass
+    # def test_course_teacher_soft_constraint(self):
+    #     """ It allows the course to be assigned to the teacher """
+    #     pass
 
-    def test_course_teacher_no_constraint(self):
-        """ It is free to choose any course for the teacher """
-        pass
+    # def test_course_teacher_no_constraint(self):
+    #     """ It is free to choose any course for the teacher """
+    #     pass
 
-    def test_course_time_start_end_constraint(self):
-        """ It sets the available start and end time for a course """
-        pass
+    # def test_course_time_start_end_constraint(self):
+    #     """ It sets the available start and end time for a course """
+    #     pass
 
-    def test_course_duration_constraint(self):
-        """ It sets the duration of the course """
-        pass
+    # def test_course_duration_constraint(self):
+    #     """ It sets the duration of the course """
+    #     pass
 
-    def test_student_group_student_constraint(self):
-        """ It includes the student in the student group """
-        pass
+    # def test_student_group_student_constraint(self):
+    #     """ It includes the student in the student group """
+    #     pass
 
-    def test_course_student_group_hard_constraint(self):
-        """ It requires a student group to be assigned the course """
-        pass
+    # def test_course_student_group_hard_constraint(self):
+    #     """ It requires a student group to be assigned the course """
+    #     pass
 
-    def test_course_student_group_med_constraint(self):
-        """ It sets a preferred course for a student group """
-        pass
+    # def test_course_student_group_med_constraint(self):
+    #     """ It sets a preferred course for a student group """
+    #     pass
 
-    def test_course_student_group_soft_constraint(self):
-        """ It sets the course as available to the student group """
-        pass
+    # def test_course_student_group_soft_constraint(self):
+    #     """ It sets the course as available to the student group """
+    #     pass
 
-    def test_teacher_time_constraint(self):
-        """ It doesn't schedule the teacher for classes outside the start and end time """
-        pass
+    # def test_teacher_time_constraint(self):
+    #     """ It doesn't schedule the teacher for classes outside the start and end time """
+    #     pass
 
-    def student_group_time(self):
-        """ It doesn't schedule the student in the group for classes outside of the start and end time """
-        pass
+    # def student_group_time(self):
+    #     """ It doesn't schedule the student in the group for classes outside of the start and end time """
+    #     pass
 
     
 
