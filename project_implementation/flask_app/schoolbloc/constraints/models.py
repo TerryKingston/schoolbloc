@@ -22,3 +22,10 @@ class Test1(db.Model, Serializer):
     id = db.Column(db.Integer, primary_key=True)
     test_int = db.Column(db.Integer, nullable=False, unique=True)
     test_string = db.Column(db.String)
+
+
+class Test2(db.Model, Serializer):
+    __tablename__ = 'test2'
+    id = db.Column(db.Integer, primary_key=True)
+    test_int_2 = db.Column(db.Integer, nullable=False, unique=True)
+    test_string_2 = db.Column(db.String)
