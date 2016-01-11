@@ -35,7 +35,5 @@ if __name__ == '__main__':
     app.permanent_session_lifetime = timedelta(hours=1)
     KVSessionExtension(store, app)
 
-    from pprint import pprint
-    pprint(app.url_map)
     # Run our application
     app.run(host='0.0.0.0', port=5000, use_reloader=True)
