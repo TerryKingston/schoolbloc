@@ -4,7 +4,20 @@ from schoolbloc import db
 log = logging.getLogger(__name__)
 
 
-class Classroom(db.Model):
+class Serializer:
+    """
+    Provides a base model for our database tables and constraints. This
+    provides a serialize method that will be utilized by our rest endpoints
+    """
+    def serialize(self):
+        results = {}
+        columns = self.__table__.columns.values()
+        for column in columns:
+            results[column.name] = getattr(self, column.name)
+        return results
+
+
+class Classroom(db.Model, Serializer):
     """
     ORM object for classrooms stored in the database
 
@@ -15,13 +28,6 @@ class Classroom(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     room_number = db.Column(db.Integer, nullable=False, unique=True)  # user assigned room number
     max_student_count = db.Column(db.Integer)
-
-    def serialize(self):
-        return {
-            'id': self.id,
-            'room_number': self.room_number,
-            'max_student_count': self.max_student_count,
-        }
 
 
 class ClassroomsTeacher(db.Model):

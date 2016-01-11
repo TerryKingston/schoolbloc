@@ -80,30 +80,6 @@ def auth_required(realm=None, roles=None):
     return wrapper
 
 
-# These are just examples. Check out the users/views.py for a better example
-@app.route('/anyone')
-def anyone():
-    return jsonify({'result': 'anyone'})
-
-
-@app.route('/protected1')
-@auth_required()
-def protected1():
-    return jsonify({'result': 'protected, anyone can see'})
-
-
-@app.route('/protected2')
-@auth_required(roles='Admin')
-def protected2():
-    return jsonify({'result': 'protected, only admins can see'})
-
-
-@app.route('/protected3')
-@auth_required(roles=['admin', 'Student'])
-def protected3():
-    return jsonify({'result': 'protected, admins and students can see'})
-
-
 # We can set 404 or 408 error pages here, but perhaps that should be handled by
 # angular instead? (at least the 404). TODO
 @app.errorhandler(404)
@@ -120,21 +96,5 @@ def page_not_found(e):
 # This is where we take our backend modules (they are modules for the sake of
 # code organization, not models that can be toggled like the frontend angular
 # modules). All of our code will be in the modules
-from schoolbloc.courses.views import mod as course_module
-from schoolbloc.users.views import mod as user_module
-from schoolbloc.teachers.views import mod as teacher_module
-from schoolbloc.subjects.views import mod as subject_module
-from schoolbloc.students.views import mod as student_module
-from schoolbloc.student_groups.views import mod as student_group_module
-from schoolbloc.schedules.views import mod as schedule_module
-from schoolbloc.classrooms.views import mod as classroom_module
-from schoolbloc.data_import.views import mod as import_module
-app.register_blueprint(course_module)
-app.register_blueprint(user_module)
-app.register_blueprint(teacher_module)
-app.register_blueprint(subject_module)
-app.register_blueprint(student_module)
-app.register_blueprint(student_group_module)
-app.register_blueprint(schedule_module)
-app.register_blueprint(classroom_module)
-app.register_blueprint(import_module)
+from schoolbloc.constraints.views import mod as test_mod
+app.register_blueprint(test_mod)

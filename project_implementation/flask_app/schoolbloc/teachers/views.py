@@ -83,7 +83,7 @@ class TeacherListApi(Resource):
             db.session.add(s)
             db.session.commit()
         except IntegrityError:
-            db.session.rollbacke()
+            db.session.rollback()
             return {'error': 'unique constraint failed'}, 409
         return {'success': 'teacher created successfully'}, 200
 
