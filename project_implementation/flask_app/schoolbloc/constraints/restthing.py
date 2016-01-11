@@ -28,6 +28,7 @@ class TestRest(Resource):
                 setattr(orm_object, name, args[name])
         db.session.add(orm_object)
         db.session.commit()
+        return {'success': True}
 
     def delete(self, orm_id):
         orm_object = self._get_or_abort(orm_id)
@@ -51,18 +52,18 @@ class TestRest(Resource):
         columns = self.orm.__table__.columns.values()
         for column in columns:
             name = column.name
-            col_type = column.property.columns[0].type
+            col_type = column.type
 
             # Don't let someone change the primary id through the rest api
             if name == 'id':
                 continue
 
             if type(col_type) is db.Integer:
-                parser.add_argument(name, type=int)
+                parser.add_argument(name, type=int, store_missing=False)
             elif type(col_type) is db.Boolean:
-                parser.add_argument(name)
+                parser.add_argument(name, store_missing=False)
             elif type(col_type) is db.String:
-                parser.add_argument(name)
+                parser.add_argument(name, store_missing=False)
             else:
                 raise Exception("Unknown type {} found".format(col_type))
 
@@ -70,11 +71,6 @@ class TestRest(Resource):
 
 
 class TestRestList(Resource):
-
-    def __init__(self, orm, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.orm = orm
-        self.tablename = orm.__table__.name
 
     def get(self):
         return [orm_obj.serialize() for orm_obj in self.orm.query.all()]
@@ -101,7 +97,7 @@ class TestRestList(Resource):
         columns = self.orm.__table__.columns.values()
         for column in columns:
             name = column.name
-            col_type = column.property.columns[0].type
+            col_type = column.type
             required = not column.nullable  # nullable == not required
 
             # Don't let someone specify a primary key
@@ -109,11 +105,11 @@ class TestRestList(Resource):
                 continue
 
             if type(col_type) is db.Integer:
-                parser.add_argument(name, type=int, required=required)
+                parser.add_argument(name, type=int, required=required, store_missing=False)
             elif type(col_type) is db.Boolean:
-                parser.add_argument(name, type=bool, required=required)
+                parser.add_argument(name, type=bool, required=required, store_missing=False)
             elif type(col_type) is db.String:
-                parser.add_argument(name, required=required)
+                parser.add_argument(name, required=required, store_missing=False)
             else:
                 raise Exception("Unknown type {} found".format(col_type))
 
