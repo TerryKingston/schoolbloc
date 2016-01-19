@@ -329,20 +329,24 @@ class Scheduler():
 
         # Now we'll start adding constraints. The first set are implied constraints like
         # a teacher can't be in two places at one time.
+        
+        # these ones are relatively fast
         constraints += self.ensure_valid_ids()
         constraints += self.ensure_valid_class_durations()
         constraints += self.ensure_valid_class_start_times()
         constraints += self.ensure_lunch_period()
         constraints += self.prevent_room_time_collision()
-        constraints += self.prevent_teacher_time_collision()
-        constraints += self.prevent_student_time_collision()
-        constraints += self.prevent_duplicate_student()
 
-        # next, include the user provided constraints
-        constraints += self.constrain_course_rooms()
-        # constraints += self.constrain_teacher_time()
-        constraints += self.constrain_course_size()
-        constraints += self.constrain_student_req_courses()
+        # these ones take longer
+        constraints += self.prevent_teacher_time_collision() 
+        constraints += self.prevent_duplicate_student() 
+        # constraints += self.prevent_student_time_collision()
+
+        # # # next, include the user provided constraints
+        # constraints += self.constrain_course_rooms()
+        # # constraints += self.constrain_teacher_time()
+        # # constraints += self.constrain_course_size() 
+        # constraints += self.constrain_student_req_courses()
 
 
       

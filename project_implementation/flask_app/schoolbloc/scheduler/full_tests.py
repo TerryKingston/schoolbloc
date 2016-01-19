@@ -97,6 +97,6 @@ class FullScheduleTests(unittest.TestCase):
                               lunch_start=1086,
                               lunch_end=1131,
                               class_duration=82,
-                              class_count=20)
+                              class_count=60) # normally 70
         scheduler.make_schedule()
 
