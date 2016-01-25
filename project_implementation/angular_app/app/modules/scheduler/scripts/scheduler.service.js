@@ -30,6 +30,7 @@ angular.module('sbAngularApp').factory('schedulerService', ['$q', '$http', 'comm
 			
 			return deferred.promise;
 
+			// NOTE test method:
 			// var data = [ 
 			// 	{ 
 			// 		"teacher": {
@@ -103,6 +104,10 @@ angular.module('sbAngularApp').factory('schedulerService', ['$q', '$http', 'comm
 			// 		]
 			// 	}
 			// ];
+			
+			// deferred.resolve(data);
+			
+			// return deferred.promise;
 		},
 
 		/**

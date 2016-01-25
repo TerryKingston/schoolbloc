@@ -83,5 +83,6 @@
 	"schedulerModule.STUDENTS": "Students",
 	"schedulerModule.TEACHER": "Teacher",
 	"schedulerModule.GENERATE_SCHEDULE": "Generate Schedule",
-	"schedulerModule.DELETE_SCHEDULE": "Delete Schedule"
+	"schedulerModule.DELETE_SCHEDULE": "Delete Schedule",
+	"schedulerModule.EXPORT_SCHEDULE": "Export Schedule"
 }

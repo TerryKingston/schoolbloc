@@ -1,11 +1,15 @@
 <sb-view-header config="schedulerModule.viewHeaderConfig"></sb-view-header>
 <!-- scheduler -->
 <div class="scheduler-wrapper" ng-if="!config.subView">
-  <sb-scheduler-container></sb-scheduler-container>
+  <div ng-controller="SchedulerContainer">
+    <sb-scheduler-container></sb-scheduler-container>
+  </div>
 </div>
 
 
 <!-- facts and constraints -->
 <div class="facts-constraints-wrapper" ng-if="config.subView === 'facts and constraints'">
-  <sb-facts-constraints config="schedulerModule"></sb-facts-constraints>
+  <div ng-controller="FactsConstraints">
+    <sb-facts-constraints config="schedulerModule"></sb-facts-constraints>
+  </div>
 </div>

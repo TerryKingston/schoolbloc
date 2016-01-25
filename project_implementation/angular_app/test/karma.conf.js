@@ -38,6 +38,8 @@ module.exports = function(config) {
       'bower_components/angular-mocks/angular-mocks.js',
       // endbower
       "app/scripts/**/*.js",
+      // for karma-ng-html2js-preprocessor as listed below
+      "app/views/*.html",
       "test/mock/**/*.js",
       "test/spec/**/*.js"
     ],
@@ -58,14 +60,30 @@ module.exports = function(config) {
     // - PhantomJS
     // - IE (only Windows)
     browsers: [
-      "PhantomJS"
+      "Chrome"
     ],
 
     // Which plugins to enable
+    // 'karma-chrome-launcher'
+    // 'karma-phantomjs-launcher'
+    // "karma-ng-html2js-preprocessor" is needed for templateUrl in directives
     plugins: [
-      "karma-phantomjs-launcher",
-      "karma-jasmine"
+      "karma-chrome-launcher",
+      "karma-jasmine",
+      "karma-ng-html2js-preprocessor"
     ],
+    
+    // manually added for testing templateUrl
+    // CITE: http://stackoverflow.com/questions/15214760/unit-testing-angularjs-directive-with-templateurl
+    preprocessors: {
+      'app/views/*.html': ['ng-html2js']
+    },
+ 
+    ngHtml2JsPreprocessor: { 
+      stripPrefix: 'app/', 
+      moduleName: 'sbTemplates' 
+    },
+    // END CITE
 
     // Continuous Integration mode
     // if true, it capture browsers, run tests and exit
