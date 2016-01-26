@@ -1,6 +1,6 @@
 from functools import wraps
 import logging
-from flask import Flask, current_app, jsonify
+from flask import Flask, current_app
 from flask.ext.jwt import current_identity, JWT, _jwt_required
 from flask.ext.restful import abort
 from flask.ext.sqlalchemy import SQLAlchemy
@@ -96,5 +96,9 @@ def page_not_found(e):
 # This is where we take our backend modules (they are modules for the sake of
 # code organization, not models that can be toggled like the frontend angular
 # modules). All of our code will be in the modules
-from schoolbloc.constraints.views import mod as test_mod
-app.register_blueprint(test_mod)
+from schoolbloc.data_import.views import mod as data_import_mod
+from schoolbloc.scheduler.views import mod as scheduler_mod
+from schoolbloc.users.views import mod as users_mod
+app.register_blueprint(data_import_mod)
+app.register_blueprint(scheduler_mod)
+app.register_blueprint(users_mod)

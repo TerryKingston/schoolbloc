@@ -1,11 +1,6 @@
 import csv
-import os
-import sys
-from schoolbloc import app, db
-from schoolbloc.students.models import Student
-from schoolbloc.classrooms.models import Classroom
-from schoolbloc.teachers.models import Teacher
-from schoolbloc.courses.models import Course
+from schoolbloc import db
+from schoolbloc.scheduler.models import Student, Classroom, Teacher, Course
 from schoolbloc.users.models import User
 
 

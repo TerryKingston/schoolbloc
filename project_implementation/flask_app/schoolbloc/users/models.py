@@ -1,5 +1,4 @@
 import logging
-from flask import json
 from passlib.hash import pbkdf2_sha512
 from schoolbloc import db
 

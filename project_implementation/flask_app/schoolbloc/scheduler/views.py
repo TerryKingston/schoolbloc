@@ -1,14 +1,8 @@
 from flask import Blueprint
 from flask.ext.restful import Api
-
 from schoolbloc import auth_required
-from schoolbloc.constraints.restthing import TestRest, TestRestList
-
-from schoolbloc.constraints.models import CoursesStudent, Course, \
-    Teacher, Subject, StudentsStudentGroup, Student, StudentGroup, \
-    ScheduledClassesStudent, ScheduledClass, Schedule, ClassroomsCourse, \
-    ClassroomsTeacher, Classroom, CoursesSubject, CoursesStudentGroup, \
-    CoursesTeacher
+from schoolbloc.scheduler.restexport import TestRest, TestRestList
+from schoolbloc.scheduler.models import *
 
 mod = Blueprint('api', __name__)
 api = Api(mod)

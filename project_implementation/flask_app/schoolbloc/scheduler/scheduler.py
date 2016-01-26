@@ -1,12 +1,6 @@
 from z3 import *
-
+from schoolbloc.scheduler.models import *
 from schoolbloc import db
-from schoolbloc.schedules.models import Schedule, ScheduledClass, ScheduledClassesStudent
-from schoolbloc.users.models import User
-from schoolbloc.teachers.models import Teacher
-from schoolbloc.classrooms.models import Classroom, ClassroomsTeacher, ClassroomsCourse
-from schoolbloc.students.models import Student, StudentsStudentGroup
-from schoolbloc.courses.models import Course, CoursesStudent, CoursesTeacher, CoursesStudentGroup, CoursesSubject
 from schoolbloc.config import config
 
 DEFAULT_MAX_CLASS_SIZE = 30
