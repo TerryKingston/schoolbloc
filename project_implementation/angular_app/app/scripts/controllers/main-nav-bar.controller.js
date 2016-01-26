@@ -22,15 +22,41 @@
  * Controller of the sbAngularApp
  */
 angular.module('sbAngularApp')
-.controller('MainNavBar', ['$scope', function($scope) {
+.controller('MainNavBar', ['$scope', 'userAuthService', function($scope, userAuthService) {
 	this.components = [
 		'HTML5 Boilerplate',
 		'AngularJS',
 		'Karma'
 	];
 
+	$scope.mainNavBar = {
+		isOpen: true,
+		navBarStyle: {
+			// since browsers don't determine height in css form, we need to manually determine it here
+			'height': '0px'
+		},
+		profileIsOpen: false,
+	};
+
+	$scope.mainNavBar.changeView = function(view) {
+		$scope.mainNavBar.config.view = view;
+		$scope.mainNavBar.config.subView = null
+	};
+
+	$scope.mainNavBar.changeSubView = function(subView, view) {
+		// show active for parent module
+		$scope.mainNavBar.config.view = view;
+		$scope.mainNavBar.config.subView = subView;
+	};
+
+	$scope.mainNavBar.logout = function() {
+		userAuthService.logoutUser();
+		$scope.$emit("checkUserAuth");
+	};
+
+
 }])
-.directive('sbMainNavBar', ['$window', 'userAuthService', function($window, userAuthService) {
+.directive('sbMainNavBar', ['$window', function($window) {
 	/**
 	 * For manipulating the DOM
 	 * @param  scope   as configured in the controller
@@ -38,15 +64,12 @@ angular.module('sbAngularApp')
 	 * @param  attrs   hash object with key-value pairs of normalized attribute names and their corresponding attribute values.
 	 */
 	function link(scope, element, attrs) {
-
-		scope.mainNavBar = {
-			isOpen: true,
-			navBarStyle: {
-				// since browsers don't determine height in css form, we need to manually determine it here
-				'height': '0px'
-			},
-			profileIsOpen: false
-		};
+		/**
+		 * Provide config params to the controller
+		 */
+		function linkConfig () {
+			scope.mainNavBar.config = scope.config;
+		}
 
 		/**
 		 * Updates the height of the window as it is resized.
@@ -64,17 +87,6 @@ angular.module('sbAngularApp')
 	        });
 		}
 
-		scope.changeView = function(view) {
-			scope.config.view = view;
-			scope.config.subView = null
-		};
-
-		scope.changeSubView = function(subView, view) {
-			// show active for parent module
-			scope.config.view = view;
-			scope.config.subView = subView;
-		};
-
 		scope.toggleNavBar = function(isOpen) {
 			scope.mainNavBar.isOpen = isOpen;
 		};
@@ -83,10 +95,8 @@ angular.module('sbAngularApp')
 			scope.profileIsOpen = !scope.profileIsOpen;
 		};
 
-		scope.logout = function() {
-			userAuthService.logoutUser();
-			scope.$emit("checkUserAuth");
-		};
+		/**** initial setup ****/
+		linkConfig();
 
 		// check against the current window size when the browser loads.
 		updateWindowSize();
@@ -102,14 +112,15 @@ angular.module('sbAngularApp')
 
 	/**
 	 * restrict: directive is triggered by element (E) name
-	 * scope: isolated scope to $scope.mainNavBar only
+	 * scope: isolated scope
 	 * templateUrl: where we find the template.html
 	 * link: for manipulating the DOM
 	 */
 	return {
 		restrict: 'E',
 		scope: {
-			config: '=config'
+			config: '=config',
+			mainNavBar: '=info'
 		},
 		templateUrl: 'views/main-nav-bar.html',
 		link: link
