@@ -7,8 +7,6 @@ storage
 """
 from schoolbloc import app, db
 from datetime import timedelta
-from simplekv.memory import DictStore
-from flask_kvsession import KVSessionExtension
 from schoolbloc.users.models import Role, User
 
 if __name__ == '__main__':
@@ -29,11 +27,6 @@ if __name__ == '__main__':
         db.session.commit()
     except:
         pass
-
-    # Create the in memory session manager. In production, this is redis
-    store = DictStore()
-    app.permanent_session_lifetime = timedelta(hours=1)
-    KVSessionExtension(store, app)
 
     # Run our application
     app.run(host='0.0.0.0', port=5000, use_reloader=True)
