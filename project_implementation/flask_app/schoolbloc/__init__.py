@@ -1,6 +1,6 @@
 from functools import wraps
 import logging
-from flask import Flask, current_app
+from flask import Flask, current_app, jsonify
 from flask.ext.jwt import current_identity, JWT, _jwt_required
 from flask.ext.restful import abort
 from flask.ext.sqlalchemy import SQLAlchemy
@@ -42,6 +42,7 @@ def identity(payload):
 
 # Create the javascript web tokens auth engine
 jwt = JWT(app, authenticate, identity)
+
 
 # Provide a custom method for returning successful auth data
 def auth_response_handler(access_token, identity):
