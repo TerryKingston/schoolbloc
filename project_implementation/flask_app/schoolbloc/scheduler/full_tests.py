@@ -4,10 +4,12 @@ from schoolbloc.users.models import User, Role
 from schoolbloc.teachers.models import Teacher
 from schoolbloc.classrooms.models import Classroom
 from schoolbloc.classrooms.models import ClassroomsCourse
-from schoolbloc.courses.models import Course, CoursesTeacher, CoursesStudent, CoursesStudentGroup
+from schoolbloc.courses.models import Course, CoursesTeacher, CoursesStudent, CoursesStudentGroup, CoursesSubject
 from schoolbloc.scheduler.scheduler import Scheduler
-from schoolbloc.students.models import Student
+from schoolbloc.students.models import Student, StudentsStudentGroup
+from schoolbloc.student_groups.models import StudentGroup
 from schoolbloc.schedules.models import ScheduledClass, ScheduledClassesStudent, ScheduledClassesStudent
+from schoolbloc.subjects.models import Subject, SubjectsStudentGroup
 
 class FullScheduleTests(unittest.TestCase):
     """ Tests full scheduling scenarios """
@@ -63,30 +65,207 @@ class FullScheduleTests(unittest.TestCase):
         r_model_list = [ Classroom(room_number=r) for r in room_list ]
         for r in r_model_list: db.session.add(r)
 
-        # Add the courses
-        course_list = ["7th Grade Math", "8th Grade Math", "Math Lab", 
-                       "Secondary Math I", "Secondary Math II", "Secondary Math III", 
-                       "Int Science (7)", "Int Science (8)", 
-                       "Beg Band", "Int Band",  "Beg Orch", "Int Orchestra",
-                       "Girls Choir", "Boys Choir",
-                       "Musical Theatre", "Concert Choir", "Madrigals"
-                       "7th PE/Health", "8th PE/Health", "9th PE/Health", 
-                       "Leadership", "Learning Strategies", "College & Career Awareness",
-                       "FACS", "Pre Engineering", "Student Govt", "Utah Studies 7",
-                       "US History I", "Comp Tech",  "Int Science (8)", 
-                       "World Geog (9)", "Auto", "Chemistry (9)",  
-                       "Language Arts 7", "Language Arts 8", "Language Arts 10",
-                       "Technology", "Computer Essentials", "Robotics" "Computer Tech"]
-        c_model_list = [ Course(name=c, duration=82, 
-                                min_student_count=0, 
-                                max_student_count=60) for c in course_list ]
+        # Add courses and subjects
+        sub_music = Subject(name="Music")
+        db.session.add(sub_music)
+        cl_music = [ Course(name=c_name, duration=82, 
+                            min_student_count=0,
+                            max_student_count=60) 
+                      for c_name in ["Beg Band", "Int Band",  "Beg Orch", "Int Orchestra",
+                                     "Girls Choir", "Boys Choir",
+                                     "Musical Theatre", "Concert Choir", "Madrigals"] ]
+        for c in cl_music: db.session.add(c)
+        db.session.flush()
 
-        for c in c_model_list: db.session.add(c)
+        csubs = [ CoursesSubject(course_id=c.id, subject_id=sub_music.id) for c in cl_music ]
+        for cs in csubs: db.session.add(cs)
+
+        sub_7th_math = Subject(name="7th Math")
+        db.session.add(sub_7th_math)
+        cl_7th_math = [Course(name=c_name, duration=82, 
+                            min_student_count=0,
+                            max_student_count=60) 
+                       for c_name in ["7th Grade Math", "8th Grade Math",  
+                                      "Secondary Math I", "Secondary Math II", "Secondary Math III"] ]
+        for c in cl_7th_math: db.session.add(c)
+        db.session.flush()
+
+        csubs = [ CoursesSubject(course_id=c.id, subject_id=sub_7th_math.id) for c in cl_7th_math ]
+        for cs in csubs: db.session.add(cs)
+
+        sub_8th_math = Subject(name="8th Math")
+        db.session.add(sub_8th_math)
+        cl_8th_math = [Course(name=c_name, duration=82, 
+                            min_student_count=0,
+                            max_student_count=60)
+                        for c_name in ["8th Grade Math",  
+                                       "Secondary Math I", "Secondary Math II", "Secondary Math III"] ]
+        for c in cl_8th_math: db.session.add(c)
+        db.session.flush()
+
+        csubs = [ CoursesSubject(course_id=c.id, subject_id=sub_8th_math.id) for c in cl_8th_math ]
+        for cs in csubs: db.session.add(cs)
+
+        sub_9th_math = Subject(name="9th Math")                               
+        db.session.add(sub_9th_math)
+        cl_9th_math = [ Course(name=c_name, duration=82, 
+                            min_student_count=0,
+                            max_student_count=60)  
+                        for c_name in ["9th Grade Math", "Secondary Math I", "Secondary Math II", "Secondary Math III"] ]
+        for c in cl_9th_math: db.session.add(c)
+        db.session.flush()
+
+        csubs = [ CoursesSubject(course_id=c.id, subject_id=sub_9th_math.id) for c in cl_9th_math ]
+        for cs in csubs: db.session.add(cs)
+
+        course_7th_sci = Course(name="Int Science (7)", duration=82, 
+                            min_student_count=0,
+                            max_student_count=60)
+        db.session.add(course_7th_sci)
+
+        course_8th_sci = Course(name="Int Science (8)", duration=82, 
+                            min_student_count=0,
+                            max_student_count=60)
+        db.session.add(course_8th_sci)
+
+        course_9th_sci = Course(name="Int Science (9)", duration=82, 
+                            min_student_count=0,
+                            max_student_count=60)
+        db.session.add(course_9th_sci)
+
+        course_7th_la = Course(name="Language Arts (7)", duration=82, 
+                            min_student_count=0,
+                            max_student_count=60)
+        db.session.add(course_7th_la)
+
+        course_8th_la = Course(name="Language Arts (8)", duration=82, 
+                            min_student_count=0,
+                            max_student_count=60)
+        db.session.add(course_8th_la)
+
+        course_9th_la = Course(name="Language Arts (9)", duration=82, 
+                            min_student_count=0,
+                            max_student_count=60)
+        db.session.add(course_9th_la)
+
+        course_7th_pe = Course(name="PE/Health (7)", duration=82, 
+                            min_student_count=0,
+                            max_student_count=60)
+        db.session.add(course_7th_pe)
+
+        course_8th_pe = Course(name="PE/Health (8)", duration=82, 
+                            min_student_count=0,
+                            max_student_count=60)
+        db.session.add(course_8th_pe)
+
+        course_9th_pe = Course(name="PE/Health (9)", duration=82, 
+                            min_student_count=0,
+                            max_student_count=60)
+        db.session.add(course_9th_pe)
+
+        course_leadership = Course(name="Leadership", duration=82, 
+                            min_student_count=0,
+                            max_student_count=60)
+        db.session.add(course_leadership)
+
+        sub_soc_stud = Subject(name="Social Studies")                               
+        db.session.add(sub_soc_stud)
+        cl_soc_stud = [ Course(name=c_name, duration=82, 
+                            min_student_count=0,
+                            max_student_count=60)  
+                        for c_name in ["Student Govt", "Utah Studies", "US History I", "World Geog"] ]
+        for c in cl_soc_stud: db.session.add(c)
+        db.session.flush()
+
+        csubs = [ CoursesSubject(course_id=c.id, subject_id=sub_soc_stud.id) for c in cl_soc_stud ]
+        for cs in csubs: db.session.add(cs)
+
+        sub_tech = Subject(name="Technology")                               
+        db.session.add(sub_tech)
+        cl_tech = [ Course(name=c_name, duration=82, 
+                            min_student_count=0,
+                            max_student_count=60)  
+                        for c_name in ["Technology", "Computer Essentials", "Robotics" "Computer Tech", "Pre Engineering", "Auto"] ]
+        for c in cl_tech: db.session.add(c)
+        db.session.flush()
+
+        csubs = [ CoursesSubject(course_id=c.id, subject_id=sub_tech.id) for c in cl_tech ]
+        for cs in csubs: db.session.add(cs)
+
+        sub_learning = Subject(name="Learning")                               
+        db.session.add(sub_learning)
+        cl_learning = [ Course(name=c_name, duration=82, 
+                            min_student_count=0,
+                            max_student_count=60)  
+                        for c_name in ["Learning Strategies", "College & Career Awareness"] ]
+        for c in cl_learning: db.session.add(c)
+        db.session.flush()
+
+        csubs = [ CoursesSubject(course_id=c.id, subject_id=sub_learning.id) for c in cl_learning ]
+        for cs in csubs: db.session.add(cs)
 
         db.session.flush()
 
-        # now add the constraints
-        # TODO
+        ### now add the constraints
+        
+        # add student groups
+        sg_7th_grade = StudentGroup(name="7th Grade")
+        sg_8th_grade = StudentGroup(name="8th Grade")
+        sg_9th_grade = StudentGroup(name="9th Grade")
+        sg_list = [sg_7th_grade, sg_8th_grade, sg_9th_grade]
+
+        db.session.flush()
+
+        # assign students to each group, 100 each
+        for i in range(100):
+          StudentsStudentGroup(student_group_id=sg_7th_grade.id, student_id=stud_list[i])
+
+        for i in range(100):
+          StudentsStudentGroup(student_group_id=sg_8th_grade.id, student_id=stud_list[i+100])
+
+        for i in range(100):
+          StudentsStudentGroup(student_group_id=sg_9th_grade.id, student_id=stud_list[i+200])
+
+        # add course assignments to each student group
+        for sg in sg_list: SubjectsStudentGroup(subject_id=sub_music.id, student_group_id=sg.id)
+        for sg in sg_list: SubjectsStudentGroup(subject_id=sub_soc_stud.id, student_group_id=sg.id)
+        for sg in sg_list: SubjectsStudentGroup(subject_id=sub_tech.id, student_group_id=sg.id)
+        for sg in sg_list: SubjectsStudentGroup(subject_id=sub_learning.id, student_group_id=sg.id)
+
+        SubjectsStudentGroup(subject_id=sub_7th_math.id, 
+                             student_group_id=sg_7th_grade.id)
+        SubjectsStudentGroup(subject_id=sub_8th_math.id, 
+                             student_group_id=sg_8th_grade.id)
+        SubjectsStudentGroup(subject_id=sub_9th_math.id, 
+                             student_group_id=sg_9th_grade.id)
+
+        CoursesStudentGroup(course_id=course_7th_sci, 
+                            student_group_id=sg_7th_grade.id)
+        CoursesStudentGroup(course_id=course_8th_sci, 
+                            student_group_id=sg_8th_grade.id)
+        CoursesStudentGroup(course_id=course_9th_sci, 
+                            student_group_id=sg_9th_grade.id)
+
+        CoursesStudentGroup(course_id=course_7th_la, 
+                            student_group_id=sg_7th_grade.id)
+        CoursesStudentGroup(course_id=course_8th_la, 
+                            student_group_id=sg_8th_grade.id)
+        CoursesStudentGroup(course_id=course_9th_la, 
+                            student_group_id=sg_9th_grade.id)
+
+        CoursesStudentGroup(course_id=course_7th_pe, 
+                            student_group_id=sg_7th_grade.id)
+        CoursesStudentGroup(course_id=course_8th_pe, 
+                            student_group_id=sg_8th_grade.id)
+        CoursesStudentGroup(course_id=course_9th_pe, 
+                            student_group_id=sg_9th_grade.id)
+
+        CoursesStudentGroup(course_id=course_leadership, 
+                            student_group_id=sg_7th_grade.id)
+        CoursesStudentGroup(course_id=course_leadership, 
+                            student_group_id=sg_8th_grade.id)
+        CoursesStudentGroup(course_id=course_leadership, 
+                            student_group_id=sg_9th_grade.id)
 
         db.session.commit()
 
@@ -97,6 +276,8 @@ class FullScheduleTests(unittest.TestCase):
                               lunch_start=1086,
                               lunch_end=1131,
                               class_duration=82,
-                              class_count=60) # normally 70
+                              class_count=30) # normally 70
+        
+        # self.assertEqual(scheduler.calc_course_count(), {})
         scheduler.make_schedule()
 

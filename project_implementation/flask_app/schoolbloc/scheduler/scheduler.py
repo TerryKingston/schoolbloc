@@ -98,7 +98,7 @@ class Scheduler():
 
         # look at the course requirements for each student to determine 
         # how many classes of each course we will need. 
-        course_req_map = {1: 10}
+        course_req_map = {}
         for course in Course.query.all():
             count = 0
 
