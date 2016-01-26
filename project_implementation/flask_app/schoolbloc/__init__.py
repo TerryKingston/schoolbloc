@@ -55,7 +55,9 @@ def auth_response_handler(access_token, identity):
     return jsonify({
         'access_token': access_token.decode('utf-8'),
         'username': identity.username,
-        'role': identity.role.role_type
+        'user_id': identity.id,
+        'role': identity.role.role_type,
+        'role_id': identity.role_id
     })
 jwt.auth_response_callback = auth_response_handler
 
