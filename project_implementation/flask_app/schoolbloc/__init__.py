@@ -43,6 +43,21 @@ def identity(payload):
 # Create the javascript web tokens auth engine
 jwt = JWT(app, authenticate, identity)
 
+# Provide a custom method for returning successful auth data
+def auth_response_handler(access_token, identity):
+    """
+    Custom auth handler. If a username and password is correctly sent to the
+    auth page, return the access token, as well as the uername and role of this
+    user. Note that the identity passed to this function User object from
+    users.models (what is returned from the identity function above)
+    """
+    return jsonify({
+        'access_token': access_token.decode('utf-8'),
+        'username': identity.username,
+        'role': identity.role.role_type
+    })
+jwt.auth_response_callback = auth_response_handler
+
 
 def auth_required(realm=None, roles=None):
     """
