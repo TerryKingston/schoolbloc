@@ -1,12 +1,11 @@
 import logging
 import os
-from flask import Blueprint, request, Flask, jsonify
+from flask import Blueprint, request, Flask
 from schoolbloc import auth_required
 from schoolbloc.data_import import csv_import
-from flask.ext.restful import Api, Resource, abort, reqparse
-from werkzeug.datastructures import FileStorage
+from flask.ext.restful import Api, Resource, abort
 from werkzeug import secure_filename
-from schoolbloc.students.models import Student
+
 # Setup logger
 log = logging.getLogger(__name__)
 
@@ -19,17 +18,12 @@ app = Flask(__name__)
 app.config['ALLOWED_EXTENSIONS'] = set(['csv'])
 app.config['TMP_FOLDER'] = '///../tmp/' # maybe pick a better place for temp files?
 
+
 class DataImportStudent(Resource):
     """ Get all users or create new user """
 
-    # @auth_required(roles='admin')
+    #@auth_required(roles='admin')
     def post(self):
-        # Check https://gist.github.com/RishabhVerma/7228939
-        # parser = reqparse.RequestParser()
-        # parser.add_argument('csv', required=True, type=FileStorage, location='files')
-        # args = parser.parse_args()
-        # csv = args['csv']
-
         csv = request.files['file']
 
         if not csv:
@@ -52,13 +46,11 @@ class DataImportStudent(Resource):
             return {'error': 'something went wrong'}, 409
 
 
-
 class DataImportTeacher(Resource):
     """ Get all users or create new user """
 
-    # @auth_required(roles='admin')
+    #@auth_required(roles='admin')
     def post(self):
-        
         csv = request.files['file']
 
         if not csv:
@@ -81,14 +73,11 @@ class DataImportTeacher(Resource):
             return {'error': 'something went wrong'}, 409
 
 
-
-
 class DataImportCourse(Resource):
     """ Get all users or create new user """
 
-    # @auth_required(roles='admin')
+    #@auth_required(roles='admin')
     def post(self):
-
         csv = request.files['file']
 
         if not csv:
@@ -111,11 +100,10 @@ class DataImportCourse(Resource):
             return {'error': 'something went wrong'}, 409
 
 
-
 class DataImportClassroom(Resource):
     """ Get all users or create new user """
 
-    # @auth_required(roles='admin')
+    #@auth_required(roles='admin')
     def post(self):
         csv = request.files['file']
 

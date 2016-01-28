@@ -21,6 +21,9 @@ $secondary-gray: #666;
 $secondary-gray-hover: #555;
 $add-green: #7CD845;
 
+$primary-link: #36A5E7;
+$secondary-link: #105681;
+
 // colors - suggestions
 $secondary-blue: #0F5580;
 $alert-background: #FFE5DE;
@@ -39,6 +42,7 @@ $dashboard-dark-active: #324148;
 // colors - table
 $table-background: #dbe6ec;
 $table-border: #bac9d0;
+$table-row-hover: #DEEFFA;
 
 // sizes
 $icon-size: 22px;
@@ -787,9 +791,29 @@ textarea {
   cursor: pointer;
 }
 
-.dynamic-table .table-cluster div {
+.dynamic-table .table-cluster .table-cluster-open div,
+.dynamic-table .table-cluster .table-cluster-closed a {
   height: 35px;
   line-height: 35px;
   font-size: 14px;
 }
+
+.dynamic-table .table-cluster .table-cluster-closed a {
+  color: $secondary-link;
+  font-weight: 700;
+}
+
+.dynamic-table .table-cluster .table-cluster-closed a:hover {
+  text-decoration: underline;
+}
+
+.dynamic-table .table-cluster .table-cluster-open {
+  cursor: pointer;
+}
+
+.dynamic-table .table-cluster .table-cluster-open:hover {
+  opacity: 0.5;
+}
+
+
 /* END table */

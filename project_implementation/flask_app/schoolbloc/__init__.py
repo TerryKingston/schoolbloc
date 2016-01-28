@@ -44,6 +44,24 @@ def identity(payload):
 jwt = JWT(app, authenticate, identity)
 
 
+# Provide a custom method for returning successful auth data
+def auth_response_handler(access_token, identity):
+    """
+    Custom auth handler. If a username and password is correctly sent to the
+    auth page, return the access token, as well as the uername and role of this
+    user. Note that the identity passed to this function User object from
+    users.models (what is returned from the identity function above)
+    """
+    return jsonify({
+        'access_token': access_token.decode('utf-8'),
+        'username': identity.username,
+        'user_id': identity.id,
+        'role': identity.role.role_type,
+        'role_id': identity.role_id
+    })
+jwt.auth_response_callback = auth_response_handler
+
+
 def auth_required(realm=None, roles=None):
     """
     I had to do some hacking to get this working, as it was complainging about
@@ -80,30 +98,6 @@ def auth_required(realm=None, roles=None):
     return wrapper
 
 
-# These are just examples. Check out the users/views.py for a better example
-@app.route('/anyone')
-def anyone():
-    return jsonify({'result': 'anyone'})
-
-
-@app.route('/protected1')
-@auth_required()
-def protected1():
-    return jsonify({'result': 'protected, anyone can see'})
-
-
-@app.route('/protected2')
-@auth_required(roles='Admin')
-def protected2():
-    return jsonify({'result': 'protected, only admins can see'})
-
-
-@app.route('/protected3')
-@auth_required(roles=['admin', 'Student'])
-def protected3():
-    return jsonify({'result': 'protected, admins and students can see'})
-
-
 # We can set 404 or 408 error pages here, but perhaps that should be handled by
 # angular instead? (at least the 404). TODO
 @app.errorhandler(404)
@@ -120,21 +114,9 @@ def page_not_found(e):
 # This is where we take our backend modules (they are modules for the sake of
 # code organization, not models that can be toggled like the frontend angular
 # modules). All of our code will be in the modules
-from schoolbloc.courses.views import mod as course_module
-from schoolbloc.users.views import mod as user_module
-from schoolbloc.teachers.views import mod as teacher_module
-from schoolbloc.subjects.views import mod as subject_module
-from schoolbloc.students.views import mod as student_module
-from schoolbloc.student_groups.views import mod as student_group_module
-from schoolbloc.schedules.views import mod as schedule_module
-from schoolbloc.classrooms.views import mod as classroom_module
-from schoolbloc.data_import.views import mod as import_module
-app.register_blueprint(course_module)
-app.register_blueprint(user_module)
-app.register_blueprint(teacher_module)
-app.register_blueprint(subject_module)
-app.register_blueprint(student_module)
-app.register_blueprint(student_group_module)
-app.register_blueprint(schedule_module)
-app.register_blueprint(classroom_module)
-app.register_blueprint(import_module)
+from schoolbloc.data_import.views import mod as data_import_mod
+from schoolbloc.scheduler.views import mod as scheduler_mod
+from schoolbloc.users.views import mod as users_mod
+app.register_blueprint(data_import_mod)
+app.register_blueprint(scheduler_mod)
+app.register_blueprint(users_mod)

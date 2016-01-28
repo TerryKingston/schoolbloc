@@ -430,10 +430,11 @@ module.exports = function (grunt) {
     },
 
     // Test settings
+    // singleRun: to debug on Chrome, it must be false
     karma: {
       unit: {
         configFile: 'test/karma.conf.js',
-        singleRun: true
+        singleRun: false
       }
     }
   });

@@ -1,7 +1,7 @@
 import unittest
 from sqlalchemy.orm.exc import NoResultFound
 from schoolbloc import app, db
-from schoolbloc.classrooms.models import Classroom
+from schoolbloc.scheduler.models import Classroom
 
 
 class ClassroomTests(unittest.TestCase):

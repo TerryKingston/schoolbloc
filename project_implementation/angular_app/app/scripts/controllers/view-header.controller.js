@@ -88,7 +88,7 @@ angular.module('sbAngularApp')
 
 	/**
 	 * restrict: directive is triggered by element (E) name
-	 * scope: isolated scope to $scope.viewHeader only
+	 * scope: isolated scope
 	 * templateUrl: where we find the template.html
 	 * link: for manipulating the DOM
 	 */

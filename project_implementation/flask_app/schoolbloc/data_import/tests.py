@@ -1,9 +1,6 @@
 import unittest
 import os
-from schoolbloc.students.models import Student
-from schoolbloc.teachers.models import Teacher
-from schoolbloc.classrooms.models import Classroom
-from schoolbloc.courses.models import Course
+from schoolbloc.scheduler.models import Student, Teacher, Classroom, Course
 from schoolbloc.testing.testing import BaseTestClass
 from schoolbloc.data_import import csv_import
 

@@ -1,13 +1,9 @@
 import unittest
 from schoolbloc import app, db
 from schoolbloc.users.models import User, Role
-from schoolbloc.teachers.models import Teacher
-from schoolbloc.classrooms.models import Classroom
-from schoolbloc.classrooms.models import ClassroomsCourse
-from schoolbloc.courses.models import Course, CoursesTeacher, CoursesStudent, CoursesStudentGroup
+from schoolbloc.scheduler.models import *
 from schoolbloc.scheduler.scheduler import Scheduler
-from schoolbloc.students.models import Student
-from schoolbloc.schedules.models import ScheduledClass, ScheduledClassesStudent, ScheduledClassesStudent
+
 
 class SchedulerTests(unittest.TestCase):
     """ Testing the scheduler """
@@ -24,9 +20,6 @@ class SchedulerTests(unittest.TestCase):
         db.session.add(Role(role_type='student'))
         db.session.commit()
         
-
-
-
     def tearDown(self):
         """ Ensures that the database is emptied for next unit test """
         app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite://'

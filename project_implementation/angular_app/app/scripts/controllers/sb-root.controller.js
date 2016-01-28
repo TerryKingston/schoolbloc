@@ -11,12 +11,13 @@
  * Controller of the sbAngularApp
  */
 angular.module('sbAngularApp')
-.controller('SbRoot', ['$scope', function($scope) {
+.controller('SbRoot', ['$scope', 'globalService', 'userAuthService', function($scope, globalService, userAuthService) {
 	this.components = [
 		'HTML5 Boilerplate',
 		'AngularJS',
 		'Karma'
 	];
+
 	$scope.sbRoot = {
 		initialLoading: true,
 		user: {
@@ -26,11 +27,78 @@ angular.module('sbAngularApp')
 		},
 		userAuthContainer: {
 			errorCode: null
+		},
+		mainContainer: {
+			navBarConfig: {
+				view: "import export",
+				subView : null,
+				profile: {
+					username: "!!Test User",
+					role: "!!Admin"
+				},
+				modules: [
+					{
+						identifier: "scheduler",
+						name: "",
+						submodules: [
+							{
+								identifier: "facts and constraints",
+								name: ""
+							}
+						]
+					}
+				]
+			}
 		}
 	};
 
+	$scope.sbRoot.stateUpdates = globalService.getStateUpdates();
+	$scope.$watch('sbRoot.stateUpdates.forbiddenState', setState);
+
+	$scope.$on("checkUserAuth", function (event, args) {
+		determineJwtState();
+	});
+
+	/**
+	 * If some trigger has asked for a state change, 
+	 * determine which trigger and update the state accordingly.
+	 * Resets the trigger once done.
+	 */
+	function setState() {
+		if ($scope.sbRoot.stateUpdates.forbiddenState) {
+			$scope.sbRoot.user.authenticated = false;
+			// @TODO: update error message for child directive: user-auth-container
+			$scope.sbRoot.userAuthContainer.errorCode = "FORBIDDEN";
+			// reset the trigger
+			$scope.sbRoot.stateUpdates.forbiddenState = false;
+		}
+	}
+
+	/**
+	 * Determines the state based on JWT.
+	 * Sets necessary variables to accept the state.
+	 */
+	function determineJwtState() {
+		// only returns username if JWT exists and hasn't expired
+		$scope.sbRoot.user.username = userAuthService.getUsername();
+		// is the user already authenticated?
+		if ($scope.sbRoot.user.username) {
+			$scope.sbRoot.user.authenticated = true;
+		}
+		else {
+			$scope.sbRoot.user.authenticated = false;
+		}
+
+		$scope.sbRoot.initialLoading = false;
+	}
+
+	/**********************
+	 * Begin initial setup.
+	 *********************/
+	determineJwtState();
+
 }])
-.directive('sbSbRoot', ['userAuthService', 'globalService', function(userAuthService, globalService) {
+.directive('sbSbRoot', [ function() {
 	/**
 	 * For manipulating the DOM
 	 * @param  scope   as configured in the controller
@@ -38,55 +106,12 @@ angular.module('sbAngularApp')
 	 * @param  attrs   hash object with key-value pairs of normalized attribute names and their corresponding attribute values.
 	 */
 	function link(scope, element, attrs) {
-		scope.sbRoot.stateUpdates = globalService.getStateUpdates();
-		scope.$watch('sbRoot.stateUpdates.forbiddenState', setState);
 
-		scope.$on("checkUserAuth", function (event, args) {
-			determineJwtState();
-		});
-
-		/**
-		 * If some trigger has asked for a state change, 
-		 * determine which trigger and update the state accordingly.
-		 * Resets the trigger once done.
-		 */
-		function setState() {
-			if (scope.sbRoot.stateUpdates.forbiddenState) {
-				scope.sbRoot.user.authenticated = false;
-				// @TODO: update error message for child directive: user-auth-container
-				scope.sbRoot.userAuthContainer.errorCode = "FORBIDDEN";
-				// reset the trigger
-				scope.sbRoot.stateUpdates.forbiddenState = false;
-			}
-		}
-
-		/**
-		 * Determines the state based on JWT.
-		 * Sets necessary variables to accept the state.
-		 */
-		function determineJwtState() {
-			// only returns username if JWT exists and hasn't expired
-			scope.sbRoot.user.username = userAuthService.getUsername();
-			// is the user already authenticated?
-			if (scope.sbRoot.user.username) {
-				scope.sbRoot.user.authenticated = true;
-			}
-			else {
-				scope.sbRoot.user.authenticated = false;
-			}
-
-			scope.sbRoot.initialLoading = false;
-		}
-
-		/**********************
-		 * Begin initial setup.
-		 *********************/
-		determineJwtState();
 	}
 
 	/**
 	 * restrict: directive is triggered by element (E) name
-	 * scope: isolated scope to $scope.sbRoot only
+	 * scope: isolated scope
 	 * templateUrl: where we find the template.html
 	 * link: for manipulating the DOM
 	 */

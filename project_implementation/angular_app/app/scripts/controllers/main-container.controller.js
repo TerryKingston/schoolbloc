@@ -17,6 +17,8 @@ angular.module('sbAngularApp')
 		'Karma'
 	];
 
+	$scope.mainNavBar = null;
+
 }])
 .directive('sbMainContainer', ['$translate', function($translate) {
 	/**
@@ -26,30 +28,6 @@ angular.module('sbAngularApp')
 	 * @param  attrs   hash object with key-value pairs of normalized attribute names and their corresponding attribute values.
 	 */
 	function link(scope, element, attrs) {
-		scope.mainContainer = {
-			navBarConfig: {
-				view: "import export",
-				subView : null,
-				profile: {
-					username: "!!Test User",
-					role: "!!Admin"
-				},
-				modules: [
-					{
-						identifier: "scheduler",
-						name: "",
-						submodules: [
-							{
-								identifier: "facts and constraints",
-								name: ""
-							}
-						]
-					}
-				]
-			}
-		};
-
-
 		function getModuleTranslations() {
 			$translate("schedulerModule.SCHEDULER").then(function (translation) {
 				scope.mainContainer.navBarConfig.modules[0].name = translation;
@@ -67,14 +45,15 @@ angular.module('sbAngularApp')
 
 	/**
 	 * restrict: directive is triggered by element (E) name
-	 * scope: isolated scope to $scope.mainContainer only
+	 * scope: isolated scope
 	 * templateUrl: where we find the template.html
 	 * link: for manipulating the DOM
 	 */
 	return {
 		restrict: 'E',
 		scope: {
-			mainView: '=view'
+			mainView: '=view',
+			mainContainer: '=info'
 		},
 		templateUrl: 'views/main-container.html',
 		link: link

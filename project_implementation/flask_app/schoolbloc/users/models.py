@@ -1,5 +1,4 @@
 import logging
-from flask import json
 from passlib.hash import pbkdf2_sha512
 from schoolbloc import db
 
@@ -29,7 +28,7 @@ class User(db.Model):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(20), nullable=False, unique=True)
-    hashed_passwd = db.Column(db.String, nullable=False)
+    hashed_passwd = db.Column(db.String(128), nullable=False)
     role_id = db.Column(db.Integer, db.ForeignKey('roles.id'), nullable=False)
     role = db.relationship("Role", backref="users")
 

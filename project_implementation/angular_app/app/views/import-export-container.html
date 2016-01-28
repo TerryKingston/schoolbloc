@@ -33,8 +33,8 @@
         <tr ng-repeat="f in fileUploader.queue track by $index">
           <td class="table-capitalize">{{f.formData.table_name}}</td>
           <td>{{f.file.name}}</td>
-          <td class="delete-table-entry table-icon" ng-show="!f.isSuccess" ng-click="deleteTableEntry($index, f.isUploading)">
-            <div></div>
+          <td class="delete-table-entry table-icon" ng-click="deleteTableEntry($index, f.isUploading)">
+            <div ng-show="!f.isSuccess"></div>
           </td>
           <!-- status -->
           <td>
@@ -50,7 +50,7 @@
       <button class="btn btn-recommended" ng-disabled="fileUploader.isUploading || fileUploader.queue.length == 0" ng-click="uploadSelectedFiles()">{{"importExport.UPLOAD_FILE" | translate}}</button>
     </div>
   </section>
-  <h4>{{"importExport.EXPORT_HEADER" | translate}}</h4>
+  <!--<h4>{{"importExport.EXPORT_HEADER" | translate}}</h4>
   <section class="view-sub-content">
     <div class="input-row">
       <label>
@@ -65,7 +65,7 @@
       </label>
     </div>
     <button class="btn btn-recommended">{{"importExport.EXPORT_FILE" | translate}}</button>
-  </section>
+  </section>-->
   <h3>{{"importExport.MODULES_SECTION" | translate}}</h3>
   <h4>{{"importExport.SCHEDULER_HEADER" | translate}}</h4>
   <section class="view-sub-content">
@@ -75,12 +75,12 @@
         <input type="text">
       </label>
     </div>
-    <div class="input-row">
+    <!--<div class="input-row">
       <label>
         <div>{{"importExport.EXPORT_TO" | translate}}</div>
         <input type="text">
       </label>
-    </div>
+    </div>-->
     <button class="btn btn-recommended">{{"importExport.EXPORT_FILE" | translate}}</button>
   </section>
 </section>
