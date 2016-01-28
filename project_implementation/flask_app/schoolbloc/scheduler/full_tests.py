@@ -208,64 +208,79 @@ class FullScheduleTests(unittest.TestCase):
 
         ### now add the constraints
         
-        # add student groups
+        # # add student groups
         sg_7th_grade = StudentGroup(name="7th Grade")
-        sg_8th_grade = StudentGroup(name="8th Grade")
-        sg_9th_grade = StudentGroup(name="9th Grade")
-        sg_list = [sg_7th_grade, sg_8th_grade, sg_9th_grade]
+        # sg_8th_grade = StudentGroup(name="8th Grade")
+        # sg_9th_grade = StudentGroup(name="9th Grade")
+        # sg_list = [sg_7th_grade, sg_8th_grade, sg_9th_grade]
 
+        db.session.add(sg_7th_grade)
+        # db.session.add(sg_8th_grade)
+        # db.session.add(sg_9th_grade)
         db.session.flush()
 
-        # assign students to each group, 100 each
-        for i in range(100):
-          StudentsStudentGroup(student_group_id=sg_7th_grade.id, student_id=stud_list[i])
+        # # assign students to each group, 100 each
+        students_7th_grade = []
+        # students_8th_grade = []
+        # students_9th_grade = []
+        for i in range(20):
+            stud = stud_list[i]
+            students_7th_grade.append(stud)
+            ssg = StudentsStudentGroup(student_group_id=sg_7th_grade.id, student_id=stud.id)
+            db.session.add(ssg)
 
-        for i in range(100):
-          StudentsStudentGroup(student_group_id=sg_8th_grade.id, student_id=stud_list[i+100])
+        # for i in range(100):
+        #     stud = stud_list[i+100]
+        #     students_8th_grade.append(stud)
+        #     ssg = StudentsStudentGroup(student_group_id=sg_8th_grade.id, student_id=stud.id)
+        #     db.session.add(ssg)
 
-        for i in range(100):
-          StudentsStudentGroup(student_group_id=sg_9th_grade.id, student_id=stud_list[i+200])
+        # for i in range(100):
+        #     stud = stud_list[i+200]
+        #     students_9th_grade.append(stud)
+        #     ssg = StudentsStudentGroup(student_group_id=sg_9th_grade.id, student_id=stud.id)
+        #     db.session.add(ssg)
 
         # add course assignments to each student group
-        for sg in sg_list: SubjectsStudentGroup(subject_id=sub_music.id, student_group_id=sg.id)
-        for sg in sg_list: SubjectsStudentGroup(subject_id=sub_soc_stud.id, student_group_id=sg.id)
-        for sg in sg_list: SubjectsStudentGroup(subject_id=sub_tech.id, student_group_id=sg.id)
-        for sg in sg_list: SubjectsStudentGroup(subject_id=sub_learning.id, student_group_id=sg.id)
+        # for sg in sg_list: db.session.add(SubjectsStudentGroup(subject_id=sub_music.id, student_group_id=sg.id))
+        # for sg in sg_list: db.session.add(SubjectsStudentGroup(subject_id=sub_soc_stud.id, student_group_id=sg.id))
+        # for sg in sg_list: db.session.add(SubjectsStudentGroup(subject_id=sub_tech.id, student_group_id=sg.id))
+        # for sg in sg_list: db.session.add(SubjectsStudentGroup(subject_id=sub_learning.id, student_group_id=sg.id))
 
-        SubjectsStudentGroup(subject_id=sub_7th_math.id, 
-                             student_group_id=sg_7th_grade.id)
-        SubjectsStudentGroup(subject_id=sub_8th_math.id, 
-                             student_group_id=sg_8th_grade.id)
-        SubjectsStudentGroup(subject_id=sub_9th_math.id, 
-                             student_group_id=sg_9th_grade.id)
+        db.session.add(SubjectsStudentGroup(subject_id=sub_7th_math.id, 
+                                   student_group_id=sg_7th_grade.id))
+        # db.session.add(SubjectsStudentGroup(subject_id=sub_8th_math.id, 
+        #                      student_group_id=sg_8th_grade.id))
+        # db.session.add(SubjectsStudentGroup(subject_id=sub_9th_math.id, 
+        #                      student_group_id=sg_9th_grade.id))
 
-        CoursesStudentGroup(course_id=course_7th_sci, 
-                            student_group_id=sg_7th_grade.id)
-        CoursesStudentGroup(course_id=course_8th_sci, 
-                            student_group_id=sg_8th_grade.id)
-        CoursesStudentGroup(course_id=course_9th_sci, 
-                            student_group_id=sg_9th_grade.id)
+        db.session.add(CoursesStudentGroup(course_id=course_7th_sci.id, 
+                            student_group_id=sg_7th_grade.id))
+        # db.session.add(CoursesStudentGroup(course_id=course_8th_sci.id, 
+        #                     student_group_id=sg_8th_grade.id))
+        # db.session.add(CoursesStudentGroup(course_id=course_9th_sci.id, 
+        #                     student_group_id=sg_9th_grade.id))
 
-        CoursesStudentGroup(course_id=course_7th_la, 
-                            student_group_id=sg_7th_grade.id)
-        CoursesStudentGroup(course_id=course_8th_la, 
-                            student_group_id=sg_8th_grade.id)
-        CoursesStudentGroup(course_id=course_9th_la, 
-                            student_group_id=sg_9th_grade.id)
+        db.session.add(CoursesStudentGroup(course_id=course_7th_la.id, 
+                            student_group_id=sg_7th_grade.id))
+        # db.session.add(CoursesStudentGroup(course_id=course_8th_la.id, 
+        #                     student_group_id=sg_8th_grade.id))
+        # db.session.add(CoursesStudentGroup(course_id=course_9th_la.id, 
+        #                     student_group_id=sg_9th_grade.id))
 
-        CoursesStudentGroup(course_id=course_7th_pe, 
-                            student_group_id=sg_7th_grade.id)
-        CoursesStudentGroup(course_id=course_8th_pe, 
-                            student_group_id=sg_8th_grade.id)
-        CoursesStudentGroup(course_id=course_9th_pe, 
-                            student_group_id=sg_9th_grade.id)
+        db.session.add(CoursesStudentGroup(course_id=course_7th_pe.id, 
+                            student_group_id=sg_7th_grade.id))
+        # db.session.add(CoursesStudentGroup(course_id=course_8th_pe.id, 
+        #                     student_group_id=sg_8th_grade.id))
+        # db.session.add(CoursesStudentGroup(course_id=course_9th_pe.id, 
+        #                     student_group_id=sg_9th_grade.id))
 
-        CoursesStudentGroup(course_id=course_leadership, 
-                            student_group_id=sg_7th_grade.id)
-        CoursesStudentGroup(course_id=course_leadership, 
-                            student_group_id=sg_8th_grade.id)
-        CoursesStudentGroup(course_id=course_leadership, 
-                            student_group_id=sg_9th_grade.id)
+        # db.session.add(CoursesStudentGroup(course_id=course_leadership.id, 
+        #                     student_group_id=sg_7th_grade.id))
+        # db.session.add(CoursesStudentGroup(course_id=course_leadership.id, 
+        #                     student_group_id=sg_8th_grade.id))
+        # db.session.add(CoursesStudentGroup(course_id=course_leadership.id, 
+        #                     student_group_id=sg_9th_grade.id))
 
         db.session.commit()
 
@@ -276,8 +291,16 @@ class FullScheduleTests(unittest.TestCase):
                               lunch_start=1086,
                               lunch_end=1131,
                               class_duration=82,
-                              class_count=30) # normally 70
+                              class_count=20) # normally 70
         
         # self.assertEqual(scheduler.calc_course_count(), {})
         scheduler.make_schedule()
 
+        # did we get a student-course maping for the CoursesStudentGroups?
+        # s_ids = []
+        # for c in ScheduledClass.query.filter_by(course_id=course_7th_sci.id):
+        #     stud_list = ScheduledClassesStudent.filter_by(scheduled_class_id=c.id)
+        #     s_ids += [ s.id for s in stud_list ]
+
+        # for s in students_7th_grade:
+        #     self.assertIn(s.id, s_ids)
