@@ -10,13 +10,19 @@
  * Controller of the sbAngularApp
  */
 angular.module('sbAngularApp')
-.controller('FactsConstraints', ['$scope', function($scope) {
+.controller('FactsConstraints', ['$scope', 'tableEntriesService', function($scope, tableEntriesService) {
 	this.components = [
 		'HTML5 Boilerplate',
 		'AngularJS',
 		'Karma'
 	];
 
+	function setupTableEntries() {
+		tableEntriesService.updateTableConfig("fact", "course");
+	}
+
+	/**** initial setup ****/
+	setupTableEntries();
 }])
 .directive('sbFactsConstraints', [function() {
 	/**
@@ -26,6 +32,7 @@ angular.module('sbAngularApp')
 	 * @param  attrs   hash object with key-value pairs of normalized attribute names and their corresponding attribute values.
 	 */
 	function link(scope, element, attrs) {
+
 	}
 
 	/**

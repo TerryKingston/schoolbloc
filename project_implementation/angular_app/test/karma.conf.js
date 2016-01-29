@@ -36,6 +36,8 @@ module.exports = function(config) {
       'bower_components/angular-translate-handler-log/angular-translate-handler-log.js',
       'bower_components/angular-file-upload/dist/angular-file-upload.min.js',
       'bower_components/angular-mocks/angular-mocks.js',
+      'bower_components/sinonjs/sinon.js',
+      'bower_components/jasmine-sinon/lib/jasmine-sinon.js',
       // endbower
       "app/scripts/**/*.js",
       // for karma-ng-html2js-preprocessor as listed below

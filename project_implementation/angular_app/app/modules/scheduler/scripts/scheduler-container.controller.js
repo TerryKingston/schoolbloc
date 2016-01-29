@@ -19,7 +19,8 @@ angular.module('sbAngularApp')
 
 	$scope.config = {
 		showSchedule: false,
-		loadingGenerate: false
+		loadingGenerate: false,
+		error: null
 	}
 	$scope.schedule = [];
 	$scope.clusterList = [];
@@ -49,23 +50,35 @@ angular.module('sbAngularApp')
 			}
 		}
 	}
-	debugger;
+
+	/**
+	 * Request the generated schedule from the back-end
+	 */
 	$scope.generateSchedule = function() {
-		debugger;
 		$scope.config.loadingGenerate = true;
 		schedulerService.generateSchedule().then(function(data) {
 			$scope.config.loadingGenerate = false;
+			$scope.config.error = null;
 			refreshSchedule(data);
 		}, function(error) {
 			$scope.config.loadingGenerate = false;
+			$scope.config.error = "Error: could not generate a schedule."
 			refreshSchedule();
 		});
 	};
 
+	/**
+	 * Remove the schedule from the front-end view
+	 */
 	$scope.deleteSchedule = function() {
+		// @TODO: actually remove the schedule
 		refreshSchedule();
 	};
 
+	/**
+	 * Export the schedule to a .json file
+	 * @todo : allow for other file types in export
+	 */
 	$scope.exportSchedule = function() {	
 		var scheduleId = "", filename, data, blob,
 			e, a;	

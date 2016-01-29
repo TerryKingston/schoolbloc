@@ -17,7 +17,7 @@ describe('Controller: SbRoot', function () {
     });
   }));
 
-  it('should test initial state of scope', function () {
-    expect(scope.sbRoot.initialLoading).toBe(true);
+  it('should test if determineJwtState was called', function () {
+    expect(scope.sbRoot.initialLoading).toBe(false);
   });
 });

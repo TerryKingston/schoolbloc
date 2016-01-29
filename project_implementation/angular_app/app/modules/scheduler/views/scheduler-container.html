@@ -1,4 +1,5 @@
 <section class="scheduler-container main-view-content">
+  <div class="error-box" ng-if="config.error">{{config.error}}</div>
   <button class="btn btn-recommended" ng-click="generateSchedule()" ng-show="!config.showSchedule" ng-disabled="config.loadingGenerate">{{"schedulerModule.GENERATE_SCHEDULE" | translate}}</button>
   <button class="btn btn-recommended" ng-click="exportSchedule()" ng-show="config.showSchedule">{{"schedulerModule.EXPORT_SCHEDULE" | translate}}</button>
   <button class="btn btn-danger" ng-click="deleteSchedule()" ng-show="config.showSchedule">{{"schedulerModule.DELETE_SCHEDULE" | translate}}</button>
@@ -21,7 +22,7 @@
         <td class="table-cluster" ng-click="toggleCluster($index, 'students')">
           <div class="table-cluster-closed" ng-show="!clusterList[$index].students.show">
             <!-- TODO: this should be set to LOCALE after demo -->
-            <a href="">View {{row.students.length}} Students</a>
+            <a href="">!!View {{row.students.length}} Students</a>
           </div>
           <div class="table-cluster-open" ng-show="clusterList[$index].students.show">
             <div ng-repeat="student in row.students">{{student.first_name}} {{student.last_name}}</div>

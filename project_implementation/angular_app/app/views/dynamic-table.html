@@ -1,0 +1,18 @@
+<section class="table-wrapper">
+  <table class="dynamic-table schedule-table" ng-if="tableView.rows && tableView.rows.length">
+    <tr>
+      <th ng-repeat="header in tableView.headers track by $index">{{header}}</th>
+    </tr>
+    <tr ng-repeat="row in tableView.rows track by $index">
+      <td ng-repeat="rowEntry in row track by $index">{{rowEntry}}</td>
+      <!-- <td class="table-cluster" ng-click="toggleCluster($index, 'students')">
+        <div class="table-cluster-closed" ng-show="!clusterList[$index].students.show">
+          <a href="">!!View {{row.students.length}} Students</a>
+        </div>
+        <div class="table-cluster-open" ng-show="clusterList[$index].students.show">
+          <div ng-repeat="student in row.students">{{student.first_name}} {{student.last_name}}</div>
+        </div>
+      </td> -->
+    </tr>
+  </table>
+</section>
