@@ -190,14 +190,24 @@ class Scheduler():
     def prevent_room_time_collision(self):
         """ returns a list of z3 constraints that prevent a room from being assigned to two 
             classes that occur at the same time. Ignores rooms with id == 0 """
-        return [ If(And(i != j, self.room(i) == self.room(j), self.room(i) != 0, self.room(j) != 0),
+        # return [ If(And(i != j, self.room(i) == self.room(j), self.room(i) != 0, self.room(j) != 0),
+        #              Not( Or( And( TimeBlock.start(self.time(i)) <= TimeBlock.start(self.time(j)), 
+        #                            TimeBlock.end(self.time(i)) >= TimeBlock.end(self.time(j)) ),
+        #                       And( TimeBlock.start(self.time(i)) <= TimeBlock.start(self.time(j)), 
+        #                            TimeBlock.end(self.time(i)) >= TimeBlock.start(self.time(j)) ),
+        #                       And( TimeBlock.start(self.time(i)) <= TimeBlock.end(self.time(j)),
+        #                            TimeBlock.end(self.time(i)) >= TimeBlock.end(self.time(j)) ))),  # then
+        #              True)  # else
+        #           for i in range(self.class_count) for j in range(self.class_count) ]
+
+        return [ If(i == j, True,
+                    Or(self.room(i) == 0, self.room(j) == 0, 
                      Not( Or( And( TimeBlock.start(self.time(i)) <= TimeBlock.start(self.time(j)), 
                                    TimeBlock.end(self.time(i)) >= TimeBlock.end(self.time(j)) ),
                               And( TimeBlock.start(self.time(i)) <= TimeBlock.start(self.time(j)), 
                                    TimeBlock.end(self.time(i)) >= TimeBlock.start(self.time(j)) ),
                               And( TimeBlock.start(self.time(i)) <= TimeBlock.end(self.time(j)),
-                                   TimeBlock.end(self.time(i)) >= TimeBlock.end(self.time(j)) ))),  # then
-                     True)  # else
+                                   TimeBlock.end(self.time(i)) >= TimeBlock.end(self.time(j)) ))))) 
                   for i in range(self.class_count) for j in range(self.class_count) ]
 
     def prevent_teacher_time_collision(self):
@@ -218,9 +228,22 @@ class Scheduler():
         #             True)
         #         for i in range(self.class_count) for j in range(self.class_count)]
 
+    # 217 seconds
     def prevent_student_time_collision(self):
         """ returns a list of z3 constraints that prevent a student from being assigned to two 
             classes that occur at the same time. Ignores students with id == 0 """
+        # x2 = Int(self.next_int_name())   
+        # x3 = Int(self.next_int_name())
+        # return [If(And(i != j, 
+        #            Or(  And( TimeBlock.start(self.time(i)) <= TimeBlock.start(self.time(j)), 
+        #                      TimeBlock.end(self.time(i)) >= TimeBlock.end(self.time(j)) ),
+        #                 And( TimeBlock.start(self.time(i)) <= TimeBlock.start(self.time(j)), 
+        #                      TimeBlock.end(self.time(i)) >= TimeBlock.start(self.time(j)) ),
+        #                 And( TimeBlock.start(self.time(i)) <= TimeBlock.end(self.time(j)),
+        #                      TimeBlock.end(self.time(i)) >= TimeBlock.end(self.time(j))))),
+        #           ForAll([x2, x3], self.students(i)[x2] != self.students(j)[x3]), 
+        #           True)
+        #         for i in range(self.class_count) for j in range(self.class_count)]
         x2 = Int(self.next_int_name())   
         x3 = Int(self.next_int_name())
         return [If(And(i != j, 
@@ -230,7 +253,8 @@ class Scheduler():
                              TimeBlock.end(self.time(i)) >= TimeBlock.start(self.time(j)) ),
                         And( TimeBlock.start(self.time(i)) <= TimeBlock.end(self.time(j)),
                              TimeBlock.end(self.time(i)) >= TimeBlock.end(self.time(j))))),
-                  ForAll([x2, x3], self.students(i)[x2] != self.students(j)[x3]), True)
+                  ForAll([x2, x3], self.students(i)[1] != self.students(j)[2]), 
+                  True) 
                 for i in range(self.class_count) for j in range(self.class_count)]
 
 
@@ -369,21 +393,27 @@ class Scheduler():
         # Now we'll start adding constraints. The first set are implied constraints like
         # a teacher can't be in two places at one time.
         
-        # these ones are relatively fast
+        # these ones are relatively fast (1x)
         constraints += self.ensure_valid_ids()
         constraints += self.ensure_valid_times()
         constraints += self.ensure_valid_class_durations()
         constraints += self.ensure_valid_class_start_times()
         constraints += self.ensure_lunch_period()
+        constraints += self.constrain_course_rooms()
+
+        # 3x slower
+        constraints += self.constrain_max_course_size() 
+
+        # 6x slower
         constraints += self.prevent_room_time_collision()
         constraints += self.prevent_teacher_time_collision() 
+        constraints += self.constrain_student_req_courses()
+
+        # 42x slower
         constraints += self.prevent_student_time_collision()
 
-        # next, include the user provided constraints
-        constraints += self.constrain_course_rooms()
+
         # # constraints += self.constrain_teacher_time()
-        constraints += self.constrain_max_course_size() 
-        constraints += self.constrain_student_req_courses()
 
 
       
@@ -397,7 +427,7 @@ class Scheduler():
             m = s.model()
             
             # first, make the schedule object and then assign the classes to it
-            new_schedule = Schedule('sample schedule')
+            new_schedule = Schedule(name="Sample Schedule")
             db.session.add(new_schedule)
             db.session.flush() 
 
@@ -406,7 +436,7 @@ class Scheduler():
             # for c in Course.query.all():
             #     print('{} = {}'.format(c.id, c.name))
 
-            print('course_id | room_id | teacher_id | start_time | end_time ', file=sys.stderr)
+            # print('course_id | room_id | teacher_id | start_time | end_time ', file=sys.stderr)
 
             for i in range(self.class_count):
                 course_id = int(str(m.evaluate(self.course(i))))
@@ -420,8 +450,8 @@ class Scheduler():
                 start_time = int(str(m.evaluate(TimeBlock.start(self.time(i)))))
                 end_time = int(str(m.evaluate(TimeBlock.end(self.time(i)))))
                 
-                print('    {}    |    {}    |    {}    |    {}    |    {}'.format(
-                    course_id, room_id, teacher_id, start_time, end_time), file=sys.stderr)
+                # print('    {}    |    {}    |    {}    |    {}    |    {}'.format(
+                #     course_id, room_id, teacher_id, start_time, end_time), file=sys.stderr)
 
                 c = ScheduledClass(new_schedule.id,
                                    course_id,
@@ -449,7 +479,7 @@ class Scheduler():
                         if course_id != 0 and room_id != 0 and teacher_id != 0:
                             db.session.add(class_student) 
                 
-                print('students: {}'.format(student_ids))
+                # print('students: {}'.format(student_ids))
                 db.session.commit()
         
 

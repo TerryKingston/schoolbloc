@@ -30,61 +30,58 @@ class SchedulerTests(unittest.TestCase):
     def gen_test_data(self):
 
         # Make all the DB facts we need for our tests
-        t_user_list = [ User('t_user_%s' % i, 'password', 'teacher') for i in range(30)]
+        t_user_list = [ User('t_user_%s' % i, 'password', 'teacher') for i in range(10)]
         for u in t_user_list: db.session.add(u)
-        db.session.commit()
+        db.session.flush()
 
         teach_list = [ Teacher(first_name="first_name_%s" % i, 
                                last_name="last_name_%s" % i, 
-                               user_id=t_user_list[i].id) for i in range(30) ]
+                               user_id=t_user_list[i].id) for i in range(10) ]
 
         for t in teach_list: db.session.add(t)
 
-        room_list = [ Classroom(room_number=i+1) for i in range(30) ]
+        room_list = [ Classroom(room_number=i+1) for i in range(10) ]
         for r in room_list: db.session.add(r) 
 
-        course_list = [ Course(name="course_%s" % i) for i in range(30) ]
-        for c in course_list: db.session.add(c)
+        # course_list = [ Course(name="course_%s" % i) for i in range(10) ]
+        sg_course =  Course(name="SG reqired course", 
+                            duration=82, 
+                            min_student_count=0,
+                            max_student_count=30) 
+        db.session.add(sg_course)
+        # for c in course_list: db.session.add(c)
 
-        s_user_list = [ User('s_user_%s' % i, 'password', 'student') for i in range(200)]
+        s_user_list = [ User('s_user_%s' % i, 'password', 'student') for i in range(10)]
         for u in s_user_list: db.session.add(u)
-        db.session.commit()
+        db.session.flush()
 
         stud_list = [ Student(first_name="first_name_%s" % i, 
                               last_name="last_name_%s" % i, 
-                              user_id=s_user_list[i].id) for i in range(200) ]
+                              user_id=s_user_list[i].id) for i in range(10) ]
         for s in stud_list: db.session.add(s)
+        db.session.flush()
+
+        stud_grp = StudentGroup(name="Student Group 1")
+        db.session.add(stud_grp)
+        db.session.flush()
+        for s in stud_list:
+            db.session.add(StudentsStudentGroup(student_id=s.id, student_group_id=stud_grp.id))
+
+        db.session.add(CoursesStudentGroup(student_group_id=stud_grp.id, course_id=sg_course.id))
+        # db.session.add(CoursesStudentGroup(student_group_id=stud_grp.id, course_id=course_list[1].id))
 
         db.session.commit()
 
-    # def test_generate_schedule(self):
-    #     """ It creates 10 scheduled classes """
-    #     self.gen_test_data()
-        
-    #     scheduler = Scheduler()
-    #     scheduler.make_schedule()
-    #     self.assertTrue(len(ScheduledClass.query.all()) == 10)
-
-    def test_calc_course_count(self):
-        """ When there are no required classes it returns 0 for every course """
+    def test_valid_teacher_ids(self):
+        """ The selections of the scheduler are only for valid Ids """
         self.gen_test_data()
-        
-        scheduler = Scheduler()
-        cmap = scheduler.calc_course_count()
-        for key in cmap:
-            self.assertEqual(cmap[key], 0)
 
-
-    # def test_valid_teacher_ids(self):
-    #     """ The selections of the scheduler are only for valid Ids """
-    #     self.gen_test_data()
-
-    #     scheduler = Scheduler()
-    #     scheduler.make_schedule()
-    #     # now loop through the scheduled classes and make sure all the teachers are valid
-    #     teacher_ids = [ t.id for t in Teacher.query.all() ]
-    #     for c in ScheduledClass.query.all():
-    #         self.assertIn(c.teacher_id, teacher_ids)
+        scheduler = Scheduler(class_count=20)
+        scheduler.make_schedule()
+        # now loop through the scheduled classes and make sure all the teachers are valid
+        teacher_ids = [ t.id for t in Teacher.query.all() ]
+        for c in ScheduledClass.query.all():
+            self.assertIn(c.teacher_id, teacher_ids)
 
     # def test_valid_room_ids(self):
     #     """ It assigns only valid classroom Ids from the DB """
@@ -150,8 +147,8 @@ class SchedulerTests(unittest.TestCase):
     #     """ It doesn't schedule the start of a class within 'break_length' minutes of the 
     #         end of the previous class for the same room, teacher, or student """
     #     # make sure there are possible room, teacher, and student colisions
-    #     teacher1 = Teacher("teacher1 first", "teacher1 last")
-    #     teacher2 = Teacher("teacher2 first", "teacher2 last")
+    #     teacher1 = Teacher(first_name="teacher1 first", "teacher1 last")
+    #     teacher2 = Teacher(first_name="teacher2 first", "teacher2 last")
     #     course1 = Course("course1 name")
     #     course2 = Course("course2 name")
     #     course3 = Course("course3 name")

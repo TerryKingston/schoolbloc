@@ -221,6 +221,7 @@ class StudentGroup(db.Model, SqlalchemySerializer):
     __tablename__ = 'student_groups'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(128), nullable=False)
+    students = association_proxy('students_student_groups', 'student')
 
 
 class Student(db.Model, SqlalchemySerializer):
