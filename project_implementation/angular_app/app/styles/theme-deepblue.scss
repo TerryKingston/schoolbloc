@@ -63,6 +63,12 @@ $alert-icon: url("data:image/svg+xml;uft8,<svg xmlns='http://www.w3.org/2000/svg
 $small-add-icon: url("data:image/svg+xml;uft8,<svg xmlns='http://www.w3.org/2000/svg' version='1.1' x='0px' y='0px' width='18' height='18' viewBox='0 0 18 18' enable-background='new 0 0 18 18' xml:space='preserve' fill='#FFF'><polygon points='8 3 10 3 10 8 15 8 15 10 10 10 10 15 8 15 8 10 3 10 3 8 8 8 '/></svg>");
 $calendar-icon: url("data:image/svg+xml;uft8,<svg xmlns='http://www.w3.org/2000/svg' version='1.1' x='0' y='0' width='20' height='20' viewBox='0 0 20 20' enable-background='new 0 0 20 20' xml:space='preserve'><path fill-rule='evenodd' clip-rule='evenodd' fill='#010101' d='M12.95 1.3c0.23-0.2 0.5-0.3 0.8-0.3 0.33 0 0.62 0.1 0.85 0.3 0.2 0.23 0.3 0.52 0.3 0.85v1.2c0 0.33-0.1 0.62-0.3 0.85 -0.23 0.2-0.52 0.3-0.85 0.3 -0.3 0-0.57-0.1-0.8-0.3C12.72 3.97 12.6 3.68 12.6 3.35v-1.2C12.6 1.82 12.72 1.53 12.95 1.3zM3.7 2.3h0.4v1.15c0 0.5 0.17 0.92 0.5 1.25 0.37 0.37 0.82 0.55 1.35 0.55S6.93 5.07 7.3 4.7s0.55-0.8 0.55-1.3V2.3h4.05v1.15c0 0.5 0.17 0.92 0.5 1.25 0.37 0.37 0.82 0.55 1.35 0.55s0.98-0.18 1.35-0.55c0.37-0.37 0.55-0.8 0.55-1.3V2.3h0.25c1.8 0 2.7 0.9 2.7 2.7v12.2c0 1.8-0.9 2.7-2.7 2.7H3.7C1.9 19.9 1 19 1 17.2V5C1 3.2 1.9 2.3 3.7 2.3zM5.15 1.3C5.38 1.1 5.65 1 5.95 1 6.28 1 6.57 1.1 6.8 1.3 7 1.53 7.1 1.82 7.1 2.15v1.2C7.1 3.68 7 3.97 6.8 4.2 6.57 4.4 6.28 4.5 5.95 4.5c-0.3 0-0.57-0.1-0.8-0.3C4.92 3.97 4.8 3.68 4.8 3.35v-1.2C4.8 1.82 4.92 1.53 5.15 1.3zM2.6 8v9.2c0 0.67 0.33 1 1 1h12.25c0.67 0 1-0.33 1-1V8H2.6zM15.55 12.4h-3.15V9.25h3.15V12.4zM11.25 12.4H8.1V9.25h3.15V12.4zM11.25 13.55v3.15H8.1v-3.15H11.25zM12.4 16.7v-3.15h3.15v3.15H12.4zM3.75 9.25H6.9v3.15H3.75V9.25zM6.9 13.55v3.15H3.75v-3.15H6.9z'/></svg>");
 
+$clock-icon: url("data:image/svg+xml;uft8,<svg xmlns='http://www.w3.org/2000/svg' version='1.1' x='0px' y='0px' width='20' height='20' viewBox='0 0 20 20' enable-background='new 0 0 20 20' xml:space='preserve'><g><circle fill-rule='evenodd' clip-rule='evenodd' fill='none' stroke='#231F20' stroke-width='1.5' stroke-miterlimit='10' cx='10' cy='10' r='8.5'/></g><g fill='#373737'><rect x='9.25' y='3.5' width='1.5' height='6.5'/><rect x='10.951' y='9.338' transform='matrix(-0.7073 0.7069 -0.7069 -0.7073 28.2458 11.7039)' width='1.498' height='4.724'/><circle cx='10' cy='10' r='0.75'/></g></svg>");
+$disable-icon: url("data:image/svg+xml;uft8,<svg xmlns='http://www.w3.org/2000/svg' version='1.1' x='0px' y='0px' width='20' height='20' viewBox='0 0 20 20' enable-background='new 0 0 20 20' xml:space='preserve'><g><circle fill-rule='evenodd' clip-rule='evenodd' fill='#F13E01' cx='10' cy='10' r='9'/><rect x='4.5' y='8.5' fill-rule='evenodd' clip-rule='evenodd' fill='#FFFFFF' width='11' height='3'/></g></svg>
+");
+$false-disable-icon: url("data:image/svg+xml;uft8,<svg xmlns='http://www.w3.org/2000/svg' version='1.1' x='0px' y='0px' width='20' height='20' viewBox='0 0 20 20' enable-background='new 0 0 20 20' xml:space='preserve'><g><circle fill-rule='evenodd' clip-rule='evenodd' fill='#ccc' cx='10' cy='10' r='9'/><rect x='4.5' y='8.5' fill-rule='evenodd' clip-rule='evenodd' fill='#FFFFFF' width='11' height='3'/></g></svg>
+");
+
 /* Meyere's CSS reset
   CITE: http://meyerweb.com/eric/tools/css/reset/ */
 html, body, div, span, applet, object, iframe,
@@ -674,6 +680,7 @@ textarea {
   height: 25px;
   box-sizing: border-box;
   border: solid $note-gray 1px;
+  border-radius: 0;
   padding: 0 5px;
   width: 200px;
 }
@@ -824,4 +831,14 @@ textarea {
   color: $alert-red;
   font-weight: 700;
   font-size: 14px;
+}
+
+
+.input-row .input-row-min-max {
+    width: 200px !important;
+}
+
+.input-row .input-row-min-max input {
+    width: 53px;
+    margin-right: 9px;
 }

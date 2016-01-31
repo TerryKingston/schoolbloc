@@ -6,8 +6,57 @@
 angular.module('sbAngularApp').factory('tableEntriesService', [ function() {
 	// never reinstantiate: reference will be lost with bound controllers
 	var tableConfig = {
-
+		tableType: null,
+		tableSelection: null
 	};
+
+	var factTypeConfig = {
+		"course": [
+			{
+				key: "course name",
+				required: true,
+				type: "text",
+				multipleValues: false
+			},
+			{
+				key: "term",
+				required: true,
+				type: "dropdown",
+				multipleValues: false,
+				possibleAnswers: ["year", "quarter"]
+			},
+			{
+				key: "size",
+				required: false,
+				type: "minMax",
+				multipleValues: true
+			},
+			{
+				key: "time",
+				required: false,
+				type: "constraint",
+				multipleValues: true
+			},
+			{
+				key: "subject",
+				required: false,
+				type: "constraint",
+				multipleValues: true
+			},
+			{
+				key: "teacher",
+				required: false,
+				type: "constraint",
+				multipleValues: true
+			},
+			{
+				key: "classroom",
+				required: false,
+				type: "constraint",
+				multipleValues: true
+			}
+		]
+	}
 
 
 	return {
@@ -58,6 +107,10 @@ angular.module('sbAngularApp').factory('tableEntriesService', [ function() {
 					}
 				];
 			}
+		},
+
+		getFactTypeConfig: function(factType) {
+			return factTypeConfig[factType];
 		}
 	};
 }]);

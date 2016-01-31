@@ -1,0 +1,36 @@
+<div>
+<button class="btn btn-recommended" ng-if="!addFactConfig.showAddFact" ng-click="toggleAddFact(true)">{{addFactConfig.addFactText}}</button>
+</div>
+<div class="add-fact-form" ng-if="addFactConfig.showAddFact">
+  <h4>{{"schedulerModule.ADDING_COURSE" | translate}}</h4>
+  <section class="view-sub-content">
+    <div class="input-row" ng-repeat="factInput in addFactConfig.factTypeConfig track by $index">
+      <label>
+        <div>{{factInput.key}}<div class="required" ng-if="factInput.required">*</div></div>
+        <input type="text" ng-if="factInput.type === 'text'">
+        <div class="input-row-min-max" ng-if="factInput.type === 'minMax'" >
+          <div>{{"schedulerModule.MIN" | translate}}:</div>
+          <input type="number" min="0">
+          <div>{{"schedulerModule.MAX" | translate}}:</div>
+          <input type="number" min="1">
+        </div>
+        <select ng-if="factInput.type === 'dropdown'">
+          <option ng-repeat="option in factInput.possibleAnswers" value="{{option}}">{{option}}</option>
+        </select>
+        <input type="text" ng-if="factInput.type === 'constraint'">
+      </label>
+      <button class="circle-btn circle-btn-add" ng-if="factInput.multipleValues"></button>
+    </div>
+    <div class="icon-option-row">
+      <a href="">
+        <div class="calendar-icon"></div>
+        <div>{{"schedulerModule.SET_REPEAT" | translate}}</div>
+      </a>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-recommended" ng-click="saveFact(false)">{{"schedulerModule.SAVE" | translate}}</button>
+      <button class="btn btn-recommended" ng-click="saveFact(true)">{{"schedulerModule.SAVE_ANOTHER" | translate}}</button>
+      <button class="btn btn-secondary" ng-click="toggleAddFact(false)">{{"schedulerModule.CANCEL" | translate}}</button>
+    </div>
+  </section>
+</div>
