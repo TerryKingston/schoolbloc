@@ -1,15 +1,15 @@
 import unittest
 from schoolbloc import app, db
 from schoolbloc.users.models import User, Role
-from schoolbloc.teachers.models import Teacher
-from schoolbloc.classrooms.models import Classroom
-from schoolbloc.classrooms.models import ClassroomsCourse
-from schoolbloc.courses.models import Course, CoursesTeacher, CoursesStudent, CoursesStudentGroup, CoursesSubject
+from schoolbloc.scheduler.models import (Teacher, Classroom, ClassroomsCourse, 
+                                         Course, CoursesTeacher, CoursesStudent, 
+                                         CoursesStudentGroup, CoursesSubject,
+                                         Student, StudentsStudentGroup, StudentGroup,
+                                         ScheduledClass, ScheduledClassesStudent,
+                                         Subject, StudentGroupsSubject)
 from schoolbloc.scheduler.scheduler import Scheduler
-from schoolbloc.students.models import Student, StudentsStudentGroup
-from schoolbloc.student_groups.models import StudentGroup
-from schoolbloc.schedules.models import ScheduledClass, ScheduledClassesStudent, ScheduledClassesStudent
-from schoolbloc.subjects.models import Subject, SubjectsStudentGroup
+from schoolbloc.scheduler.scheduler import timeout, SchedulerTimeoutError
+
 
 class FullScheduleTests(unittest.TestCase):
     """ Tests full scheduling scenarios """
@@ -112,6 +112,7 @@ class FullScheduleTests(unittest.TestCase):
                             min_student_count=0,
                             max_student_count=60)  
                         for c_name in ["9th Grade Math", "Secondary Math I", "Secondary Math II", "Secondary Math III"] ]
+        
         for c in cl_9th_math: db.session.add(c)
         db.session.flush()
 
@@ -242,16 +243,16 @@ class FullScheduleTests(unittest.TestCase):
         #     db.session.add(ssg)
 
         # add course assignments to each student group
-        # for sg in sg_list: db.session.add(SubjectsStudentGroup(subject_id=sub_music.id, student_group_id=sg.id))
-        # for sg in sg_list: db.session.add(SubjectsStudentGroup(subject_id=sub_soc_stud.id, student_group_id=sg.id))
-        # for sg in sg_list: db.session.add(SubjectsStudentGroup(subject_id=sub_tech.id, student_group_id=sg.id))
-        # for sg in sg_list: db.session.add(SubjectsStudentGroup(subject_id=sub_learning.id, student_group_id=sg.id))
+        # for sg in sg_list: db.session.add(StudentGroupsSubject(subject_id=sub_music.id, student_group_id=sg.id))
+        # for sg in sg_list: db.session.add(StudentGroupsSubject(subject_id=sub_soc_stud.id, student_group_id=sg.id))
+        # for sg in sg_list: db.session.add(StudentGroupsSubject(subject_id=sub_tech.id, student_group_id=sg.id))
+        # for sg in sg_list: db.session.add(StudentGroupsSubject(subject_id=sub_learning.id, student_group_id=sg.id))
 
-        db.session.add(SubjectsStudentGroup(subject_id=sub_7th_math.id, 
+        db.session.add(StudentGroupsSubject(subject_id=sub_7th_math.id, 
                                    student_group_id=sg_7th_grade.id))
-        # db.session.add(SubjectsStudentGroup(subject_id=sub_8th_math.id, 
+        # db.session.add(StudentGroupsSubject(subject_id=sub_8th_math.id, 
         #                      student_group_id=sg_8th_grade.id))
-        # db.session.add(SubjectsStudentGroup(subject_id=sub_9th_math.id, 
+        # db.session.add(StudentGroupsSubject(subject_id=sub_9th_math.id, 
         #                      student_group_id=sg_9th_grade.id))
 
         db.session.add(CoursesStudentGroup(course_id=course_7th_sci.id, 
@@ -294,6 +295,7 @@ class FullScheduleTests(unittest.TestCase):
                               class_count=20) # normally 70
         
         # self.assertEqual(scheduler.calc_course_count(), {})
+        # with timeout(seconds=30):
         scheduler.make_schedule()
 
         # did we get a student-course maping for the CoursesStudentGroups?
