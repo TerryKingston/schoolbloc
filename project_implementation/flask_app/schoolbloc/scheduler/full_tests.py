@@ -8,7 +8,6 @@ from schoolbloc.scheduler.models import (Teacher, Classroom, ClassroomsCourse,
                                          ScheduledClass, ScheduledClassesStudent,
                                          Subject, StudentGroupsSubject)
 from schoolbloc.scheduler.scheduler import Scheduler
-from schoolbloc.scheduler.scheduler import timeout, SchedulerTimeoutError
 
 
 class FullScheduleTests(unittest.TestCase):

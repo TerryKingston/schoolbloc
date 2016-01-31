@@ -3,7 +3,6 @@ from schoolbloc import app, db
 from schoolbloc.users.models import User, Role
 from schoolbloc.scheduler.models import *
 from schoolbloc.scheduler.scheduler import Scheduler, SchedulerNoSolution
-from schoolbloc.scheduler.scheduler import timeout, SchedulerTimeoutError
 from random import *
 
 
@@ -105,41 +104,40 @@ class SchedulerTests(unittest.TestCase):
     def gen_test_data(self):
 
         # Make all the DB facts we need for our tests
-        teach_list = self.gen_teachers(10)
+        self.gen_teachers(10)
         stud_list = self.gen_students(10)
-
-        room_list = [ Classroom(room_number=i+1) for i in range(10) ]
-        for r in room_list: db.session.add(r) 
+        self.gen_classrooms(10)
 
         # course_list = [ Course(name="course_%s" % i) for i in range(10) ]
-        sg_course =  Course(name="SG reqired course") 
-        db.session.add(sg_course)
+        course =  Course(name="SG reqired course") 
+        db.session.add(course)
         # for c in course_list: db.session.add(c)
 
         stud_grp = StudentGroup(name="Student Group 1")
         db.session.add(stud_grp)
         db.session.flush()
+
         for s in stud_list:
             db.session.add(StudentsStudentGroup(student_id=s.id, student_group_id=stud_grp.id))
 
-        db.session.add(CoursesStudentGroup(student_group_id=stud_grp.id, course_id=sg_course.id))
+        db.session.add(CoursesStudentGroup(student_group_id=stud_grp.id, course_id=course.id))
         # db.session.add(CoursesStudentGroup(student_group_id=stud_grp.id, course_id=course_list[1].id))
 
         db.session.commit()
 
-    # def test_valid_teacher_ids(self):
-    #     """ The selections of the scheduler are only for valid Ids """
-    #     self.gen_test_data()
+    def test_valid_teacher_ids(self):
+        """ The selections of the scheduler are only for valid Ids """
+        self.gen_test_data()
 
-    #     scheduler = Scheduler(class_count=20)
-    #     scheduler.make_schedule()
-    #     # now loop through the scheduled classes and make sure all the teachers are valid
-    #     teacher_ids = [ t.id for t in Teacher.query.all() ]
+        scheduler = Scheduler(class_count=20)
+        scheduler.make_schedule()
+        # now loop through the scheduled classes and make sure all the teachers are valid
+        teacher_ids = [ t.id for t in Teacher.query.all() ]
 
-    #     classes = ScheduledClass.query.all()
-    #     self.assertNotEqual(len(classes), 0)
-    #     for c in classes:
-    #         self.assertIn(c.teacher_id, teacher_ids)
+        classes = ScheduledClass.query.all()
+        self.assertNotEqual(len(classes), 0)
+        for c in classes:
+            self.assertIn(c.teacher_id, teacher_ids)
 
     # def test_valid_room_ids(self):
     #     """ It assigns only valid classroom Ids from the DB """

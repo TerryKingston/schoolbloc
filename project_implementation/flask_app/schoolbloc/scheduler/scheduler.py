@@ -33,20 +33,6 @@ TimeBlock, SchClass = CreateDatatypes(TimeBlock, SchClass)
 
 class SchedulerNoSolution(Exception):
     pass
-class SchedulerTimeoutError(Exception):
-    pass
-
-class timeout:
-    def __init__(self, seconds=1, error_message='Timeout'):
-        self.seconds = seconds
-        self.error_message = error_message
-    def handle_timeout(self, signum, frame):
-        raise SchedulerTimeoutError(self.error_message)
-    def __enter__(self):
-        signal.signal(signal.SIGALRM, self.handle_timeout)
-        signal.alarm(self.seconds)
-    def __exit__(self, type, value, traceback):
-        signal.alarm(0)
 
 class Scheduler():
 
@@ -509,16 +495,16 @@ class Scheduler():
         constraints += self.constrain_course_teachers()
 
         # # 6x slower
-        # constraints += self.constrain_max_course_size() 
-        # constraints += self.prevent_room_time_collision()
-        # constraints += self.prevent_teacher_time_collision() 
-        # constraints += self.constrain_student_courses()
+        constraints += self.constrain_max_course_size() 
+        constraints += self.prevent_room_time_collision()
+        constraints += self.prevent_teacher_time_collision() 
+        constraints += self.constrain_student_courses()
 
         # 10x slower
-        # constraints += self.constrain_student_group_subjects()
+        constraints += self.constrain_student_group_subjects()
         
         # # 42x slower
-        # # constraints += self.prevent_student_time_collision()
+        constraints += self.prevent_student_time_collision()
 
         # # ?
 
@@ -530,6 +516,7 @@ class Scheduler():
 
         # Finally, ask the solver to give us a schedule and then parse the results
         s = Solver()
+        s.set(timeout=100000)
         s.add(constraints)
         if s.check() != sat:
             raise SchedulerNoSolution()
