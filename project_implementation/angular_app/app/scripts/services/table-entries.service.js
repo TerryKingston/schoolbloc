@@ -14,12 +14,16 @@ angular.module('sbAngularApp').factory('tableEntriesService', [ function() {
 		"course": [
 			{
 				key: "course",
+				value: null,
+				error: null,
 				required: true,
 				type: "text",
 				multipleValues: false
 			},
 			{
 				key: "term",
+				value: null,
+				error: null,
 				required: true,
 				type: "dropdown",
 				multipleValues: false,
@@ -27,12 +31,18 @@ angular.module('sbAngularApp').factory('tableEntriesService', [ function() {
 			},
 			{
 				key: "size",
+				value: {
+					min: null,
+					max: null
+				},
 				required: false,
 				type: "minMax",
 				multipleValues: true
 			},
 			{
 				key: "time",
+				value: null,
+				error: null,
 				required: false,
 				type: "constraint",
 				multipleValues: true,
@@ -40,6 +50,8 @@ angular.module('sbAngularApp').factory('tableEntriesService', [ function() {
 			},
 			{
 				key: "subject",
+				value: null,
+				error: null,
 				required: false,
 				type: "constraint",
 				multipleValues: true,
@@ -47,6 +59,8 @@ angular.module('sbAngularApp').factory('tableEntriesService', [ function() {
 			},
 			{
 				key: "teacher",
+				value: null,
+				error: null,
 				required: false,
 				type: "constraint",
 				multipleValues: true,
@@ -54,6 +68,8 @@ angular.module('sbAngularApp').factory('tableEntriesService', [ function() {
 			},
 			{
 				key: "classroom",
+				value: null,
+				error: null,
 				required: false,
 				type: "constraint",
 				multipleValues: true,

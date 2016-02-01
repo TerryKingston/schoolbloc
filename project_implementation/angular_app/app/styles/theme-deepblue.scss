@@ -659,7 +659,6 @@ textarea {
 
 .main-view-content .input-row {
   margin-bottom: 10px;
-  height: 25px;
   line-height: 25px;
 }
 
@@ -689,6 +688,17 @@ textarea {
   border-radius: 0;
   padding: 0 5px;
   width: 200px;
+}
+
+.main-view-content .input-row .input-row-error {
+    background: none;
+    color: $alert-red;
+    width: 320px;
+    display: block;
+    padding: 2px 10px;
+    margin: 10px 0;
+    border: solid 1px $alert-red;
+    border-left-width: 10px;
 }
 
 .main-view-content .view-sub-content {

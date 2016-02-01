@@ -7,18 +7,18 @@
     <div class="input-row" ng-repeat="factInput in addFactConfig.factTypeConfig track by $index">
       <label>
         <div>{{factInput.key}}<div class="required" ng-if="factInput.required">*</div></div>
-        <input type="text" ng-if="factInput.type === 'text'">
-        <div class="input-row-min-max" ng-if="factInput.type === 'minMax'" >
+        <input type="text" ng-if="factInput.type === 'text'" ng-model="factInput.value" ng-blur="checkInput(factInput)">
+        <div class="input-row-min-max" ng-if="factInput.type === 'minMax'">
           <div>{{"schedulerModule.MIN" | translate}}:</div>
-          <input class="input-row-min" type="number" min="0">
+          <input class="input-row-min" type="number" min="0" ng-model="factInput.value.min" ng-blur="checkInput(factInput, 'min')">
           <div>{{"schedulerModule.MAX" | translate}}:</div>
-          <input type="number" min="1">
+          <input type="number" min="1" ng-model="factInput.value.max" ng-blur="checkInput(factInput, 'max')">
         </div>
-        <select ng-if="factInput.type === 'dropdown'">
+        <select ng-if="factInput.type === 'dropdown'" ng-model="factInput.value" ng-blur="checkInput(factInput)">
           <option ng-repeat="option in factInput.possibleAnswers" value="{{option}}">{{option}}</option>
         </select>
         <div class="input-row-constraint" ng-if="factInput.type === 'constraint'">
-          <input list="{{factInput.key}}" ng-disabled="!factInput.facts.length">
+          <input list="{{factInput.key}}" ng-disabled="!factInput.facts.length" ng-model="factInput.value" ng-blur="checkInput(factInput)">
           <datalist id="{{factInput.key}}">
             <option ng-repeat="fact in factInput.facts" value="{{fact}}">{{fact}}</option>
           </datalist>
@@ -26,6 +26,7 @@
       </label>
       <button class="circle-btn circle-btn-add" ng-if="factInput.multipleValues && !factInput.addedValue" ng-click="addInput(factInput, $index)"></button>
       <button class="circle-btn circle-btn-remove" ng-if="factInput.multipleValues && factInput.addedValue" ng-click="removeInput(factInput, $index)"></button>
+      <div class="input-row-error" ng-if="factInput.error">{{factInput.error}}</div>
     </div>
     <div class="icon-option-row">
       <a href="">
