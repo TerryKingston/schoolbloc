@@ -3,9 +3,10 @@ from schoolbloc.scheduler.models import *
 from schoolbloc import db
 from schoolbloc.config import config
 from functools import wraps
-import errno
-import os
-import signal
+# import errno
+# import os
+# import signal
+import time
 
 DEFAULT_MAX_CLASS_SIZE = 29
 
@@ -148,9 +149,11 @@ class Scheduler():
 
     def ensure_valid_times(self):
 
-        return [ And(TimeBlock.start(self.time(i)) >= 0,
-                     TimeBlock.end(self.time(i)) > TimeBlock.start(self.time(i)),
-                     TimeBlock.end(self.time(i)) <= 2359)
+        return [ If(And(self.course(i) != 0, self.room(i) != 0, self.teacher(i) != 0),
+                    And(TimeBlock.start(self.time(i)) >= 0,
+                        TimeBlock.end(self.time(i)) > TimeBlock.start(self.time(i)),
+                        TimeBlock.end(self.time(i)) <= 2359),
+                    True)
                  for i in range(self.class_count) ]
 
     def ensure_valid_class_durations(self):
@@ -160,11 +163,11 @@ class Scheduler():
         cons_list = []
         for c in Course.query.all():
             if c.duration:
-                cons_list += [ If(self.course(i) == c.id, 
+                cons_list += [ If(And(self.course(i) == c.id, self.teacher(i) != 0, self.room(i) != 0),
                                   TimeBlock.end(self.time(i)) - TimeBlock.start(self.time(i)) == c.duration,
                                   True) for i in range(self.class_count) ]
             else:
-                cons_list += [ If(self.course(i) == c.id, 
+                cons_list += [ If(And(self.course(i) == c.id, self.teacher(i) != 0, self.room(i) != 0),
                                   TimeBlock.end(self.time(i)) - TimeBlock.start(self.time(i)) == self.class_duration,
                                   True) for i in range(self.class_count) ] 
         return cons_list
@@ -184,12 +187,17 @@ class Scheduler():
             start_times.append(cur_time)
             cur_time += self.class_duration + self.break_length
 
-        return [ Or([TimeBlock.start(self.time(i)) == s for s in start_times]) 
+        return [ If(And(self.course(i) != 0, self.room(i) != 0, self.teacher(i) != 0), 
+                    Or([TimeBlock.start(self.time(i)) == s for s in start_times]),
+                    True) 
                  for i in range(self.class_count) ]
 
     def ensure_lunch_period(self):
         """ returns a list of z3 constraints making sure no class falls within the lunch period """
-        return [ Or(TimeBlock.start(self.time(i)) >= self.lunch_end, TimeBlock.end(self.time(i)) <= self.lunch_start) 
+        return [ If(And(self.course(i) != 0, self.room(i) != 0, self.teacher(i) != 0),
+                    Or(TimeBlock.start(self.time(i)) >= self.lunch_end, 
+                    TimeBlock.end(self.time(i)) <= self.lunch_start),
+                    True) 
                  for i in range(self.class_count) ]
 
     def prevent_room_time_collision(self):
@@ -241,7 +249,7 @@ class Scheduler():
         #         for i in range(self.class_count) for j in range(self.class_count)]
         x2 = Int(self.next_int_name())   
         x3 = Int(self.next_int_name())
-        return [If(And(i != j, 
+        return [If(And(i != j, self.teacher(i) != 0, self.room(i) != 0, self.course(i) != 0,
                    Or(  And( TimeBlock.start(self.time(i)) <= TimeBlock.start(self.time(j)), 
                              TimeBlock.end(self.time(i)) >= TimeBlock.end(self.time(j)) ),
                         And( TimeBlock.start(self.time(i)) <= TimeBlock.start(self.time(j)), 
@@ -263,7 +271,7 @@ class Scheduler():
         mod_map = {}
         for mod in cons_models:
             if mod.course_id not in mod_map:
-                mod_map[mod.course_id] = [mod.classroom_id]
+                mod_map[mod.course_id] = [mod.classroom_id, 0]
             else:
                 mod_map[mod.course_id].append(mod.classroom_id)
 
@@ -325,41 +333,48 @@ class Scheduler():
         # courses, or by the student being a member of a student group that has a constraint 
         # relationship with the course. 
         for cs in CoursesStudent.query.all():
-            or_list = []
-            for i in range(self.class_count):
-                x = Int(self.next_int_name())
+            # print('\033[94m CS-REQ Course: \033[0m student: {} course: {}'.format(cs.student_id, cs.course_id), file=sys.stderr)
+            # or_list = []
+            # for i in range(self.class_count):
+            #     x = Int(self.next_int_name())
 
-                or_list += [ And(self.course(i) == cs.course_id, 
-                                 self.students(i)[x] == cs.student_id,
-                                 x <= self.max_class_size(cs.course_id),
-                                 x > 0,
-                                 self.room(i) != 0,
-                                 self.teacher(i) != 0) ]
-
-            cons_list += [ Or(or_list) ] 
-            # cons_list += [ Or([ And(self.course(i) == cs.course_id, 
-            #                      Or([ self.students(i)[x] == cs.student_id 
-            #                           for x in range(self.max_class_size(cs.course_id)) ]),
+            #     or_list += [ And(self.course(i) == cs.course_id, 
+            #                      self.students(i)[x] == cs.student_id,
+            #                      x <= self.max_class_size(cs.course_id),
+            #                      x > 0,
             #                      self.room(i) != 0,
-            #                      self.teacher(i) != 0)
-            #                for i in range(self.class_count)]) ]
+            #                      self.teacher(i) != 0) ]
+
+            # cons_list += [ Or(or_list) ] 
+            cons_list += [ Or([ And(self.course(i) == cs.course_id, 
+                                 Or([ self.students(i)[x] == cs.student_id 
+                                      for x in range(self.max_class_size(cs.course_id)) ]),
+                                 self.room(i) != 0,
+                                 self.teacher(i) != 0)
+                           for i in range(self.class_count)]) ]
 
         # include classes assigned to the student group
-        for c_grp in CoursesStudentGroup.query.all():
-            stud_list = c_grp.student_group.students
+        for cgrp in CoursesStudentGroup.query.all():
+            stud_list = cgrp.student_group.students
             for stud in stud_list:
-                or_list = []
-                for i in range(self.class_count):
-                    x = Int(self.next_int_name())
+                # print('\033[94m CSGRP-REQ Course: \033[0m student: {} course: {}'.format(stud.id, cgrp.course_id), file=sys.stderr)
+                # or_list = []
+                # for i in range(self.class_count):
+                #     x = Int(self.next_int_name())
 
-                    or_list += [ And(self.course(i) == c_grp.course_id, 
-                                     self.students(i)[x] == stud.id,
-                                     x <= self.max_class_size(c_grp.course_id),
-                                     x > 0,
-                                     self.room(i) != 0,
-                                     self.teacher(i) != 0) ]
-
-                cons_list += [ Or(or_list) ] 
+                #     or_list += [ And(self.course(i) == cgrp.course_id, 
+                #                      self.students(i)[x] == stud.id,
+                #                      x <= self.max_class_size(cgrp.course_id),
+                #                      x > 0,
+                #                      self.room(i) != 0,
+                #                      self.teacher(i) != 0) ]
+                # cons_list += [ Or(or_list) ] 
+                cons_list += [ Or([ And(self.course(i) == cgrp.course_id, 
+                                     Or([ self.students(i)[x] == stud.id 
+                                          for x in range(self.max_class_size(cgrp.course_id)) ]),
+                                    self.room(i) != 0,
+                                    self.teacher(i) != 0)
+                               for i in range(self.class_count)]) ]
 
 
         return cons_list
@@ -372,11 +387,11 @@ class Scheduler():
         cons_list = []
         for room in Classroom.query.all():
             if room.avail_start_time:
-                cons_list += [ If(self.room(i) == room.id, 
+                cons_list += [ If(And(self.room(i) == room.id, self.teacher(i) != 0, self.course(i) != 0),
                                    TimeBlock.start(self.time(i)) >= room.avail_start_time,
                                    True ) for i in range(self.class_count) ]
             if room.avail_end_time:
-                cons_list += [ If(self.room(i) == room.id,
+                cons_list += [ If(And(self.room(i) == room.id, self.teacher(i) != 0, self.course(i) != 0),
                                   TimeBlock.end(self.time(i)) <= room.avail_end_time,
                                   True) for i in range(self.class_count) ]
 
@@ -390,11 +405,11 @@ class Scheduler():
         cons_list = []
         for teach in Teacher.query.all():
             if teach.avail_start_time:
-                cons_list += [ If(self.teacher(i) == teach.id, 
+                cons_list += [ If(And(self.teacher(i) == teach.id, self.room(i) != 0, self.course(i) != 0),
                                    TimeBlock.start(self.time(i)) >= teach.avail_start_time,
                                    True ) for i in range(self.class_count) ]
             if teach.avail_end_time:
-                cons_list += [ If(self.teacher(i) == teach.id,
+                cons_list += [ If(And(self.teacher(i) == teach.id, self.room(i) != 0, self.course(i) != 0),
                                   TimeBlock.end(self.time(i)) <= teach.avail_end_time,
                                   True) for i in range(self.class_count) ]
 
@@ -408,11 +423,11 @@ class Scheduler():
         cons_list = []
         for course in Course.query.all():
             if course.avail_start_time:
-                cons_list += [ If(self.course(i) == course.id, 
+                cons_list += [ If(And(self.course(i) == course.id, self.room(i) != 0, self.teacher(i) != 0),
                                    TimeBlock.start(self.time(i)) >= course.avail_start_time,
                                    True ) for i in range(self.class_count) ]
             if course.avail_end_time:
-                cons_list += [ If(self.course(i) == course.id,
+                cons_list += [ If(And(self.course(i) == course.id, self.room(i) != 0, self.teacher(i) != 0),
                                   TimeBlock.end(self.time(i)) <= course.avail_end_time,
                                   True) for i in range(self.class_count) ]
 
@@ -426,12 +441,17 @@ class Scheduler():
         cons_list = []
         for stud_subj in StudentsSubject.query.all():
             or_list = []
-            for cs in CoursesSubject.query.filter_by(subject_id=stud_subj.subject_id).all():
+            course_subs = CoursesSubject.query.filter_by(subject_id=stud_subj.subject_id).all()
+            # print('\033[94m CSSUB-REQ: \033[0m student: {} courses: {}'.format(
+            #       stud_subj.student_id, [ cs.id for cs in course_subs]), file=sys.stderr)
+            for cs in course_subs:
                 or_list += [ Or([ And(self.course(i) == cs.course_id, 
                                      Or([ self.students(i)[x] == stud_subj.student_id 
                                           for x in range(self.max_class_size(cs.course_id)) ]),
                                      self.room(i) != 0,
-                                     self.teacher(i) != 0)
+                                     self.teacher(i) != 0,
+                                     TimeBlock.start(self.time(i)) >= 0,
+                                     TimeBlock.end(self.time(i)) <= 2359)
                                for i in range(self.class_count)]) ]
 
             cons_list += [ Or(or_list) ] 
@@ -446,12 +466,17 @@ class Scheduler():
         for sgrp_sub in StudentGroupsSubject.query.all():
             for stud in sgrp_sub.student_group.students:
                 or_list = []
-                for cs in CoursesSubject.query.filter_by(subject_id=sgrp_sub.subject_id).all():
+                course_subs = CoursesSubject.query.filter_by(subject_id=sgrp_sub.subject_id).all()
+                # print('\033[94m CSSUB-REQ: \033[0m student: {} courses: {}'.format(
+                #       stud.id, [ cs.id for cs in course_subs]), file=sys.stderr)
+                for cs in course_subs:
                     or_list += [ Or([ And(self.course(i) == cs.course_id, 
                                          Or([ self.students(i)[x] == stud.id 
                                               for x in range(self.max_class_size(cs.course_id)) ]),
                                          self.room(i) != 0,
-                                         self.teacher(i) != 0)
+                                         self.teacher(i) != 0,
+                                         TimeBlock.start(self.time(i)) >= 0,
+                                         TimeBlock.end(self.time(i)) <= 2359)
                                    for i in range(self.class_count)]) ]
 
                 cons_list += [ Or(or_list) ] 
@@ -470,7 +495,7 @@ class Scheduler():
 
         # now make the constraint
         for c_id, t_id_list in ct_map.items():
-            cons_list += [ If(self.course(i) == c_id, 
+            cons_list += [ If(And(self.course(i) == c_id, self.room(i) != 0),
                               Or([ self.teacher(i) == t_id for t_id in t_id_list]), 
                               True) 
                            for i in range(self.class_count) ]
@@ -479,6 +504,8 @@ class Scheduler():
     
     def make_schedule(self):
         
+        print('\033[93m Preparing constraints...\033[0m')
+        timing_start = time.time()
         constraints = []
         
         # these ones are relatively fast (1x)
@@ -494,33 +521,47 @@ class Scheduler():
         constraints += self.constrain_student_subjects()
         constraints += self.constrain_course_teachers()
 
-        # # 6x slower
-        constraints += self.constrain_max_course_size() 
+        # # # # 6x slower
         constraints += self.prevent_room_time_collision()
         constraints += self.prevent_teacher_time_collision() 
         constraints += self.constrain_student_courses()
 
-        # 10x slower
+        # # # 10x slower
         constraints += self.constrain_student_group_subjects()
         
-        # # 42x slower
+        # # # 42x slower
         constraints += self.prevent_student_time_collision()
+        # ?
+        # constraints += self.constrain_max_course_size() 
 
-        # # ?
-
-        # TODO:
-        # 
 
 
       
 
         # Finally, ask the solver to give us a schedule and then parse the results
         s = Solver()
-        s.set(timeout=100000)
+        s.set(timeout=3600000)
+        timing_cons_start = time.time()
+        print('\033[93m Constraints prepped in {} s, adding to solver...\033[0m'.format(timing_cons_start - timing_start))
         s.add(constraints)
-        if s.check() != sat:
+        timing_check_start = time.time()
+        # print('\033[93m Constraints added in {} s, checking Sat...\033[0m'.format(timing_check_start - timing_cons_start))
+        tries_left = 3
+        is_sat = False
+        while tries_left > 0 and not is_sat:
+            if s.check() == sat:
+                is_sat = True
+                break
+            else:
+                print('\033[91m No sat ({} sec), trying again...\033[0m'.format(time.time() - timing_check_start))
+                timing_check_start = time.time()
+                tries_left -= 1
+
+        if not is_sat:
+            print('\033[91m NO SOLUTION\033[0m')
             raise SchedulerNoSolution()
         else:
+            print('\033[92m Satisfied! generating model...\033[0m')
             m = s.model()
             
             # first, make the schedule object and then assign the classes to it
@@ -533,7 +574,7 @@ class Scheduler():
             # for c in Course.query.all():
             #     print('{} = {}'.format(c.id, c.name))
 
-            print('course_id | room_id | teacher_id | start_time | end_time ', file=sys.stderr)
+            print('\033[95m course_id | room_id | teacher_id | start_time | end_time \033[0m', file=sys.stderr)
 
             for i in range(self.class_count):
                 course_id = int(str(m.evaluate(self.course(i))))
@@ -547,19 +588,23 @@ class Scheduler():
                 start_time = int(str(m.evaluate(TimeBlock.start(self.time(i)))))
                 end_time = int(str(m.evaluate(TimeBlock.end(self.time(i)))))
                 
-                print('    {}    |    {}    |    {}    |    {}    |    {}'.format(
+                
+                PRINTC = '\033[92m'
+                # if course_id == 0 or room_id == 0 or teacher_id == 0 or start_time < 0 or end_time > 2359:
+                #     PRINTC = '\033[91m'
+                # else:
+                print(PRINTC + '     {}     |    {}    |      {}     |     {}     |    {}\033[0m'.format(
                     course_id, room_id, teacher_id, start_time, end_time), file=sys.stderr)
 
-                c = ScheduledClass(new_schedule.id,
-                                   course_id,
-                                   room_id,
-                                   teacher_id,
-                                   start_time,
-                                   end_time)
-                                   
-                # if course_id != 0 and room_id != 0 and teacher_id != 0:
-                db.session.add(c)
-                db.session.flush() 
+                if course_id != 0 and room_id != 0 and teacher_id != 0 and start_time >= 0 and end_time <= 2359:
+                    c = ScheduledClass(new_schedule.id,
+                                       course_id,
+                                       room_id,
+                                       teacher_id,
+                                       start_time,
+                                       end_time)
+                    db.session.add(c)
+                    db.session.flush() 
 
                 # # now add the students to the new class. the z3 arrays are undefined length (they will return values
                 # # for any index we give them.) we'll pull values until the max class size after that the values should
@@ -568,16 +613,17 @@ class Scheduler():
                 max_stud_count = self.max_class_size(str(m.evaluate(self.course(i))), int(str(m.evaluate(self.room(i)))))
                 for j in range(max_stud_count+5):
                     stud_id = int(str(m.evaluate(self.students(i)[j])))
+                    # student_ids.append(stud_id)
 
                     if stud_id != 0 and stud_id not in student_ids:
                         student_ids.append(stud_id)
-                        class_student = ScheduledClassesStudent(student_id=stud_id, scheduled_class_id=c.id)
-                    
-                        if course_id != 0 and room_id != 0 and teacher_id != 0:
+                        if course_id != 0 and room_id != 0 and teacher_id != 0 and start_time >= 0 and end_time <= 2359:
+                            class_student = ScheduledClassesStudent(student_id=stud_id, scheduled_class_id=c.id)
                             db.session.add(class_student) 
                 
                 print('students: {}'.format(student_ids))
                 db.session.commit()
-        
+        timing_end = time.time()
+        print('\033[93m check took {} s\033[0m'.format(timing_end - timing_check_start), file=sys.stderr)
 
 
