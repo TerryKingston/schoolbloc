@@ -39,6 +39,24 @@ angular.module('sbAngularApp')
 		}
 	};
 
+	$scope.addInput = function (factInput, index) {
+		var newFactInput = {}, 
+			keys, i;
+
+		keys = Object.keys(factInput);
+		for (i = 0; i < keys.length; i++) {
+			newFactInput[keys[i]] = factInput[keys[i]];
+		}
+		// mark it as an added input 
+		newFactInput.addedValue = true;
+
+		$scope.addFactConfig.factTypeConfig.splice(index + 1, 0, newFactInput);
+	};
+
+	$scope.removeInput = function (factInput, index) {
+		$scope.addFactConfig.factTypeConfig.splice(index, 1);
+	}
+
 	$scope.$watch('tableConfig.tableSelection', updateFactType);
 
 	function getTableConfig() {
@@ -49,6 +67,9 @@ angular.module('sbAngularApp')
 	function updateFactType() {
 		if ($scope.tableConfig.tableType === "fact" && $scope.tableConfig.tableSelection) {
 			$scope.addFactConfig.factTypeConfig = tableEntriesService.getFactTypeConfig($scope.tableConfig.tableSelection);
+
+			// make sure to grab the array of constraints for this fact type
+			tableEntriesService.updateFactTypeFacts($scope.tableConfig.tableSelection);
 		}
 	}
 

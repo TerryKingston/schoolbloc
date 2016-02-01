@@ -10,16 +10,22 @@
         <input type="text" ng-if="factInput.type === 'text'">
         <div class="input-row-min-max" ng-if="factInput.type === 'minMax'" >
           <div>{{"schedulerModule.MIN" | translate}}:</div>
-          <input type="number" min="0">
+          <input class="input-row-min" type="number" min="0">
           <div>{{"schedulerModule.MAX" | translate}}:</div>
           <input type="number" min="1">
         </div>
         <select ng-if="factInput.type === 'dropdown'">
           <option ng-repeat="option in factInput.possibleAnswers" value="{{option}}">{{option}}</option>
         </select>
-        <input type="text" ng-if="factInput.type === 'constraint'">
+        <div class="input-row-constraint" ng-if="factInput.type === 'constraint'">
+          <input list="{{factInput.key}}" ng-disabled="!factInput.facts.length">
+          <datalist id="{{factInput.key}}">
+            <option ng-repeat="fact in factInput.facts" value="{{fact}}">{{fact}}</option>
+          </datalist>
+        </div>
       </label>
-      <button class="circle-btn circle-btn-add" ng-if="factInput.multipleValues"></button>
+      <button class="circle-btn circle-btn-add" ng-if="factInput.multipleValues && !factInput.addedValue" ng-click="addInput(factInput, $index)"></button>
+      <button class="circle-btn circle-btn-remove" ng-if="factInput.multipleValues && factInput.addedValue" ng-click="removeInput(factInput, $index)"></button>
     </div>
     <div class="icon-option-row">
       <a href="">

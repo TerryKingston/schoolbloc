@@ -333,6 +333,12 @@ textarea {
   background-image: $small-add-icon;
   background-color: $add-green;
 }
+
+.circle-btn-remove {
+  background-image: $small-add-icon;
+  background-color: $alert-color;
+  transform: rotate(45deg);
+}
 /* END button */
 
 /* Main Nav Bar */
@@ -834,11 +840,15 @@ textarea {
 }
 
 
-.input-row .input-row-min-max {
+.input-row .input-row-min-max,
+.input-row .input-row-constraint {
     width: 200px !important;
 }
 
 .input-row .input-row-min-max input {
-    width: 53px;
-    margin-right: 9px;
+    width: 60px;
+}
+
+.input-row .input-row-min-max .input-row-min {
+    margin-right: 5px;
 }
