@@ -53,7 +53,7 @@ class Scheduler():
         self.lunch_start = lunch_start or config.lunch_start
         self.lunch_end = lunch_end or config.lunch_end
         self.class_duration = class_duration or config.block_size
-
+        self.errors = [] # container to hold error messages
 
         # Right now, we make more classes than we need so that Z3 can be free to choose
         # the right class for each constraint. later, we'll remove the unused class objects
@@ -88,7 +88,55 @@ class Scheduler():
 
     def students(self, i):
         return SchClass.students(self.classes[i])
-    
+
+    # Some sanity checking
+    def check_teacher_reqs():
+        pass
+        # """
+        # Makes sure there is a teacher that can teach each course
+        # """
+
+        # """
+        # Makes sure there are enough teachers that can teach each course. 
+        # """
+
+    def check_student_reqs(self):
+        """
+        Makes sure each student isn't assigned to more classes than they can take
+        in a single schedule.
+        """
+        # determine the number of classes per day
+        num_classes = self.number_of_classes()
+
+        for student in Student.query.all():
+            count = 0
+            count += StudentsSubject.query.filter_by(student_id=student.id).count()
+            count += CoursesStudent.query.filter_by(student_id=student.id).count()
+            # add the courses for the student groups this student is part of
+            for sgrp in StudentsStudentGroup.query.filter_by(student_id=student.id):
+                count += StudentGroupsSubject.query.filter_by(student_group_id=sgrp.id).count()
+                count += CoursesStudentGroup.query.filter_by(student_group_id=sgrp.id).count()
+
+            if count > num_classes:
+                self.errors.append("Student {} is assigned to {} classes and there are only {} class blocks available".format(
+                                    student.id, count, num_classes))
+
+    def number_of_classes(self):
+        """ 
+        Calculates the number of classes per schedule
+        """
+        count = 0        
+        cur_time = self.day_start_time
+        while cur_time < self.lunch_start:
+            count += 1
+            cur_time += self.class_duration + self.break_length
+
+        cur_time = self.lunch_end
+        while cur_time < self.day_end_time:
+            count += 1
+            cur_time += self.class_duration + self.break_length         
+
+        return count
 
     def max_class_size(self, course_id=None, classroom_id=None):
         """ 
@@ -256,7 +304,7 @@ class Scheduler():
                              TimeBlock.end(self.time(i)) >= TimeBlock.start(self.time(j)) ),
                         And( TimeBlock.start(self.time(i)) <= TimeBlock.end(self.time(j)),
                              TimeBlock.end(self.time(i)) >= TimeBlock.end(self.time(j))))),
-                  ForAll([x2, x3], self.students(i)[1] != self.students(j)[2]), 
+                  ForAll([x2, x3], self.students(i)[x2] != self.students(j)[x3]), 
                   True) 
                 for i in range(self.class_count) for j in range(self.class_count)]
 
@@ -503,9 +551,18 @@ class Scheduler():
         return cons_list
     
     def make_schedule(self):
-        
-        print('\033[93m Preparing constraints...\033[0m')
+        san_check_start = time.time()
+        print('\033[93m Starting sanity check...\033[0m')
+        self.check_student_reqs()        
+        if len(self.errors) > 0:
+            print('\033[91m Sanity check failed ({} errors.)\033[0m'.format(len(self.errors)))
+
+            for err_msg in self.errors:
+                print('\033[91m Error: {}\033[0m'.format(err_msg))
+            # return 
+
         timing_start = time.time()
+        print('\033[93m Done ({} sec). Preparing constraints...\033[0m'.format(timing_start - san_check_start))
         constraints = []
         
         # these ones are relatively fast (1x)
@@ -541,6 +598,7 @@ class Scheduler():
         # Finally, ask the solver to give us a schedule and then parse the results
         s = Solver()
         s.set(timeout=3600000)
+        # s.set(verbose=10)
         timing_cons_start = time.time()
         print('\033[93m Constraints prepped in {} s, adding to solver...\033[0m'.format(timing_cons_start - timing_start))
         s.add(constraints)
@@ -569,10 +627,10 @@ class Scheduler():
             db.session.add(new_schedule)
             db.session.flush() 
 
-            # print('Key:', file=sys.stderr)
-            # print('courses:')
-            # for c in Course.query.all():
-            #     print('{} = {}'.format(c.id, c.name))
+            print('Key:', file=sys.stderr)
+            print('courses:')
+            for c in Course.query.all():
+                print('{} = {}'.format(c.id, c.name))
 
             print('\033[95m course_id | room_id | teacher_id | start_time | end_time \033[0m', file=sys.stderr)
 
