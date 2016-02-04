@@ -86,5 +86,7 @@
 	"schedulerModule.DELETE_SCHEDULE": "Delete Schedule",
 	"schedulerModule.EXPORT_SCHEDULE": "Export Schedule",
 	"schedulerModule.MIN": "Min",
-	"schedulerModule.MAX": "Max"
+	"schedulerModule.MAX": "Max",
+	"schedulerModule.START": "Start",
+	"schedulerModule.END": "End"
 }

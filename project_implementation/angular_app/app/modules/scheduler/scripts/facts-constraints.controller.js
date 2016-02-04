@@ -17,8 +17,21 @@ angular.module('sbAngularApp')
 		'Karma'
 	];
 
+	$scope.factSelections = null;
+	$scope.factSelection = null;
+
 	function setupTableEntries() {
-		tableEntriesService.updateTableConfig("fact", "course");
+		$scope.factSelections = tableEntriesService.getTableSelections("fact");
+		if ($scope.factSelections && $scope.factSelections.length) {
+			$scope.factSelection = $scope.factSelections[0];
+			// setup fact view to be defined for a particular fact (in this case, 'classroom')
+			tableEntriesService.updateTableConfig("fact", $scope.factSelection);
+		}
+	}
+
+	$scope.updateSelection = function() {
+		// factSelection is set by ng-model in view
+		tableEntriesService.updateTableConfig("fact", $scope.factSelection);
 	}
 
 	/**** initial setup ****/
@@ -43,9 +56,6 @@ angular.module('sbAngularApp')
 	 */
 	return {
 		restrict: 'E',
-		scope: {
-			config: "=config"
-		},
 		templateUrl: 'modules/scheduler/views/facts-constraints.html',
 		link: link
 	};
