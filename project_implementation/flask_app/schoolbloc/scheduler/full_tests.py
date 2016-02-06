@@ -36,10 +36,10 @@ class FullScheduleTests(unittest.TestCase):
         for u in s_user_list: db.session.add(u)
         db.session.flush()
 
-        stud_list = [ Student(first_name="first_name_%s" % i, 
+        stud_7th_list = [ Student(first_name="first_name_%s" % i, 
                               last_name="last_name_%s" % i, 
-                              user_id=s_user_list[i].id) for i in range(30) ]
-        for s in stud_list: db.session.add(s)
+                              user_id=s_user_list[i].id) for i in range(10) ]
+        for s in stud_7th_list: db.session.add(s)
 
         # Add the teachers
         teacher_list = [("S", "Owen"),("M", "Evans"), ("S", "Evans"), ("J", "Green"),
@@ -221,19 +221,18 @@ class FullScheduleTests(unittest.TestCase):
 
         # # assign students to each group, 100 each
         students_7th_grade = []
-        students_8th_grade = []
+        # students_8th_grade = []
         # students_9th_grade = []
-        for i in range(10):
-            stud = stud_list[i]
+        for stud in stud_7th_list:
             students_7th_grade.append(stud)
             ssg = StudentsStudentGroup(student_group_id=sg_7th_grade.id, student_id=stud.id)
             db.session.add(ssg)
 
-        for i in range(10):
-            stud = stud_list[i+10]
-            students_8th_grade.append(stud)
-            ssg = StudentsStudentGroup(student_group_id=sg_8th_grade.id, student_id=stud.id)
-            db.session.add(ssg)
+        # for i in range(10):
+        #     stud = stud_list[i+10]
+        #     students_8th_grade.append(stud)
+        #     ssg = StudentsStudentGroup(student_group_id=sg_8th_grade.id, student_id=stud.id)
+        #     db.session.add(ssg)
 
         # for i in range(10):
         #     stud = stud_list[i+200]
@@ -249,36 +248,36 @@ class FullScheduleTests(unittest.TestCase):
 
         db.session.add(StudentGroupsSubject(subject_id=sub_7th_math.id, 
                                    student_group_id=sg_7th_grade.id))
-        db.session.add(StudentGroupsSubject(subject_id=sub_8th_math.id, 
-                             student_group_id=sg_8th_grade.id))
+        # db.session.add(StudentGroupsSubject(subject_id=sub_8th_math.id, 
+        #                      student_group_id=sg_8th_grade.id))
         # db.session.add(StudentGroupsSubject(subject_id=sub_9th_math.id, 
         #                      student_group_id=sg_9th_grade.id))
 
         db.session.add(CoursesStudentGroup(course_id=course_7th_sci.id, 
                             student_group_id=sg_7th_grade.id))
-        db.session.add(CoursesStudentGroup(course_id=course_8th_sci.id, 
-                            student_group_id=sg_8th_grade.id))
+        # db.session.add(CoursesStudentGroup(course_id=course_8th_sci.id, 
+        #                     student_group_id=sg_8th_grade.id))
         # db.session.add(CoursesStudentGroup(course_id=course_9th_sci.id, 
         #                     student_group_id=sg_9th_grade.id))
 
         db.session.add(CoursesStudentGroup(course_id=course_7th_la.id, 
                             student_group_id=sg_7th_grade.id))
-        db.session.add(CoursesStudentGroup(course_id=course_8th_la.id, 
-                            student_group_id=sg_8th_grade.id))
+        # db.session.add(CoursesStudentGroup(course_id=course_8th_la.id, 
+        #                     student_group_id=sg_8th_grade.id))
         # db.session.add(CoursesStudentGroup(course_id=course_9th_la.id, 
         #                     student_group_id=sg_9th_grade.id))
 
         db.session.add(CoursesStudentGroup(course_id=course_7th_pe.id, 
                             student_group_id=sg_7th_grade.id))
-        db.session.add(CoursesStudentGroup(course_id=course_8th_pe.id, 
-                            student_group_id=sg_8th_grade.id))
+        # db.session.add(CoursesStudentGroup(course_id=course_8th_pe.id, 
+        #                     student_group_id=sg_8th_grade.id))
         # db.session.add(CoursesStudentGroup(course_id=course_9th_pe.id, 
         #                     student_group_id=sg_9th_grade.id))
 
         db.session.add(CoursesStudentGroup(course_id=course_leadership.id, 
                             student_group_id=sg_7th_grade.id))
-        db.session.add(CoursesStudentGroup(course_id=course_leadership.id, 
-                            student_group_id=sg_8th_grade.id))
+        # db.session.add(CoursesStudentGroup(course_id=course_leadership.id, 
+        #                     student_group_id=sg_8th_grade.id))
         # db.session.add(CoursesStudentGroup(course_id=course_leadership.id, 
         #                     student_group_id=sg_9th_grade.id))
 
