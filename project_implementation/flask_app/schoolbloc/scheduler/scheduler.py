@@ -295,18 +295,17 @@ class Scheduler():
         #           ForAll([x2, x3], self.students(i)[x2] != self.students(j)[x3]), 
         #           True)
         #         for i in range(self.class_count) for j in range(self.class_count)]
-        x2 = Int(self.next_int_name())   
-        x3 = Int(self.next_int_name())
-        return [If(And(i != j, self.teacher(i) != 0, self.room(i) != 0, self.course(i) != 0,
-                   Or(  And( TimeBlock.start(self.time(i)) <= TimeBlock.start(self.time(j)), 
-                             TimeBlock.end(self.time(i)) >= TimeBlock.end(self.time(j)) ),
-                        And( TimeBlock.start(self.time(i)) <= TimeBlock.start(self.time(j)), 
-                             TimeBlock.end(self.time(i)) >= TimeBlock.start(self.time(j)) ),
-                        And( TimeBlock.start(self.time(i)) <= TimeBlock.end(self.time(j)),
-                             TimeBlock.end(self.time(i)) >= TimeBlock.end(self.time(j))))),
-                  ForAll([x2, x3], self.students(i)[x2] != self.students(j)[x3]), 
-                  True) 
-                for i in range(self.class_count) for j in range(self.class_count)]
+        x = Int(self.next_int_name())   
+        y = Int(self.next_int_name())
+        return [ForAll([x, y], If(And(x > 0, y > 0, self.students(i)[x] != 0, self.students(j)[y] != 0, 
+                                      self.students(i)[x] == self.students(i)[y] ),
+                                  Not(Or( And( TimeBlock.start(self.time(i)) <= TimeBlock.start(self.time(j)), 
+                                               TimeBlock.end(self.time(i)) >= TimeBlock.end(self.time(j)) ),
+                                          And( TimeBlock.start(self.time(i)) <= TimeBlock.start(self.time(j)), 
+                                               TimeBlock.end(self.time(i)) >= TimeBlock.start(self.time(j)) ),
+                                          And( TimeBlock.start(self.time(i)) <= TimeBlock.end(self.time(j)),
+                                               TimeBlock.end(self.time(i)) >= TimeBlock.end(self.time(j))))),
+                                 True)) for i in range(self.class_count) for j in range(self.class_count) ]
 
 
     def constrain_course_rooms(self):
@@ -597,7 +596,7 @@ class Scheduler():
 
         # Finally, ask the solver to give us a schedule and then parse the results
         s = Solver()
-        s.set(timeout=3600000)
+        s.set(timeout=21600000) # 21600000 = 6 hrs
         # s.set(verbose=10)
         timing_cons_start = time.time()
         print('\033[93m Constraints prepped in {} s, adding to solver...\033[0m'.format(timing_cons_start - timing_start))
