@@ -242,10 +242,10 @@ class FullScheduleTests(unittest.TestCase):
         #     db.session.add(ssg)
 
         # add course assignments to each student group
-        for sg in sg_list: db.session.add(StudentGroupsSubject(subject_id=sub_music.id, student_group_id=sg.id))
-        for sg in sg_list: db.session.add(StudentGroupsSubject(subject_id=sub_soc_stud.id, student_group_id=sg.id))
-        for sg in sg_list: db.session.add(StudentGroupsSubject(subject_id=sub_tech.id, student_group_id=sg.id))
-        for sg in sg_list: db.session.add(StudentGroupsSubject(subject_id=sub_learning.id, student_group_id=sg.id))
+        # for sg in sg_list: db.session.add(StudentGroupsSubject(subject_id=sub_music.id, student_group_id=sg.id))
+        # for sg in sg_list: db.session.add(StudentGroupsSubject(subject_id=sub_soc_stud.id, student_group_id=sg.id))
+        # for sg in sg_list: db.session.add(StudentGroupsSubject(subject_id=sub_tech.id, student_group_id=sg.id))
+        # for sg in sg_list: db.session.add(StudentGroupsSubject(subject_id=sub_learning.id, student_group_id=sg.id))
 
         db.session.add(StudentGroupsSubject(subject_id=sub_7th_math.id, 
                                    student_group_id=sg_7th_grade.id))
@@ -290,8 +290,7 @@ class FullScheduleTests(unittest.TestCase):
                               break_length=5,
                               lunch_start=1086,
                               lunch_end=1131,
-                              class_duration=82,
-                              class_count=50) # normally 70
+                              class_duration=82) 
         
         # self.assertEqual(scheduler.calc_course_count(), {})
         # with timeout(seconds=30):
