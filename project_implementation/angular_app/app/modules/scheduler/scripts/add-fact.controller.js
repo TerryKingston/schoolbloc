@@ -10,7 +10,7 @@
  * Controller of the sbAngularApp
  */
 angular.module('sbAngularApp')
-.controller('AddFact', ['$scope', 'tableEntriesService', function($scope, tableEntriesService) {
+.controller('AddFact', ['$scope', 'tableEntriesService', 'commonService', function($scope, tableEntriesService, commonService) {
 	this.components = [
 		'HTML5 Boilerplate',
 		'AngularJS',
@@ -49,15 +49,33 @@ angular.module('sbAngularApp')
 			else if (factInput.type === "constraint") {
 				checkConstraint(factInput);
 			}
+			else if (factInput.type === "startEnd") {
+				checkStartEnd(factInput);
+			}
 			else {
 				console.error("addFactController.checkInput: unexpected state - invalid factInput type");
 			}
 		}
 	};
 
+	function checkStartEnd(factInput) {
+		var convertedInput = factInput.value;
+		if (checkRequired(factInput)) {
+			return;
+		}
+		convertedInput = commonService.formatTimeInput2S(convertedInput);
+		if (convertedInput === "ERROR") {
+			factInput.error = "!!Invalid input. Valid example: 9:35AM";
+			return;
+		}
+		factInput.error = null;
+		factInput.value = convertedInput;
+	}
+
 	function checkMin(factInput) {
 		if (!factInput.value.min && !factInput.value.min !== 0 && factInput.required) {
 			factInput.error = "!!Input is required.";
+			return;
 		}
 		if (factInput.value.min < 0) {
 			factInput.error = "!!Cannot have a negative value.";
@@ -73,6 +91,7 @@ angular.module('sbAngularApp')
 	function checkMax(factInput) {
 		if (!factInput.value.max && !factInput.value.max !== 0 && factInput.required) {
 			factInput.error = "!!Input is required.";
+			return;
 		}
 		if (factInput.value.max < 1) {
 			factInput.error = "!!Must be a positive value.";

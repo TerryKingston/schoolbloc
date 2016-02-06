@@ -15,12 +15,13 @@
           <div>{{"schedulerModule.MAX" | translate}}:</div>
           <input type="number" min="1" ng-model="factInput.value.max" ng-blur="checkInput(factInput, 'max')">
         </div>
-        <div class="input-row-start-end" ng-if="factInput.type === 'startEnd'">
+        <input ng-if="factInput.type == 'startEnd'" type="text" ng-model="factInput.value" ng-blur="checkInput(factInput)">
+        <!-- <div class="input-row-start-end" ng-if="factInput.type === 'startEnd'">
           <div>{{"schedulerModule.START" | translate}}:</div>
           <input class="input-row-start" type="text" ng-model="factInput.value.start" ng-blur="checkInput(factInput, 'start')">
           <div>{{"schedulerModule.END" | translate}}:</div>
           <input type="text" ng-model="factInput.value.end" ng-blur="checkInput(factInput, 'end')">
-        </div>
+        </div> -->
         <select ng-if="factInput.type === 'dropdown'" ng-model="factInput.value" ng-blur="checkInput(factInput)">
           <option ng-repeat="option in factInput.possibleAnswers" value="{{option}}">{{option}}</option>
         </select>

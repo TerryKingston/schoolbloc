@@ -334,14 +334,18 @@ angular.module('sbAngularApp').factory('tableEntriesService', [ function() {
 		],
 		"time": [
 			{
-				key: "time",
-				value: {
-					start: null,
-					end: null
-				},
-				required: false,
+				key: "start time",
+				value: null,
+				required: true,
 				type: "startEnd",
-				multipleValues: true
+				multipleValues: false
+			},
+			{
+				key: "end time",
+				value: null,
+				required: true,
+				type: "startEnd",
+				multipleValues: false
 			},
 			{
 				key: "days",

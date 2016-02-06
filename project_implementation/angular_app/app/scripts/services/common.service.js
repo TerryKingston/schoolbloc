@@ -12,7 +12,7 @@ angular.module('sbAngularApp').factory('commonService', ['$translate', '$window'
 	function checkMilitaryTime(time) {
 		var timeValue;
 		// needs four characters: 0000
-		if (time || !time.length || time.length !== 4) {
+		if (!time || !time.length || time.length !== 4) {
 			return false;
 		}
 		timeValue = parseInt(time);
@@ -31,7 +31,7 @@ angular.module('sbAngularApp').factory('commonService', ['$translate', '$window'
 		var curCheck;
 		var timeValue;
 		// needs 7 characters: 00:00XX
-		if (time || !time.length || time.length !== 7) {
+		if (!time || !time.length || time.length !== 7) {
 			return false;
 		}
 		// check hour between 01 and 12
@@ -41,11 +41,11 @@ angular.module('sbAngularApp').factory('commonService', ['$translate', '$window'
 			return false;
 		}
 		// check :
-		if (time.indexOf('-') !== 2) {
+		if (time.indexOf(':') !== 2) {
 			return false;
 		}
 		// check minute between 00 and 59
-		curCheck = time.substring(3,2);
+		curCheck = time.substring(3,5);
 		timeValue = parseInt(curCheck);
 		if (timeValue < 0 || timeValue > 59) {
 			return false;
@@ -71,10 +71,13 @@ angular.module('sbAngularApp').factory('commonService', ['$translate', '$window'
 			timeValue -= 1200;
 		}
 
-		// add necessary leading 0s
-		timeValue = addLeadingZerosMilitary(timeValue);
+		// convert 00 --> 12
+		if (timeValue < 100) {
+			timeValue += 1200;
+		}
 
-		timeString = '' + timeValue;
+		// add necessary leading 0s
+		timeString = addLeadingZerosMilitary(timeValue);
 
 		return timeString.substring(0,2) + ":" + timeString.substring(2) + amPm;
 	}
@@ -89,12 +92,18 @@ angular.module('sbAngularApp').factory('commonService', ['$translate', '$window'
 		var addedHours = 0;
 
 		// get am/pm
-		if (time.substring(6,2) === 'PM') {
+		if (time.substring(5) === 'PM') {
 			addedHours = 1200;
 		}
 
 		// remove :
 		timeString = timeString.replace(':', '');
+
+		// 12:00 special case
+		// 12 --> 0
+		if (timeString.substring(0,2) === '12') {
+			timeString = timeString.substring(2);
+		}
 
 		// get correct 24-hour time
 		timeValue = parseInt(timeString);
@@ -118,7 +127,7 @@ angular.module('sbAngularApp').factory('commonService', ['$translate', '$window'
 		if (time < 1000) {
 			return "0" + time;
 		}
-		return time;
+		return time + '';
 	}
 
 	return {
@@ -315,9 +324,9 @@ angular.module('sbAngularApp').factory('commonService', ['$translate', '$window'
 				// get minutes
 				// XX
 				// remove AM, PM, A, or P
-				timeSplit[1] = timeString[1].replace("A", "");
-				timeSplit[1] = timeString[1].replace("P", "");
-				timeSplit[1] = timeString[1].replace("M", "");
+				timeSplit[1] = timeSplit[1].replace("A", "");
+				timeSplit[1] = timeSplit[1].replace("P", "");
+				timeSplit[1] = timeSplit[1].replace("M", "");
 				// all what should be left is the number digits
 				if (timeSplit[1].length !== 2) {
 					return "ERROR";
@@ -329,7 +338,7 @@ angular.module('sbAngularApp').factory('commonService', ['$translate', '$window'
 				}
 				// go back to string if no errors
 				minutes = timeSplit[1];
-				
+
 				return hour+":"+minutes+amPm;
 			}
 		}
