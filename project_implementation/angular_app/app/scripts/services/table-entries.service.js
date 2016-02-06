@@ -422,8 +422,8 @@ angular.module('sbAngularApp').factory('tableEntriesService', [ function() {
 							max: 30
 						},
 						time: {
-							start: 1420,
-							end: 1520
+							start: '1420',
+							end: '1520'
 						},
 						disabled: true
 					},
@@ -441,12 +441,12 @@ angular.module('sbAngularApp').factory('tableEntriesService', [ function() {
 						},
 						time: [
 							{
-								start: 1215,
-								end: 1300
+								start: '1215',
+								end: '1300'
 							},
 							{
-								start: 1420,
-								end: 1520
+								start: '1420',
+								end: '1520'
 							}
 						],
 						disabled: false
@@ -490,16 +490,16 @@ angular.module('sbAngularApp').factory('tableEntriesService', [ function() {
 			if (constraintName === "time") {
 				return [
 					{
-						start: 1215,
-						end: 1300
+						start: '1215',
+						end: '1300'
 					},
 					{
-						start: 1420,
-						end: 1520
+						start: '1420',
+						end: '1520'
 					},
 					{
-						start: 1400,
-						end: 1445
+						start: '1400',
+						end: '1445'
 					}
 				];
 			}
