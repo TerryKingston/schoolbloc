@@ -33,8 +33,8 @@ angular.module('sbAngularApp')
 				view: "import export",
 				subView : null,
 				profile: {
-					username: "!!Test User",
-					role: "!!Admin"
+					username: null,
+					role: null
 				},
 				modules: [
 					{
@@ -81,6 +81,11 @@ angular.module('sbAngularApp')
 	function determineJwtState() {
 		// only returns username if JWT exists and hasn't expired
 		$scope.sbRoot.user.username = userAuthService.getUsername();
+		$scope.sbRoot.user.role = userAuthService.getRole();
+		// set navbar config
+		$scope.sbRoot.mainContainer.navBarConfig.profile.username = $scope.sbRoot.user.username;
+		$scope.sbRoot.mainContainer.navBarConfig.profile.role = $scope.sbRoot.user.role;
+
 		// is the user already authenticated?
 		if ($scope.sbRoot.user.username) {
 			$scope.sbRoot.user.authenticated = true;

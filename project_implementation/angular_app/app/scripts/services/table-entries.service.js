@@ -513,11 +513,17 @@ angular.module('sbAngularApp').factory('tableEntriesService', [ function() {
 			else if (constraintName === "teacher") {
 				return ["Karyl Heider", "Ralph Winterspoon", "Leeroy Jenkins", "Mrs. Buttersworth"]
 			}
+			else if (constraintName === "student") {
+				return ["Harry Potter", "Frodo Baggins", "Luke Skywalker", "Tron"]
+			}
 			else if (constraintName === "classroom") {
 				return ["1001", "1002", "203L", "West 123"]
 			}
-			else if (constraintName === "course") {
+			else if (constraintName === "course" || constraintName === "required course" ) {
 				return ["English III"]
+			}
+			else if (constraintName === "student group") {
+				return ["4th grade", "5th grade", "6th grade", "student body"]
 			}
 			else {
 				console.error("tableEntriesService.getConstraintFacts: unexpected state: invalid constraintName: " + constraintName);

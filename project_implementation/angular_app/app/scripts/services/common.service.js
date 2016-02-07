@@ -170,6 +170,63 @@ angular.module('sbAngularApp').factory('commonService', ['$translate', '$window'
 			// END CITE
 		},
 
+		formatDateInput: function(input) {
+			var date = input;
+			var dateArr, month, day, year;
+
+			var getDateParse = function(dateElement, max, min, isYear) {
+				var value = parseInt(dateElement);
+				
+				// sometimes people might input 00/00/92, meaning 1992.
+				// add in proper values
+				if (value < 100 && isYear) {
+					// @TODO: must update yearly
+					// as in 2016 (the current year)
+					if (value > 16) {
+						value += 1900;
+					}
+					else {
+						value += 2000;
+					}
+				}
+
+				if (max && value > max) {
+					return "ERROR";
+				}
+				if (min && value < min) {
+					return "ERROR";
+				}
+
+				// add leading zeros as needed
+				if (value < 10) {
+					value = '0' + value;
+				}
+				return value + '';
+			};
+
+			// try to get input formatting in a more common way
+			date = date.replace(" ", "");
+			dateArr = date.split("/");
+
+			if (dateArr.length !== 3) {
+				// check - instead
+				dateArr = date.split("-");
+				if (dateArr.length !== 3) {
+					return "ERROR";
+				}
+			}
+
+			// check month, day, year
+			month = getDateParse(dateArr[0], 12, 1, false);
+			day = getDateParse(dateArr[1], 32, 1, false);
+			// @TODO: must update yearly
+			year = getDateParse(dateArr[2], 2016, 1916, true);
+			if (month === "ERROR" || day === "ERROR" || year === "ERROR") {
+				return "ERROR";
+			}
+			return month + "/" + day + "/" + year;
+		},
+
 		/**
 		 * Formats military time (0000 - 2359) into standard time format
 		 * @param  {string} start military time start

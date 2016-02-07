@@ -10,7 +10,7 @@
  * Controller of the sbAngularApp
  */
 angular.module('sbAngularApp')
-.controller('AddFact', ['$scope', 'tableEntriesService', 'commonService', function($scope, tableEntriesService, commonService) {
+.controller('AddFact', ['$scope', '$translate', 'tableEntriesService', 'commonService', function($scope, $translate, tableEntriesService, commonService) {
 	this.components = [
 		'HTML5 Boilerplate',
 		'AngularJS',
@@ -19,7 +19,8 @@ angular.module('sbAngularApp')
 
 	$scope.addFactConfig = {
 		showAddFact: false,
-		addFactText: "!!Add Course",
+		addFactText: null,
+		addingFactText: null,
 		factTypeConfig: null,
 		factEntry: null
 	};
@@ -43,6 +44,9 @@ angular.module('sbAngularApp')
 			if (factInput.type === "text") {
 				checkText(factInput);
 			}
+			else if (factInput.type === "uniqueText") {
+				checkUniqueText(factInput);
+			}
 			else if (factInput.type === "dropdown") {
 				checkDropdown(factInput);
 			}
@@ -52,11 +56,38 @@ angular.module('sbAngularApp')
 			else if (factInput.type === "startEnd") {
 				checkStartEnd(factInput);
 			}
+			else if (factInput.type === "date") {
+				checkDate(factInput);
+			}
 			else {
 				console.error("addFactController.checkInput: unexpected state - invalid factInput type");
 			}
 		}
 	};
+
+	function checkUniqueText(factInput) {
+		if (checkRequired(factInput)) {
+			return;
+		}
+		factInput.error = null;
+		// @TODO: you've already received a list of all facts of this type 
+		// (it's used in the dynamic table directive)
+		// just check against that list
+	}
+
+	function checkDate(factInput) {
+		var convertedInput = factInput.value;
+		if (checkRequired(factInput)) {
+			return;
+		}
+		convertedInput = commonService.formatDateInput(convertedInput);
+		if (convertedInput === "ERROR") {
+			factInput.error = "!!Invalid input. Must follow: MM/DD/YYYY";
+			return;
+		}
+		factInput.error = null;
+		factInput.value = convertedInput;
+	}
 
 	function checkStartEnd(factInput) {
 		var convertedInput = factInput.value;
@@ -225,12 +256,24 @@ angular.module('sbAngularApp')
 			return;
 		}
 
+		getTranslations();
+
 		// get the config object
 		$scope.addFactConfig.factTypeConfig = tableEntriesService.getFactTypeConfig($scope.tableConfig.tableSelection);
 
 		// make sure to grab the array of constraints for this fact type
 		tableEntriesService.updateFactTypeFacts($scope.tableConfig.tableSelection);
 	}
+
+	function getTranslations() {
+		$translate("schedulerModule.ADD_FACT").then(function (translation) {
+			$scope.addFactConfig.addFactText = commonService.format(translation, [$scope.tableConfig.tableSelection]);
+		});
+
+		$translate("schedulerModule.ADDING_FACT").then(function (translation) {
+			$scope.addFactConfig.addingFactText = commonService.format(translation, [$scope.tableConfig.tableSelection]);
+		});
+	};
 
 	/**** initial setup ****/
 	getTableConfig(); 

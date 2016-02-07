@@ -18,10 +18,10 @@ angular.module('sbAngularApp')
 	];
 	$scope.adminHomeContainer = {
 		viewHeaderConfig: {
-			title: "!!TITLE!!!",
-			subTitle: "!!TEST!!",
+			title: "mainDashboard.TITLE",
+			subTitle: "mainDashboard.SUBTITLE",
 			link: {
-				text: "!!TEST2!!",
+				text: "mainDashboard.SUBTITLE_ACTION",
 				action: null
 			}
 		}

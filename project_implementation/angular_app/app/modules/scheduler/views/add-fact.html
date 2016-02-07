@@ -2,13 +2,14 @@
 <button class="btn btn-recommended" ng-if="!addFactConfig.showAddFact" ng-click="toggleAddFact(true)">{{addFactConfig.addFactText}}</button>
 </div>
 <div class="add-fact-form" ng-if="addFactConfig.showAddFact">
-  <h4>{{"schedulerModule.ADDING_COURSE" | translate}}</h4>
+  <h4>{{addFactConfig.addingFactText}}</h4>
   <section class="view-sub-content">
     <div class="input-row" ng-repeat="factInput in addFactConfig.factTypeConfig track by $index">
       <label>
         <div>{{factInput.key}}<div class="required" ng-if="factInput.required">*</div></div>
         <input type="text" ng-if="factInput.type === 'text' || factInput.type === 'uniqueText'" ng-model="factInput.value" ng-blur="checkInput(factInput)">
         <input type="number" ng-if="factInput.type === 'number'" min="0" ng-model="factInput.value" ng-blur="checkInput(factInput)">
+        <input type="text" placeholder="{{'schedulerModule.DATE_PLACEHOLDER' | translate}}" ng-if="factInput.type === 'date'" ng-model="factInput.value" ng-blur="checkInput(factInput)">
         <div class="input-row-min-max" ng-if="factInput.type === 'minMax'">
           <div>{{"schedulerModule.MIN" | translate}}:</div>
           <input class="input-row-min" type="number" min="0" ng-model="factInput.value.min" ng-blur="checkInput(factInput, 'min')">
@@ -44,7 +45,7 @@
     </div>
     <div class="btn-row">
       <button class="btn btn-recommended" ng-click="saveFact(false)">{{"schedulerModule.SAVE" | translate}}</button>
-      <button class="btn btn-recommended" ng-click="saveFact(true)">{{"schedulerModule.SAVE_ANOTHER" | translate}}</button>
+      <button class="btn btn-recommended" ng-click="saveFact(true)" ng-bind-html="'schedulerModule.SAVE_ANOTHER' | translate"></button>
       <button class="btn btn-secondary" ng-click="toggleAddFact(false)">{{"schedulerModule.CANCEL" | translate}}</button>
     </div>
   </section>

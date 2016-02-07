@@ -99,8 +99,23 @@ angular.module('sbAngularApp').factory('userAuthService', ['$q', '$http', '$wind
 		getUsername: function() {
 			var self = this;
 			if (self.isUserAuthenticated()) {
+				// @TODO: remove when jwt passes in username and role with it
+				return "admin"
+				
 				// flask-JWT is only returning the identity
-				return parseJwtTokenClaim(self.getJwtToken()).identity;
+				return parseJwtTokenClaim(self.getJwtToken()).username;
+			}
+			// @TODO: what do we do if the token has expired or there is no token?
+		},
+
+		getRole: function() {
+			var self = this;
+			if (self.isUserAuthenticated()) {
+				// @TODO: remove when jwt passes in username and role with it
+				return "admin"
+				
+				// flask-JWT is only returning the identity
+				return parseJwtTokenClaim(self.getJwtToken()).role;
 			}
 			// @TODO: what do we do if the token has expired or there is no token?
 		},

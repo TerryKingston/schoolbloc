@@ -56,7 +56,7 @@ angular.module('sbAngularApp')
 
 
 }])
-.directive('sbMainNavBar', ['$window', function($window) {
+.directive('sbMainNavBar', ['$window', '$translate', 'commonService', function($window, $translate, commonService) {
 	/**
 	 * For manipulating the DOM
 	 * @param  scope   as configured in the controller
@@ -64,6 +64,9 @@ angular.module('sbAngularApp')
 	 * @param  attrs   hash object with key-value pairs of normalized attribute names and their corresponding attribute values.
 	 */
 	function link(scope, element, attrs) {
+		scope.translations = {
+			signed_in: null
+		};
 		/**
 		 * Provide config params to the controller
 		 */
@@ -95,8 +98,15 @@ angular.module('sbAngularApp')
 			scope.profileIsOpen = !scope.profileIsOpen;
 		};
 
+		function getTranslations() {
+			$translate("mainNavBar.SIGNED_IN").then(function (translation) {
+				scope.translations.signed_in = commonService.format(translation, [scope.config.profile.username]);
+			});
+		};
+
 		/**** initial setup ****/
 		linkConfig();
+		getTranslations();
 
 		// check against the current window size when the browser loads.
 		updateWindowSize();
