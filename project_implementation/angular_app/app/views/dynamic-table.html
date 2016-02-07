@@ -4,8 +4,20 @@
       <th ng-repeat="header in tableView.headers track by $index">{{header}}</th>
     </tr>
     <tr ng-repeat="row in tableView.rows track by $index">
-      <td ng-repeat="rowEntry in row track by $index">{{rowEntry}}</td>
-      <!-- <td class="table-cluster" ng-click="toggleCluster($index, 'students')">
+      <!-- if value-->
+      <td ng-if="!(typeof(rowEntry) == 'object') && !(Array.isArray(rowEntry))" ng-repeat="rowEntry in row track by $index">
+        {{rowEntry}}</td>
+      <!-- If array of values-->
+      <td ng-if="!(typeof(rowEntry) == 'object') && Array.isArray(rowEntry)" ng-repeat="rowEntry in row track by $index">
+        {{rowEntry.pop + " , " + rowEntry.pop}}</td>
+      <!-- If array of objects-->
+      <td ng-if="(typeof(rowEntry) == 'object') && Array.isArray(rowEntry)" ng-repeat="rowEntry in row track by $index">
+        {{rowEntry}}</td>
+      <!-- If object-->
+      <td ng-if="(typeof(rowEntry) == 'object') && !Array.isArray(rowEntry)" ng-repeat="rowEntry in row track by $index">
+        {{rowEntry}}</td>
+     <!-- <td ng-repeat="rowEntry in row track by $index">{{rowEntry}}</td>
+        <td class="table-cluster" ng-click="toggleCluster($index, 'students')">
         <div class="table-cluster-closed" ng-show="!clusterList[$index].students.show">
           <a href="">!!View {{row.students.length}} Students</a>
         </div>

@@ -5,7 +5,7 @@
  * @name sbAngularApp.controller:DynamicTable
  * @description
  *
- * 
+ *
  * # DynamicTable
  * Controller of the sbAngularApp
  */
@@ -27,8 +27,8 @@ angular.module('sbAngularApp')
 	}
 
 	function setupTableView() {
-		var i, rowEntry, j;
-
+		var i, rowEntry, j, k, z;
+    var srowItem = "",tmpRowItem = "";
 		$scope.tableView = {
 			headers: [],
 			rows: []
@@ -46,7 +46,64 @@ angular.module('sbAngularApp')
 			for (j = 0; j < $scope.tableView.headers.length; j++) {
 				rowEntry.push($scope.tableConfig.entries[i][$scope.tableView.headers[j]]);
 			}
-			$scope.tableView.rows.push(rowEntry);
+
+      // Converts each object or array to a string
+      for (k = 0; k < Object.keys(rowEntry).length; k++) {
+
+        // If array
+        if(Array.isArray(rowEntry[k])) {
+
+          // If the array contains objects
+          if (!Array.isArray(rowEntry[k][0]) && typeof(rowEntry[k][0]) == 'object') {
+            if(typeof rowEntry[k][0].min !== "undefined")
+            {
+              srowItem = rowEntry[k][0].min + "-" + rowEntry[k][0].max;
+            }
+            else if(typeof rowEntry[k][0].start !== "undefined")
+            {
+              srowItem = rowEntry[k][0].start + "-" + rowEntry[k][0].end;
+            }
+            for (z = 1; z < Object.keys(rowEntry[k]).length; z++) {
+              tmpRowItem = rowEntry[k][z];
+              if(typeof tmpRowItem.min !== "undefined")
+              {
+                srowItem = srowItem + ", " + tmpRowItem + "-" + rowEntry[k].max;
+              }
+              else if(typeof tmpRowItem.start !== "undefined")
+              {
+                srowItem = srowItem + ", " + rowEntry[k][z].start + "-" + rowEntry[k][z].end;
+              }
+            }
+            rowEntry[k] = srowItem;
+          }
+          // If the array does not contain objects
+          else
+          {
+            srowItem = rowEntry[k][0]
+            for(z = 1; z < Object.keys(rowEntry[k]).length; z++)
+            {
+              srowItem = srowItem + ", " +  rowEntry[k][z];
+            }
+            rowEntry[k] = srowItem;
+          }
+        }
+          // If object
+          else if(rowEntry[k] !== null && typeof(rowEntry[k]) == 'object')
+          {
+            if(typeof rowEntry[k].min !== "undefined")
+            {
+              tmpRowItem = rowEntry[k].min;
+              rowEntry[k] = tmpRowItem + "-" + rowEntry[k].max;
+            }
+            else {
+              tmpRowItem = rowEntry[k].start;
+              rowEntry[k] = tmpRowItem + "-" + rowEntry[k].end;
+            }
+          }
+
+
+        }
+      $scope.tableView.rows.push(rowEntry);
 		}
 	}
 
