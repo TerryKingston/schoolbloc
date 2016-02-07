@@ -1,4 +1,4 @@
 <header class="view-header">
-  <h1>{{viewHeader.textValues.title}}</h1>
-  <h2>{{viewHeader.textValues.subTitle}}&nbsp;&nbsp;<span class="view-header-link" ng-if="config.link"><a href="" ng-click="linkToHeaderAction()">{{viewHeader.textValues.subTitleAction}}</a></span></h2>
+  <h1 ng-bind-html="viewHeader.textValues.title"></h1>
+  <h2><span ng-bind-html="viewHeader.textValues.subTitle"></span>&nbsp;&nbsp;<span class="view-header-link" ng-if="config.link"><a href="" ng-click="linkToHeaderAction()">{{viewHeader.textValues.subTitleAction}}</a></span></h2>
 </header>

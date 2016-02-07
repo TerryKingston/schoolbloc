@@ -1,0 +1,610 @@
+Manage courses (/api/courses/<int:courses_id>)
+=========================================================
+The endpoint for viewing/modifying/deleting individual courses.
+If you pass in a courses_id that doesn't exist in the database, a
+404 is returned with the message "courses ID <id> not found"
+
+GET request - returns a json dict representation of this courses containing the following keys:
+
+              - id (INTEGER)
+              - name (VARCHAR(128))
+              - duration (INTEGER)
+              - max_student_count (INTEGER)
+              - min_student_count (INTEGER)
+
+DELETE request - removes the given courses. Returns {'success': True} (code 200) on success and
+                 {'error': <err_msg>} (code 409) on failure
+
+PUT request - updates the data for this course. it will return {'success': True}
+              (code 200) on success, {'error': <err_msg>} (code 409) on failure.
+              It takes any number of the following optional args:
+
+                - name (VARCHAR(128))
+                - duration (INTEGER)
+                - max_student_count (INTEGER)
+                - min_student_count (INTEGER)
+
+List/Create courses (/api/courses)
+===============================
+The endpoint for listing all courses and creating new courses.
+
+GET request - return a json list of all coursess
+
+POST request - create a new courses. This will return '{success': 'Added successfully'}
+               (code 200) on success, or {'error': <err_msg>} (code 409) on failure.
+               It takes the following args:
+
+                - name (VARCHAR(128))   # Required
+                - duration (INTEGER)   # Optional
+                - max_student_count (INTEGER)   # Optional
+                - min_student_count (INTEGER)   # Optional
+
+
+Manage courses_students (/api/courses_students/<int:courses_students_id>)
+=========================================================
+The endpoint for viewing/modifying/deleting individual courses_students.
+If you pass in a courses_students_id that doesn't exist in the database, a
+404 is returned with the message "courses_students ID <id> not found"
+
+GET request - returns a json dict representation of this courses_students containing the following keys:
+
+              - id (INTEGER)
+              - course_id (INTEGER)
+              - student_id (INTEGER)
+              - active (BOOLEAN)
+
+DELETE request - removes the given courses_students. Returns {'success': True} (code 200) on success and
+                 {'error': <err_msg>} (code 409) on failure
+
+PUT request - updates the data for this course. it will return {'success': True}
+              (code 200) on success, {'error': <err_msg>} (code 409) on failure.
+              It takes any number of the following optional args:
+
+                - course_id (INTEGER)
+                - student_id (INTEGER)
+                - active (BOOLEAN)
+
+List/Create courses_students (/api/courses_students)
+===============================
+The endpoint for listing all courses_students and creating new courses_students.
+
+GET request - return a json list of all courses_studentss
+
+POST request - create a new courses_students. This will return '{success': 'Added successfully'}
+               (code 200) on success, or {'error': <err_msg>} (code 409) on failure.
+               It takes the following args:
+
+                - course_id (INTEGER)   # Required
+                - student_id (INTEGER)   # Required
+                - active (BOOLEAN)   # Required
+
+
+Manage courses_teachers (/api/courses_teachers/<int:courses_teachers_id>)
+=========================================================
+The endpoint for viewing/modifying/deleting individual courses_teachers.
+If you pass in a courses_teachers_id that doesn't exist in the database, a
+404 is returned with the message "courses_teachers ID <id> not found"
+
+GET request - returns a json dict representation of this courses_teachers containing the following keys:
+
+              - id (INTEGER)
+              - course_id (INTEGER)
+              - teacher_id (INTEGER)
+              - active (BOOLEAN)
+
+DELETE request - removes the given courses_teachers. Returns {'success': True} (code 200) on success and
+                 {'error': <err_msg>} (code 409) on failure
+
+PUT request - updates the data for this course. it will return {'success': True}
+              (code 200) on success, {'error': <err_msg>} (code 409) on failure.
+              It takes any number of the following optional args:
+
+                - course_id (INTEGER)
+                - teacher_id (INTEGER)
+                - active (BOOLEAN)
+
+List/Create courses_teachers (/api/courses_teachers)
+===============================
+The endpoint for listing all courses_teachers and creating new courses_teachers.
+
+GET request - return a json list of all courses_teacherss
+
+POST request - create a new courses_teachers. This will return '{success': 'Added successfully'}
+               (code 200) on success, or {'error': <err_msg>} (code 409) on failure.
+               It takes the following args:
+
+                - course_id (INTEGER)   # Required
+                - teacher_id (INTEGER)   # Required
+                - active (BOOLEAN)   # Required
+
+
+Manage courses_student_groups (/api/courses_student_groups/<int:courses_student_groups_id>)
+=========================================================
+The endpoint for viewing/modifying/deleting individual courses_student_groups.
+If you pass in a courses_student_groups_id that doesn't exist in the database, a
+404 is returned with the message "courses_student_groups ID <id> not found"
+
+GET request - returns a json dict representation of this courses_student_groups containing the following keys:
+
+              - id (INTEGER)
+              - course_id (INTEGER)
+              - student_group_id (INTEGER)
+              - active (BOOLEAN)
+
+DELETE request - removes the given courses_student_groups. Returns {'success': True} (code 200) on success and
+                 {'error': <err_msg>} (code 409) on failure
+
+PUT request - updates the data for this course. it will return {'success': True}
+              (code 200) on success, {'error': <err_msg>} (code 409) on failure.
+              It takes any number of the following optional args:
+
+                - course_id (INTEGER)
+                - student_group_id (INTEGER)
+                - active (BOOLEAN)
+
+List/Create courses_student_groups (/api/courses_student_groups)
+===============================
+The endpoint for listing all courses_student_groups and creating new courses_student_groups.
+
+GET request - return a json list of all courses_student_groupss
+
+POST request - create a new courses_student_groups. This will return '{success': 'Added successfully'}
+               (code 200) on success, or {'error': <err_msg>} (code 409) on failure.
+               It takes the following args:
+
+                - course_id (INTEGER)   # Required
+                - student_group_id (INTEGER)   # Required
+                - active (BOOLEAN)   # Required
+
+
+Manage courses_subjects (/api/courses_subjects/<int:courses_subjects_id>)
+=========================================================
+The endpoint for viewing/modifying/deleting individual courses_subjects.
+If you pass in a courses_subjects_id that doesn't exist in the database, a
+404 is returned with the message "courses_subjects ID <id> not found"
+
+GET request - returns a json dict representation of this courses_subjects containing the following keys:
+
+              - id (INTEGER)
+              - course_id (INTEGER)
+              - subject_id (INTEGER)
+              - active (BOOLEAN)
+
+DELETE request - removes the given courses_subjects. Returns {'success': True} (code 200) on success and
+                 {'error': <err_msg>} (code 409) on failure
+
+PUT request - updates the data for this course. it will return {'success': True}
+              (code 200) on success, {'error': <err_msg>} (code 409) on failure.
+              It takes any number of the following optional args:
+
+                - course_id (INTEGER)
+                - subject_id (INTEGER)
+                - active (BOOLEAN)
+
+List/Create courses_subjects (/api/courses_subjects)
+===============================
+The endpoint for listing all courses_subjects and creating new courses_subjects.
+
+GET request - return a json list of all courses_subjectss
+
+POST request - create a new courses_subjects. This will return '{success': 'Added successfully'}
+               (code 200) on success, or {'error': <err_msg>} (code 409) on failure.
+               It takes the following args:
+
+                - course_id (INTEGER)   # Required
+                - subject_id (INTEGER)   # Required
+                - active (BOOLEAN)   # Required
+
+
+Manage classrooms (/api/classrooms/<int:classrooms_id>)
+=========================================================
+The endpoint for viewing/modifying/deleting individual classrooms.
+If you pass in a classrooms_id that doesn't exist in the database, a
+404 is returned with the message "classrooms ID <id> not found"
+
+GET request - returns a json dict representation of this classrooms containing the following keys:
+
+              - id (INTEGER)
+              - room_number (INTEGER)
+              - max_student_count (INTEGER)
+
+DELETE request - removes the given classrooms. Returns {'success': True} (code 200) on success and
+                 {'error': <err_msg>} (code 409) on failure
+
+PUT request - updates the data for this course. it will return {'success': True}
+              (code 200) on success, {'error': <err_msg>} (code 409) on failure.
+              It takes any number of the following optional args:
+
+                - room_number (INTEGER)
+                - max_student_count (INTEGER)
+
+List/Create classrooms (/api/classrooms)
+===============================
+The endpoint for listing all classrooms and creating new classrooms.
+
+GET request - return a json list of all classroomss
+
+POST request - create a new classrooms. This will return '{success': 'Added successfully'}
+               (code 200) on success, or {'error': <err_msg>} (code 409) on failure.
+               It takes the following args:
+
+                - room_number (INTEGER)   # Required
+                - max_student_count (INTEGER)   # Optional
+
+
+Manage classrooms_teachers (/api/classrooms_teachers/<int:classrooms_teachers_id>)
+=========================================================
+The endpoint for viewing/modifying/deleting individual classrooms_teachers.
+If you pass in a classrooms_teachers_id that doesn't exist in the database, a
+404 is returned with the message "classrooms_teachers ID <id> not found"
+
+GET request - returns a json dict representation of this classrooms_teachers containing the following keys:
+
+              - id (INTEGER)
+              - classroom_id (INTEGER)
+              - teacher_id (INTEGER)
+              - active (BOOLEAN)
+
+DELETE request - removes the given classrooms_teachers. Returns {'success': True} (code 200) on success and
+                 {'error': <err_msg>} (code 409) on failure
+
+PUT request - updates the data for this course. it will return {'success': True}
+              (code 200) on success, {'error': <err_msg>} (code 409) on failure.
+              It takes any number of the following optional args:
+
+                - classroom_id (INTEGER)
+                - teacher_id (INTEGER)
+                - active (BOOLEAN)
+
+List/Create classrooms_teachers (/api/classrooms_teachers)
+===============================
+The endpoint for listing all classrooms_teachers and creating new classrooms_teachers.
+
+GET request - return a json list of all classrooms_teacherss
+
+POST request - create a new classrooms_teachers. This will return '{success': 'Added successfully'}
+               (code 200) on success, or {'error': <err_msg>} (code 409) on failure.
+               It takes the following args:
+
+                - classroom_id (INTEGER)   # Required
+                - teacher_id (INTEGER)   # Required
+                - active (BOOLEAN)   # Required
+
+
+Manage classrooms_courses (/api/classrooms_courses/<int:classrooms_courses_id>)
+=========================================================
+The endpoint for viewing/modifying/deleting individual classrooms_courses.
+If you pass in a classrooms_courses_id that doesn't exist in the database, a
+404 is returned with the message "classrooms_courses ID <id> not found"
+
+GET request - returns a json dict representation of this classrooms_courses containing the following keys:
+
+              - id (INTEGER)
+              - classroom_id (INTEGER)
+              - course_id (INTEGER)
+              - active (BOOLEAN)
+
+DELETE request - removes the given classrooms_courses. Returns {'success': True} (code 200) on success and
+                 {'error': <err_msg>} (code 409) on failure
+
+PUT request - updates the data for this course. it will return {'success': True}
+              (code 200) on success, {'error': <err_msg>} (code 409) on failure.
+              It takes any number of the following optional args:
+
+                - classroom_id (INTEGER)
+                - course_id (INTEGER)
+                - active (BOOLEAN)
+
+List/Create classrooms_courses (/api/classrooms_courses)
+===============================
+The endpoint for listing all classrooms_courses and creating new classrooms_courses.
+
+GET request - return a json list of all classrooms_coursess
+
+POST request - create a new classrooms_courses. This will return '{success': 'Added successfully'}
+               (code 200) on success, or {'error': <err_msg>} (code 409) on failure.
+               It takes the following args:
+
+                - classroom_id (INTEGER)   # Required
+                - course_id (INTEGER)   # Required
+                - active (BOOLEAN)   # Required
+
+
+Manage schedules (/api/schedules/<int:schedules_id>)
+=========================================================
+The endpoint for viewing/modifying/deleting individual schedules.
+If you pass in a schedules_id that doesn't exist in the database, a
+404 is returned with the message "schedules ID <id> not found"
+
+GET request - returns a json dict representation of this schedules containing the following keys:
+
+              - id (INTEGER)
+              - name (VARCHAR(40))
+
+DELETE request - removes the given schedules. Returns {'success': True} (code 200) on success and
+                 {'error': <err_msg>} (code 409) on failure
+
+PUT request - updates the data for this course. it will return {'success': True}
+              (code 200) on success, {'error': <err_msg>} (code 409) on failure.
+              It takes any number of the following optional args:
+
+                - name (VARCHAR(40))
+
+List/Create schedules (/api/schedules)
+===============================
+The endpoint for listing all schedules and creating new schedules.
+
+GET request - return a json list of all scheduless
+
+POST request - create a new schedules. This will return '{success': 'Added successfully'}
+               (code 200) on success, or {'error': <err_msg>} (code 409) on failure.
+               It takes the following args:
+
+                - name (VARCHAR(40))   # Required
+
+
+Manage scheduled_classes (/api/scheduled_classes/<int:scheduled_classes_id>)
+=========================================================
+The endpoint for viewing/modifying/deleting individual scheduled_classes.
+If you pass in a scheduled_classes_id that doesn't exist in the database, a
+404 is returned with the message "scheduled_classes ID <id> not found"
+
+GET request - returns a json dict representation of this scheduled_classes containing the following keys:
+
+              - id (INTEGER)
+              - schedule_id (INTEGER)
+              - classroom_id (INTEGER)
+              - teacher_id (INTEGER)
+              - course_id (INTEGER)
+              - start_time (INTEGER)
+              - end_time (INTEGER)
+
+DELETE request - removes the given scheduled_classes. Returns {'success': True} (code 200) on success and
+                 {'error': <err_msg>} (code 409) on failure
+
+PUT request - updates the data for this course. it will return {'success': True}
+              (code 200) on success, {'error': <err_msg>} (code 409) on failure.
+              It takes any number of the following optional args:
+
+                - schedule_id (INTEGER)
+                - classroom_id (INTEGER)
+                - teacher_id (INTEGER)
+                - course_id (INTEGER)
+                - start_time (INTEGER)
+                - end_time (INTEGER)
+
+List/Create scheduled_classes (/api/scheduled_classes)
+===============================
+The endpoint for listing all scheduled_classes and creating new scheduled_classes.
+
+GET request - return a json list of all scheduled_classess
+
+POST request - create a new scheduled_classes. This will return '{success': 'Added successfully'}
+               (code 200) on success, or {'error': <err_msg>} (code 409) on failure.
+               It takes the following args:
+
+                - schedule_id (INTEGER)   # Required
+                - classroom_id (INTEGER)   # Required
+                - teacher_id (INTEGER)   # Required
+                - course_id (INTEGER)   # Required
+                - start_time (INTEGER)   # Required
+                - end_time (INTEGER)   # Required
+
+
+Manage scheduled_classes_students (/api/scheduled_classes_students/<int:scheduled_classes_students_id>)
+=========================================================
+The endpoint for viewing/modifying/deleting individual scheduled_classes_students.
+If you pass in a scheduled_classes_students_id that doesn't exist in the database, a
+404 is returned with the message "scheduled_classes_students ID <id> not found"
+
+GET request - returns a json dict representation of this scheduled_classes_students containing the following keys:
+
+              - id (INTEGER)
+              - scheduled_class_id (INTEGER)
+              - student_id (INTEGER)
+
+DELETE request - removes the given scheduled_classes_students. Returns {'success': True} (code 200) on success and
+                 {'error': <err_msg>} (code 409) on failure
+
+PUT request - updates the data for this course. it will return {'success': True}
+              (code 200) on success, {'error': <err_msg>} (code 409) on failure.
+              It takes any number of the following optional args:
+
+                - scheduled_class_id (INTEGER)
+                - student_id (INTEGER)
+
+List/Create scheduled_classes_students (/api/scheduled_classes_students)
+===============================
+The endpoint for listing all scheduled_classes_students and creating new scheduled_classes_students.
+
+GET request - return a json list of all scheduled_classes_studentss
+
+POST request - create a new scheduled_classes_students. This will return '{success': 'Added successfully'}
+               (code 200) on success, or {'error': <err_msg>} (code 409) on failure.
+               It takes the following args:
+
+                - scheduled_class_id (INTEGER)   # Required
+                - student_id (INTEGER)   # Required
+
+
+Manage student_groups (/api/student_groups/<int:student_groups_id>)
+=========================================================
+The endpoint for viewing/modifying/deleting individual student_groups.
+If you pass in a student_groups_id that doesn't exist in the database, a
+404 is returned with the message "student_groups ID <id> not found"
+
+GET request - returns a json dict representation of this student_groups containing the following keys:
+
+              - id (INTEGER)
+              - name (VARCHAR(128))
+
+DELETE request - removes the given student_groups. Returns {'success': True} (code 200) on success and
+                 {'error': <err_msg>} (code 409) on failure
+
+PUT request - updates the data for this course. it will return {'success': True}
+              (code 200) on success, {'error': <err_msg>} (code 409) on failure.
+              It takes any number of the following optional args:
+
+                - name (VARCHAR(128))
+
+List/Create student_groups (/api/student_groups)
+===============================
+The endpoint for listing all student_groups and creating new student_groups.
+
+GET request - return a json list of all student_groupss
+
+POST request - create a new student_groups. This will return '{success': 'Added successfully'}
+               (code 200) on success, or {'error': <err_msg>} (code 409) on failure.
+               It takes the following args:
+
+                - name (VARCHAR(128))   # Required
+
+
+Manage students (/api/students/<int:students_id>)
+=========================================================
+The endpoint for viewing/modifying/deleting individual students.
+If you pass in a students_id that doesn't exist in the database, a
+404 is returned with the message "students ID <id> not found"
+
+GET request - returns a json dict representation of this students containing the following keys:
+
+              - id (INTEGER)
+              - first_name (VARCHAR(128))
+              - last_name (VARCHAR(128))
+              - user_id (INTEGER)
+
+DELETE request - removes the given students. Returns {'success': True} (code 200) on success and
+                 {'error': <err_msg>} (code 409) on failure
+
+PUT request - updates the data for this course. it will return {'success': True}
+              (code 200) on success, {'error': <err_msg>} (code 409) on failure.
+              It takes any number of the following optional args:
+
+                - first_name (VARCHAR(128))
+                - last_name (VARCHAR(128))
+                - user_id (INTEGER)
+
+List/Create students (/api/students)
+===============================
+The endpoint for listing all students and creating new students.
+
+GET request - return a json list of all studentss
+
+POST request - create a new students. This will return '{success': 'Added successfully'}
+               (code 200) on success, or {'error': <err_msg>} (code 409) on failure.
+               It takes the following args:
+
+                - first_name (VARCHAR(128))   # Required
+                - last_name (VARCHAR(128))   # Required
+                - user_id (INTEGER)   # Required
+
+
+Manage students_student_groups (/api/students_student_groups/<int:students_student_groups_id>)
+=========================================================
+The endpoint for viewing/modifying/deleting individual students_student_groups.
+If you pass in a students_student_groups_id that doesn't exist in the database, a
+404 is returned with the message "students_student_groups ID <id> not found"
+
+GET request - returns a json dict representation of this students_student_groups containing the following keys:
+
+              - id (INTEGER)
+              - student_id (INTEGER)
+              - student_group_id (INTEGER)
+              - active (BOOLEAN)
+
+DELETE request - removes the given students_student_groups. Returns {'success': True} (code 200) on success and
+                 {'error': <err_msg>} (code 409) on failure
+
+PUT request - updates the data for this course. it will return {'success': True}
+              (code 200) on success, {'error': <err_msg>} (code 409) on failure.
+              It takes any number of the following optional args:
+
+                - student_id (INTEGER)
+                - student_group_id (INTEGER)
+                - active (BOOLEAN)
+
+List/Create students_student_groups (/api/students_student_groups)
+===============================
+The endpoint for listing all students_student_groups and creating new students_student_groups.
+
+GET request - return a json list of all students_student_groupss
+
+POST request - create a new students_student_groups. This will return '{success': 'Added successfully'}
+               (code 200) on success, or {'error': <err_msg>} (code 409) on failure.
+               It takes the following args:
+
+                - student_id (INTEGER)   # Required
+                - student_group_id (INTEGER)   # Required
+                - active (BOOLEAN)   # Required
+
+
+Manage subjects (/api/subjects/<int:subjects_id>)
+=========================================================
+The endpoint for viewing/modifying/deleting individual subjects.
+If you pass in a subjects_id that doesn't exist in the database, a
+404 is returned with the message "subjects ID <id> not found"
+
+GET request - returns a json dict representation of this subjects containing the following keys:
+
+              - id (INTEGER)
+              - name (VARCHAR(255))
+
+DELETE request - removes the given subjects. Returns {'success': True} (code 200) on success and
+                 {'error': <err_msg>} (code 409) on failure
+
+PUT request - updates the data for this course. it will return {'success': True}
+              (code 200) on success, {'error': <err_msg>} (code 409) on failure.
+              It takes any number of the following optional args:
+
+                - name (VARCHAR(255))
+
+List/Create subjects (/api/subjects)
+===============================
+The endpoint for listing all subjects and creating new subjects.
+
+GET request - return a json list of all subjectss
+
+POST request - create a new subjects. This will return '{success': 'Added successfully'}
+               (code 200) on success, or {'error': <err_msg>} (code 409) on failure.
+               It takes the following args:
+
+                - name (VARCHAR(255))   # Required
+
+
+Manage teachers (/api/teachers/<int:teachers_id>)
+=========================================================
+The endpoint for viewing/modifying/deleting individual teachers.
+If you pass in a teachers_id that doesn't exist in the database, a
+404 is returned with the message "teachers ID <id> not found"
+
+GET request - returns a json dict representation of this teachers containing the following keys:
+
+              - id (INTEGER)
+              - first_name (VARCHAR(128))
+              - last_name (VARCHAR(128))
+              - user_id (INTEGER)
+
+DELETE request - removes the given teachers. Returns {'success': True} (code 200) on success and
+                 {'error': <err_msg>} (code 409) on failure
+
+PUT request - updates the data for this course. it will return {'success': True}
+              (code 200) on success, {'error': <err_msg>} (code 409) on failure.
+              It takes any number of the following optional args:
+
+                - first_name (VARCHAR(128))
+                - last_name (VARCHAR(128))
+                - user_id (INTEGER)
+
+List/Create teachers (/api/teachers)
+===============================
+The endpoint for listing all teachers and creating new teachers.
+
+GET request - return a json list of all teacherss
+
+POST request - create a new teachers. This will return '{success': 'Added successfully'}
+               (code 200) on success, or {'error': <err_msg>} (code 409) on failure.
+               It takes the following args:
+
+                - first_name (VARCHAR(128))   # Required
+                - last_name (VARCHAR(128))   # Required
+                - user_id (INTEGER)   # Required

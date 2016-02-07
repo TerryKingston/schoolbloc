@@ -7,17 +7,74 @@ angular.module('sbAngularApp').factory('tableEntriesService', [ function() {
 	// never reinstantiate: reference will be lost with bound controllers
 	var tableConfig = {
 		tableType: null,
-		tableSelection: null
+		tableSelection: null,
+	};
+
+	var tableTypes = {
+		"fact": ["classroom", "course", "student", "student group", "subject", "teacher", "time"]
 	};
 
 	var factTypeConfig = {
-		"course": [
+		"classroom": [
+			{
+				key: "room number",
+				value: null,
+				error: null,
+				required: true,
+				type: "uniqueText",
+				multipleValues: false
+			},
+			{
+				key: "size",
+				value: null,
+				required: true,
+				type: "number",
+				multipleValues: false
+			},
+			{
+				key: "time",
+				value: null,
+				error: null,
+				required: false,
+				type: "constraint",
+				multipleValues: true,
+				facts: null
+			},
+			{
+				key: "subject",
+				value: null,
+				error: null,
+				required: false,
+				type: "constraint",
+				multipleValues: true,
+				facts: null
+			},
+			{
+				key: "teacher",
+				value: null,
+				error: null,
+				required: false,
+				type: "constraint",
+				multipleValues: true,
+				facts: null
+			},
 			{
 				key: "course",
 				value: null,
 				error: null,
+				required: false,
+				type: "constraint",
+				multipleValues: true,
+				facts: null
+			}
+		],
+		"course": [
+			{
+				key: "course name",
+				value: null,
+				error: null,
 				required: true,
-				type: "text",
+				type: "uniqueText",
 				multipleValues: false
 			},
 			{
@@ -75,8 +132,259 @@ angular.module('sbAngularApp').factory('tableEntriesService', [ function() {
 				multipleValues: true,
 				facts: null
 			}
-		]
-	}
+		],
+		"student": [
+			{
+				key: "id",
+				value: null,
+				error: null,
+				required: true,
+				type: "uniqueText",
+				multipleValues: false
+			},
+			{
+				key: "gender",
+				value: null,
+				error: null,
+				required: true,
+				type: "dropdown",
+				multipleValues: false,
+				possibleAnswers: ["female", "male", "other"]
+			},
+			{
+				key: "name",
+				value: null,
+				error: null,
+				required: true,
+				type: "text",
+				multipleValues: false
+			},
+			{
+				key: "date of birth",
+				value: null,
+				error: null,
+				required: true,
+				type: "date",
+				multipleValues: false
+			},
+			{
+				key: "time",
+				value: null,
+				error: null,
+				required: false,
+				type: "constraint",
+				multipleValues: true,
+				facts: null
+			},
+			{
+				key: "student group",
+				value: null,
+				error: null,
+				required: false,
+				type: "constraint",
+				multipleValues: true,
+				facts: null
+			},
+			{
+				key: "required course",
+				value: null,
+				error: null,
+				required: false,
+				type: "constraint",
+				multipleValues: true,
+				facts: null
+			}
+		],
+		"student group": [
+			{
+				key: "group name",
+				value: null,
+				error: null,
+				required: true,
+				type: "uniqueText",
+				multipleValues: false
+			},
+			{
+				key: "time",
+				value: null,
+				error: null,
+				required: false,
+				type: "constraint",
+				multipleValues: true,
+				facts: null
+			},
+			{
+				key: "student",
+				value: null,
+				error: null,
+				required: false,
+				type: "constraint",
+				multipleValues: true,
+				facts: null
+			},
+			{
+				key: "required course",
+				value: null,
+				error: null,
+				required: false,
+				type: "constraint",
+				multipleValues: true,
+				facts: null
+			}
+		],
+		"subject": [
+			{
+				key: "subject name",
+				value: null,
+				error: null,
+				required: true,
+				type: "uniqueText",
+				multipleValues: false
+			},
+			{
+				key: "time",
+				value: null,
+				error: null,
+				required: false,
+				type: "constraint",
+				multipleValues: true,
+				facts: null
+			},
+			{
+				key: "course",
+				value: null,
+				error: null,
+				required: false,
+				type: "constraint",
+				multipleValues: true,
+				facts: null
+			},
+			{
+				key: "teacher",
+				value: null,
+				error: null,
+				required: false,
+				type: "constraint",
+				multipleValues: true,
+				facts: null
+			},
+			{
+				key: "classroom",
+				value: null,
+				error: null,
+				required: false,
+				type: "constraint",
+				multipleValues: true,
+				facts: null
+			}
+		],
+		"teacher": [
+			{
+				key: "id",
+				value: null,
+				error: null,
+				required: true,
+				type: "uniqueText",
+				multipleValues: false
+			},
+			{
+				key: "name",
+				value: null,
+				error: null,
+				required: true,
+				type: "text",
+				multipleValues: false
+			},
+			{
+				key: "time",
+				value: null,
+				error: null,
+				required: false,
+				type: "constraint",
+				multipleValues: true,
+				facts: null
+			},
+			{
+				key: "subject",
+				value: null,
+				error: null,
+				required: false,
+				type: "constraint",
+				multipleValues: true,
+				facts: null
+			},
+			{
+				key: "course",
+				value: null,
+				error: null,
+				required: false,
+				type: "constraint",
+				multipleValues: true,
+				facts: null
+			},
+			{
+				key: "classroom",
+				value: null,
+				error: null,
+				required: false,
+				type: "constraint",
+				multipleValues: true,
+				facts: null
+			}
+		],
+		"time": [
+			{
+				key: "start time",
+				value: null,
+				required: true,
+				type: "startEnd",
+				multipleValues: false
+			},
+			{
+				key: "end time",
+				value: null,
+				required: true,
+				type: "startEnd",
+				multipleValues: false
+			},
+			{
+				key: "days",
+				value: null,
+				error: null,
+				required: true,
+				type: "dropdown",
+				multipleValues: true,
+				possibleAnswers: ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday", "weekdays"]
+			},
+			{
+				key: "subject",
+				value: null,
+				error: null,
+				required: false,
+				type: "constraint",
+				multipleValues: true,
+				facts: null
+			},
+			{
+				key: "course",
+				value: null,
+				error: null,
+				required: false,
+				type: "constraint",
+				multipleValues: true,
+				facts: null
+			},
+			{
+				key: "classroom",
+				value: null,
+				error: null,
+				required: false,
+				type: "constraint",
+				multipleValues: true,
+				facts: null
+			}
+		],
+	};
 
 
 	return {
@@ -88,6 +396,10 @@ angular.module('sbAngularApp').factory('tableEntriesService', [ function() {
 			self.updateTableConfig();
 
 			return tableConfig;
+		},
+
+		getTableSelections: function(tableType) {
+			return tableTypes[tableType];
 		},
 
 		updateTableConfig: function(tableType, tableSelection) {
@@ -114,8 +426,8 @@ angular.module('sbAngularApp').factory('tableEntriesService', [ function() {
 							max: 30
 						},
 						time: {
-							start: 1420,
-							end: 1520
+							start: '1420',
+							end: '1520'
 						},
 						disabled: true
 					},
@@ -133,12 +445,12 @@ angular.module('sbAngularApp').factory('tableEntriesService', [ function() {
 						},
 						time: [
 							{
-								start: 1215,
-								end: 1300
+								start: '1215',
+								end: '1300'
 							},
 							{
-								start: 1420,
-								end: 1520
+								start: '1420',
+								end: '1520'
 							}
 						],
 						disabled: false
@@ -182,16 +494,16 @@ angular.module('sbAngularApp').factory('tableEntriesService', [ function() {
 			if (constraintName === "time") {
 				return [
 					{
-						start: 1215,
-						end: 1300
+						start: '1215',
+						end: '1300'
 					},
 					{
-						start: 1420,
-						end: 1520
+						start: '1420',
+						end: '1520'
 					},
 					{
-						start: 1400,
-						end: 1445
+						start: '1400',
+						end: '1445'
 					}
 				];
 			}
@@ -201,8 +513,17 @@ angular.module('sbAngularApp').factory('tableEntriesService', [ function() {
 			else if (constraintName === "teacher") {
 				return ["Karyl Heider", "Ralph Winterspoon", "Leeroy Jenkins", "Mrs. Buttersworth"]
 			}
+			else if (constraintName === "student") {
+				return ["Harry Potter", "Frodo Baggins", "Luke Skywalker", "Tron"]
+			}
 			else if (constraintName === "classroom") {
 				return ["1001", "1002", "203L", "West 123"]
+			}
+			else if (constraintName === "course" || constraintName === "required course" ) {
+				return ["English III"]
+			}
+			else if (constraintName === "student group") {
+				return ["4th grade", "5th grade", "6th grade", "student body"]
 			}
 			else {
 				console.error("tableEntriesService.getConstraintFacts: unexpected state: invalid constraintName: " + constraintName);

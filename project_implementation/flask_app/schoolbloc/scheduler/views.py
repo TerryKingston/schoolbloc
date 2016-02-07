@@ -51,6 +51,10 @@ def register_rest_orm(orm, get='admin', put='admin', post='admin',
     api.add_resource(cls, '/api/{}/<int:orm_id>'.format(name))
     api.add_resource(cls_list, '/api/{}'.format(name))
 
+    # Print api docs
+    #print(cls.generate_docs(cls))
+    #print(cls_list.generate_docs(cls_list))
+
     # Return the classes, so that the caller can overwrite a function if desired
     return cls, cls_list
 

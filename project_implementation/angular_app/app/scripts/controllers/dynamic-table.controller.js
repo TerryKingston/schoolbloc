@@ -35,7 +35,7 @@ angular.module('sbAngularApp')
 		};
 
 		// no entries
-		if (!$scope.tableConfig.entries.length) {
+		if (!$scope.tableConfig.entries || !$scope.tableConfig.entries.length) {
 			return;
 		}
 

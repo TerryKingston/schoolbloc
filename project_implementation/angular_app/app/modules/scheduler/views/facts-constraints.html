@@ -4,7 +4,9 @@
   <div class="header-input-row">
     <label>
       <div>{{"schedulerModule.VIEWING" | translate}}</div>
-      <input type="text">
+      <select ng-model="factSelection" ng-disabled="!factSelection" ng-blur="updateSelection()">
+        <option ng-repeat="option in factSelections track by $index" value="{{option}}" ng-selected="$index === 0">{{option}}</option>
+      </select>
     </label>
   </div>
   <div ng-controller="AddFact">
