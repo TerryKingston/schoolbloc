@@ -41,8 +41,10 @@ class Schedule:
 
 
 class Course:
-    def __init__(self, id, timeblock_index, max_students, min_students):
+    def __init__(self, id, room_id, teacher_id, timeblock_index, max_students, min_students):
         self.id = id
+        self.room_id = room_id
+        self.teacher_id = teacher_id
         self.timeblock_index = timeblock_index
         self.max_student_count = max_students
         self.min_student_count = min_students
@@ -72,6 +74,6 @@ class Student:
         """
         self.timeblocks = {}
         for i in range(num_of_timeblocks):
-            self.timeblock[i] = None
+            self.timeblocks[i] = None
         self.required_courses = required_courses
         self.optional_courses = optional_courses
