@@ -4,3 +4,6 @@
 venv/
 schoolbloc.db
 sftp-config.json
+*.DS_Store
+angr-z3-angr
+_pycache_
