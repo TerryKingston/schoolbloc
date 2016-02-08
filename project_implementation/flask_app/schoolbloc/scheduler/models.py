@@ -12,9 +12,18 @@ class SqlalchemySerializer:
     """
     def serialize(self):
         results = {}
+
         columns = self.__table__.columns.values()
         for column in columns:
             results[column.name] = getattr(self, column.name)
+
+        relationships = self.__mapper__.relationships.keys()
+        for name in relationships:
+            try:
+                results[name] = [x.serialize() for x in getattr(self, name)]
+            except TypeError:
+                # Only grab one to many relationships (infinite loop otherwise)
+                pass
         return results
 
 
