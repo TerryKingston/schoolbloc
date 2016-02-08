@@ -209,7 +209,7 @@ class Scheduler():
 
         for student in Student.query.all():
             req_courses = self.calc_student_courses(student.id)
-            sched_student = ScheduleStudent(student.id, len(self.time_blocks), req_courses)
+            sched_student = ScheduleStudent(student.id, len(self.time_blocks), req_courses, [])
             self.sched_students.append(sched_student)
 
             if len(req_courses) > len(self.time_blocks):
@@ -489,15 +489,15 @@ class Scheduler():
         constraints = []
         constraints += self.ensure_valid_ids()
         constraints += self.set_courses()
-        # constraints += self.prevent_room_time_collision()
-        # constraints += self.prevent_teacher_time_collision() 
+        constraints += self.prevent_room_time_collision()
+        constraints += self.prevent_teacher_time_collision() 
 
         # # User provided constraints
-        # constraints += self.constrain_course_rooms()
-        # constraints += self.constrain_room_time()
-        # constraints += self.constrain_course_time()
-        # constraints += self.constrain_teacher_time()
-        # constraints += self.constrain_course_teachers()
+        constraints += self.constrain_course_rooms()
+        constraints += self.constrain_room_time()
+        constraints += self.constrain_course_time()
+        constraints += self.constrain_teacher_time()
+        constraints += self.constrain_course_teachers()
         return constraints
 
     def make_schedule(self):
@@ -549,13 +549,14 @@ class Scheduler():
             print('\033[91m NO SOLUTION\033[0m')
             raise SchedulerNoSolution()
         else:
-            print('\033[92m Satisfied! \033[0m')
             schedule = self.gen_sched_classes(solver.model())
 
             # now start assigning students to classes and see if we can find
             # a place for every student
             for student in self.sched_students:
                 if not schedule.schedule_student_required_classes(student):
-                    raise SchedulerNoSolution
-                else:
-                    pass
+                    msg = ", ".join(schedule.errors)
+                    print('\033[91m NO SOLUTION: {}\033[0m'.format(msg))
+                    raise SchedulerNoSolution()
+            print('\033[92m Satisfied! \033[0m')
+            print('\033[92m {} \033[0m'.format(schedule))

@@ -3,19 +3,41 @@
 class Schedule:
     def __init__(self, course_list):
         self.courses = {}
+        self.errors = []
         for course in course_list:
             if course.id not in self.courses:
                 self.courses[course.id] = []
             self.courses[course.id].append(course)
 
+    def __repr__(self):
+        rep = "course_id | room_id | teacher_id | time_block | max_students | student_count \n"
+        for course_id, class_list in self.courses.items():
+            for cls in class_list:
+                rep += "    {}     |    {}    |     {}      |     {}      |      {}      |      {}\n".format(
+                        cls.id, cls.room_id, cls.teacher_id, cls.timeblock_index, cls.max_student_count, len(cls.students))
+                rep += "      Students: {}\n\n".format([ s.id for s in cls.students] )
+
+        return rep
+
+
     def schedule_student_required_classes(self, student):
         for course_id in student.required_courses:
-            self._add_student_to_course(student, course_id)
+            if not self._add_student_to_course(student, course_id):
+                msg = "Failed adding course {} to student {}".format(course_id, student.id)
+                self.errors.append(msg)
+                return False
+        return True
+
 
     def schedule_student_optional_classes(self, student):
         # dunno if this is a good idea or not, but worth looking into
         for course_id in student.optional_courses:
-            self._add_student_to_course(student, course_id)
+            if not self._add_student_to_course(student, course_id):
+                msg = "Failed adding course {} to student {}".format(course_id, student.id)
+                self.errors.append(msg)
+                return False
+        return True
+
 
     def _add_student_to_course(self, student, course_id):
         """
@@ -28,7 +50,7 @@ class Schedule:
         :return:
         """
         course_list = self.courses[course_id]
-        course_list.sort()  # TODO change me to a heap or something
+        # course_list.sort()  # TODO change me to a heap or something
         for course in course_list:
             if course.add_student(student):
                 return True
@@ -63,15 +85,17 @@ class Course:
 
 
 class Student:
-    def __init__(self, num_of_timeblocks, required_courses, optional_courses):
+    def __init__(self, id, num_of_timeblocks, required_courses, optional_courses):
         """
         Student object for building a schedules
 
+        :param id: the student model's id
         :param num_of_timeblocks:  number of blocks in a day
         :param required_courses:   list of required courese ids
         :param optional_courses:   list of optional course ids
         :return:
         """
+        self.id = id
         self.timeblocks = {}
         for i in range(num_of_timeblocks):
             self.timeblocks[i] = None
