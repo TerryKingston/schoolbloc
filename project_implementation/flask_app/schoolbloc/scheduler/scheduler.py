@@ -79,7 +79,14 @@ class Scheduler():
 
 
     def assign_class_for_course(self, sch_class_map, sch_student, course_index):
+        """
+        Recursively assigns the SchedulerStudent to all of its required courses (which are
+        defined by the req_course_ids property.)
 
+        sch_class_map = a map of ScheduledClass objects (i.e. {course_id => [<ScheduledClass>, <ScheduledClass> ...]} )
+        sch_student = ScheduerStudent object being assigned to courses
+        course_index = index into sch_student.req_course_ids for the current course being assigned
+        """
         if course_index >= len(sch_student.req_course_ids):
             return True
         
