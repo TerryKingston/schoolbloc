@@ -15,7 +15,7 @@ angular.module('sbAngularApp').factory('userAuthService', ['$q', '$http', '$wind
 	 */
 	function parseJwtTokenClaim(token) {
 		// token = "<base64-encoded header>.<base64-encoded claims>.<base64-encoded signature>"
-		
+
 		// CITE: https://thinkster.io/angularjs-jwt-auth
 		// we are only interested in the <base64-encoded claims> as the other components are only necessary for the server
 		// NOTE: this may not be true as we may need to verify the token is correct.  See https://developer.atlassian.com/static/connect/docs/latest/concepts/understanding-jwt.html
@@ -27,7 +27,7 @@ angular.module('sbAngularApp').factory('userAuthService', ['$q', '$http', '$wind
 	}
 
 	return {
-		
+
 		/**
 		 * Attempts to register the user with the given credentials
 		 */
@@ -54,7 +54,8 @@ angular.module('sbAngularApp').factory('userAuthService', ['$q', '$http', '$wind
 		 * Attempts to log in the user with the given credentials
 		 */
 		loginUser: function(username, password) {
-			var data;
+
+      var data;
 			var url =  commonService.conformUrl(LOGIN_URL);
 			var deferred = $q.defer();
 
@@ -99,29 +100,14 @@ angular.module('sbAngularApp').factory('userAuthService', ['$q', '$http', '$wind
 		getUsername: function() {
 			var self = this;
 			if (self.isUserAuthenticated()) {
-				// @TODO: remove when jwt passes in username and role with it
-				return "admin"
-				
 				// flask-JWT is only returning the identity
-				return parseJwtTokenClaim(self.getJwtToken()).username;
-			}
-			// @TODO: what do we do if the token has expired or there is no token?
-		},
-
-		getRole: function() {
-			var self = this;
-			if (self.isUserAuthenticated()) {
-				// @TODO: remove when jwt passes in username and role with it
-				return "admin"
-				
-				// flask-JWT is only returning the identity
-				return parseJwtTokenClaim(self.getJwtToken()).role;
+				return parseJwtTokenClaim(self.getJwtToken()).identity;
 			}
 			// @TODO: what do we do if the token has expired or there is no token?
 		},
 
 		/**
-		 * Saves the JWT token to local storage.  
+		 * Saves the JWT token to local storage.
 		 * Make sure to only call this function if the token is validated.
 		 * @param  {string} token JWT token
 		 */
