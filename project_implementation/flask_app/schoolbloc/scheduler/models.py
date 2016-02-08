@@ -10,20 +10,38 @@ class SqlalchemySerializer:
     Provides a base model for our database tables and constraints. This
     provides a serialize method that will be utilized by our rest endpoints
     """
-    def serialize(self):
+    def serialize(self, base_set=None):
+        if not base_set:
+            base_set = set()
+        base_set.add(self.__tablename__)
         results = {}
 
+        # Serialize the list of columns
         columns = self.__table__.columns.values()
         for column in columns:
             results[column.name] = getattr(self, column.name)
 
+        # Serialize the relationships
         relationships = self.__mapper__.relationships.keys()
+        try:
+            relationships.remove('user')  # Don't ever pass back uname/password
+        except ValueError:
+            pass
+
         for name in relationships:
-            try:
-                results[name] = [x.serialize() for x in getattr(self, name)]
-            except TypeError:
-                # Only grab one to many relationships (infinite loop otherwise)
-                pass
+            obj = getattr(self, name)
+            if isinstance(obj, list):
+                try:
+                    tablename = obj[0].__tablename__
+                    if tablename not in base_set:  # Avoid circular serialization
+                        results[name] = [x.serialize(base_set) for x in getattr(self, name)]
+                except IndexError:
+                    results[name] = []
+            else:
+                tablename = obj.__tablename__
+                if tablename not in base_set:  # Avoid circular serialization
+                    results[name] = obj.serialize(base_set)
+        base_set.remove(self.__tablename__)
         return results
 
 
