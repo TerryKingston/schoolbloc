@@ -50,9 +50,14 @@ class Schedule:
         :return:
         """
         course_list = self.courses[course_id]
-        # course_list.sort()  # TODO change me to a heap or something
-        for course in course_list:
-            if course.add_student(student):
+        for i in range(len(course_list)):
+            if course_list[i].add_student(student):
+                # Keep the list ordered from least full to most full classes
+                try:
+                    if course_list[i] > course_list[i+1]:
+                        course_list[i], course_list[i+1] = course_list[i+1], course_list[i]
+                except IndexError:
+                    pass
                 return True
 
         # TODO If a student doesn't fit in this course, so if we can swap around
