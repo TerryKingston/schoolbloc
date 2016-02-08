@@ -16,10 +16,12 @@ class SqlalchemySerializer:
         base_set.add(self.__tablename__)
         results = {}
 
-        # Serialize the list of columns
+        # Serialize the list of columns. Don't print out foreign keys, as those
+        # get dereference into their full objects bellow
         columns = self.__table__.columns.values()
         for column in columns:
-            results[column.name] = getattr(self, column.name)
+            if not column.foreign_keys:
+                results[column.name] = getattr(self, column.name)
 
         # Serialize the relationships
         relationships = self.__mapper__.relationships.keys()
