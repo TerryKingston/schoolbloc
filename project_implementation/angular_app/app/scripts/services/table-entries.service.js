@@ -94,7 +94,7 @@ angular.module('sbAngularApp').factory('tableEntriesService', [ function() {
 				},
 				required: false,
 				type: "minMax",
-				multipleValues: true
+				multipleValues: false
 			},
 			{
 				key: "time",

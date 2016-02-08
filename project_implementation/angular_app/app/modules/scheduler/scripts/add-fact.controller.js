@@ -44,6 +44,9 @@ angular.module('sbAngularApp')
 			if (factInput.type === "text") {
 				checkText(factInput);
 			}
+			else if (factInput.type === "number") {
+				checkNumber(factInput);
+			}
 			else if (factInput.type === "uniqueText") {
 				checkUniqueText(factInput);
 			}
@@ -60,10 +63,27 @@ angular.module('sbAngularApp')
 				checkDate(factInput);
 			}
 			else {
-				console.error("addFactController.checkInput: unexpected state - invalid factInput type");
+				console.error("addFactController.checkInput: unexpected state - invalid factInput type: " + factInput.type);
 			}
 		}
 	};
+
+	function checkNumber(factInput) {
+		if (checkRequired(factInput)) {
+			return;
+		}
+		var number = factInput.value;
+		number = parseInt(number);
+		if (isNaN(number)) {
+			factInput.error = "!!Input must be a number.";
+			return;
+		}
+		if (number < 0) {
+			factInput.error = "!!Must be a positive integer.";
+		}
+
+		factInput.error = null;
+	}
 
 	function checkUniqueText(factInput) {
 		if (checkRequired(factInput)) {
@@ -186,9 +206,29 @@ angular.module('sbAngularApp')
 	}
 
 	$scope.saveFact = function (addAnotherFact) {
-		// check all input fields for errors
+		var i,
+			ftc = $scope.addFactConfig.factTypeConfig;
 
-		//// set the factEntry keys according to the config object
+		// check all input fields for errors
+		for (i = 0; i < ftc.length; i++) {
+			// special case since .value is an object
+			if (ftc[i].type === "minMax") {
+				$scope.checkInput(ftc[i], "min");
+				$scope.checkInput(ftc[i], "min");
+
+			}
+			else {
+				$scope.checkInput(ftc[i]);
+			}
+		}
+		// if errors, don't continue
+		for (i = 0; i < ftc.length; i++) {
+			if (ftc[i].error) {
+				return;
+			}
+		}
+
+		//// @TODO: set the factEntry keys according to the config object
 		// 
 		// no config object given
 		if (!$scope.addFactConfig.factTypeConfig || !$scope.addFactConfig.factTypeConfig.length) {
@@ -196,13 +236,14 @@ angular.module('sbAngularApp')
 			return;
 		}
 		$scope.addFactConfig.factEntry = {};
-		ftc = $scope.addFactConfig.factTypeConfig;
 		fe = $scope.addFactConfig.factEntry;
 		for (i = 0; i < ftc.length; i++) {
 			fe[ftc[i].key] = null;
 		}
 
+		// @TODO: reset the form
 
+		// if save instead of save & add another
 		if (!addAnotherFact) {
 			$scope.addFactConfig.showAddFact = false;
 		}
