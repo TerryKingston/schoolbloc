@@ -24,9 +24,11 @@ if __name__ == '__main__':
         db.session.add(User(username='admin', password='admin', role_type='admin'))
         db.session.add(User(username='teacher', password='teacher', role_type='teacher'))
         db.session.add(User(username='student', password='student', role_type='student'))
+        db.session.add(User(username='student2', password='student2', role_type='student'))
+        db.session.add(User(username='student3', password='student3', role_type='student'))
         db.session.commit()
     except:
-        pass
+        db.session.rollback()
 
     # Run our application
     app.run(host='0.0.0.0', port=5000, use_reloader=True)
