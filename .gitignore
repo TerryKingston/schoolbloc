@@ -6,3 +6,4 @@ schoolbloc.db
 sftp-config.json
 _pycache_
 angr-z3-angr
+**.DS_Store

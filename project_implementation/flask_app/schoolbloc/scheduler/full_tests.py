@@ -1,4 +1,6 @@
 import unittest
+import tempfile
+import os
 from schoolbloc import app, db
 from schoolbloc.users.models import User, Role
 from schoolbloc.scheduler.models import (Teacher, Classroom, ClassroomsCourse, 
@@ -15,19 +17,36 @@ class FullScheduleTests(unittest.TestCase):
     """ Tests full scheduling scenarios """
 
     def setUp(self):
-        """ Uses an in memory sqlite database for testing """
-
-        # Clean the DB
-        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite://'
-        db.init_app(app)
-        with app.app_context():
-            db.drop_all()        
-            db.create_all()
+        self.db_fd, app.config['DATABASE'] = tempfile.mkstemp()
+        app.config['TESTING'] = True
+        self.app = app.test_client()
+        db.create_all()
+        # flaskr.init_db()
 
         db.session.add(Role(role_type='admin'))
         db.session.add(Role(role_type='teacher'))
         db.session.add(Role(role_type='student'))
         db.session.commit()
+
+
+    def tearDown(self):
+        os.close(self.db_fd)
+        os.unlink(flaskr.app.config['DATABASE'])
+
+    # def setUp(self):
+    #     """ Uses an in memory sqlite database for testing """
+
+    #     # Clean the DB
+    #     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite://'
+    #     db.init_app(app)
+    #     # with app.app_context():
+    #     db.drop_all()        
+    #     db.create_all()
+
+    #     db.session.add(Role(role_type='admin'))
+    #     db.session.add(Role(role_type='teacher'))
+    #     db.session.add(Role(role_type='student'))
+    #     db.session.commit()
 
     def gen_students(self, n):
         """ returns n students in a list after saving them to the DB """

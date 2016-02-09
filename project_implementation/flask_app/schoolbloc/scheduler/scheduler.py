@@ -564,6 +564,6 @@ class Scheduler():
                 if not schedule.schedule_student_required_classes(student):
                     msg = ", ".join(schedule.errors)
                     print('\033[91m NO SOLUTION: {}\033[0m'.format(msg))
-                    raise SchedulerNoSolution()
+                    # raise SchedulerNoSolution()
             print('\033[92m Satisfied! \033[0m')
             print('\033[92m {} \033[0m'.format(schedule))
