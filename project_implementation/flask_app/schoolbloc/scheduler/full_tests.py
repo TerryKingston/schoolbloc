@@ -22,7 +22,6 @@ class FullScheduleTests(unittest.TestCase):
         self.app = app.test_client()
         db.drop_all()
         db.create_all()
-        # flaskr.init_db()
 
         db.session.add(Role(role_type='admin'))
         db.session.add(Role(role_type='teacher'))
@@ -37,7 +36,6 @@ class FullScheduleTests(unittest.TestCase):
 
     def tearDown(self):
         os.close(self.db_fd)
-        os.unlink(flaskr.app.config['DATABASE'])
 
     # def setUp(self):
     #     """ Uses an in memory sqlite database for testing """
