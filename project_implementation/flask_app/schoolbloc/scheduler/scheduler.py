@@ -2,7 +2,7 @@ from z3 import *
 from schoolbloc.scheduler.models import *
 from schoolbloc import db
 from schoolbloc.config import config
-from schoolbloc.scheduler.schedule_test import Schedule
+from schoolbloc.scheduler.schedule_test import Schedule as ScheduleData
 from schoolbloc.scheduler.schedule_test import Course as ScheduleClass
 from schoolbloc.scheduler.schedule_test import Student as ScheduleStudent
 from functools import wraps
@@ -490,7 +490,7 @@ class Scheduler():
                                             0))
 
 
-        return Schedule(class_list)
+        return ScheduleData(class_list)
 
     def prep_constraints(self):
         constraints = []
@@ -567,3 +567,9 @@ class Scheduler():
                     # raise SchedulerNoSolution()
             print('\033[92m Satisfied! \033[0m')
             print('\033[92m {} \033[0m'.format(schedule))
+
+            # now save the schedule
+            db_schedule = Schedule(name="Sample Schedule")
+            db.session.add(db_schedule)
+            db.session.flush()
+            schedule.save(db_schedule, db, self.time_blocks)

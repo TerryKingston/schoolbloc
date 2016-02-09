@@ -1,3 +1,4 @@
+from schoolbloc.scheduler.models import ScheduledClass, ScheduledClassesStudent
 
 
 class Schedule:
@@ -19,6 +20,22 @@ class Schedule:
 
         return rep
 
+    def save(self, db_sched, db, time_block_list):
+        for course_id, cls_list in self.courses.items():
+            for c in cls_list:
+                start_time = time_block_list[c.timeblock_index].start
+                end_time = time_block_list[c.timeblock_index].end
+                cls = ScheduledClass(schedule_id=db_sched.id, teacher_id=c.teacher_id, course_id=c.id, 
+                                     classroom_id=c.room_id, start_time=start_time, end_time=end_time)
+                db.session.add(cls)
+                db.session.flush()
+
+                # now add the students
+                for stud in c.students:
+                    cs = ScheduledClassesStudent(student_id=stud.id, scheduled_class_id=cls.id)
+                    db.session.add(cs)
+
+        db.session.commit()
 
     def schedule_student_required_classes(self, student):
         for course_id in student.required_courses:

@@ -37,7 +37,7 @@ class FullScheduleTests(unittest.TestCase):
 
     def tearDown(self):
         os.close(self.db_fd)
-        os.unlink(flaskr.app.config['DATABASE'])
+        os.unlink(app.config['DATABASE'])
 
     # def setUp(self):
     #     """ Uses an in memory sqlite database for testing """
