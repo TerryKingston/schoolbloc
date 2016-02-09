@@ -412,7 +412,228 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 			return tableTypes[tableType];
 		},
 
+		getTableFacts: function(factName) {
+			var url;
+			var deferred = $q.defer();
+
+			if (!factName) {
+				return null;
+			}
+
+			// @TODO: change to get from back-end instead
+			if (factName === "time") {
+				deferred.resolve([
+					{
+						"time": "12:15PM-01:00PM",
+						"days": ["monday", "wednesday", "friday"],
+						"subjects": null,
+						"courses": null,
+						"teachers": null,
+						"classrooms": null
+					},
+					{
+						"time": "12:20PM-14:20PM",
+						"days": ["tuesday", "thursday", "friday"],
+						"subjects": null,
+						"courses": null,
+						"teachers": null,
+						"classrooms": null
+					},
+					{
+						"time": "2:00PM-2:45PM",
+						"days": ["monday", "wednesday", "friday"],
+						"subjects": null,
+						"courses": null,
+						"teachers": null,
+						"classrooms": null
+					}
+				]);
+				return deferred.promise;
+			}
+			else if (factName === "subject") {
+				url = SUBJECT_URL;
+			}
+			else if (factName === "teacher") {
+				url = TEACHER_URL;
+			}
+			else if (factName === "student") {
+				url = STUDENT_URL;
+			}
+			else if (factName === "classroom") {
+				url = CLASSROOM_URL;
+			}
+			else if (factName === "course" || factName === "required course" ) {
+				url = COURSE_URL;
+			}
+			else if (factName === "student group") {
+				url = STUDENT_GROUP_URL;
+			}
+			else {
+				console.error("tableEntriesService.getTableFacts: unexpected state: invalid factName: " + constraintName);
+				deferred.reject("ERROR: Unexpected front-end input.");
+				return deferred.promise;
+			}
+
+			// conform the url to change the port
+			url = commonService.conformUrl(url);
+
+			$http.get(url).then(function(data) {
+				// @TODO: this should automatically be conformed later
+				var conformedData = [], i;
+				// conform based on url, since we have no other way of knowing what type it is
+				if (data.config.url.indexOf("student_groups") > 0) {
+					// blank
+					conformedData.push({
+						"name": "4th grade",
+						"students": null,
+						"attributes": null,
+						"transition to": "5th grade",
+						"times": null,
+						disabled: false
+					});
+
+					conformedData.push({
+						"name": "5th grade",
+						"students": null,
+						"attributes": null,
+						"transition to": "6th grade",
+						"times": null,
+						disabled: false
+					});
+
+					conformedData.push({
+						"name": "6th grade",
+						"students": null,
+						"attributes": null,
+						"transition to": null,
+						"times": null,
+						disabled: false
+					});
+
+					conformedData.push({
+						"name": "student body",
+						"students": null,
+						"attributes": "Student - male",
+						"transition to": null,
+						"times": null,
+						disabled: false
+					});
+				}
+				else if (data.config.url.indexOf("students") > 0) {
+					for (i = 0; i < data.data.length; i++) {
+						conformedData.push({
+							"id": data.data[i].id,
+							"first name": data.data[i].first_name,
+							"last name": data.data[i].last_name,
+							"gender": null,
+							"date of birth": null,
+							"student groups": data.data[i].students_student_groups,
+							"courses": data.data[i].courses_students,
+							"times": null,
+							disabled: false
+						});
+					}
+				}
+				else if (data.config.url.indexOf("teachers") > 0) {
+					for (i = 0; i < data.data.length; i++) {
+						conformedData.push({
+							"id": data.data[i].id,
+							"first name": data.data[i].first_name,
+							"last name": data.data[i].last_name,
+							"courses": data.data[i].courses_teachers,
+							"subjects": data.data[i].subjects_teachers,
+							"classrooms": data.data[i].classrooms_teachers,
+							"times": null,
+							disabled: false
+						});
+					}
+				}
+				else if (data.config.url.indexOf("classrooms") > 0) {
+					for (i = 0; i < data.data.length; i++) {
+						conformedData.push({
+							"room": data.data[i].room_number,
+							"seats": data.data[i].max_student_count,
+							"subjects": data.data[i].classrooms_subjects,
+							"teachers": data.data[i].classrooms_teachers,
+							"courses": data.data[i].classrooms_courses,
+							"times": null,
+							disabled: false
+						});
+					}
+				}
+				else if (data.config.url.indexOf("courses") > 0) {
+					for (i = 0; i < data.data.length; i++) {
+						conformedData.push({
+							"course": data.data[i].name,
+							"term": data.data[i].term,
+							"size": {
+								min: data.data[i].min_student_count,
+								max: data.data[i].max_student_count
+							},
+							"subjects": data.data[i].courses_subjects,
+							"teachers": data.data[i].courses_teachers,
+							"students": data.data[i].courses_students,
+							"student groups": data.data[i].courses_student_groups,
+							"rooms": data.data[i].classrooms_courses,
+							"times": null,
+							disabled: false
+						});
+					}
+				}
+				else if (data.config.url.indexOf("subjects") > 0) {
+					// blank
+					conformedData.push({
+						"name": "Math",
+						"courses": null,
+						"teachers": null,
+						"times": null,
+						disabled: false
+					});
+
+					conformedData.push({
+						"name": "English",
+						"courses": null,
+						"teachers": null,
+						"times": null,
+						disabled: false
+					});
+
+					conformedData.push({
+						"name": "Programming",
+						"courses": null,
+						"teachers": null,
+						"times": null,
+						disabled: false
+					});
+
+					conformedData.push({
+						"name": "Science",
+						"courses": null,
+						"teachers": null,
+						"times": null,
+						disabled: false
+					});
+
+					conformedData.push({
+						"name": "History",
+						"courses": null,
+						"teachers": null,
+						"times": null,
+						disabled: false
+					});
+				}
+				else {
+					console.error("tableEntriesService.getTableFacts: unexpected url reuturn: " + data.config.url);
+				}
+				deferred.resolve(conformedData);
+			}, function(data) {
+				deferred.reject(data.data);
+			});
+			return deferred.promise;
+		},
+
 		updateTableConfig: function(tableType, tableSelection) {
+			var self = this;
 			// we're simply requesting an update, but cannot update if there is no given config
 			if (!tableType && !tableSelection && !tableConfig.tableType) {
 				return;
@@ -423,50 +644,59 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 			}
 
 			// retrieve the table entries depending on type and selection
-			if (tableType === "fact", tableSelection === "course") {
-				tableConfig.entries = [
-					{
-						course: "English III",
-						subject: "English",
-						teacher: "Karyl Heider",
-						classroom: null,
-						term: "Year",
-						size: {
-							min: 15,
-							max: 30
-						},
-						time: {
-							start: '1420',
-							end: '1520'
-						},
-						disabled: true
-					},
-					{
-						course: "Programming I",
-						subject: null,
-						teacher: null,
-						classroom: [
-							"1001", "1002"
-						],
-						term: "Quarter",
-						size: {
-							min: 8,
-							max: 22
-						},
-						time: [
-							{
-								start: '1215',
-								end: '1300'
-							},
-							{
-								start: '1420',
-								end: '1520'
-							}
-						],
-						disabled: false
-					}
-				];
+			if (tableType === "fact" && tableSelection) {
+				// reset entries
+				tableConfig.entries = null;
+				self.getTableFacts(tableSelection).then(function (data) {
+					tableConfig.entries = data;
+				}, function (data) {
+					// @TODO: display error message
+				});
 			}
+			// if (tableType === "fact", tableSelection === "course") {
+			// 	tableConfig.entries = [
+			// 		{
+			// 			course: "English III",
+			// 			subject: "English",
+			// 			teacher: "Karyl Heider",
+			// 			classroom: null,
+			// 			term: "Year",
+			// 			size: {
+			// 				min: 15,
+			// 				max: 30
+			// 			},
+			// 			time: {
+			// 				start: '1420',
+			// 				end: '1520'
+			// 			},
+			// 			disabled: true
+			// 		},
+			// 		{
+			// 			course: "Programming I",
+			// 			subject: null,
+			// 			teacher: null,
+			// 			classroom: [
+			// 				"1001", "1002"
+			// 			],
+			// 			term: "Quarter",
+			// 			size: {
+			// 				min: 8,
+			// 				max: 22
+			// 			},
+			// 			time: [
+			// 				{
+			// 					start: '1215',
+			// 					end: '1300'
+			// 				},
+			// 				{
+			// 					start: '1420',
+			// 					end: '1520'
+			// 				}
+			// 			],
+			// 			disabled: false
+			// 		}
+			// 	];
+			// }
 		},
 
 		getFactTypeConfig: function(factType) {

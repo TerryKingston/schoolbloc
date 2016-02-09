@@ -107,6 +107,8 @@ angular.module('sbAngularApp')
 		}
 	}
 
+  $scope.$watch('tableConfig.entries', setupTableView);
+
 	/**** initial setup ****/
 	getTableEntries();
 }])
