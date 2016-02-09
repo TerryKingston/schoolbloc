@@ -39,15 +39,17 @@ angular.module('sbAngularApp')
      * Returns string if obj is object, otherwise returns obj
      */
     var convertObjectToString = function(obj) {
-      if (!obj) {
-        return null;
+      if (obj === null || typeof obj !== 'object') {
+        return obj;
       }
-      if (obj.min && obj.max) {
+      if ('min' in obj && 'max' in obj ) {
         return obj.min + "-" + obj.max;
       }
-      else if (obj.start && obj.end) {
+      else if ('start' in obj  && 'end' in obj ) {
         return obj.start + "-" + obj.end;
       }
+      // if we reach here, there is an object that we aren't accounting for
+      console.error("dynamicTable.convertObjectToString: unexpected state");
       return obj;
     };
 
@@ -76,15 +78,21 @@ angular.module('sbAngularApp')
             for (k = 0; k < entry.length; k++) {
               entry[k] = convertObjectToString(entry[k]);
             }
-            // specify that it is an array
-            entry = {
-              value: entry,
-              type: "array",
-              closedText: null,
-              show: false
-            };
-            // add the "View X entries" text
-            entry.closedText = commonService.format($scope.tableText.closedArrayEntry, entry.value.length + '');
+            // make it not an array if there is only 1 entry
+            if (entry.length === 1) {
+              entry = entry[0];
+            }
+            else {
+              // specify that it is an array
+              entry = {
+                value: entry,
+                type: "array",
+                closedText: null,
+                show: false
+              };
+              // add the "View X entries" text
+              entry.closedText = commonService.format($scope.tableText.closedArrayEntry, entry.value.length + '');
+            }
           }
         }
         else {
