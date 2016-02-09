@@ -20,12 +20,18 @@ class FullScheduleTests(unittest.TestCase):
         self.db_fd, app.config['DATABASE'] = tempfile.mkstemp()
         app.config['TESTING'] = True
         self.app = app.test_client()
+        db.drop_all()
         db.create_all()
         # flaskr.init_db()
 
         db.session.add(Role(role_type='admin'))
         db.session.add(Role(role_type='teacher'))
         db.session.add(Role(role_type='student'))
+        db.session.add(User(username='admin', password='admin', role_type='admin'))
+        db.session.add(User(username='teacher', password='teacher', role_type='teacher'))
+        db.session.add(User(username='student', password='student', role_type='student'))
+        db.session.add(User(username='student2', password='student2', role_type='student'))
+        db.session.add(User(username='student3', password='student3', role_type='student'))
         db.session.commit()
 
 
