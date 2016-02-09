@@ -59,7 +59,8 @@ class Course(db.Model, SqlalchemySerializer):
     duration = db.Column(db.Integer) # optional duration, will use global default if not specified
     max_student_count = db.Column(db.Integer)
     min_student_count = db.Column(db.Integer)
-
+    avail_start_time = db.Column(db.Integer)
+    avail_end_time = db.Column(db.Integer)
 
 class CoursesStudent(db.Model, SqlalchemySerializer):
     """
@@ -148,6 +149,8 @@ class Classroom(db.Model, SqlalchemySerializer):
     id = db.Column(db.Integer, primary_key=True)
     room_number = db.Column(db.Integer, nullable=False, unique=True)  # user assigned room number
     max_student_count = db.Column(db.Integer)
+    avail_start_time = db.Column(db.Integer)
+    avail_end_time = db.Column(db.Integer)
 
 
 class ClassroomsTeacher(db.Model, SqlalchemySerializer):
@@ -226,6 +229,10 @@ class ScheduledClass(db.Model, SqlalchemySerializer):
         self.classroom_id = classroom_id
         self.teacher_id = teacher_id
 
+    def __repr__(self):
+        return "<id: {}, start: {}, end: {}, course_id: {}, classroom_id: {}, teacher_id: {}>".format(
+                self.id, self.start_time, self.end_time, self.course_id, self.classroom_id, self.teacher_id)
+
 
 class ScheduledClassesStudent(db.Model, SqlalchemySerializer):
     """
@@ -250,6 +257,18 @@ class StudentGroup(db.Model, SqlalchemySerializer):
     __tablename__ = 'student_groups'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(128), nullable=False)
+    students = association_proxy('students_student_groups', 'student')
+
+class StudentGroupsSubject(db.Model, SqlalchemySerializer):
+    """
+    ORM object for linking table between student_groups and subjects 
+    """
+    __tablename__ = 'student_groups_subjects'
+    id = db.Column(db.Integer, primary_key=True)
+    student_group_id = db.Column(db.Integer, db.ForeignKey('student_groups.id'), nullable=False)
+    subject_id = db.Column(db.Integer, db.ForeignKey('subjects.id'), nullable=False)
+    student_group = db.relationship("StudentGroup", backref="student_groups_subjects")
+    subject = db.relationship("Subject", backref="student_groups_subjects")
 
 
 class Student(db.Model, SqlalchemySerializer):
@@ -286,6 +305,18 @@ class StudentsStudentGroup(db.Model, SqlalchemySerializer):
     student = db.relationship("Student", backref="students_student_groups")
     student_group = db.relationship("StudentGroup", backref="students_student_groups")
 
+class StudentsSubject(db.Model, SqlalchemySerializer):
+    """
+    ORM Object for linking table between students and subjects
+    """
+    __tablename__ = 'subjects_students'
+    id = db.Column(db.Integer, primary_key=True)
+    student_id = db.Column(db.Integer, db.ForeignKey('students.id'), nullable=False)
+    subject_id = db.Column(db.Integer, db.ForeignKey('subjects.id'), nullable=False)
+    active = db.Column(db.Boolean, nullable=False, default=True)
+    student = db.relationship("Student", backref="students_subjects")
+    subject = db.relationship("Subject", backref="students_subjects")
+
 
 class Subject(db.Model, SqlalchemySerializer):
     """
@@ -311,3 +342,6 @@ class Teacher(db.Model, SqlalchemySerializer):
     last_name = db.Column(db.String(128), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     user = db.relationship("User", backref="teacher")
+    avail_start_time = db.Column(db.Integer)
+    avail_end_time = db.Column(db.Integer)
+    
