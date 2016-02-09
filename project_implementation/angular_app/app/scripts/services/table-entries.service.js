@@ -12,7 +12,7 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 		SUBJECT_URL = SERVER_ROOT + "subjects",
 		TEACHER_URL = SERVER_ROOT + "teachers",
 		TIME_URL = SERVER_ROOT + "times";
-		
+
 
 	// never reinstantiate: reference will be lost with bound controllers
 	var tableConfig = {
@@ -399,7 +399,7 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 
 	return {
 
-		
+
 		getTableConfiguration: function() {
 			var self = this;
 
@@ -480,6 +480,7 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 			$http.get(url).then(function(data) {
 				// @TODO: this should automatically be conformed later
 				var conformedData = [], i;
+        var conformedElement = [];
 				// conform based on url, since we have no other way of knowing what type it is
 				if (data.config.url.indexOf("student_groups") > 0) {
 					// blank
@@ -520,36 +521,68 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 					});
 				}
 				else if (data.config.url.indexOf("students") > 0) {
-					for (i = 0; i < data.data.length; i++) {
-						conformedData.push({
-							"id": data.data[i].id,
-							"first name": data.data[i].first_name,
-							"last name": data.data[i].last_name,
-							"gender": null,
-							"date of birth": null,
-							"student groups": data.data[i].students_student_groups,
-							"courses": data.data[i].courses_students,
-							"times": null,
-							disabled: false
-						});
-					}
+					//for (i = 0; i < data.data.length; i++) {
+					//	conformedData.push({
+					//		"id": data.data[i].id,
+					//		"first name": data.data[i].first_name,
+					//		"last name": data.data[i].last_name,
+					//		"gender": null,
+					//		"date of birth": null,
+					//		"student groups": data.data[i].students_student_groups,
+					//		"courses": data.data[i].courses_students,
+					//		"times": null,
+					//		disabled: false
+					//	});
+					//}
+          for(i = 0; i < data.data.length; i++)
+          {
+            conformedData.push({
+              "id": data.data[i].id,
+              "first name": data.data[i].first_name,
+              "last name": data.data[i].last_name,
+              "gender": null,
+              "date of birth": null,
+              "student groups": data.data[i].students_student_groups.map(function(group){
+                return group.student_group.name;
+              }),
+              "courses": data.data[i].scheduled_classes_student.map(function(course){
+                return course.scheduled_class.course.name;
+              }),
+              "times": null,
+              disabled: false
+            })
+          }
 				}
 				else if (data.config.url.indexOf("teachers") > 0) {
 					for (i = 0; i < data.data.length; i++) {
-						conformedData.push({
-							"id": data.data[i].id,
-							"first name": data.data[i].first_name,
-							"last name": data.data[i].last_name,
-							"courses": data.data[i].courses_teachers,
-							"subjects": data.data[i].subjects_teachers,
-							"classrooms": data.data[i].classrooms_teachers,
-							"times": null,
-							disabled: false
-						});
-					}
+						//conformedData.push({
+						//	"id": data.data[i].id,
+						//	"first name": data.data[i].first_name,
+						//	"last name": data.data[i].last_name,
+						//	"courses": data.data[i].courses_teachers,
+						//	"subjects": data.data[i].subjects_teachers,
+						//	"classrooms": data.data[i].classrooms_teachers,
+						//	"times": null,
+						//	disabled: false
+						//});
+
+          conformedData.push({
+            "id": data.data[i].id,
+            "first name": data.data[i].first_name,
+            "last name": data.data[i].last_name,
+            "courses": data.data[i].scheduled_class.map(function(course){
+              return course.name;
+            }),
+            "subjects": data.data[i].subjects_teachers,
+            "classrooms": data.data[i].classrooms_teachers,
+            "times": null,
+            disabled: false
+          });
+        }
+
 				}
 				else if (data.config.url.indexOf("classrooms") > 0) {
-					for (i = 0; i < data.data.length; i++) {
+          for (i = 0; i < data.data.length; i++) {
 						conformedData.push({
 							"room": data.data[i].room_number,
 							"seats": data.data[i].max_student_count,
@@ -559,10 +592,11 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 							"times": null,
 							disabled: false
 						});
+
 					}
 				}
 				else if (data.config.url.indexOf("courses") > 0) {
-					for (i = 0; i < data.data.length; i++) {
+          for (i = 0; i < data.data.length; i++) {
 						conformedData.push({
 							"course": data.data[i].name,
 							"term": data.data[i].term,
@@ -570,7 +604,9 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 								min: data.data[i].min_student_count,
 								max: data.data[i].max_student_count
 							},
-							"subjects": data.data[i].courses_subjects,
+							"subjects": data.data[i].courses_subjects.map(function(course_subjects){
+                return course_subjects.subject.name;
+              }),
 							"teachers": data.data[i].courses_teachers,
 							"students": data.data[i].courses_students,
 							"student groups": data.data[i].courses_student_groups,
@@ -578,6 +614,7 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 							"times": null,
 							disabled: false
 						});
+
 					}
 				}
 				else if (data.config.url.indexOf("subjects") > 0) {
@@ -789,7 +826,7 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 
 			$http.get(url).then(function(data) {
 				// @TODO: this should automatically be conformed later
-				
+
 				var conformedData = [], i;
 				// conform based on url, since we have no other way of knowing what type it is
 				if (data.config.url.indexOf("student_groups") > 0) {
