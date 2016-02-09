@@ -64,6 +64,8 @@
 	"importExport.UPLOAD_ERROR": "Error",
 	"importExport.READY": "Ready",
 	"importExport.STATUS": "Status",
+	"dynamicTable.CLOSED_TEXT": "Show {0} entries",
+	"dynamicTable.OPENED_TEXT": "Hide entries",
 	"schedulerModule.TITLE": "Scheduler - Admin View",
 	"schedulerModule.SUBTITLE": "Viewing the facts & constraints for {0} term.",
 	"schedulerModule.SUBTITLE_ACTION": "Change Term",

@@ -16,8 +16,8 @@ angular.module('sbAngularApp').factory('schedulerService', ['$q', '$http', 'comm
 			var deferred = $q.defer();
 			var url = commonService.conformUrl(GET_SCHEDULES);
 
-			$http.post(url).then(function(data) {
-				deferred.resolve(data.data);
+			$http.get(url).then(function(data) {
+				deferred.resolve(data.data[0].scheduled_classes);
 				// 	// TODO: for now, return the most recently generated schedule
 				// if (data.data && data.data.length) {
 				// 	deferred.resolve(data.data[data.data.length - 1]);
