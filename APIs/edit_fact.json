@@ -1,0 +1,54 @@
+// PUT /api/<fact>
+"Payload": {
+	"fact": "unique_id",
+	"edit": [
+		{
+			"key": "",
+			"value": "",
+			"new_value": "",
+			"*disabled": false,
+			"*priority": "mandatory, high, low"
+		}
+	],
+	"add": [
+		{
+			"key": "",
+			"value": "",
+			"*disabled": false,
+			"*priority": "mandatory, high, low"
+		}
+	],
+	"delete": [
+		{
+			"key": "",
+			"value": ""
+		}
+	]
+}
+// example
+// PUT /api/classroom
+"Payload": {
+	"fact": "L103",
+	"edit": [
+		// editing value
+		{
+			"key": "size",
+			"value": "5-30",
+			"new_value": "0-30"
+		},
+		// editing priority and disabled
+		{
+			"key": "teacher",
+			"value": "Mrs. Buttersworth",
+			"priority": "mandatory", 
+			"disabled": true
+		}
+	],
+	// no add (basically like edit)
+	"delete": [
+		{
+			"key": "time",
+			"value": "12:00PM-1:15PM"
+		}
+	]
+}

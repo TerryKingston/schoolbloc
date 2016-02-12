@@ -393,7 +393,7 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 				multipleValues: true,
 				facts: null
 			}
-		],
+		]
 	};
 
 
