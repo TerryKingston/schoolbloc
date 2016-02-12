@@ -596,6 +596,7 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 					}
 				}
 				else if (data.config.url.indexOf("courses") > 0) {
+          //debugger
           for (i = 0; i < data.data.length; i++) {
 						conformedData.push({
 							"course": data.data[i].name,
@@ -609,7 +610,9 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
               }),
 							"teachers": data.data[i].courses_teachers,
 							"students": data.data[i].courses_students,
-							"student groups": data.data[i].courses_student_groups,
+							"student groups": data.data[i].courses_student_groups.map(function(group) {
+                return group.student_group.name;
+              }),
 							"rooms": data.data[i].classrooms_courses,
 							"times": null,
 							disabled: false
