@@ -2,9 +2,16 @@
 // matches the keys given in the fact_type depending on the fact type
 "Payload": {
 	"unique_id": "",
-	"single_key": "",
-	"multi_key": [
-		"single_key", "single_key"
+	"single_property": "",
+	"multi_property": [
+		"single_property", "single_property"
+	],
+	"array_constraints": [
+		{
+			"value": "",
+			"priority": "mandatory, high, low",
+			"disabled": false
+		}
 	]
 }
 // example
@@ -12,8 +19,30 @@
 "Payload": {
 	"room number": "L103",
 	"size": "5-30",
-	"time": ["12:00PM-1:15PM", "12:15PM-1:00PM", "2:10PM-3:00PM"],
+	"time": [
+		{
+			"value": "12:00PM-1:15PM",
+			"priority": "mandatory",
+			"disabled": false
+		},
+		{
+			"value": "12:15PM-1:00PM",
+			"priority": "mandatory",
+			"disabled": false
+		},
+		{
+			"value": "2:10PM-3:00PM",
+			"priority": "mandatory",
+			"disabled": false
+		}
+	],
 	"subject": null,
-	"teacher": "Mrs. Buttersworth",
-	"course": ["English III", "English II", "Math I", "Programming IV"]
+	"teacher": [
+		{
+			"value": "Mrs. Buttersworth",
+			"priority": "mandatory",
+			"disabled": false
+		}
+	],
+	"course": null
 }
