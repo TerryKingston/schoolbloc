@@ -158,6 +158,17 @@ class Student:
         self.required_courses = required_courses
         self.optional_courses = optional_courses
 
+    def get_avail_timeblocks(self):
+        """
+        returns a list of timeblock ids that are not assigned to 
+        a course.
+        """
+        time_list = []
+        for timeblock_id, course in self.timeblocks:
+            if not course:
+                time_list.append(timeblock_id)
+        return time_list
+
 class ScheduleCollision:
     def __init__(self, student, scheduled_class, collision_type):
         """

@@ -613,8 +613,21 @@ class Scheduler():
             print('\033[91m{}\033[0m'.format(msg))
             # now make a constraint to avoid the collision
             if col.collision_type == 'timeblock':
-                
+                # figure out what timeblock is available for this student and 
+                # make the course fill that timeblock.
+                time_ids = col.student.get_avail_timeblocks()
+                if len(time_ids) == 0:
+                    raise SchedulerNoSolution("No available time blocks for student {}".format(col.student.id))
+                course_id = col.scheduled_class.course_id
+                time_id = time_ids[0]
+                ct = CoursesTimeblock(course_id=course_id, timeblock_id=time_id)
+                print('\033[91m Added CoursesTimeblock: course_id={}, timeblock_id={} trying again...\033[0m'.format(
+                    course_id, time_id))
+                db.session.add(ct)
+                db.session.commit()
+
             elif col.collision_type == 'full class':
+                pass
         return []
             
     def save_schedule(self):
