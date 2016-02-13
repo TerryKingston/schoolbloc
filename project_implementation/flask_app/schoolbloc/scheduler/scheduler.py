@@ -413,16 +413,23 @@ class Scheduler():
 
         cons_list = []
         for room in Classroom.query.all():
-            if not room.avail_start_time and not room.avail_end_time:
-                continue
-            # figure out which time blocks can be assigned to the room
-            avail_time_ids = self.calc_avail_time_ids(room.avail_start_time, room.avail_end_time)
-            
-            cons_list += [ If(self.room(i) == room.id, 
-                              Or([ self.time(i) == time_id for time_id in avail_time_ids ]),
-                              True)
-                           for i in range(self.class_count) ]
-
+            if room.avail_start_time or room.avail_end_time:
+                # figure out which time blocks can be assigned to the room
+                avail_time_ids = self.calc_avail_time_ids(room.avail_start_time, room.avail_end_time)
+                
+                cons_list += [ If(self.room(i) == room.id, 
+                                  Or([ self.time(i) == time_id for time_id in avail_time_ids ]),
+                                  True)
+                               for i in range(self.class_count) ]
+            else:
+                room_times = ClassroomsTimeblock.query.filter_by(classroom_id=room.id).all()
+                if len(room_times) > 0:
+                    # collect all the timeblocks mapped to this room
+                    timeblock_ids = [ rt.timeblock_id for rt in room_times ]
+                    cons_list += [ If(self.room(i) == room.id, 
+                                      Or([ self.time(i) == time_id for time_id in timeblock_ids ]),
+                                      True)
+                                   for i in range(self.class_count)]
         return cons_list
     
     def constrain_teacher_time(self):
@@ -433,15 +440,23 @@ class Scheduler():
 
         cons_list = []
         for teacher in Teacher.query.all():
-            if not teacher.avail_start_time and not teacher.avail_end_time:
-                continue
-            # figure out which time blocks can be assigned to the teacher
-            avail_time_ids = self.calc_avail_time_ids(teacher.avail_start_time, teacher.avail_end_time)
-            
-            cons_list += [ If(self.teacher(i) == teacher.id, 
-                              Or([ self.time(i) == time_id for time_id in avail_time_ids ]),
-                              True)
-                           for i in range(self.class_count) ]
+            if teacher.avail_start_time or teacher.avail_end_time:
+                # figure out which time blocks can be assigned to the teacher
+                avail_time_ids = self.calc_avail_time_ids(teacher.avail_start_time, teacher.avail_end_time)
+                
+                cons_list += [ If(self.teacher(i) == teacher.id, 
+                                  Or([ self.time(i) == time_id for time_id in avail_time_ids ]),
+                                  True)
+                               for i in range(self.class_count) ]
+            else:
+                teacher_times = TeachersTimeblock.query.filter_by(teacher_id=teacher.id).all()
+                if len(teacher_times) > 0:
+                    # collect all the timeblocks mapped to this teacher
+                    timeblock_ids = [ tt.timeblock_id for tt in teacher_times ]
+                    cons_list += [ If(self.teacher(i) == teacher.id, 
+                                      Or([ self.time(i) == time_id for time_id in timeblock_ids ]),
+                                      True)
+                                   for i in range(self.class_count)]
 
         return cons_list
 
@@ -453,15 +468,23 @@ class Scheduler():
 
         cons_list = []
         for course in Teacher.query.all():
-            if not course.avail_start_time and not course.avail_end_time:
-                continue
-            # figure out which time blocks can be assigned to the course
-            avail_time_ids = self.calc_avail_time_ids(course.avail_start_time, course.avail_end_time)
-            
-            cons_list += [ If(self.course(i) == course.id, 
-                              Or([ self.time(i) == time_id for time_id in avail_time_ids ]),
-                              True)
-                           for i in range(self.class_count) ]
+            if course.avail_start_time or course.avail_end_time:
+                # figure out which time blocks can be assigned to the course
+                avail_time_ids = self.calc_avail_time_ids(course.avail_start_time, course.avail_end_time)
+                
+                cons_list += [ If(self.course(i) == course.id, 
+                                  Or([ self.time(i) == time_id for time_id in avail_time_ids ]),
+                                  True)
+                               for i in range(self.class_count) ]
+            else:
+                course_times = CoursesTimeblock.query.filter_by(course_id=course.id).all()
+                if len(course_times) > 0:
+                    # collect all the timeblocks mapped to this course
+                    timeblock_ids = [ ct.timeblock_id for ct in course_times ]
+                    cons_list += [ If(self.course(i) == course.id, 
+                                      Or([ self.time(i) == time_id for time_id in timeblock_ids ]),
+                                      True)
+                                   for i in range(self.class_count)]
 
         return cons_list
 
