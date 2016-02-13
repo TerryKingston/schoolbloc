@@ -62,7 +62,6 @@ angular.module('sbAngularApp')
 		if (!$scope.tableConfig.entries || !$scope.tableConfig.entries.length) {
 			return;
 		}
-
 		$scope.tableView.headers = Object.keys($scope.tableConfig.entries[0]);
 
 		for (i = 0; i < $scope.tableConfig.entries.length; i++) {
@@ -70,29 +69,27 @@ angular.module('sbAngularApp')
 			for (j = 0; j < $scope.tableView.headers.length; j++) {
         entry = $scope.tableConfig.entries[i][$scope.tableView.headers[j]];
         if (Array.isArray(entry)) {
-          // make sure there is actually objects in the array
+          // check if there is actually objects in the array
           if (!entry.length) {
-            entry = null;
+            // specify that it is an array
+            entry = {
+              value: null,
+              type: "array"
+            };
           }
           else {
             for (k = 0; k < entry.length; k++) {
               entry[k] = convertObjectToString(entry[k]);
             }
-            // make it not an array if there is only 1 entry
-            if (entry.length === 1) {
-              entry = entry[0];
-            }
-            else {
-              // specify that it is an array
-              entry = {
-                value: entry,
-                type: "array",
-                closedText: null,
-                show: false
-              };
-              // add the "View X entries" text
-              entry.closedText = commonService.format($scope.tableText.closedArrayEntry, entry.value.length + '');
-            }
+            // specify that it is an array
+            entry = {
+              value: entry,
+              type: "array",
+              closedText: null,
+              show: false
+            };
+            // add the "View X entries" text
+            entry.closedText = commonService.format($scope.tableText.closedArrayEntry, entry.value.length + '');
           }
         }
         else {

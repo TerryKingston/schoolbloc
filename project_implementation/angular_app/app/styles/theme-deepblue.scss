@@ -815,28 +815,41 @@ textarea {
 }
 
 .dynamic-table .table-cluster .table-cluster-open div,
-.dynamic-table .table-cluster .table-cluster-closed a {
+.dynamic-table .table-cluster a {
   height: 35px;
   line-height: 35px;
   font-size: 14px;
 }
 
-.dynamic-table .table-cluster .table-cluster-closed a {
+.dynamic-table .table-cluster .table-cluster-open,
+.dynamic-table .table-cluster .table-cluster-closed {
+	display: inline-block;
+}
+
+.dynamic-table .table-cluster a {
   color: $secondary-link;
   font-weight: 700;
 }
 
-.dynamic-table .table-cluster .table-cluster-closed a:hover {
+.dynamic-table .table-cluster a:hover {
   text-decoration: underline;
 }
 
-.dynamic-table .table-cluster .table-cluster-open {
+.dynamic-table .table-cluster .table-cluster-add {
   cursor: pointer;
+  width: 18px;
+  height: 18px;
+  background-image: $small-add-icon;
+  background-color: $add-green;
+  border-radius: 18px;
+  display: inline-block;
+  border: none;
+  margin-right: 10px;
 }
 
-.dynamic-table .table-cluster .table-cluster-open:hover {
-  opacity: 0.5;
-}
+// .dynamic-table .table-cluster .table-cluster-add:hover {
+//   opacity: 0.5;
+// }
 
 
 /* END table */
