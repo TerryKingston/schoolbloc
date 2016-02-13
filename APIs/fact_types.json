@@ -1,0 +1,270 @@
+// just for a reference.
+{
+	"classroom": [
+		{
+			"key": "room number",
+			"required": true,
+			"type": "uniqueText",
+			"multipleValues": false
+		},
+		{
+			"key": "size",
+			"required": true,
+			"type": "number",
+			"multipleValues": false
+		},
+		{
+			"key": "time",
+			"required": false,
+			"type": "constraint",
+			"multipleValues": true
+		},
+		{
+			"key": "subject",
+			"required": false,
+			"type": "constraint",
+			"multipleValues": true
+		},
+		{
+			"key": "teacher",
+			"required": false,
+			"type": "constraint",
+			"multipleValues": true
+		},
+		{
+			"key": "course",
+			"required": false,
+			"type": "constraint",
+			"multipleValues": true
+		}
+	],
+	"course": [
+		{
+			"key": "course name",
+			"required": true,
+			"type": "uniqueText",
+			"multipleValues": false
+		},
+		{
+			"key": "term",
+			"required": true,
+			"type": "dropdown",
+			"multipleValues": false,
+			"possibleAnswers": ["year", "quarter"]
+		},
+		{
+			"key": "size",
+			"value": {
+				"min": null,
+				"max": null
+			},
+			"required": false,
+			"type": "minMax",
+			"multipleValues": false
+		},
+		{
+			"key": "time",
+			"required": false,
+			"type": "constraint",
+			"multipleValues": true
+		},
+		{
+			"key": "subject",
+			"required": false,
+			"type": "constraint",
+			"multipleValues": true
+		},
+		{
+			"key": "teacher",
+			"required": false,
+			"type": "constraint",
+			"multipleValues": true
+		},
+		{
+			"key": "classroom",
+			"required": false,
+			"type": "constraint",
+			"multipleValues": true
+		}
+	],
+	"student": [
+		{
+			"key": "id",
+			"required": true,
+			"type": "uniqueText",
+			"multipleValues": false
+		},
+		{
+			"key": "gender",
+			"required": true,
+			"type": "dropdown",
+			"multipleValues": false,
+			"possibleAnswers": ["female", "male", "other"]
+		},
+		{
+			"key": "name",
+			"required": true,
+			"type": "text",
+			"multipleValues": false
+		},
+		{
+			"key": "date of birth",
+			"required": true,
+			"type": "date",
+			"multipleValues": false
+		},
+		{
+			"key": "time",
+			"required": false,
+			"type": "constraint",
+			"multipleValues": true
+		},
+		{
+			"key": "student group",
+			"required": false,
+			"type": "constraint",
+			"multipleValues": true
+		},
+		{
+			"key": "required course",
+			"required": false,
+			"type": "constraint",
+			"multipleValues": true
+		}
+	],
+	"student group": [
+		{
+			"key": "group name",
+			"required": true,
+			"type": "uniqueText",
+			"multipleValues": false
+		},
+		{
+			"key": "time",
+			"required": false,
+			"type": "constraint",
+			"multipleValues": true
+		},
+		{
+			"key": "student",
+			"required": false,
+			"type": "constraint",
+			"multipleValues": true
+		},
+		{
+			"key": "required course",
+			"required": false,
+			"type": "constraint",
+			"multipleValues": true
+		}
+	],
+	"subject": [
+		{
+			"key": "subject name",
+			"required": true,
+			"type": "uniqueText",
+			"multipleValues": false
+		},
+		{
+			"key": "time",
+			"required": false,
+			"type": "constraint",
+			"multipleValues": true
+		},
+		{
+			"key": "course",
+			"required": false,
+			"type": "constraint",
+			"multipleValues": true
+		},
+		{
+			"key": "teacher",
+			"required": false,
+			"type": "constraint",
+			"multipleValues": true
+		},
+		{
+			"key": "classroom",
+			"required": false,
+			"type": "constraint",
+			"multipleValues": true
+		}
+	],
+	"teacher": [
+		{
+			"key": "id",
+			"required": true,
+			"type": "uniqueText",
+			"multipleValues": false
+		},
+		{
+			"key": "name",
+			"required": true,
+			"type": "text",
+			"multipleValues": false
+		},
+		{
+			"key": "time",
+			"required": false,
+			"type": "constraint",
+			"multipleValues": true
+		},
+		{
+			"key": "subject",
+			"required": false,
+			"type": "constraint",
+			"multipleValues": true
+		},
+		{
+			"key": "course",
+			"required": false,
+			"type": "constraint",
+			"multipleValues": true
+		},
+		{
+			"key": "classroom",
+			"required": false,
+			"type": "constraint",
+			"multipleValues": true
+		}
+	],
+	"time": [
+		{
+			"key": "start time",
+			"required": true,
+			"type": "startEnd",
+			"multipleValues": false
+		},
+		{
+			"key": "end time",
+			"required": true,
+			"type": "startEnd",
+			"multipleValues": false
+		},
+		{
+			"key": "days",
+			"required": true,
+			"type": "dropdown",
+			"multipleValues": true,
+			"possibleAnswers": ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday", "weekdays"]
+		},
+		{
+			"key": "subject",
+			"required": false,
+			"type": "constraint",
+			"multipleValues": true
+		},
+		{
+			"key": "course",
+			"required": false,
+			"type": "constraint",
+			"multipleValues": true
+		},
+		{
+			"key": "classroom",
+			"required": false,
+			"type": "constraint",
+			"multipleValues": true
+		}
+	]
+};

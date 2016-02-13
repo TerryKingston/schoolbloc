@@ -10,7 +10,7 @@
  * Controller of the sbAngularApp
  */
 angular.module('sbAngularApp')
-.controller('DynamicTable', ['$scope', 'tableEntriesService', function($scope, tableEntriesService) {
+.controller('DynamicTable', ['$scope', 'tableEntriesService', '$translate', 'commonService', function($scope, tableEntriesService, $translate, commonService) {
 	this.components = [
 		'HTML5 Boilerplate',
 		'AngularJS',
@@ -19,6 +19,9 @@ angular.module('sbAngularApp')
 
 	$scope.tableConfig = null;
 	$scope.tableView = null;
+  $scope.tableText = {
+    closedArrayEntry: null
+  };
 
 	function getTableEntries() {
 		$scope.tableConfig = tableEntriesService.getTableConfiguration();
@@ -27,8 +30,29 @@ angular.module('sbAngularApp')
 	}
 
 	function setupTableView() {
-		var i, rowEntry, j, k, z;
-    var srowItem = "",tmpRowItem = "";
+		var i, row, j, k, entry;
+
+    /**
+     * Converts an object into a string,
+     * specifically {min: x, max: y} --> "x-y"
+     * and {start: x, end: y} --> "x-y"
+     * Returns string if obj is object, otherwise returns obj
+     */
+    var convertObjectToString = function(obj) {
+      if (obj === null || typeof obj !== 'object') {
+        return obj;
+      }
+      if ('min' in obj && 'max' in obj ) {
+        return obj.min + "-" + obj.max;
+      }
+      else if ('start' in obj  && 'end' in obj ) {
+        return obj.start + "-" + obj.end;
+      }
+      // if we reach here, there is an object that we aren't accounting for
+      console.error("dynamicTable.convertObjectToString: unexpected state");
+      return obj;
+    };
+
 		$scope.tableView = {
 			headers: [],
 			rows: []
@@ -42,75 +66,60 @@ angular.module('sbAngularApp')
 		$scope.tableView.headers = Object.keys($scope.tableConfig.entries[0]);
 
 		for (i = 0; i < $scope.tableConfig.entries.length; i++) {
-			rowEntry = [];
+			row = [];
 			for (j = 0; j < $scope.tableView.headers.length; j++) {
-				rowEntry.push($scope.tableConfig.entries[i][$scope.tableView.headers[j]]);
-			}
-
-      // Converts each object or array to a string
-      for (k = 0; k < Object.keys(rowEntry).length; k++) {
-
-        // If array
-        if(Array.isArray(rowEntry[k])) {
-
-          // If the array contains objects
-          if (!Array.isArray(rowEntry[k][0]) && typeof(rowEntry[k][0]) == 'object') {
-            if(typeof rowEntry[k][0].min !== "undefined")
-            {
-              srowItem = rowEntry[k][0].min + "-" + rowEntry[k][0].max;
-            }
-            else if(typeof rowEntry[k][0].start !== "undefined")
-            {
-              srowItem = rowEntry[k][0].start + "-" + rowEntry[k][0].end;
-            }
-            for (z = 1; z < Object.keys(rowEntry[k]).length; z++) {
-              tmpRowItem = rowEntry[k][z];
-              if(typeof tmpRowItem.min !== "undefined")
-              {
-                srowItem = srowItem + ", " + tmpRowItem + "-" + rowEntry[k].max;
-              }
-              else if(typeof tmpRowItem.start !== "undefined")
-              {
-                srowItem = srowItem + ", " + rowEntry[k][z].start + "-" + rowEntry[k][z].end;
-              }
-            }
-            rowEntry[k] = srowItem;
+        entry = $scope.tableConfig.entries[i][$scope.tableView.headers[j]];
+        if (Array.isArray(entry)) {
+          // make sure there is actually objects in the array
+          if (!entry.length) {
+            entry = null;
           }
-          // If the array does not contain objects
-          else
-          {
-            srowItem = rowEntry[k][0]
-            for(z = 1; z < Object.keys(rowEntry[k]).length; z++)
-            {
-              srowItem = srowItem + ", " +  rowEntry[k][z];
+          else {
+            for (k = 0; k < entry.length; k++) {
+              entry[k] = convertObjectToString(entry[k]);
             }
-            rowEntry[k] = srowItem;
-          }
-        }
-          // If object
-          else if(rowEntry[k] !== null && typeof(rowEntry[k]) == 'object')
-          {
-            if(typeof rowEntry[k].min !== "undefined")
-            {
-              tmpRowItem = rowEntry[k].min;
-              rowEntry[k] = tmpRowItem + "-" + rowEntry[k].max;
+            // make it not an array if there is only 1 entry
+            if (entry.length === 1) {
+              entry = entry[0];
             }
             else {
-              tmpRowItem = rowEntry[k].start;
-              rowEntry[k] = tmpRowItem + "-" + rowEntry[k].end;
+              // specify that it is an array
+              entry = {
+                value: entry,
+                type: "array",
+                closedText: null,
+                show: false
+              };
+              // add the "View X entries" text
+              entry.closedText = commonService.format($scope.tableText.closedArrayEntry, entry.value.length + '');
             }
           }
-
-
         }
-      $scope.tableView.rows.push(rowEntry);
+        else {
+          entry = convertObjectToString(entry);
+        }
+				row.push(entry);
+			}
+      $scope.tableView.rows.push(row);
 		}
 	}
+
+  function getTranslations() {
+    $translate("dynamicTable.CLOSED_TEXT").then(function (translation) {
+      $scope.tableText.closedArrayEntry = translation;
+    });
+  }
+
+  $scope.toggleShow = function(rowEntry, show) {
+    rowEntry.show = show;
+  };
 
   $scope.$watch('tableConfig.entries', setupTableView);
 
 	/**** initial setup ****/
 	getTableEntries();
+
+  getTranslations();
 }])
 .directive('sbDynamicTable', [function() {
 	/**

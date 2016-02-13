@@ -1,0 +1,5 @@
+// DELETE /api/<fact>
+"Payload": "unique_id"
+// example
+// DELETE /api/classroom
+"Payload": "L013"
