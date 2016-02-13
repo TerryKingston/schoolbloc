@@ -492,8 +492,8 @@ class Scheduler():
 
         return ScheduleData(class_list)
 
-    def prep_constraints(self):
-        constraints = []
+    def prep_constraints(self, inc_constraints=None):
+        constraints = inc_constraints or []
         constraints += self.ensure_valid_ids()
         constraints += self.set_courses()
         constraints += self.prevent_room_time_collision()
@@ -555,32 +555,44 @@ class Scheduler():
                 schedule = self.gen_sched_classes(solver.model())
             # now start assigning students to classes and see if we can find
             # a place for every student
-            if self.place_students(schedule):
+            collisions = self.place_students(schedule)
+            if len(collisions) == 0:
                 print('\033[92m Satisfied! \033[0m')
                 print('\033[92m {} \033[0m'.format(schedule))
                 # now save the schedule
                 self.save_schedule(schedule)
                 return
             else:
-                # figure out what caused us to fail and adjust the constraints
+                # pop off the constraints so we can reset them
                 solver.pop()
+                # push a new 'constraint frame' so we can pop it later if needed
                 solver.push()
-                self.class_count += 1
+                constraints = self.gen_constraints_from_collisions(collisions)
                 print('\033[91m Failed placing students, trying again...\033[0m')
                 self.prep_z3_classes()
-                solver.add(self.prep_constraints())
+                # send response constraints to be included in DB generated constraints
+                solver.add(self.prep_constraints(constraints))
 
         print('\033[91m NO SOLUTION\033[0m')
         raise SchedulerNoSolution()
 
     def place_students(self, schedule):
+        collisions = []
         for student in self.sched_students:
             collision = schedule.schedule_student(student)
             if collision:
-                msg = "{} collision on student {}".format(collision.collision_type, collision.student.id)
-                schedule.errors = []
-                print('\033[91m{}\033[0m'.format(msg))
-                return False
+                collisions.append(collision)
+                return collisions
+
+    def gen_constraints_from_collisions(self, collisions):
+        for col in collisions:
+            msg = "{} collision on student {}".format(col.collision_type, col.student.id)
+            print('\033[91m{}\033[0m'.format(msg))
+            # now make a constraint to avoid the collision
+            if col.collision_type == 'timeblock':
+                
+            elif col.collision_type == 'full class':
+        return []
             
     def save_schedule(self):
         db_schedule = Schedule(name="Sample Schedule")
