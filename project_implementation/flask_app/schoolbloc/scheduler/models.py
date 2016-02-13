@@ -345,3 +345,89 @@ class Teacher(db.Model, SqlalchemySerializer):
     avail_start_time = db.Column(db.Integer)
     avail_end_time = db.Column(db.Integer)
     
+
+class CoursesTimeblock(db.Model, SqlalchemySerializer):
+    """
+    ORM Object for linking table between courses and timeblocks
+    """
+    __tablename__= 'courses_timeblocks'
+    id = db.Column(db.Integer, primary_key=True)
+    course_id = db.Column(db.Integer, db.ForeignKey('courses.id'), nullable=False)
+    timeblock_id = db.Column(db.Integer, db.ForeignKey('timeblocks.id'), nullable=False)
+    active = db.Column(db.Boolean, nullable=False, default=True)
+    course = db.relationship("Course", backref='courses_timeblocks')
+    timeblock = db.relationship("Timeblock", backref='courses_timeblocks')
+
+class ClassroomsTimeblock(db.Model, SqlalchemySerializer):
+    """
+    ORM Object for linking table between classrooms and timeblocks
+    """
+    __tablename__= 'classrooms_timeblocks'
+    id = db.Column(db.Integer, primary_key=True)
+    classroom_id = db.Column(db.Integer, db.ForeignKey('classrooms.id'), nullable=False)
+    timeblock_id = db.Column(db.Integer, db.ForeignKey('timeblocks.id'), nullable=False)
+    active = db.Column(db.Boolean, nullable=False, default=True)
+    classroom = db.relationship("Classroom", backref='classrooms_timeblocks')
+    timeblock = db.relationship("Timeblock", backref='classrooms_timeblocks')
+
+class StudentGroupsTimeblock(db.Model, SqlalchemySerializer):
+    """
+    ORM Object for linking table between classrooms and timeblocks
+    """
+    __tablename__= 'student_groups_timeblocks'
+    id = db.Column(db.Integer, primary_key=True)
+    student_group_id = db.Column(db.Integer, db.ForeignKey('student_groups.id'), nullable=False)
+    timeblock_id = db.Column(db.Integer, db.ForeignKey('timeblocks.id'), nullable=False)
+    active = db.Column(db.Boolean, nullable=False, default=True)
+    student_group = db.relationship("StudentGroup", backref='student_groups_timeblocks')
+    timeblock = db.relationship("Timeblock", backref='student_groups_timeblocks')
+
+class StudentsTimeblock(db.Model, SqlalchemySerializer):
+    """
+    ORM Object for linking table between classrooms and timeblocks
+    """
+    __tablename__= 'students_timeblocks'
+    id = db.Column(db.Integer, primary_key=True)
+    student_id = db.Column(db.Integer, db.ForeignKey('students.id'), nullable=False)
+    timeblock_id = db.Column(db.Integer, db.ForeignKey('timeblocks.id'), nullable=False)
+    active = db.Column(db.Boolean, nullable=False, default=True)
+    student = db.relationship("Student", backref='students_timeblocks')
+    timeblock = db.relationship("Timeblock", backref='students_timeblocks')
+
+class SubjectsTimeblock(db.Model, SqlalchemySerializer):
+    """
+    ORM Object for linking table between subjects and timeblocks
+    """
+    __tablename__= 'subjects_timeblocks'
+    id = db.Column(db.Integer, primary_key=True)
+    subject_id = db.Column(db.Integer, db.ForeignKey('subjects.id'), nullable=False)
+    timeblock_id = db.Column(db.Integer, db.ForeignKey('timeblocks.id'), nullable=False)
+    active = db.Column(db.Boolean, nullable=False, default=True)
+    subject = db.relationship("Subject", backref='subjects_timeblocks')
+    timeblock = db.relationship("Timeblock", backref='subjects_timeblocks')
+
+class TeachersTimeblock(db.Model, SqlalchemySerializer):
+    """
+    ORM Object for linking table between teachers and timeblocks
+    """
+    __tablename__= 'teachers_timeblocks'
+    id = db.Column(db.Integer, primary_key=True)
+    teacher_id = db.Column(db.Integer, db.ForeignKey('teachers.id'), nullable=False)
+    timeblock_id = db.Column(db.Integer, db.ForeignKey('timeblocks.id'), nullable=False)
+    active = db.Column(db.Boolean, nullable=False, default=True)
+    teacher = db.relationship("Teacher", backref='teachers_timeblocks')
+    timeblock = db.relationship("Timeblock", backref='teachers_timeblocks')
+
+
+class Timeblock(db.Model, SqlalchemySerializer):
+    """
+    ORM object for time blocks stored in the database
+
+    A time block represents a continuous block of time in one 24hr period.
+    The start time and end time are represented in 24h time as integers with 
+    minute granularity (i.e. the value 1600 is 4 o'clock PM).
+    """
+    __tablename__ = 'timeblocks'
+    id = db.Column(db.Integer, primary_key=True)
+    start_time = db.Column(db.Integer, nullable=False)
+    end_time = db.Column(db.Integer, nullable=False)
