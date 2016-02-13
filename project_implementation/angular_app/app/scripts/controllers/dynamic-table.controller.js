@@ -20,7 +20,8 @@ angular.module('sbAngularApp')
 	$scope.tableConfig = null;
 	$scope.tableView = null;
   $scope.tableText = {
-    closedArrayEntry: null
+    closedArrayEntry: null,
+    openedArrayEntry: null
   };
 
 	function getTableEntries() {
@@ -85,11 +86,14 @@ angular.module('sbAngularApp')
             entry = {
               value: entry,
               type: "array",
+              text: null,
               closedText: null,
+              openedText: $scope.tableText.openedArrayEntry,
               show: false
             };
             // add the "View X entries" text
             entry.closedText = commonService.format($scope.tableText.closedArrayEntry, entry.value.length + '');
+            entry.text = entry.closedText;
           }
         }
         else {
@@ -105,10 +109,20 @@ angular.module('sbAngularApp')
     $translate("dynamicTable.CLOSED_TEXT").then(function (translation) {
       $scope.tableText.closedArrayEntry = translation;
     });
+
+    $translate("dynamicTable.OPENED_TEXT").then(function (translation) {
+      $scope.tableText.openedArrayEntry = translation;
+    });
   }
 
-  $scope.toggleShow = function(rowEntry, show) {
-    rowEntry.show = show;
+  $scope.toggleShow = function(rowEntry) {
+    rowEntry.show = !rowEntry.show;
+    if (rowEntry.show) {
+      rowEntry.text = rowEntry.openedText;
+    }
+    else {
+      rowEntry.text = rowEntry.closedText;
+    }
   };
 
   $scope.$watch('tableConfig.entries', setupTableView);
