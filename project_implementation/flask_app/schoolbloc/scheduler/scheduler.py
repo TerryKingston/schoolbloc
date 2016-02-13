@@ -2,9 +2,9 @@ from z3 import *
 from schoolbloc.scheduler.models import *
 from schoolbloc import db
 from schoolbloc.config import config
-from schoolbloc.scheduler.schedule_test import Schedule as ScheduleData
-from schoolbloc.scheduler.schedule_test import Course as ScheduleClass
-from schoolbloc.scheduler.schedule_test import Student as ScheduleStudent
+from schoolbloc.scheduler.schedule_util import Schedule as ScheduleData
+from schoolbloc.scheduler.schedule_util import ScheduleClass 
+from schoolbloc.scheduler.schedule_util import Student as ScheduleStudent
 from functools import wraps
 import time
 
@@ -535,41 +535,55 @@ class Scheduler():
         solver.set(timeout=300000) # 5 min
         solver.push()
         self.prep_z3_classes()
-        solver.add(self.prep_constraints())
 
-        tries_left = 3
-        is_sat = False
-        while tries_left > 0 and not is_sat:
-            if solver.check() == sat:
-                is_sat = True
-                break
-            else:
-                tries_left -= 1
+        
+        attempts = 3
+        for i in range(attempts):
+            solver.push()
+            solver.add(self.prep_constraints())
+
+            if solver.check() != sat:
+                # pop the current constraints and add another class. then recalculate the constraints
                 solver.pop()
                 solver.push()
                 self.class_count += 1
                 print('\033[91m No sat, trying again with {} classes...\033[0m'.format(self.class_count))
                 self.prep_z3_classes()
                 solver.add(self.prep_constraints())
-
-        if not is_sat:
-            print('\033[91m NO SOLUTION\033[0m')
-            raise SchedulerNoSolution()
-        else:
-            schedule = self.gen_sched_classes(solver.model())
-
+                continue
+            else:
+                schedule = self.gen_sched_classes(solver.model())
             # now start assigning students to classes and see if we can find
             # a place for every student
-            for student in self.sched_students:
-                if not schedule.schedule_student_required_classes(student):
-                    msg = ", ".join(schedule.errors)
-                    print('\033[91m NO SOLUTION: {}\033[0m'.format(msg))
-                    # raise SchedulerNoSolution()
-            print('\033[92m Satisfied! \033[0m')
-            print('\033[92m {} \033[0m'.format(schedule))
+            if self.place_students(schedule):
+                print('\033[92m Satisfied! \033[0m')
+                print('\033[92m {} \033[0m'.format(schedule))
+                # now save the schedule
+                self.save_schedule(schedule)
+                return
+            else:
+                # figure out what caused us to fail and adjust the constraints
+                solver.pop()
+                solver.push()
+                self.class_count += 1
+                print('\033[91m Failed placing students, trying again...\033[0m')
+                self.prep_z3_classes()
+                solver.add(self.prep_constraints())
 
-            # now save the schedule
-            db_schedule = Schedule(name="Sample Schedule")
-            db.session.add(db_schedule)
-            db.session.flush()
-            schedule.save(db_schedule, db, self.time_blocks)
+        print('\033[91m NO SOLUTION\033[0m')
+        raise SchedulerNoSolution()
+
+    def place_students(self, schedule):
+        for student in self.sched_students:
+            collision = schedule.schedule_student(student)
+            if collision:
+                msg = "{} collision on student {}".format(collision.collision_type, collision.student.id)
+                schedule.errors = []
+                print('\033[91m{}\033[0m'.format(msg))
+                return False
+            
+    def save_schedule(self):
+        db_schedule = Schedule(name="Sample Schedule")
+        db.session.add(db_schedule)
+        db.session.flush()
+        schedule.save(db_schedule, db, self.time_blocks)
