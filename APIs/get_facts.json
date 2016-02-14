@@ -3,14 +3,17 @@
 [
 	{
 		"unique_id": "",
-		"single_key": "",
-		"single_constraint": {
-			"value": "",
-			"priority": "mandatory, high, low",
-			"disabled": false
-		},
-		"multi_key": [
-			"single_key_or_constraint", "single_key_or_constraint"
+		"single_properties": "",
+		"multiple_propertiess": [
+			"single_properties",
+			"single_properties"
+		],
+		"array_constraints": [
+			{
+				"value": "",
+				"priority": "mandatory, high, low",
+				"disabled": false
+			}
 		],
 		"disabled": false
 	}
@@ -39,11 +42,13 @@
 			}
 		],
 		"subject": null,
-		"teacher": {
-			"value": "Mrs. Buttersworth", 
-			"priority": "mandatory", 
-			"disabled": false
-		},
+		"teacher": [
+			{
+				"value": "Mrs. Buttersworth", 
+				"priority": "mandatory", 
+				"disabled": false
+			}
+		],
 		"course": [
 			{
 				"value": "English III", 
