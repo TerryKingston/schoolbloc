@@ -282,39 +282,54 @@ class FullScheduleTests(unittest.TestCase):
         # for sg in sg_list: db.session.add(StudentGroupsSubject(subject_id=sub_learning.id, student_group_id=sg.id))
 
         db.session.add(StudentGroupsSubject(subject_id=sub_7th_math.id, 
-                                   student_group_id=sg_7th_grade.id))
+                                            student_group_id=sg_7th_grade.id, 
+                                            priority="low"))
         db.session.add(StudentGroupsSubject(subject_id=sub_8th_math.id, 
-                             student_group_id=sg_8th_grade.id))
+                                            student_group_id=sg_8th_grade.id,
+                                            priority="low"))
         db.session.add(StudentGroupsSubject(subject_id=sub_9th_math.id, 
-                             student_group_id=sg_9th_grade.id))
+                                            student_group_id=sg_9th_grade.id,
+                                            priority="low"))
 
         db.session.add(CoursesStudentGroup(course_id=course_7th_sci.id, 
-                            student_group_id=sg_7th_grade.id))
+                                           student_group_id=sg_7th_grade.id,
+                                           priority="low"))
         db.session.add(CoursesStudentGroup(course_id=course_8th_sci.id, 
-                            student_group_id=sg_8th_grade.id))
+                                           student_group_id=sg_8th_grade.id,
+                                           priority="low"))
         db.session.add(CoursesStudentGroup(course_id=course_9th_sci.id, 
-                            student_group_id=sg_9th_grade.id))
+                                           student_group_id=sg_9th_grade.id,
+                                           priority="low"))
 
         db.session.add(CoursesStudentGroup(course_id=course_7th_la.id, 
-                            student_group_id=sg_7th_grade.id))
+                                           student_group_id=sg_7th_grade.id,
+                                           priority="low"))
         db.session.add(CoursesStudentGroup(course_id=course_8th_la.id, 
-                            student_group_id=sg_8th_grade.id))
+                                           student_group_id=sg_8th_grade.id,
+                                           priority="low"))
         db.session.add(CoursesStudentGroup(course_id=course_9th_la.id, 
-                            student_group_id=sg_9th_grade.id))
+                                           student_group_id=sg_9th_grade.id,
+                                           priority="low"))
 
         db.session.add(CoursesStudentGroup(course_id=course_7th_pe.id, 
-                            student_group_id=sg_7th_grade.id))
+                                           student_group_id=sg_7th_grade.id,
+                                           priority="low"))
         db.session.add(CoursesStudentGroup(course_id=course_8th_pe.id, 
-                            student_group_id=sg_8th_grade.id))
+                                           student_group_id=sg_8th_grade.id,
+                                           priority="low"))
         db.session.add(CoursesStudentGroup(course_id=course_9th_pe.id, 
-                            student_group_id=sg_9th_grade.id))
+                                           student_group_id=sg_9th_grade.id,
+                                           priority="low"))
 
         db.session.add(CoursesStudentGroup(course_id=course_leadership.id, 
-                            student_group_id=sg_7th_grade.id))
+                                           student_group_id=sg_7th_grade.id,
+                                           priority="low"))
         db.session.add(CoursesStudentGroup(course_id=course_leadership.id, 
-                            student_group_id=sg_8th_grade.id))
+                                           student_group_id=sg_8th_grade.id,
+                                           priority="low"))
         db.session.add(CoursesStudentGroup(course_id=course_leadership.id, 
-                            student_group_id=sg_9th_grade.id))
+                                           student_group_id=sg_9th_grade.id,
+                                           priority="low"))
 
         db.session.commit()
 
