@@ -77,6 +77,7 @@ class CoursesStudent(db.Model, SqlalchemySerializer):
     course_id = db.Column(db.Integer, db.ForeignKey('courses.id'), nullable=False)
     student_id = db.Column(db.Integer, db.ForeignKey('students.id'), nullable=False)
     active = db.Column(db.Boolean, nullable=False, default=True)
+    priority = db.Column(db.String(128), nullable=False)
     student = db.relationship("Student", backref="courses_students")
     course = db.relationship("Course", backref="courses_students")
 
@@ -96,6 +97,7 @@ class CoursesTeacher(db.Model, SqlalchemySerializer):
     course_id = db.Column(db.Integer, db.ForeignKey('courses.id'), nullable=False)
     teacher_id = db.Column(db.Integer, db.ForeignKey('teachers.id'), nullable=False)
     active = db.Column(db.Boolean, nullable=False, default=True)
+    priority = db.Column(db.String(128), nullable=False)
     teacher = db.relationship("Teacher", backref="courses_teachers")
     course = db.relationship("Course", backref="courses_teachers")
 
@@ -115,6 +117,7 @@ class CoursesStudentGroup(db.Model, SqlalchemySerializer):
     course_id = db.Column(db.Integer, db.ForeignKey('courses.id'), nullable=False)
     student_group_id = db.Column(db.Integer, db.ForeignKey('student_groups.id'), nullable=False)
     active = db.Column(db.Boolean, nullable=False, default=True)
+    priority = db.Column(db.String(128), nullable=False)
     student_group = db.relationship("StudentGroup", backref="courses_student_groups")
     course = db.relationship("Course", backref="courses_student_groups")
 
@@ -166,10 +169,11 @@ class ClassroomsTeacher(db.Model, SqlalchemySerializer):
     __tablename__ = 'classrooms_teachers'
     id = db.Column(db.Integer, primary_key=True)
     classroom_id = db.Column(db.Integer, db.ForeignKey('classrooms.id'), nullable=False)
-    classroom = db.relationship("Classroom", backref="classrooms_teachers")
     teacher_id = db.Column(db.Integer, db.ForeignKey('teachers.id'), nullable=False)
-    teacher = db.relationship("Teacher", backref="classrooms_teachers")
     active = db.Column(db.Boolean, nullable=False, default=True)
+    priority = db.Column(db.String(128), nullable=False)
+    classroom = db.relationship("Classroom", backref="classrooms_teachers")
+    teacher = db.relationship("Teacher", backref="classrooms_teachers")
 
 
 class ClassroomsCourse(db.Model, SqlalchemySerializer):
@@ -184,10 +188,11 @@ class ClassroomsCourse(db.Model, SqlalchemySerializer):
     __tablename__ = 'classrooms_courses'
     id = db.Column(db.Integer, primary_key=True)
     classroom_id = db.Column(db.Integer, db.ForeignKey('classrooms.id'), nullable=False)
-    classroom = db.relationship("Classroom", backref="classrooms_courses")
     course_id = db.Column(db.Integer, db.ForeignKey('courses.id'), nullable=False)
-    course = db.relationship("Course", backref="classrooms_courses")
     active = db.Column(db.Boolean, nullable=False, default=True)
+    priority = db.Column(db.String(128), nullable=False)
+    classroom = db.relationship("Classroom", backref="classrooms_courses")
+    course = db.relationship("Course", backref="classrooms_courses")
 
 
 class Schedule(db.Model, SqlalchemySerializer):
@@ -267,6 +272,8 @@ class StudentGroupsSubject(db.Model, SqlalchemySerializer):
     id = db.Column(db.Integer, primary_key=True)
     student_group_id = db.Column(db.Integer, db.ForeignKey('student_groups.id'), nullable=False)
     subject_id = db.Column(db.Integer, db.ForeignKey('subjects.id'), nullable=False)
+    active = db.Column(db.Boolean, nullable=False, default=True)
+    priority = db.Column(db.String(128), nullable=False)
     student_group = db.relationship("StudentGroup", backref="student_groups_subjects")
     subject = db.relationship("Subject", backref="student_groups_subjects")
 
@@ -355,6 +362,7 @@ class CoursesTimeblock(db.Model, SqlalchemySerializer):
     course_id = db.Column(db.Integer, db.ForeignKey('courses.id'), nullable=False)
     timeblock_id = db.Column(db.Integer, db.ForeignKey('timeblocks.id'), nullable=False)
     active = db.Column(db.Boolean, nullable=False, default=True)
+    priority = db.Column(db.String(128), nullable=False)
     course = db.relationship("Course", backref='courses_timeblocks')
     timeblock = db.relationship("Timeblock", backref='courses_timeblocks')
 
@@ -367,6 +375,7 @@ class ClassroomsTimeblock(db.Model, SqlalchemySerializer):
     classroom_id = db.Column(db.Integer, db.ForeignKey('classrooms.id'), nullable=False)
     timeblock_id = db.Column(db.Integer, db.ForeignKey('timeblocks.id'), nullable=False)
     active = db.Column(db.Boolean, nullable=False, default=True)
+    priority = db.Column(db.String(128), nullable=False)
     classroom = db.relationship("Classroom", backref='classrooms_timeblocks')
     timeblock = db.relationship("Timeblock", backref='classrooms_timeblocks')
 
@@ -379,6 +388,7 @@ class StudentGroupsTimeblock(db.Model, SqlalchemySerializer):
     student_group_id = db.Column(db.Integer, db.ForeignKey('student_groups.id'), nullable=False)
     timeblock_id = db.Column(db.Integer, db.ForeignKey('timeblocks.id'), nullable=False)
     active = db.Column(db.Boolean, nullable=False, default=True)
+    priority = db.Column(db.String(128), nullable=False)
     student_group = db.relationship("StudentGroup", backref='student_groups_timeblocks')
     timeblock = db.relationship("Timeblock", backref='student_groups_timeblocks')
 
@@ -391,6 +401,7 @@ class StudentsTimeblock(db.Model, SqlalchemySerializer):
     student_id = db.Column(db.Integer, db.ForeignKey('students.id'), nullable=False)
     timeblock_id = db.Column(db.Integer, db.ForeignKey('timeblocks.id'), nullable=False)
     active = db.Column(db.Boolean, nullable=False, default=True)
+    priority = db.Column(db.String(128), nullable=False)
     student = db.relationship("Student", backref='students_timeblocks')
     timeblock = db.relationship("Timeblock", backref='students_timeblocks')
 
@@ -403,6 +414,7 @@ class SubjectsTimeblock(db.Model, SqlalchemySerializer):
     subject_id = db.Column(db.Integer, db.ForeignKey('subjects.id'), nullable=False)
     timeblock_id = db.Column(db.Integer, db.ForeignKey('timeblocks.id'), nullable=False)
     active = db.Column(db.Boolean, nullable=False, default=True)
+    priority = db.Column(db.String(128), nullable=False)
     subject = db.relationship("Subject", backref='subjects_timeblocks')
     timeblock = db.relationship("Timeblock", backref='subjects_timeblocks')
 
@@ -415,6 +427,7 @@ class TeachersTimeblock(db.Model, SqlalchemySerializer):
     teacher_id = db.Column(db.Integer, db.ForeignKey('teachers.id'), nullable=False)
     timeblock_id = db.Column(db.Integer, db.ForeignKey('timeblocks.id'), nullable=False)
     active = db.Column(db.Boolean, nullable=False, default=True)
+    priority = db.Column(db.String(128), nullable=False)
     teacher = db.relationship("Teacher", backref='teachers_timeblocks')
     timeblock = db.relationship("Timeblock", backref='teachers_timeblocks')
 
