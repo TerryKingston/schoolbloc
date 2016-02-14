@@ -20,7 +20,8 @@ angular.module('sbAngularApp')
 	$scope.tableConfig = null;
 	$scope.tableView = null;
   $scope.tableText = {
-    closedArrayEntry: null
+    closedArrayEntry: null,
+    openedArrayEntry: null
   };
 
 	function getTableEntries() {
@@ -62,7 +63,6 @@ angular.module('sbAngularApp')
 		if (!$scope.tableConfig.entries || !$scope.tableConfig.entries.length) {
 			return;
 		}
-
 		$scope.tableView.headers = Object.keys($scope.tableConfig.entries[0]);
 
 		for (i = 0; i < $scope.tableConfig.entries.length; i++) {
@@ -70,29 +70,30 @@ angular.module('sbAngularApp')
 			for (j = 0; j < $scope.tableView.headers.length; j++) {
         entry = $scope.tableConfig.entries[i][$scope.tableView.headers[j]];
         if (Array.isArray(entry)) {
-          // make sure there is actually objects in the array
+          // check if there is actually objects in the array
           if (!entry.length) {
-            entry = null;
+            // specify that it is an array
+            entry = {
+              value: null,
+              type: "array"
+            };
           }
           else {
             for (k = 0; k < entry.length; k++) {
               entry[k] = convertObjectToString(entry[k]);
             }
-            // make it not an array if there is only 1 entry
-            if (entry.length === 1) {
-              entry = entry[0];
-            }
-            else {
-              // specify that it is an array
-              entry = {
-                value: entry,
-                type: "array",
-                closedText: null,
-                show: false
-              };
-              // add the "View X entries" text
-              entry.closedText = commonService.format($scope.tableText.closedArrayEntry, entry.value.length + '');
-            }
+            // specify that it is an array
+            entry = {
+              value: entry,
+              type: "array",
+              text: null,
+              closedText: null,
+              openedText: $scope.tableText.openedArrayEntry,
+              show: false
+            };
+            // add the "View X entries" text
+            entry.closedText = commonService.format($scope.tableText.closedArrayEntry, entry.value.length + '');
+            entry.text = entry.closedText;
           }
         }
         else {
@@ -108,10 +109,20 @@ angular.module('sbAngularApp')
     $translate("dynamicTable.CLOSED_TEXT").then(function (translation) {
       $scope.tableText.closedArrayEntry = translation;
     });
+
+    $translate("dynamicTable.OPENED_TEXT").then(function (translation) {
+      $scope.tableText.openedArrayEntry = translation;
+    });
   }
 
-  $scope.toggleShow = function(rowEntry, show) {
-    rowEntry.show = show;
+  $scope.toggleShow = function(rowEntry) {
+    rowEntry.show = !rowEntry.show;
+    if (rowEntry.show) {
+      rowEntry.text = rowEntry.openedText;
+    }
+    else {
+      rowEntry.text = rowEntry.closedText;
+    }
   };
 
   $scope.$watch('tableConfig.entries', setupTableView);

@@ -6,13 +6,17 @@
     <tr ng-repeat="row in tableView.rows track by $index">
       <!-- if value-->
       <td ng-repeat="rowEntry in row track by $index">
-        <!-- cluster -->
-        <div class="table-cluster" ng-if="rowEntry.type === 'array'">
-          <div class="table-cluster-closed" ng-show="!rowEntry.show">
-            <a href="" ng-click="toggleShow(rowEntry, true)">{{rowEntry.closedText}}</a>
+        <!-- cluster - NO entries -->
+        <div class="table-cluster" ng-if="rowEntry.type === 'array' && !rowEntry.value" ng-click="addConstraint()">
+          <button class="table-cluster-add" alt="{{'dynamicTable.ADD' | translate}}"></button>
+          <a class="table-cluster-add-text" href="" ng-click="addConstraint()">{{'dynamicTable.ADD' | translate}}</a>
+        </div>
+        <!-- cluster - entries -->
+        <div class="table-cluster" ng-if="rowEntry.type === 'array' && rowEntry.value">
+          <button class="table-cluster-add" ng-click="addConstraint()" alt="{{'dynamicTable.ADD' | translate}}"></button>
+          <a href="" ng-click="toggleShow(rowEntry)">{{rowEntry.text}}</a>
           </div>
           <div class="table-cluster-open" ng-show="rowEntry.show">
-            <a href="" ng-click="toggleShow(rowEntry, false)">{{"dynamicTable.OPENED_TEXT" | translate}}</a>
             <div ng-repeat="element in rowEntry.value track by $index">{{element}}</div>
           </div>
         </div>
