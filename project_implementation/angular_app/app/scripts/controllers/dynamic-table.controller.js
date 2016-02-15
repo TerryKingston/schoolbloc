@@ -102,6 +102,13 @@ angular.module('sbAngularApp')
 				row.push(entry);
 			}
       $scope.tableView.rows.push(row);
+
+      // DEBUG: adding constraint view
+      if (i === 0) {
+        $scope.tableView.rows.push({
+          type: "editor"
+        });
+      }
 		}
 	}
 
