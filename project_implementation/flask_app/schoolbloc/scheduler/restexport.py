@@ -135,7 +135,34 @@ class TestRestList(Resource):
 
     def post(self):
         parser = self._generate_parser()
-        kwargs = parser.parse_args()
+        request_json = {}  # TODO get json from request
+
+        # Get the json of the primary object of this api call (ie, if this was a
+        # call to /api/classrooms, the primary object would be a Classroom object)
+        primary_json = None
+        for key, value in parser.items():
+            if value['primary']:
+                primary_json = value
+
+        # Verify received json has correct data, and make orm object
+        kwargs = {}
+        for param in primary_json['required_params']:
+            if param in request_json['payload']:
+                kwargs[param] = request_json['payload'][param]
+                del request_json['payload'][param]
+            else:
+                raise Exception('param {} for {} not in payload'.format(param, primary_json['name']))
+        for param in request_json['payload']:
+            if param in primary_json['optional_params']:
+                kwargs[param] = request_json['payload'][param]
+                del request_json['payload'][param]
+        primary_orm_obj = primary_json['orm'](**kwargs)
+
+        # Verify constraint data and create constraints
+
+
+
+        # Save to db
         try:
             orm_object = self.orm(**kwargs)
             db.session.add(orm_object)
@@ -148,6 +175,40 @@ class TestRestList(Resource):
     @staticmethod
     def _add_orm_to_parser(orm, parser):
         """ Adds all the columns of this orm to a parser """
+        # Example of what a parser might look like
+        parser = {
+            'orm': Classroom,
+            'name': 'classrooms',  # orm.__tablename__
+            'required_params': {
+                'room_number': str,
+            },
+            'optional_params': {
+                'max_student_count': int,
+                'avail_start_time': int,
+                'avail_end_time': int,
+            },
+            'constraints': {  # These should already exist in the db
+                'classrooms_courses': {  # orm.__tablename__
+                    'orm': ClassroomsCourse,
+                    'id': int,  # course.id (id instead of name for uniqueness)
+                    'active': bool,
+                    'priority': str,
+                },
+                'classrooms_teachers': {
+                    'orm': ClassroomsTeacher,
+                    'id': int,
+                    'active': bool,
+                    'priority': str,
+                },
+                'classrooms_courses': {
+                    'orm': ClassroomsCourse,
+                    'id': int,
+                    'active': bool,
+                    'priority': str,
+                },
+            }
+        }
+
         columns = orm.__table__.columns.values()
         for column in columns:
             name = column.name
