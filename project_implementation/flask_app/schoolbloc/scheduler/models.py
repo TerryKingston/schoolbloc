@@ -62,6 +62,7 @@ class Course(db.Model, SqlalchemySerializer):
     avail_start_time = db.Column(db.Integer)
     avail_end_time = db.Column(db.Integer)
 
+
 class CoursesStudent(db.Model, SqlalchemySerializer):
     """
     ORM object for linking table between courses and students tables
@@ -149,6 +150,7 @@ class Classroom(db.Model, SqlalchemySerializer):
     a school building.
     """
     __tablename__ = 'classrooms'
+    __restfulbinds__ = [ClassroomsTeacher, ClassroomsCourse, ClassroomsTimeblock]
     id = db.Column(db.Integer, primary_key=True)
     room_number = db.Column(db.Integer, nullable=False, unique=True)  # user assigned room number
     max_student_count = db.Column(db.Integer)

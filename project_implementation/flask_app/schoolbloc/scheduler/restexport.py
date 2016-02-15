@@ -145,14 +145,10 @@ class TestRestList(Resource):
             return {'error': 'SQL integrity error'}, 409
         return {'success': 'Added successfully'}, 200
 
-    def _generate_parser(self):
-        """
-        Dynamically generate a reqparser for every Integer, Boolean, and String
-        object in this sqlalchemy table.
-        """
-        parser = reqparse.RequestParser()
-
-        columns = self.orm.__table__.columns.values()
+    @staticmethod
+    def _add_orm_to_parser(orm, parser):
+        """ Adds all the columns of this orm to a parser """
+        columns = orm.__table__.columns.values()
         for column in columns:
             name = column.name
             col_type = column.type
@@ -171,6 +167,17 @@ class TestRestList(Resource):
             else:
                 raise Exception("Unknown type {} found".format(col_type))
 
+    def _generate_parser(self):
+        """
+        Dynamically generate a reqparser for every Integer, Boolean, and String
+        object in this sqlalchemy table.
+        """
+        parser = reqparse.RequestParser()
+        self._add_orm_to_parser(self.orm, parser)
+        if not hasattr(self.orm, '__restfulbinds__'):
+            return parser
+        for orm in self.orm.__restfulbinds__:
+            self._add_orm_to_parser(orm, parser)
         return parser
 
     def generate_docs(self):
