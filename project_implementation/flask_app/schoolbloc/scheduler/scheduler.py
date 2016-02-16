@@ -1,35 +1,14 @@
 from z3 import *
 from schoolbloc.scheduler.models import *
-from schoolbloc import db
 from schoolbloc.config import config
-from schoolbloc.scheduler.schedule_util import Schedule as ScheduleData
-from schoolbloc.scheduler.schedule_util import ScheduleClass, ClassConstraint 
-from schoolbloc.scheduler.schedule_util import Student as ScheduleStudent
+from schoolbloc.scheduler.schedule_util import ScheduleClass, ScheduleStudent, ScheduleData
+from schoolbloc.scheduler.schedule_constraints import ScheduleConstraints, ClassConstraint
 from functools import wraps
 import time
 
-DEFAULT_MAX_CLASS_SIZE = 29
 
-# make the class z3 data type and define its constructor
-# a class represents a mapping of teacher, room, course, time, and students
-# Z3 will choose integers for teacher, room, course, and time. Its our job to
-# restrict the choices of integer to only valid IDs of correspoding DB objects
-SchClass = Datatype('SchClass')
 
-SchClass.declare('SchClass', ('teacher', IntSort()),
-                             ('room', IntSort()),
-                             ('time', IntSort()),
-                             ('course', IntSort()))
 
-SchClass = SchClass.create()
-
-class TimeBlock():
-    """
-    Helper class to hold time block data
-    """
-    def __init__(self, start, end):
-        self.start = start
-        self.end = end
 
 # class SchedulerStudent():
 #     """
@@ -73,32 +52,17 @@ class SchedulerNoSolution(Exception):
 
 class Scheduler():
 
-    def __init__(self, day_start_time=None, 
-                       day_end_time=None, 
-                       break_length=None, 
-                       lunch_start=None, 
-                       lunch_end=None,
-                       class_duration=None):
-
-        # if values aren't provided, get the defaults from the config file
-        self.day_start_time = day_start_time or config.school_start_time
-        self.day_end_time = day_end_time or config.school_end_time
-        self.break_length = break_length or config.time_between_classes
-        self.lunch_start = lunch_start or config.lunch_start
-        self.lunch_end = lunch_end or config.lunch_end
-        self.class_duration = class_duration or config.block_size
+    def __init__(self):
 
         self.class_count = 0
         self.classes = []
         self.sched_students = []
         # self.req_courses = {}
 
-        # calculate the timeblocks
-        self.time_blocks = []
-        self.calc_time_blocks()
-
         # a dictionary of ClassConstraint objects. the key's are the course_id
         self.class_constraints = {}
+
+        self.custom_constraints = []
 
 
     def __repr__(self):
@@ -149,7 +113,7 @@ class Scheduler():
         The max count is the lesser of the two if both course and classroom are given.
         """
         
-        class_size = DEFAULT_MAX_CLASS_SIZE
+        class_size = config.default_max_class_size
 
         if course_id: 
             course = Course.query.get(course_id)
@@ -174,376 +138,18 @@ class Scheduler():
 
     
 
-
-    # We setup some shortcuts to the accessors in the class constructor above just to make
-    # coding easier and more readable
-    def teacher(self, i):
-        return SchClass.teacher(self.classes[i])
-
-    def room(self, i):
-        return SchClass.room(self.classes[i])
-
-    def course(self, i):
-        return SchClass.course(self.classes[i])
-
-    def time(self, i):
-        return SchClass.time(self.classes[i])
-
-    def calc_time_blocks(self):
-        """
-        Creates a list of TimeBlock objects and stores them in self.time_block. 
-        The TimeBlock start and end times are calculated based on the Scheduler attributes
-        day_start_time, class_duration, break_length, lunch_start, lunch_end, and day_end_time 
-        """
-        self.time_blocks = []
-        cur_time = self.day_start_time
-        while cur_time < self.lunch_start:
-            self.time_blocks.append(TimeBlock(cur_time, cur_time + self.class_duration))
-            cur_time += self.class_duration + self.break_length
-
-        cur_time = self.lunch_end
-        while cur_time < self.day_end_time:
-            self.time_blocks.append(TimeBlock(cur_time, cur_time + self.class_duration))
-            cur_time += self.class_duration + self.break_length
-
-    def calc_avail_rooms(self, course_id):
-        """
-        Takes a course_id and returns a list of room_ids available to the course based
-        on constraints in the DB
-        """
-        # TODO: consider constraints and priorities
-        return [ room.id for room in Classroom.query.all() ]
-
-    def calc_avail_teachers(self, course_id):
-        """
-        Takes a course_id and returns a list of teacher_ids available to the course based
-        on constraints in the DB
-        """
-        # TODO: consider constraints and priorities
-        return [ teacher.id for teacher in Teacher.query.all() ]
-
-    def calc_avail_timeblocks(self, course_id):
-        """
-        Takes a course_id and returns a list of timeblock_ids available to the course based
-        on constraints in the DB
-        """
-        # TODO: consider constraints and priorities
-        # return [ timeblock.id for timeblock in Timeblock.query.all() ]
-        return list(range(len(self.time_blocks)))
-
-
-    def calc_class_constraints(self):
-        """
-        Calculates the courses needed from the required corses for each student.
-        In the case of a Subject requirement, without a course requirement for the 
-        Subject, a course is arbritrarily assigned. The calculated course needs are stored 
-        in ClassConstraint objects
-
-        Also, this method creates a list of SchedulerStudent objects with their required
-        course ids. It also detects when
-        a student is assigned to more courses than there are time_blocks in the schedule
-        """
-        self.class_constraints = {}
-        self.sched_students = []
-        course_student_counts = {}
-
-        # we go through each student and make a list of their required courses. We also
-        # count the number of students for each course. 
-        for student in Student.query.all():
-            req_courses = self.calc_student_courses(student.id)
-            sched_student = ScheduleStudent(student.id, len(self.time_blocks), req_courses, [])
-            self.sched_students.append(sched_student)
-
-            # detect if the student is over scheduled
-            if len(req_courses) > len(self.time_blocks):
-                msg = "Student {} course req ({}) is greater than time block count ({})".format(
-                    student.id, len(req_courses), len(self.time_blocks))
-                raise SchedulerNoSolution(msg)
-            else:
-                for course_id in req_courses:
-                    if course_id not in course_student_counts:
-                        course_student_counts[course_id] = 0
-                    course_student_counts[course_id] += 1
-
-        # now we know how many students are assigned to each course. we'll go through each 
-        # and determine the total course count from the max student count of each course
-        self.class_count = 0
-        for course_id, student_count in course_student_counts.items():
-            max_stud_count = self.max_class_size(course_id)
-            course_count = int(student_count / max_stud_count)
-            # if it didn't divide cleanly, then add 1 more class for that course
-            if student_count % max_stud_count != 0:
-                course_count += 1
-            self.class_count += course_count
-            # now make a ClassConstraint object for each course
-            if course_id not in self.class_constraints:
-                self.class_constraints[course_id] = []
-            for i in range(course_count):
-                class_cons = ClassConstraint(course_id)
-                class_cons.room_ids = self.calc_avail_rooms(course_id)
-                class_cons.teacher_ids = self.calc_avail_teachers(course_id)
-                class_cons.timeblock_ids = self.calc_avail_timeblocks(course_id)
-
-                self.class_constraints[course_id].append(class_cons)
-
-
-    @classmethod
-    def calc_student_courses(self, student_id):
-        """
-        Calculates the courses needed from the required corses for the student.
-        In the case of a Subject requirement, without a course requirement for the 
-        Subject, a course is arbritrarily assigned. This method also detects when
-        a student is assigned to more courses than there are time_blocks in the schedule
-        """
-        required_course_ids = []
-        for course_student in CoursesStudent.query.filter_by(student_id=student_id).all():
-            required_course_ids.append(course_student.course_id)
-
-
-        # now add the courses that are required for all the student groups this student
-        # is part of
-        for sgrp in StudentsStudentGroup.query.filter_by(student_id=student_id).all():
-            for course_sgrp in CoursesStudentGroup.query.filter_by(student_group_id=sgrp.student_group_id):
-                
-                if course_sgrp.course_id not in required_course_ids:
-                    required_course_ids.append(course_sgrp.course_id)
-
-            # and pick a course in the subjects required for the student group
-            for sub_sgrp in StudentGroupsSubject.query.filter_by(student_group_id=sgrp.student_group_id).all():
-                cs_subs = CoursesSubject.query.filter_by(subject_id=sub_sgrp.subject_id).all()
-                if len(cs_subs) > 0:
-                    course_ids = [ cs.course_id for cs in cs_subs ]
-                    # if we don't already have a course for this subject then pick one and add it
-                    intersect = set(course_ids) & set(required_course_ids)
-                    # intersect = [ filter(lambda x: x in course_ids, sublist) for sublist in required_course_ids ]
-                    if len(intersect) == 0:
-                        required_course_ids.append(course_ids[0])
-
-
-        # pick a course in the subjects required for the student
-        for sub_stud in StudentsSubject.query.filter_by(student_id=student_id).all():
-            cs_subs = CoursesSubject.query.filter_by(subject_id=sub_stud.subject_id).all()
-            if len(cs_subs) > 0:
-                course_ids = [ cs.course_id for cs in cs_subs ]
-                # if we don't already have a course for this subject then pick one and add it
-                intersect = set(course_ids) & set(required_course_ids)
-                if len(intersect) == 0:
-                    required_course_ids.append(course_ids[0])
-
-        return required_course_ids
-
-    def prep_z3_classes(self):
-        self.classes = [Const("class_%s" % (i + 1), SchClass) for i in range(self.class_count)]  
-
-    # ensures the teacher, room, and course ids are valid. We also allow an id
-    # of 0 which means null was chosen by the scheduler
-    #
-    # DEPRECIATED: set_courses provides this functionality
-    # def ensure_valid_ids(self):
-
-    #     teacher_ids = [t.id for t in Teacher.query.all()]
-    #     room_ids = [r.id for r in Classroom.query.all()]
-    #     course_ids = [c.id for c in Course.query.all()]
-    #     # this basically loops through each class, and then each of the lists above and makes
-    #     # an 'assert equal' for each. The lists are put in an 'Or' constraint to ensure
-    #     # each entry appears in the respective id list
-    #     return [ And(Or([self.teacher(i) == t_id for t_id in teacher_ids]),
-    #                       Or([self.room(i) == r_id for r_id in room_ids]),
-    #                       And(self.time(i) >= 0, self.time(i) < len(self.time_blocks)),
-    #                       Or([self.course(i) == c_id for c_id in course_ids]))
-    #                   for i in range(self.class_count) ]
-
-    def set_courses(self):
-        """
-        Returns a list of z3 constraints that make sure the scheduler includes the 
-        courses we need as determined by calc_class_constraints (stored in self.class_constraints)
-        """
-        cons_list = []
-        i = 0
-        # loop through set courses and add constraints for each course
-        for course_id, class_const_list in self.class_constraints.items():
-            for class_const in class_const_list:
-                cons_list += [ And(self.course(i) == course_id,
-                                   Or([ self.teacher(i) == t_id for t_id in class_const.teacher_ids ]),
-                                   Or([ self.room(i) == r_id for r_id in class_const.room_ids]),
-                                   Or([ self.time(i) == t_id for t_id in class_const.timeblock_ids ])) ]
-                i += 1
-        return cons_list
-
-
-    def prevent_room_time_collision(self):
-        """ returns a list of z3 constraints that prevent a room from being assigned to two 
-            classes that occur at the same time. Ignores rooms with id == 0 """
-        return [ If(And(i != j, self.room(i) == self.room(j)),
-                     self.time(i) != self.time(j), True)
-                  for i in range(self.class_count) for j in range(self.class_count) ]
-
-    def prevent_teacher_time_collision(self):
-        """ returns a list of z3 constraints that prevent a teacher from being assigned to two 
-            classes that occur at the same time. Ignores teachers with id == 0 """
-        return [ If(And(i != j, self.teacher(i) == self.teacher(j)),
-                    self.time(i) != self.time(j), True)
-                  for i in range(self.class_count) for j in range(self.class_count) ]
-
-    def constrain_course_rooms(self):
-        """ returns a list of z3 constraints for relationships between courses and rooms. """
-        
-        cons_models = ClassroomsCourse.query.all()
-        cons_list = []
-        # we need to construct a big 'OR' clause for each course that has 
-        # all the available rooms. We'll restructure the data to make this easier
-        mod_map = {}
-        for mod in cons_models:
-            if mod.course_id not in mod_map:
-                mod_map[mod.course_id] = [mod.classroom_id, 0]
-            else:
-                mod_map[mod.course_id].append(mod.classroom_id)
-
-        # now we can loop through the map's keys and add the constraints
-        for course_id in mod_map.keys():
-
-            # the rooms aren't grouped in the DB so we look through all the models and 
-            # construct a list of rooms available to this course.
-            cons_list += [ If( self.course(i) == course_id, 
-                               Or([ self.room(i) == room_id for room_id in mod_map[course_id] ]), 
-                               True )  
-                            for i in range(self.class_count) for j in range(self.class_count) ]
-        return cons_list
-
-    def constrain_course_teachers(self):
-        cons_list = []
-        
-        # build a list of courses each teacher can teach
-        ct_map = {}
-        for ct in CoursesTeacher.query.all():
-            if ct.course_id in ct_map:
-                ct_map[ct.course_id].append(ct.teacher_id)
-            else:
-                ct_map[ct.course_id] = [ct.teacher_id]
-
-        # now make the constraint
-        if len(ct_map) == 0:
-            return cons_list
-
-        for c_id, t_id_list in ct_map.items():
-            cons_list += [ If(self.course(i) == c_id,
-                              Or([ self.teacher(i) == t_id for t_id in t_id_list]), 
-                              True) 
-                           for i in range(self.class_count) ]
-
-    def calc_avail_time_ids(self, start_time=None, end_time=None):
-        times = []
-        for i in range(self.time_blocks):
-            time_block = self.time_blocks[i]
-            if start_time and end_time:
-                if start_time >= time_block.start and end_time <= time_block.end:
-                    times.append(i)
-            elif start_time:
-                if start_time >= time_block.start:
-                    times.append(i)
-            elif end_time:
-                if end_time <= time_block.end:
-                    times.append(i)
-            else:
-                times.append(i)
-
-
-    def constrain_room_time(self):
-        """ 
-        returns a list of z3 constrains that prevent a room from being scheduled beyond 
-        its available start and end times 
-        """
-
-        cons_list = []
-        for room in Classroom.query.all():
-            if room.avail_start_time or room.avail_end_time:
-                # figure out which time blocks can be assigned to the room
-                avail_time_ids = self.calc_avail_time_ids(room.avail_start_time, room.avail_end_time)
-                
-                cons_list += [ If(self.room(i) == room.id, 
-                                  Or([ self.time(i) == time_id for time_id in avail_time_ids ]),
-                                  True)
-                               for i in range(self.class_count) ]
-            else:
-                room_times = ClassroomsTimeblock.query.filter_by(classroom_id=room.id).all()
-                if len(room_times) > 0:
-                    # collect all the timeblocks mapped to this room
-                    timeblock_ids = [ rt.timeblock_id for rt in room_times ]
-                    cons_list += [ If(self.room(i) == room.id, 
-                                      Or([ self.time(i) == time_id for time_id in timeblock_ids ]),
-                                      True)
-                                   for i in range(self.class_count)]
-        return cons_list
-    
-    def constrain_teacher_time(self):
-        """ 
-        returns a list of z3 constrains that prevent a teacher from being scheduled beyond 
-        his/her available start and end times 
-        """
-
-        cons_list = []
-        for teacher in Teacher.query.all():
-            if teacher.avail_start_time or teacher.avail_end_time:
-                # figure out which time blocks can be assigned to the teacher
-                avail_time_ids = self.calc_avail_time_ids(teacher.avail_start_time, teacher.avail_end_time)
-                
-                cons_list += [ If(self.teacher(i) == teacher.id, 
-                                  Or([ self.time(i) == time_id for time_id in avail_time_ids ]),
-                                  True)
-                               for i in range(self.class_count) ]
-            else:
-                teacher_times = TeachersTimeblock.query.filter_by(teacher_id=teacher.id).all()
-                if len(teacher_times) > 0:
-                    # collect all the timeblocks mapped to this teacher
-                    timeblock_ids = [ tt.timeblock_id for tt in teacher_times ]
-                    cons_list += [ If(self.teacher(i) == teacher.id, 
-                                      Or([ self.time(i) == time_id for time_id in timeblock_ids ]),
-                                      True)
-                                   for i in range(self.class_count)]
-
-        return cons_list
-
-    def constrain_course_time(self):
-        """ 
-        returns a list of z3 constrains that prevent a course from being scheduled beyond 
-        its available start and end times 
-        """
-
-        cons_list = []
-        for course in Teacher.query.all():
-            if course.avail_start_time or course.avail_end_time:
-                # figure out which time blocks can be assigned to the course
-                avail_time_ids = self.calc_avail_time_ids(course.avail_start_time, course.avail_end_time)
-                
-                cons_list += [ If(self.course(i) == course.id, 
-                                  Or([ self.time(i) == time_id for time_id in avail_time_ids ]),
-                                  True)
-                               for i in range(self.class_count) ]
-            else:
-                course_times = CoursesTimeblock.query.filter_by(course_id=course.id).all()
-                if len(course_times) > 0:
-                    # collect all the timeblocks mapped to this course
-                    timeblock_ids = [ ct.timeblock_id for ct in course_times ]
-                    cons_list += [ If(self.course(i) == course.id, 
-                                      Or([ self.time(i) == time_id for time_id in timeblock_ids ]),
-                                      True)
-                                   for i in range(self.class_count)]
-
-        return cons_list
-
-
-    def gen_sched_classes(self, model):
+    def gen_sched_classes(self, model, class_count, sched_constraints):
 
         sch_map = {}
 
         print('\033[95m course_id | room_id | teacher_id | time_block \033[0m', file=sys.stderr)
         
         class_list = []
-        for i in range(self.class_count):
-            course_id = int(str(model.evaluate(self.course(i))))
-            room_id = int(str(model.evaluate(self.room(i))))
-            teacher_id = int(str(model.evaluate(self.teacher(i))))
-            time_block_index = int(str(model.evaluate(self.time(i))))
+        for i in range(class_count):
+            course_id = int(str(model.evaluate(sched_constraints.course(i))))
+            room_id = int(str(model.evaluate(sched_constraints.room(i))))
+            teacher_id = int(str(model.evaluate(sched_constraints.teacher(i))))
+            time_block_index = int(str(model.evaluate(sched_constraints.time(i))))
 
             print('\033[92m     {}     |    {}    |      {}     |     {} \033[0m'.format(
                   course_id, room_id, teacher_id, time_block_index), file=sys.stderr)
@@ -558,19 +164,6 @@ class Scheduler():
 
         return ScheduleData(class_list)
 
-    def prep_constraints(self):
-        constraints = []
-        constraints += self.set_courses()
-        constraints += self.prevent_room_time_collision()
-        constraints += self.prevent_teacher_time_collision() 
-
-        # # User provided constraints
-        constraints += self.constrain_course_rooms()
-        constraints += self.constrain_room_time()
-        constraints += self.constrain_course_time()
-        constraints += self.constrain_teacher_time()
-        constraints += self.constrain_course_teachers()
-        return constraints
 
     def make_schedule(self):
         
@@ -581,16 +174,8 @@ class Scheduler():
         # figure out how many time blocks we have in a day and get an array
         # of them. the index of the array represents the id of the time block 
         # for z3 
-        self.calc_class_constraints()
-
-        print('\033[92m Calculated course Requirements: \033[0m')
-        for course_id, class_const_list in self.class_constraints.items():
-            for class_const in class_const_list:
-                print('\033[92m {} \033[0m'.format(class_const))
-
-        # if theres not enough teachers and/or rooms to meet the needs
-        # of the students we stop here and inform the user
-        # TODO
+        sched_constraints = ScheduleConstraints()
+        class_count = sched_constraints.class_count
 
         # We'll add all the constraints (implied and user provided). 
         # timing_start = time.time()
@@ -599,25 +184,22 @@ class Scheduler():
         solver = Solver()
         solver.set(timeout=300000) # 5 min
         solver.push()
-        self.prep_z3_classes()
 
         
         attempts = 3
         for i in range(attempts):
             solver.push()
-            solver.add(self.prep_constraints())
+            solver.add(sched_constraints.constraints)
 
             if solver.check() != sat:
                 # pop the current constraints and add another class. then recalculate the constraints
                 solver.pop()
                 solver.push()
-                self.class_count += 1
-                print('\033[91m No sat, trying again with {} classes...\033[0m'.format(self.class_count))
-                self.prep_z3_classes()
-                solver.add(self.prep_constraints())
+                print('\033[91m No sat, trying again with {} classes...\033[0m'.format(class_count))
+                solver.add(sched_constraints.constraints)
                 continue
             else:
-                schedule = self.gen_sched_classes(solver.model())
+                schedule = self.gen_sched_classes(solver.model(), class_count, sched_constraints)
             # now start assigning students to classes and see if we can find
             # a place for every student
             collisions = self.place_students(schedule)
@@ -632,14 +214,14 @@ class Scheduler():
                 solver.pop()
                 # push a new 'constraint frame' so we can pop it later if needed
                 solver.push()
-                self.gen_constraints_from_collisions(collisions)
                 print('\033[91m Failed placing students, trying again...\033[0m')
-                self.prep_z3_classes()
+                sched_constraints.gen_constraints_from_collisions(collisions)
                 # send response constraints to be included in DB generated constraints
-                solver.add(self.prep_constraints())
+                solver.add(sched_constraints.constraints)
 
         print('\033[91m NO SOLUTION\033[0m')
         raise SchedulerNoSolution()
+
 
     def place_students(self, schedule):
         collisions = []
@@ -648,35 +230,9 @@ class Scheduler():
             if collision:
                 collisions.append(collision)
                 return collisions
+        return collisions
+    
 
-    def add_class_of_course(self, course_id):
-        class_const = ClassConstraint(course_id)
-        class_const.timeblock_ids = self.calc_avail_timeblocks(course_id)
-        class_const.teacher_ids = self.calc_avail_teachers(course_id)
-        class_const.room_ids = self.calc_avail_rooms(course_id)
-        
-        self.class_constraints[course_id].append(class_const)
-        self.class_count += 1
-        print('\033[91m Added ClassConstraint: {}\033[0m'.format(class_const))
-
-    def restrict_timeblocks(self, course_id, time_id):
-        class_const = self.class_constraints[course_id][0]
-        class_const.timeblock_ids = [time_id]
-        print('\033[91m Updated ClassConstraint: {}\033[0m'.format(class_const))
-
-    def gen_constraints_from_collisions(self, collisions):
-        for col in collisions:
-            msg = "{} collision on student {} course {}".format(
-                col.collision_type, col.student.id, col.scheduled_class.course_id)
-            print('\033[91m{}\033[0m'.format(msg))
-            # now make a constraint to avoid the collision
-            if col.collision_type == 'timeblock':
-                self.add_class_of_course(col.scheduled_class.course_id)
-                # self.restrict_timeblocks(col.scheduled_class.course_id, col.scheduled_class.timeblock_id)
-
-            elif col.collision_type == 'full class':
-                pass
-        
             
     def save_schedule(self):
         db_schedule = Schedule(name="Sample Schedule")

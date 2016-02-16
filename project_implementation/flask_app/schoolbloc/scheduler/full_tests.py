@@ -54,24 +54,26 @@ class FullScheduleTests(unittest.TestCase):
     #     db.session.add(Role(role_type='student'))
     #     db.session.commit()
 
-    def gen_students(self, n):
-        """ returns n students in a list after saving them to the DB """
-        s_user_list = [ User('s_user_%s' % random(), 'password', 'teacher') 
-                        for i in range(n)]
-        for u in s_user_list: db.session.add(u)
-        db.session.flush()
+    # def gen_students(self, n):
+    #     """ returns n students in a list after saving them to the DB """
+    #     s_user_list = [ User('s_user_%s' % random(), 'password', 'teacher') 
+    #                     for i in range(n)]
+    #     for u in s_user_list: db.session.add(u)
+    #     db.session.flush()
 
-        stud_list = [ Student(first_name="student_f_%s" % i, 
-                              last_name="student_l_%s" % i, 
-                              user_id=s_user_list[i].id) 
-                      for i in range(n) ]
+    #     stud_list = [ Student(first_name="student_f_%s" % i, 
+    #                           last_name="student_l_%s" % i, 
+    #                           user_id=s_user_list[i].id) 
+    #                   for i in range(n) ]
 
-        for s in stud_list: db.session.add(s)
-        db.session.commit()
-        return stud_list
+    #     for s in stud_list: db.session.add(s)
+    #     db.session.commit()
+    #     return stud_list
         
     def test_vg_fall_2015_a_day(self):
         """ Full test of vanguards schedule A day data for fall semester of 2015 """
+
+        timeblocks = TestUtil.generate_timeblocks()
 
         stud_7th_list = TestUtil.generate_students(10)
         stud_8th_list = TestUtil.generate_students(10)
@@ -334,12 +336,7 @@ class FullScheduleTests(unittest.TestCase):
         db.session.commit()
 
         # make the schedule
-        scheduler = Scheduler(day_start_time=830,
-                              day_end_time=1300,
-                              break_length=5,
-                              lunch_start=1086,
-                              lunch_end=1131,
-                              class_duration=82) 
+        scheduler = Scheduler() 
         
         # self.assertEqual(scheduler.calc_course_count(), {})
         # with timeout(seconds=30):

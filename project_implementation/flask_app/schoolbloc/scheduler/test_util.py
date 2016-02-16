@@ -1,9 +1,46 @@
 from schoolbloc import app, db
 from schoolbloc.users.models import User, Role
 from schoolbloc.scheduler.models import *
+from schoolbloc.config import config
 from random import *
 
 class SchedulerTestUtilities():
+    @staticmethod
+    def generate_timeblocks(day_start_time=None, 
+                             day_end_time=None, 
+                             break_length=None, 
+                             lunch_start=None, 
+                             lunch_end=None,
+                             class_duration=None):
+        """
+        Creates a list of Timeblock objects and stores them in self.time_block. 
+        The Timeblock start and end times are calculated based on the Scheduler attributes
+        day_start_time, class_duration, break_length, lunch_start, lunch_end, and day_end_time 
+        """
+        # if values aren't provided, get the defaults from the config file
+        day_start_time = day_start_time or config.school_start_time
+        day_end_time = day_end_time or config.school_end_time
+        break_length = break_length or config.time_between_classes
+        lunch_start = lunch_start or config.lunch_start
+        lunch_end = lunch_end or config.lunch_end
+        class_duration = class_duration or config.block_size
+
+        time_blocks = []
+        cur_time = day_start_time
+        while cur_time < lunch_start:
+            time_blocks.append(Timeblock(start_time=cur_time, end_time=cur_time + class_duration))
+            cur_time += class_duration + break_length
+
+        cur_time = lunch_end
+        while cur_time < day_end_time:
+            time_blocks.append(Timeblock(start_time=cur_time, end_time=cur_time + class_duration))
+            cur_time += class_duration + break_length
+        
+        for t in time_blocks: db.session.add(t)
+        db.session.commit()
+
+        return time_blocks
+
     @staticmethod
     def generate_students(n):
         """ returns n students in a list after saving them to the DB """
