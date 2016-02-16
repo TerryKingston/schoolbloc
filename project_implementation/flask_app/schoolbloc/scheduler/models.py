@@ -150,7 +150,7 @@ class Classroom(db.Model, SqlalchemySerializer):
     a school building.
     """
     __tablename__ = 'classrooms'
-    __restfulbinds__ = [ClassroomsTeacher, ClassroomsCourse, ClassroomsTimeblock]
+    __restconstraints__ = [ClassroomsTeacher, ClassroomsCourse, ClassroomsTimeblock]
     id = db.Column(db.Integer, primary_key=True)
     room_number = db.Column(db.Integer, nullable=False, unique=True)  # user assigned room number
     max_student_count = db.Column(db.Integer)

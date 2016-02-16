@@ -137,39 +137,43 @@ class TestRestList(Resource):
         parser = self._generate_parser()
         request_json = {}  # TODO get json from request
 
-        # Get the json of the primary object of this api call (ie, if this was a
-        # call to /api/classrooms, the primary object would be a Classroom object)
-        primary_json = None
-        for key, value in parser.items():
-            if value['primary']:
-                primary_json = value
-
-        # Verify received json has correct data, and make orm object
+        # Verify received json has required data, and make orm object from said data
         kwargs = {}
-        for param in primary_json['required_params']:
+        for param in parser['required_params']:
             if param in request_json['payload']:
                 kwargs[param] = request_json['payload'][param]
                 del request_json['payload'][param]
             else:
                 raise Exception('param {} for {} not in payload'.format(param, primary_json['name']))
-        for param in request_json['payload']:
-            if param in primary_json['optional_params']:
+        for param in parser['optional_params']:
+            if param in request_json['optional_params']:
                 kwargs[param] = request_json['payload'][param]
                 del request_json['payload'][param]
-        primary_orm_obj = primary_json['orm'](**kwargs)
+        orm_obj = parser['orm'](**kwargs)
+        db.session.add(orm_obj)
 
-        # Verify constraint data and create constraints
+        # only stuff left in json_request should be the constraint data. If there
+        # is additional keys here, go ahead and error out instead of ignoring them
+        for constraint, data in request_json.items():
+            if constraint not in parser:
+                raise Exception('Unexpected keyword found: {}'.format(constraint))
+            try:
+                tmp_kwargs = {}
+                tmp_kwargs['active'] = request_json[constraint]['active']
+                tmp_kwargs['priority'] = request_json[constraint]['priority']
+                # TODO get names of orm_key_id and foreigh_key_id
+                tmp_kwargs['foreign_key_id'] = request_json[constraint]['active']
+                tmp_kwargs['orm_key_id'] = orm_obj.id
+                db.session.add(data['orm'](**tmp_kwargs))
+            except KeyError as e:
+                raise Exception("missing key {} in constraint {}".format(str(e), constraint))
 
-
-
-        # Save to db
+        # Save all new objects to db
         try:
-            orm_object = self.orm(**kwargs)
-            db.session.add(orm_object)
             db.session.commit()
-        except IntegrityError:
+        except IntegrityError as e:
             db.session.rollback()
-            return {'error': 'SQL integrity error'}, 409
+            return {'error': 'SQL integrity error: {}'.format(e)}, 409
         return {'success': 'Added successfully'}, 200
 
     @staticmethod
@@ -200,8 +204,8 @@ class TestRestList(Resource):
                     'active': bool,
                     'priority': str,
                 },
-                'classrooms_courses': {
-                    'orm': ClassroomsCourse,
+                'classrooms_timeblock': {
+                    'orm': ClassroomsTimeblock,
                     'id': int,
                     'active': bool,
                     'priority': str,
@@ -235,7 +239,7 @@ class TestRestList(Resource):
         """
         parser = reqparse.RequestParser()
         self._add_orm_to_parser(self.orm, parser)
-        if not hasattr(self.orm, '__restfulbinds__'):
+        if not hasattr(self.orm, '__restconstraints__'):
             return parser
         for orm in self.orm.__restfulbinds__:
             self._add_orm_to_parser(orm, parser)
