@@ -10,7 +10,7 @@
  * Controller of the sbAngularApp
  */
 angular.module('sbAngularApp')
-.controller('DynamicTable', ['$scope', 'tableEntriesService', '$translate', 'commonService', function($scope, tableEntriesService, $translate, commonService) {
+.controller('DynamicTable', ['$scope', 'tableEntriesService', '$translate', '$location', '$anchorScroll', 'commonService', function($scope, tableEntriesService, $translate, $location, $anchorScroll, commonService) {
 	this.components = [
 		'HTML5 Boilerplate',
 		'AngularJS',
@@ -121,6 +121,12 @@ angular.module('sbAngularApp')
       $scope.tableText.openedArrayEntry = translation;
     });
   }
+
+  $scope.addConstraint = function() {
+    // scroll to the editor box
+    $location.hash('constraintEditor');
+    $anchorScroll();
+  };
 
   $scope.toggleShow = function(rowEntry) {
     rowEntry.show = !rowEntry.show;

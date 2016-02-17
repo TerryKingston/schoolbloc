@@ -5,7 +5,7 @@
     </tr>
     <tr ng-repeat="row in tableView.rows track by $index">
       <!-- if editor -->
-      <td class="table-editor" colspan="{{tableView.headers.length}}" ng-if="row.type === 'editor'">
+      <td class="table-editor" id="constraintEditor" colspan="{{tableView.headers.length}}" ng-if="row.type === 'editor'">
         <div class="table-editor-flex">
           <div class="table-editor-left">
             <section>
@@ -18,6 +18,14 @@
               </label>
               <div class="table-editor-priority">
                 <button class="priority-help">?</button>
+                <section class="priority-help-tooltip">
+                  <div class="tooltip-text">
+                    <p>!!(M)andatory: schedule will fail if it cannot be fulfilled.</p>
+                    <p>!!(H)igh: schedule is highly recommended to fulfill.</p>
+                    <p>!!(L)ow: schedule is suggested to fulfill.</p>
+                  </div>
+                  <div class="triangle-up"></div>
+                </section>
                 <label class="priority-text">{{'dynamicTable.PRIORITY' | translate}}:</label>
                 <button class="priority-mandatory priority-active" placeholder="{{'dynamicTable.MANDATORY' | translate}}">{{'dynamicTable.ABBR_MANDATORY' | translate}}</button>
                 <button class="priority-high" placeholder="{{'dynamicTable.HIGH' | translate}}">{{'dynamicTable.ABBR_HIGH' | translate}}</button>

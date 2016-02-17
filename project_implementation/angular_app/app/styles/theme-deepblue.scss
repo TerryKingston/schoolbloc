@@ -44,6 +44,7 @@ $table-background: #dbe6ec;
 $table-background-gray: #ddd;
 $table-border: #bac9d0;
 $table-row-open: #CCEBFF;
+$table-background-row-hover: #F0F9FF;
 
 // sizes
 $icon-size: 22px;
@@ -891,6 +892,7 @@ textarea {
 }
 
 .dynamic-table .table-cluster .table-cluster-add-text {
+  opacity: 0;
   color: $primary-link;
 }
 
@@ -898,8 +900,13 @@ textarea {
   text-decoration: underline;
 }
 
-.dynamic-table .table-cluster:hover .table-cluster-add-btn {
-  opacity: 1.0;
+.dynamic-table tr:hover .table-cluster-add-btn,
+.dynamic-table tr:hover .table-cluster-add-text {
+  opacity: 1;
+}
+
+.dynamic-table tr:hover {
+  background-color: $table-background-row-hover;
 }
 
 .dynamic-table .table-cluster .table-cluster-add-btn {
@@ -967,6 +974,40 @@ textarea {
 .dynamic-table .table-editor .table-editor-priority .priority-help {
   border-radius: 18px;
   background-color: $note-gray;
+}
+
+.dynamic-table .table-editor .table-editor-priority .priority-help:hover + .priority-help-tooltip {
+  display: block;
+}
+
+.dynamic-table .table-editor .table-editor-priority .priority-help-tooltip {
+  position: absolute;
+  margin-left: -30px;
+  display: none;
+}
+
+.dynamic-table .table-editor .table-editor-priority .priority-help-tooltip .triangle-up {
+  width: 0; 
+  height: 0; 
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-bottom: 8px solid $text-black;
+  position: absolute;
+  top: -5px;
+  left: 31px;
+} 
+
+.dynamic-table .table-editor .table-editor-priority .priority-help-tooltip .tooltip-text {
+  background-color: $text-black;
+  padding: 7px;
+  box-shadow: 0 0 20px rgba(0,0,0,0.7);
+}
+
+.dynamic-table .table-editor .table-editor-priority .priority-help-tooltip .tooltip-text p {
+  color: #FFF;
+  line-height: 18px;
+  margin: 0;
+  padding: 0;
 }
 
 .dynamic-table .table-editor .priority-text {
