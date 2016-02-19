@@ -1055,6 +1055,10 @@ textarea {
   text-decoration: underline;
 }
 
+.dynamic-table .table-editor .table-editor-filters-hide {
+  opacity: 0;
+}
+
 .dynamic-table .table-editor .table-editor-filters label {
   display: block;
   line-height: 20px;

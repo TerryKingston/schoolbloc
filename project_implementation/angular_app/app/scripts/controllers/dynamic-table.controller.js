@@ -68,6 +68,7 @@ angular.module('sbAngularApp')
 		for (i = 0; i < $scope.tableConfig.entries.length; i++) {
 			row = [];
 			for (j = 0; j < $scope.tableView.headers.length; j++) {
+        // convert arrays into property objects as needed
         entry = $scope.tableConfig.entries[i][$scope.tableView.headers[j]];
         if (Array.isArray(entry)) {
           // check if there is actually objects in the array
@@ -106,7 +107,32 @@ angular.module('sbAngularApp')
       // DEBUG: adding constraint view
       if (i === 0) {
         $scope.tableView.rows.push({
-          type: "editor"
+          "type": "editor",
+          "rowId": row[0], // unique id
+          "constraintType": "course",
+          "value": null,
+          "priority": "mandatory",
+          "constraints": ["test1"],
+          "showFilters": true,
+          "showFiltersText": $scope.tableText.hideFiltersText,
+          "filters": [
+            {
+              "text": "!!Hide rooms already marked as mandatory",
+              "checked": false
+            },
+            {
+              "text": "!!Hide rooms not constrained by English",
+              "checked": false
+            },
+            {
+              "text": "!!Hide rooms that do not fit the course max",
+              "checked": false
+            },
+            {
+              "text": "!!Hide rooms already constrained",
+              "checked": false
+            }
+          ]
         });
       }
 		}
@@ -120,7 +146,29 @@ angular.module('sbAngularApp')
     $translate("dynamicTable.OPENED_TEXT").then(function (translation) {
       $scope.tableText.openedArrayEntry = translation;
     });
+
+    $translate("dynamicTable.FILTERS_SHOW").then(function (translation) {
+      $scope.tableText.showFiltersText = translation;
+    });
+
+    $translate("dynamicTable.FILTERS_HIDE").then(function (translation) {
+      $scope.tableText.hideFiltersText = translation;
+    });
   }
+
+  $scope.toggleFilters = function(editor) {
+    editor.showFilters = !editor.showFilters;
+    if (editor.showFilters) {
+      editor.showFiltersText = $scope.tableText.hideFiltersText;
+    }
+    else {
+      editor.showFiltersText = $scope.tableText.showFiltersText;
+    }
+  };
+
+  $scope.changePriority = function(editor, priority) {
+    editor.priority = priority;
+  };
 
   $scope.addConstraint = function() {
     // scroll to the editor box

@@ -81,6 +81,8 @@
 	"dynamicTable.ABBR_LOW": "L",
 	"dynamicTable.SAVE": "Save",
 	"dynamicTable.SAVE_ANOTHER": "Save & Add Another",
+	"dynamicTable.FILTERS_SHOW": "Show Filters",
+	"dynamicTable.FILTERS_HIDE": "Hide Filters",
 	"schedulerModule.TITLE": "Scheduler - Admin View",
 	"schedulerModule.SUBTITLE": "Viewing the facts & constraints for {0} term.",
 	"schedulerModule.SUBTITLE_ACTION": "Change Term",

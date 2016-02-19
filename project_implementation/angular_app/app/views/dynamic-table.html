@@ -11,9 +11,9 @@
             <section>
               <label class="table-editor-list">
                 {{'dynamicTable.CONSTRAINT_LIST' | translate}}:
-                <input list="constraintList" placeholder="{{'dynamicTable.CHOOSE_CONSTRAINT' | translate}}">
+                <input list="constraintList" placeholder="{{'dynamicTable.CHOOSE_CONSTRAINT' | translate}}" ng-model="row.value">
                 <datalist id="constraintList">
-                  <option value="!!Test">!!Test</option>
+                  <option ng-repeat="constraint in row.constraints" value="{{constraint}}">{{constraint}}</option>
                 </datalist>
               </label>
               <div class="table-editor-priority">
@@ -27,23 +27,20 @@
                   <div class="triangle-up"></div>
                 </section>
                 <label class="priority-text">{{'dynamicTable.PRIORITY' | translate}}:</label>
-                <button class="priority-mandatory priority-active" placeholder="{{'dynamicTable.MANDATORY' | translate}}">{{'dynamicTable.ABBR_MANDATORY' | translate}}</button>
-                <button class="priority-high" placeholder="{{'dynamicTable.HIGH' | translate}}">{{'dynamicTable.ABBR_HIGH' | translate}}</button>
-                <button class="priority-low" placeholder="{{'dynamicTable.LOW' | translate}}">{{'dynamicTable.ABBR_LOW' | translate}}</button>
+                <button class="priority-mandatory" ng-class="{'priority-active': row.priority === 'mandatory'}" placeholder="{{'dynamicTable.MANDATORY' | translate}}" ng-click="changePriority(row, 'mandatory')">{{'dynamicTable.ABBR_MANDATORY' | translate}}</button>
+                <button class="priority-high" ng-class="{'priority-active': row.priority === 'high'}" placeholder="{{'dynamicTable.HIGH' | translate}}" ng-click="changePriority(row, 'high')">{{'dynamicTable.ABBR_HIGH' | translate}}</button>
+                <button class="priority-low" ng-class="{'priority-active': row.priority === 'low'}" placeholder="{{'dynamicTable.LOW' | translate}}" ng-click="changePriority(row, 'low')">{{'dynamicTable.ABBR_LOW' | translate}}</button>
               </div>
             </section>
             <section class="flex-bottom-btn">
-              <button class="btn btn-recommended">{{'dynamicTable.SAVE' | translate}}</button>
-              <button class="btn btn-recommended" ng-bind-html="'dynamicTable.SAVE_ANOTHER' | translate"></button>
+              <button class="btn btn-recommended" ng-click="submitEditor(row, false)" ng-disabled="!row.value">{{'dynamicTable.SAVE' | translate}}</button>
+              <button class="btn btn-recommended" ng-bind-html="'dynamicTable.SAVE_ANOTHER' | translate" ng-click="submitEditor(row, true)" ng-disabled="!row.value"></button>
             </section>
           </div>
           <div class="table-editor-right">
-            <a href="" ng-click="">!!Hide filters</a>
-            <div class="table-editor-filters">
-              <label><input type="checkbox">!!Hide rooms already marked as mandatory</label>
-              <label><input type="checkbox">!!Hide rooms not constrained by English</label>
-              <label><input type="checkbox">!!Hide rooms that do not fit the course max</label>
-              <label><input type="checkbox">!!Hide rooms already constrained</label>
+            <a href="" ng-click="toggleFilters(row)">{{row.showFiltersText}}</a>
+            <div class="table-editor-filters" ng-class="{'table-editor-filters-hide': !row.showFilters}">
+              <label ng-repeat="filter in row.filters"><input type="checkbox" ng-model="filter.checked" ng-disabled="!row.showFilters">{{filter.text}}</label>
             </div>
           </div>
         </div>
