@@ -347,9 +347,11 @@ textarea {
 
 /* Main Nav Bar */
 .main-nav-bar {
+  position: fixed;
   background-color: $nav-bar-color;
   padding-top: 10px;
 }
+
 
 .main-nav-bar h4,
 .main-nav-bar div {
@@ -374,6 +376,14 @@ textarea {
 .main-nav-bar .main-nav-bar-open {
   height: inherit;
   width: 230px;
+}
+
+.main-nav-bar-width-box .main-nav-bar-open {
+  width: 230px;
+}
+
+.main-nav-bar-width-box .main-nav-bar-closed {
+  width: 40px;
 }
 
 .main-nav-bar-open .close-icon {
