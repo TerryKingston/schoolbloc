@@ -33,3 +33,16 @@
         },
 	],
 }
+
+// Curl examples:
+// Set room_number to L101
+// curl -H "Content-Type: application/json" -X PUT -d '{"payload":{"room_number":"L101"}}' http://localhost:5000/api/classrooms/1
+
+// Add a classrooms teacher constraint
+// curl -H "Content-Type: application/json" -X PUT -d '{"payload":{"teacher":[{"method":"add","id":2,"active":true,"priority":"low"}]}}' http://localhost:5000/api/classrooms/1
+
+// Modify a classrooms teacher constraint
+// curl -H "Content-Type: application/json" -X PUT -d '{"payload":{"teacher":[{"method":"edit","active":false,"id":1}]}}' http://localhost:5000/api/classrooms/1
+
+// Delete a classroom teachers constraint
+// curl -H "Content-Type: application/json" -X PUT -d '{"payload":{"teacher":[{"method":"delete","id":2}]}}' http://localhost:5000/api/classrooms/1
