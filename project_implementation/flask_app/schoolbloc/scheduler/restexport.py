@@ -58,6 +58,34 @@ POST request - create a new {{ orm }}. This will return '{success': 'Added succe
 #      and http status code
 
 
+def _find_constraint_mapping_table(orm, constraint_str):
+    """
+    If called on the orm object Classroom with the constraint_str 'teacher',
+    this should return ClassroomsTeachers (as it is the constraint mapping
+    table that ties Classroom and Teacher together. It searches
+    __restconstraints__ for this data.
+
+    The string needs to match what the actual relationship is called for
+    this to work. In this example, 'teacher' would work but 'teachers'
+    would fail because the relationship is defined as:
+    teacher = db.relationship("Teacher", backref="classrooms_teachers")
+    """
+    if not hasattr(orm, '__restconstraints__'):
+        raise Exception('no __restconstraints__ defined on {}'.format(orm))
+    for table_constraint in orm.__restconstraints__:
+        mapper_table = orm.__mapper__.relationships.get(table_constraint)
+        relationships = mapper_table.mapper.relationships.keys()
+        if len(relationships) != 2:
+            raise Exception('encountered a constraint mapping table that does not have '
+                            'two foreign keys')
+        if constraint_str in relationships:
+            # this is the table we are looking for. Return the actual ORM
+            # object, not the table name or relationship property objects
+            return mapper_table.mapper.class_
+    raise Exception('No table found under __restconstraints__ which maps'
+                    '{} to {}'.format(orm.__tablename__, constraint_str))
+
+
 def _get_constraint_foreign_name(orm, constraint):
     """
     Given an orm (model) and constraint (string), return the name of the
@@ -93,6 +121,7 @@ def _get_constraint_key_column_names(base_orm, foreign_orm):
     if not this_id_name or not foreign_id_name:  # Sanity check
         raise Exception('Failed to pull out id column name')
     return this_id_name, foreign_id_name
+
 
 def _generate_parser(orm):
     """
@@ -172,74 +201,78 @@ class TestRest(Resource):
 
         # TODO verify json datatype to what parser says it should be
         # As this is editing existing data, we will treat everything as optional
+        to_remove = []  # Cannot remove elements from dict while iterating
         for key, value in request_json['payload'].items():
             if key in parser['required_params'] or key in parser['optional_params']:
                 setattr(orm_obj, key, value)  # Update orm object with n
-                del request_json['payload'][key]
+                to_remove.append(key)
+        for key in to_remove:
+            del request_json['payload'][key]
         db.session.add(orm_obj)
 
         # only stuff left in json_request should be the constraint data. If there
         # is additional keys here, go ahead and error out instead of ignoring them
         # (nothing has been commited to the db yet)
-        for constraint, data in request_json['payload'].items():
-            if 'method' not in data:
-                raise Exception('Must have method (add/edit/delete) in constraint payload')
-            if 'method' not in ('add', 'edit', 'delete'):
-                raise Exception('method in constraint payload must be add, edit, or delete')
+        for constraint, requests in request_json['payload'].items():
+            for data in requests:
+                if 'method' not in data:
+                    raise Exception('Must have method (add/edit/delete) in constraint payload')
+                if data['method'] not in ('add', 'edit', 'delete'):
+                    raise Exception('method in constraint payload must be add, edit, or delete')
 
-            orm_class = self._find_constraint_mapping_table(constraint)
-            this_id, foreign_id = _get_constraint_foreign_name(self.orm, orm_class)
+                orm_class = _find_constraint_mapping_table(self.orm, constraint)
+                this_id, foreign_id = _get_constraint_key_column_names(self.orm, orm_class)
 
-            if data['method'] == 'add':
-                try:
-                    tmp_kwargs = {}
-                    tmp_kwargs['active'] = data['active']
-                    tmp_kwargs['priority'] = data['priority']
-                    tmp_kwargs[this_id] = orm_obj.id
-                    tmp_kwargs[foreign_id] = data['id']
-                    db.session.add(orm_class(**tmp_kwargs))
-                except KeyError as e:
-                    raise Exception("missing key {} in constraint {}".format(str(e), constraint))
+                if data['method'] == 'add':
+                    try:
+                        tmp_kwargs = {}
+                        tmp_kwargs['active'] = data['active']
+                        tmp_kwargs['priority'] = data['priority']
+                        tmp_kwargs[this_id] = orm_obj.id
+                        tmp_kwargs[foreign_id] = data['id']
+                        db.session.add(orm_class(**tmp_kwargs))
+                    except KeyError as e:
+                        raise Exception("missing key {} in constraint {}".format(str(e), constraint))
 
-            elif data['method'] == 'delete':
-                try:
-                    # filter operates on columns, not strings
-                    this_col = getattr(orm_class, this_id)
-                    foreign_col = getattr(orm_class, foreign_id)
-                    tmp_orm_obj = orm_class.query.filter(this_col == orm_obj.id,
-                                                         foreign_col == data['id']).one()
-                    db.session.delete(tmp_orm_obj)
-                except NoResultFound:
-                    raise Exception("Cannot find constraint of type {} with {}={} "
-                                    "and {}={}".format(orm_class.__tablename__,
-                                                       this_id, orm_obj.id,
-                                                       foreign_id, data['id']))
+                elif data['method'] == 'delete':
+                    try:
+                        # filter operates on columns, not strings
+                        this_col = getattr(orm_class, this_id)
+                        foreign_col = getattr(orm_class, foreign_id)
+                        tmp_orm_obj = orm_class.query.filter(this_col == orm_obj.id,
+                                                             foreign_col == data['id']).one()
+                        db.session.delete(tmp_orm_obj)
+                    except NoResultFound:
+                        raise Exception("Cannot find constraint of type {} with {}={} "
+                                        "and {}={}".format(orm_class.__tablename__,
+                                                           this_id, orm_obj.id,
+                                                           foreign_id, data['id']))
 
-            elif data['method'] == 'edit':
-                try:
-                    # filter operates on columns, not strings
-                    this_col = getattr(orm_class, this_id)
-                    foreign_col = getattr(orm_class, foreign_id)
-                    tmp_orm_obj = orm_class.query.filter(this_col == orm_obj.id,
-                                                         foreign_col == data['id']).one()
+                elif data['method'] == 'edit':
+                    try:
+                        # filter operates on columns, not strings
+                        this_col = getattr(orm_class, this_id)
+                        foreign_col = getattr(orm_class, foreign_id)
+                        tmp_orm_obj = orm_class.query.filter(this_col == orm_obj.id,
+                                                             foreign_col == data['id']).one()
 
-                    for key, value in data.items():
-                        if key == 'id':
-                            setattr(tmp_orm_obj, foreign_id, value)
-                        elif key == 'active:':
-                            setattr(tmp_orm_obj, 'active', value)
-                        elif key == 'priority':
-                            setattr(tmp_orm_obj, 'priority', value)
-                        elif key == 'method':
-                            continue
-                        else:
-                            raise Exception('Bad key found in constraint json: {}'.format(key))
-                    db.session.add(tmp_orm_obj)
-                except NoResultFound:
-                    raise Exception("Cannot find constraint of type {} with {}={} "
-                                    "and {}={}".format(orm_class.__tablename__,
-                                                       this_id, orm_obj.id,
-                                                       foreign_id, data['id']))
+                        for key, value in data.items():
+                            if key == 'id':
+                                setattr(tmp_orm_obj, foreign_id, value)
+                            elif key == 'active':
+                                setattr(tmp_orm_obj, 'active', value)
+                            elif key == 'priority':
+                                setattr(tmp_orm_obj, 'priority', value)
+                            elif key == 'method':
+                                continue
+                            else:
+                                raise Exception('Bad key found in constraint json: {}'.format(key))
+                        db.session.add(tmp_orm_obj)
+                    except NoResultFound:
+                        raise Exception("Cannot find constraint of type {} with {}={} "
+                                        "and {}={}".format(orm_class.__tablename__,
+                                                           this_id, orm_obj.id,
+                                                           foreign_id, data['id']))
 
         # Save all changes made into the db, rollback and error if that fails
         try:
@@ -247,7 +280,7 @@ class TestRest(Resource):
         except IntegrityError as e:
             db.session.rollback()
             return {'error': 'SQL integrity error: {}'.format(e)}, 409
-        return {'success': 'Added successfully'}, 200
+        return {'success': 'Updated successfully'}, 200
 
     def delete(self, orm_id):
         orm_object = self._get_or_abort(orm_id)
@@ -330,8 +363,8 @@ class TestRestList(Resource):
         # (nothing has been commited to the db yet)
         for constraint, data in request_json['payload'].items():
             try:
-                orm_class = self._find_constraint_mapping_table(constraint)
-                this_id, foreign_id = _get_constraint_foreign_name(self.orm, orm_class)
+                orm_class = _find_constraint_mapping_table(self.orm, constraint)
+                this_id, foreign_id = _get_constraint_key_column_names(self.orm, orm_class)
 
                 tmp_kwargs = {}
                 tmp_kwargs['active'] = data['active']
@@ -350,32 +383,6 @@ class TestRestList(Resource):
             return {'error': 'SQL integrity error: {}'.format(e)}, 409
         return {'success': 'Added successfully'}, 200
 
-    def _find_constraint_mapping_table(self, constraint_str):
-        """
-        If called on the orm object Classroom with the constraint_str 'teacher',
-        this should return ClassroomsTeachers (as it is the constraint mapping
-        table that ties Classroom and Teacher together. It searches
-        __restconstraints__ for this data.
-
-        The string needs to match what the actual relationship is called for
-        this to work. In this example, 'teacher' would work but 'teachers'
-        would fail because the relationship is defined as:
-        teacher = db.relationship("Teacher", backref="classrooms_teachers")
-        """
-        if not hasattr(self.orm, '__restconstraints__'):
-            raise Exception('no __restconstraints__ defined on {}'.format(self.orm))
-        for table_constraint in self.orm.__restconstraints__:
-            mapper_table = self.orm.__mapper__.relationships.get(table_constraint)
-            relationships = mapper_table.mapper.relationships.keys()
-            if len(relationships) != 2:
-                raise Exception('encountered a constraint mapping table that does not have '
-                                'two foreign keys')
-            if constraint_str in relationships:
-                # this is the table we are looking for. Return the actual ORM
-                # object, not the table name or relationship property objects
-                return mapper_table.mapper.class_
-        raise Exception('No table found under __restconstraints__ which maps'
-                        '{} to {}'.format(self.orm.__tablename__, constraint_str))
 
     def generate_docs(self):
         ids = []
