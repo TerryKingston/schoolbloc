@@ -25,21 +25,55 @@ class SchedulerTestUtilities():
         lunch_end = lunch_end or config.lunch_end
         class_duration = class_duration or config.block_size
 
+        # convert the values to integers of the number of minutes from 0:00
+        day_start_mins = SchedulerTestUtilities.convert_time_to_minutes(day_start_time)
+        day_end_mins = SchedulerTestUtilities.convert_time_to_minutes(day_end_time)
+        lunch_start_mins = SchedulerTestUtilities.convert_time_to_minutes(lunch_start)
+        lunch_end_mins = SchedulerTestUtilities.convert_time_to_minutes(lunch_end)
+
         time_blocks = []
-        cur_time = day_start_time
-        while cur_time < lunch_start:
-            time_blocks.append(Timeblock(start_time=cur_time, end_time=cur_time + class_duration))
+        cur_time = day_start_mins
+        while cur_time < lunch_start_mins:
+            start_time = SchedulerTestUtilities.convert_minutes_to_time(cur_time)
+            end_time = SchedulerTestUtilities.convert_minutes_to_time(cur_time + class_duration)
+            time_blocks.append(Timeblock(start_time=start_time, end_time=end_time))
             cur_time += class_duration + break_length
 
-        cur_time = lunch_end
-        while cur_time < day_end_time:
-            time_blocks.append(Timeblock(start_time=cur_time, end_time=cur_time + class_duration))
+        cur_time = lunch_end_mins
+        while cur_time < day_end_mins:
+            start_time = SchedulerTestUtilities.convert_minutes_to_time(cur_time)
+            end_time = SchedulerTestUtilities.convert_minutes_to_time(cur_time + class_duration)
+            time_blocks.append(Timeblock(start_time=start_time, 
+                                         end_time=end_time))
             cur_time += class_duration + break_length
         
         for t in time_blocks: db.session.add(t)
         db.session.commit()
 
         return time_blocks
+
+    @staticmethod
+    def convert_time_to_minutes(time):
+        """
+        takes an integer in 24 hr format (eg. 1400 for 2:00PM ) and converts it to an integer
+        representing the number of minutes from time=0:00
+        """
+        hrs = (time / 100)
+        mins = time - hrs * 100
+
+        return hrs * 60 + mins
+
+    @staticmethod
+    def convert_minutes_to_time(minutes):
+        """
+        takes an integer representing the number of minutes from time=0:00 and returns an integer
+        representing the time in 24hr format (eg. 1400 = 2:00PM)
+        """
+        hrs = (minutes / 60) * 100
+        mins = minutes % 60
+
+        return hrs + mins
+
 
     @staticmethod
     def generate_students(n):

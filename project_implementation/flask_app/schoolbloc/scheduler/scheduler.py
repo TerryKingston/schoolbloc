@@ -186,17 +186,18 @@ class Scheduler():
         solver.push()
 
         
-        attempts = 3
+        attempts = 10
         for i in range(attempts):
+            print('\033[92m Attempt {} -----------------------------------------------\033[0m'.format(i + 1))
             solver.push()
-            solver.add(sched_constraints.constraints)
+            solver.add(sched_constraints.get_constraints())
 
             if solver.check() != sat:
                 # pop the current constraints and add another class. then recalculate the constraints
                 solver.pop()
                 solver.push()
                 print('\033[91m No sat, trying again with {} classes...\033[0m'.format(class_count))
-                solver.add(sched_constraints.constraints)
+                solver.add(sched_constraints.get_constraints())
                 continue
             else:
                 schedule = self.gen_sched_classes(solver.model(), class_count, sched_constraints)
@@ -217,7 +218,7 @@ class Scheduler():
                 print('\033[91m Failed placing students, trying again...\033[0m')
                 sched_constraints.gen_constraints_from_collisions(collisions)
                 # send response constraints to be included in DB generated constraints
-                solver.add(sched_constraints.constraints)
+                solver.add(sched_constraints.get_constraints())
 
         print('\033[91m NO SOLUTION\033[0m')
         raise SchedulerNoSolution()

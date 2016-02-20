@@ -73,7 +73,12 @@ class FullScheduleTests(unittest.TestCase):
     def test_vg_fall_2015_a_day(self):
         """ Full test of vanguards schedule A day data for fall semester of 2015 """
 
-        timeblocks = TestUtil.generate_timeblocks()
+        timeblocks = TestUtil.generate_timeblocks(day_start_time=905,
+                                                  day_end_time=1325,
+                                                  break_length=10,
+                                                  lunch_start=1105,
+                                                  lunch_end=1205,
+                                                  class_duration=50)
 
         stud_7th_list = TestUtil.generate_students(10)
         stud_8th_list = TestUtil.generate_students(10)

@@ -25,10 +25,46 @@ class ScheduleConstraints:
         course = Course.query.get(course_id)
         return course.max_student_count or config.default_max_class_size
 
+    @staticmethod
+    def gen_course_path_helper(course_list, current_path, path_list):
+        if len(course_list) == 0:
+            return
+        elif len(course_list) == 1:
+            for course_id in course_list[0]:
+                # add a copy of the current path with each course_id from the last list
+                # appended to the end
+                full_path = list(current_path) + [course_id]
+                path_list.append(full_path)
+        else:
+            # else, make a copy of the current path with the course id appended to the end
+            # and then move to the next course_id list
+            for course_id in course_list[0]:
+                new_path = list(current_path) + [course_id]
+                ScheduleConstraints.gen_course_path_helper(course_list[1:], new_path, path_list)
+
+    
+    @staticmethod
+    def gen_course_path_list(course_list):
+        """
+        generates a list of possible course combinations from the course list. 
+        For example, if course_list = [[1, 2, 3], [4], [5, 6]] 
+        then the result is: [[1, 4, 5], [1, 4, 6], [2, 4, 5], [2, 4, 6], [3, 4, 5], [3, 4, 6]]
+        
+        course_list: an array of arrays where each array is the z3 ids of ClassConstraints for a 
+                     single course
+
+        """
+        path_list = []
+        for course_id in course_list[0]:
+            ScheduleConstraints.gen_course_path_helper(course_list[1:], [course_id], path_list)
+
+        return path_list
 
     def __init__(self):
         self.class_count = 0
-        self.constraints = [] # the list of z3 constraints
+        self.db_constraints = [] # the list of z3 constraints generated from the DB
+        self.course_time_constraints = [] # constraints generated from course-time collisions
+
         self.class_constraints = {} 
         self.student_requirement_set = [] # list of StudentRequirement objects
 
@@ -37,26 +73,33 @@ class ScheduleConstraints:
         self.prep_implied_constraints()
         self.prep_db_constraints()
 
+    def get_constraints(self):
+        """
+        returns the current set of constraints
+        """
+        return self.db_constraints + self.course_time_constraints
+
+
     def prep_z3_classes(self):
         self.z3_classes = [Const("class_%s" % (i + 1), SchClass) for i in range(self.class_count)] 
 
     def prep_implied_constraints(self):
-        self.constraints += self.set_courses()
-        self.constraints += self.prevent_room_time_collision()
-        self.constraints += self.prevent_teacher_time_collision() 
+        self.db_constraints += self.set_courses()
+        self.db_constraints += self.prevent_room_time_collision()
+        self.db_constraints += self.prevent_teacher_time_collision() 
 
     def prep_db_constraints(self):
-        self.constraints += self.constrain_course_rooms()
-        self.constraints += self.constrain_room_time()
-        self.constraints += self.constrain_course_time()
-        self.constraints += self.constrain_teacher_time()
-        self.constraints += self.constrain_course_teachers()
+        self.db_constraints += self.constrain_course_rooms()
+        self.db_constraints += self.constrain_room_time()
+        self.db_constraints += self.constrain_course_time()
+        self.db_constraints += self.constrain_teacher_time()
+        self.db_constraints += self.constrain_course_teachers()
 
     def reset_constraints(self):
         """
         Re-calculates the implied constraints and the database constraints
         """
-        self.constraints = []
+        self.db_constraints = []
         self.prep_z3_classes()
         self.prep_implied_constraints()
         self.prep_db_constraints()
@@ -127,20 +170,34 @@ class ScheduleConstraints:
         Go through the courses required by the student and add a constraint that 
         prevents timeblock collisions for any of the required courses
         """
-        for course_id in student.required_courses:
-            class_constraint = self.choose_class_constraint(course_id)
-            # TODO: finish
+        print('\033[93m adding course time constraint for student: {}\033[0m'.format(student.id))
+        # build a 2 dimensional array representing the z3 indices of the 
+        # required courses for the student. where the members if each each inner list 
+        # represent the same course
+        course_indexes = [ [ c.z3_index for c in self.class_constraints[course_id] ] 
+                          for course_id in student.required_course_ids ]
 
-        # choose the courses that we want to use for this student
-        course_indexes = [ self.class_constraints[course_id][0].z3_index 
-                           for course_id in student.required_courses ]
-        
-        print('\033[93m Adding constraint to prevent time collision for courses: {}\033[0m'.format(
-                student.required_courses))
-        
-        const_list = [ If(i != j, self.time(i) != self.time(j), True)
-                        for i in course_indexes for j in course_indexes ]
-        self.custom_constraints += const_list
+        print('\033[93m course z3 index set:\n {}\033[0m'.format(course_indexes))
+
+        # now generate all the possible course paths for the student
+        path_list = ScheduleConstraints.gen_course_path_list(course_indexes)
+
+        print('\033[93m all possible course paths:\n {}\033[0m'.format(path_list))
+
+        # now build a constraint that ensures at least one arrangement of times for 
+        # the courses is free of timeblock collisions
+        or_list = []
+        for path in path_list:
+            and_list = []
+            for i in range(len(path)):
+                for j in range(len(path)):
+                    if i != j:
+                        and_list += [ self.time(path[i]) != self.time(path[j]) ]
+            or_list += [ And(and_list) ]
+
+        self.course_time_constraints += [ Or(or_list) ]
+
+
 
     # def prep_class_constraints(self):
     #     """
