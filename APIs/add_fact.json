@@ -1,48 +1,27 @@
 // POST /api/<fact>
 // matches the keys given in the fact_type depending on the fact type
 "Payload": {
-	"unique_id": "",
-	"single_property": "",
-	"multi_property": [
-		"single_property", "single_property"
-	],
-	"array_constraints": [
+	"property": "value",
+	"constraints_type": [
 		{
-			"value": "",
+			"id": 0,  // primary key id
 			"priority": "mandatory, high, low",
-			"disabled": false
+			"active": false
 		}
 	]
 }
-// example
-// POST /api/classroom
+// example from curl
+// curl -H "Content-Type: application/json" -X POST -d '{"payload":{"room_number":"L102","max_student_count":40,"teacher":{"id": 1,"active":true, "priority":"high"}}}' http://localhost:5000/api/classrooms
+
+// Example json
 "Payload": {
-	"room number": "L103",
-	"size": "5-30",
-	"time": [
-		{
-			"value": "12:00PM-1:15PM",
-			"priority": "mandatory",
-			"disabled": false
-		},
-		{
-			"value": "12:15PM-1:00PM",
-			"priority": "mandatory",
-			"disabled": false
-		},
-		{
-			"value": "2:10PM-3:00PM",
-			"priority": "mandatory",
-			"disabled": false
-		}
-	],
-	"subject": null,
+	"room_number": "L103",
+    "max_student_count": 40,
 	"teacher": [
 		{
-			"value": "Mrs. Buttersworth",
+			"id": 1,  // teacher who has primary key id of 1
 			"priority": "mandatory",
-			"disabled": false
+			"active": true
 		}
 	],
-	"course": null
 }

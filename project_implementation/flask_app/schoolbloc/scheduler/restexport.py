@@ -1,4 +1,6 @@
 import logging
+
+from flask import request
 from flask.ext.restful import Resource, reqparse, abort
 from jinja2 import Template
 from schoolbloc import db
@@ -81,8 +83,6 @@ def _generate_parser(orm):
     Here is what a parser might look like:
 
     parser = {
-        'orm': 'Classroom',
-        'name': 'classrooms',  # orm.__tablename__
         'required_params': {
             'room_number': str,
         },
@@ -107,19 +107,19 @@ def _generate_parser(orm):
 
         # Store type of column
         if type(col_type) is db.Integer:
-            type = int
+            col_type = int
         elif type(col_type) is db.Boolean:
-            type = bool
+            col_type = bool
         elif type(col_type) is db.String:
-            type = str
+            col_type = str
         else:
             raise Exception("Unknown type {} found".format(col_type))
 
         # Save data to parser
         if required:
-            parser['requred_params'][name] = type
+            parser['required_params'][name] = col_type
         else:
-            parser['optional_params'][name] = type
+            parser['optional_params'][name] = col_type
     return parser
 
 
@@ -218,10 +218,11 @@ class TestRestList(Resource):
 
     def post(self):
         parser = _generate_parser(self.orm)
-        request_json = {}  # TODO get json from request
+        request_json = request.get_json(force=True)
+        if 'payload' not in request_json:
+            raise Exception('missing key: "payload" from json request')
 
         # TODO verify json datatype to what parser says it should be
-
         # Verify received json has required data, and make orm object from said data
         kwargs = {}
         for param in parser['required_params']:
@@ -231,31 +232,38 @@ class TestRestList(Resource):
             else:
                 raise Exception('Required param {} for {} not in payload'.format(param, parser['name']))
         for param in parser['optional_params']:
-            if param in request_json['optional_params']:
+            if param in request_json['payload']:
                 kwargs[param] = request_json['payload'][param]
                 del request_json['payload'][param]
-        orm_obj = parser['orm'](**kwargs)
+        orm_obj = self.orm(**kwargs)
         db.session.add(orm_obj)
+        db.session.flush()
 
         # only stuff left in json_request should be the constraint data. If there
         # is additional keys here, go ahead and error out instead of ignoring them
         # (nothing has been commited to the db yet)
-        for constraint, data in request_json.items():
+        for constraint, data in request_json['payload'].items():
             try:
                 orm_class = self._find_constraint_mapping_table(constraint)
-                # TODO
-                this_id_name = 'classroom_id'
-                foreign_id_name = 'teacher_id'
+                for column in orm_class.__mapper__.columns.values():
+                    for foreign_key in column.foreign_keys:
+                        if foreign_key.column.table.name == self.orm.__tablename__:
+                            this_id_name = column.name
+                        else:
+                            foreign_id_name = column.name
+                if not this_id_name or not foreign_id_name:  # Sanity check
+                    raise Exception('Failed to pull out id column name')
 
                 tmp_kwargs = {}
-                tmp_kwargs['active'] = request_json[constraint]['active']
-                tmp_kwargs['priority'] = request_json[constraint]['priority']
+                tmp_kwargs['active'] = data['active']
+                tmp_kwargs['priority'] = data['priority']
                 tmp_kwargs[this_id_name] = orm_obj.id
-                tmp_kwargs[foreign_id_name] = request_json[constraint]['id']
+                tmp_kwargs[foreign_id_name] = data['id']
 
                 db.session.add(orm_class(**tmp_kwargs))
             except KeyError as e:
-                raise Exception("missing key {} in constraint {}".format(str(e), constraint))
+                #raise Exception("missing key {} in constraint {}".format(str(e), constraint))
+                raise
 
         # Save all new objects to db
         try:
@@ -289,7 +297,7 @@ class TestRestList(Resource):
                 # this is the table we are looking for. Return the actual ORM
                 # object, not the table name or relationship property objects
                 return mapper_table.mapper.class_
-        raise Exception('No table found under _restconstraints__ which maps'
+        raise Exception('No table found under __restconstraints__ which maps'
                         '{} to {}'.format(self.orm.__tablename__, constraint_str))
 
     def generate_docs(self):

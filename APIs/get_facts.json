@@ -2,84 +2,47 @@
 // matches the keys given in the fact_type depending on the fact type
 [
 	{
-		"unique_id": "",
-		"single_properties": "",
-		"multiple_propertiess": [
-			"single_properties",
-			"single_properties"
-		],
-		"array_constraints": [
+		"id": primary_key_id,
+		"key": "value",
+		"specific constraints type": [
 			{
-				"value": "",
+				"id": primary_key_id
+				"value": "string represention of constraint foreign key",
 				"priority": "mandatory, high, low",
-				"disabled": false
+				"active": "true or false"
 			}
 		],
-		"disabled": false
 	}
 ]
-// example
-// GET /api/classroom
+
+// Curl example
+// curl http://localhost:5000/api/classrooms
 [
-	{
-		"room number": "L103",
-		"size": "5-30",
-		"time": [
-			{
-				"value": "12:00PM-1:15PM", 
-				"priority": "mandatory", 
-				"disabled": false
-			},
-			{
-				"value": "12:15PM-1:00PM", 
-				"priority": "high", 
-				"disabled": true
-			},
-			{
-				"value": "2:10PM-3:00PM", 
-				"priority": "low", 
-				"disabled": false
-			}
-		],
-		"subject": null,
-		"teacher": [
-			{
-				"value": "Mrs. Buttersworth", 
-				"priority": "mandatory", 
-				"disabled": false
-			}
-		],
-		"course": [
-			{
-				"value": "English III", 
-				"priority": "mandatory", 
-				"disabled": false
-			},
-			{
-				"value": "English II", 
-				"priority": "high", 
-				"disabled": false
-			},
-			{
-				"value": "Math I", 
-				"priority": "low", 
-				"disabled": true
-			},
-			{
-				"value": "Programming IV", 
-				"priority": "low", 
-				"disabled": false
-			}
-		],
-		"disabled": false
-	},
-	{
-		"room number": "201",
-		"size": "5-30",
-		"time": null,
-		"subject": null,
-		"teacher": null,
-		"course": null,
-		"disabled": false
-	}
-]	
+    {
+        "avail_end_time": null,
+        "avail_start_time": null,
+        "course": [],
+        "id": 1,
+        "max_student_count": 40,
+        "room_number": "l101",
+        "teacher": [],
+        "timeblock": []
+    },
+    {
+        "avail_end_time": null,
+        "avail_start_time": null,
+        "course": [],
+        "id": 2,
+        "max_student_count": 40,
+        "room_number": "L102",
+        "teacher": [
+            {
+                "active": true,
+                "id": 1,
+                "priority": true,
+                "value": "Severus Snape"
+            }
+        ],
+        "timeblock": []
+    }
+]
