@@ -8,8 +8,8 @@ mod = Blueprint('api', __name__)
 api = Api(mod)
 
 
-def register_rest_orm(orm, get='admin', put='admin', post='admin',
-                      delete='admin', list='admin'):
+def register_rest_orm(orm, get=False, put='admin', post='admin',
+                      delete='admin', list=False):
     """
     Registar a sqlalchemy orm model to be exposed via the rest api. By default,
     only admins will be authorized to access each of the rest methods. You can override

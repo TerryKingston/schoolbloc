@@ -11,9 +11,6 @@ class SqlalchemySerializer:
     provides a serialize method that will be utilized by our rest endpoints
     """
     def serialize(self, base_set=None):
-        if not base_set:
-            base_set = set()
-        base_set.add(self.__tablename__)
         results = {}
 
         # Serialize the list of columns. Don't print out foreign keys, as those
@@ -22,28 +19,6 @@ class SqlalchemySerializer:
         for column in columns:
             if not column.foreign_keys:
                 results[column.name] = getattr(self, column.name)
-
-        # Serialize the relationships
-        relationships = self.__mapper__.relationships.keys()
-        try:
-            relationships.remove('user')  # Don't ever pass back uname/password
-        except ValueError:
-            pass
-
-        for name in relationships:
-            obj = getattr(self, name)
-            if isinstance(obj, list):
-                try:
-                    tablename = obj[0].__tablename__
-                    if tablename not in base_set:  # Avoid circular serialization
-                        results[name] = [x.serialize(base_set) for x in getattr(self, name)]
-                except IndexError:
-                    results[name] = []
-            else:
-                tablename = obj.__tablename__
-                if tablename not in base_set:  # Avoid circular serialization
-                    results[name] = obj.serialize(base_set)
-        base_set.remove(self.__tablename__)
         return results
 
 
@@ -150,7 +125,7 @@ class Classroom(db.Model, SqlalchemySerializer):
     a school building.
     """
     __tablename__ = 'classrooms'
-    __restconstraints__ = [ClassroomsTeacher, ClassroomsCourse, ClassroomsTimeblock]
+    __restconstraints__ = ['classrooms_teachers', 'classrooms_courses', 'classrooms_timeblocks']
     id = db.Column(db.Integer, primary_key=True)
     room_number = db.Column(db.Integer, nullable=False, unique=True)  # user assigned room number
     max_student_count = db.Column(db.Integer)
@@ -353,6 +328,9 @@ class Teacher(db.Model, SqlalchemySerializer):
     user = db.relationship("User", backref="teacher")
     avail_start_time = db.Column(db.Integer)
     avail_end_time = db.Column(db.Integer)
+
+    def __str__(self):
+        return "{} {}".format(self.first_name, self.last_name)
     
 
 class CoursesTimeblock(db.Model, SqlalchemySerializer):
@@ -368,6 +346,7 @@ class CoursesTimeblock(db.Model, SqlalchemySerializer):
     course = db.relationship("Course", backref='courses_timeblocks')
     timeblock = db.relationship("Timeblock", backref='courses_timeblocks')
 
+
 class ClassroomsTimeblock(db.Model, SqlalchemySerializer):
     """
     ORM Object for linking table between classrooms and timeblocks
@@ -380,6 +359,7 @@ class ClassroomsTimeblock(db.Model, SqlalchemySerializer):
     priority = db.Column(db.String(128), nullable=False)
     classroom = db.relationship("Classroom", backref='classrooms_timeblocks')
     timeblock = db.relationship("Timeblock", backref='classrooms_timeblocks')
+
 
 class StudentGroupsTimeblock(db.Model, SqlalchemySerializer):
     """
@@ -394,6 +374,7 @@ class StudentGroupsTimeblock(db.Model, SqlalchemySerializer):
     student_group = db.relationship("StudentGroup", backref='student_groups_timeblocks')
     timeblock = db.relationship("Timeblock", backref='student_groups_timeblocks')
 
+
 class StudentsTimeblock(db.Model, SqlalchemySerializer):
     """
     ORM Object for linking table between classrooms and timeblocks
@@ -406,6 +387,7 @@ class StudentsTimeblock(db.Model, SqlalchemySerializer):
     priority = db.Column(db.String(128), nullable=False)
     student = db.relationship("Student", backref='students_timeblocks')
     timeblock = db.relationship("Timeblock", backref='students_timeblocks')
+
 
 class SubjectsTimeblock(db.Model, SqlalchemySerializer):
     """

@@ -50,11 +50,51 @@ POST request - create a new {{ orm }}. This will return '{success': 'Added succe
 )
 
 
+def _get_constraint_foreign_name(orm, constraint):
+    """
+    Given an orm (model) and constraint (string), return the name of the
+    foreign table from the mapping table
+    """
+    # Get the relationship between the orm object and the mapping table
+    mapper_table = orm.__mapper__.relationships.get(constraint)
+    relationships = mapper_table.mapper.relationships.items()
+    if len(relationships) != 2:
+        raise Exception('encountered a constraint mapping table that does not have '
+                        'two foreign keys')
+
+    # Figure out which relationship points back to the original orm_object,
+    # and which one points to a foreign table
+    current_name = orm.__tablename__
+    for relationship_name, relationship in relationships:
+        if relationship.target.name == current_name:
+            continue
+        # teacher vs teachers
+        foreign_name = relationship_name
+        #foreign_name = relationship.target.name
+    return foreign_name
+
+
 class TestRest(Resource):
 
     def get(self, orm_id):
         orm_object = self._get_or_abort(orm_id)
-        return orm_object.serialize()
+        ret = orm_object.serialize()
+        if not hasattr(self.orm, '__restconstraints__'):
+            return ret
+        for constraint in orm_object.__restconstraints__:
+            foreign_name = _get_constraint_foreign_name(self.orm, constraint)
+            foreign_serialized = []
+            for mapper_orm in getattr(orm_object, constraint):
+                foreign_orm = getattr(mapper_orm, foreign_name)
+                serialized = {
+                    'id': foreign_orm.id,
+                    'value': str(foreign_orm),
+                    'active': mapper_orm.active,
+                    'priority': mapper_orm.active
+                }
+                foreign_serialized.append(serialized)
+            ret[foreign_name] = foreign_serialized
+        return ret
 
     def put(self, orm_id):
         # Argument parser
@@ -131,7 +171,28 @@ class TestRest(Resource):
 class TestRestList(Resource):
 
     def get(self):
-        return [orm_obj.serialize() for orm_obj in self.orm.query.all()]
+        ret = []
+        orm_objects = self.orm.query.all()
+        for orm_object in orm_objects:
+            tmp_ret = orm_object.serialize()
+            if not hasattr(self.orm, '__restconstraints__'):
+                ret.append(tmp_ret)
+                continue
+            for constraint in orm_object.__restconstraints__:
+                foreign_name = _get_constraint_foreign_name(self.orm, constraint)
+                foreign_serialized = []
+                for mapper_orm in getattr(orm_object, constraint):
+                    foreign_orm = getattr(mapper_orm, foreign_name)
+                    serialized = {
+                        'id': foreign_orm.id,
+                        'value': str(foreign_orm),
+                        'active': mapper_orm.active,
+                        'priority': mapper_orm.active
+                    }
+                    foreign_serialized.append(serialized)
+                tmp_ret[foreign_name] = foreign_serialized
+            ret.append(tmp_ret)
+        return ret
 
     def post(self):
         parser = self._generate_parser()
@@ -176,12 +237,11 @@ class TestRestList(Resource):
             return {'error': 'SQL integrity error: {}'.format(e)}, 409
         return {'success': 'Added successfully'}, 200
 
-    @staticmethod
-    def _add_orm_to_parser(orm, parser):
+    def _generate_parser(self):
         """ Adds all the columns of this orm to a parser """
         # Example of what a parser might look like
         parser = {
-            'orm': Classroom,
+            'orm': 'Classroom',
             'name': 'classrooms',  # orm.__tablename__
             'required_params': {
                 'room_number': str,
@@ -191,21 +251,21 @@ class TestRestList(Resource):
                 'avail_start_time': int,
                 'avail_end_time': int,
             },
-            'constraints': {  # These should already exist in the db
+            'constraints': {  # These should already exist in the db. All optional
                 'classrooms_courses': {  # orm.__tablename__
-                    'orm': ClassroomsCourse,
+                    'orm': 'ClassroomsCourse',
                     'id': int,  # course.id (id instead of name for uniqueness)
                     'active': bool,
                     'priority': str,
                 },
-                'classrooms_teachers': {
-                    'orm': ClassroomsTeacher,
-                    'id': int,
+                'teachers': {
+                    'orm': 'ClassroomsTeacher',  # mapping table
+                    'id': int,  # Teacher id
                     'active': bool,
                     'priority': str,
                 },
                 'classrooms_timeblock': {
-                    'orm': ClassroomsTimeblock,
+                    'orm': 'ClassroomsTimeblock',
                     'id': int,
                     'active': bool,
                     'priority': str,
@@ -213,7 +273,8 @@ class TestRestList(Resource):
             }
         }
 
-        columns = orm.__table__.columns.values()
+        parser = {'required_params': {}, 'optional_params': {}, 'constraints': {}}
+        columns = self.orm.__table__.columns.values()
         for column in columns:
             name = column.name
             col_type = column.type
@@ -223,14 +284,38 @@ class TestRestList(Resource):
             if name == 'id':
                 continue
 
+            # Store type of columnt
             if type(col_type) is db.Integer:
-                parser.add_argument(name, type=int, required=required, store_missing=False)
+                type = int
             elif type(col_type) is db.Boolean:
-                parser.add_argument(name, type=bool, required=required, store_missing=False)
+                type = bool
             elif type(col_type) is db.String:
-                parser.add_argument(name, required=required, store_missing=False)
+                type = str
             else:
                 raise Exception("Unknown type {} found".format(col_type))
+
+            # Save data to parser
+            if required:
+                parser['requred_params'][name] = type
+            else:
+                parser['optional_params'][name] = type
+        return parser
+
+    @staticmethod
+    def _generate_constraint(orm_constraint):
+        required_keys = ('#TODO_ID', 'active', 'priority')
+        columns = orm_constraint.__table__.columns.keys()
+        for key in required_keys:
+            if key not in columns:
+                raise Exception("Expected key {} not found in {}"
+                                .format(key, orm_constraint.__tablename__))
+
+        return {
+            'orm': orm_constraint,
+            'id': int,
+            'active': bool,
+            'priority': str,
+        }
 
     def _generate_parser(self):
         """
@@ -241,8 +326,8 @@ class TestRestList(Resource):
         self._add_orm_to_parser(self.orm, parser)
         if not hasattr(self.orm, '__restconstraints__'):
             return parser
-        for orm in self.orm.__restfulbinds__:
-            self._add_orm_to_parser(orm, parser)
+        for orm in self.orm.__restconstraints__:
+            parser[orm.__tablename__] = self._generate_constraint(orm)
         return parser
 
     def generate_docs(self):
