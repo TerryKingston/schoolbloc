@@ -22,12 +22,15 @@ class ScheduleData:
 
         return rep
 
-    def save(self, db_sched, db, time_block_list):
+    def save(self):
+        db_schedule = Schedule(name="Sample Schedule")
+        db.session.add(db_schedule)
+        db.session.flush()
         for course_id, cls_list in self.scheduled_classes.items():
             for c in cls_list:
-                start_time = time_block_list[c.timeblock_id].start
-                end_time = time_block_list[c.timeblock_id].end
-                cls = ScheduledClass(schedule_id=db_sched.id, teacher_id=c.teacher_id, course_id=c.course_id, 
+                start_time = self.timeblocks[c.timeblock_id].start
+                end_time = self.timeblocks[c.timeblock_id].end
+                cls = ScheduledClass(schedule_id=db_schedule.id, teacher_id=c.teacher_id, course_id=c.course_id, 
                                      classroom_id=c.room_id, start_time=start_time, end_time=end_time)
                 db.session.add(cls)
                 db.session.flush()

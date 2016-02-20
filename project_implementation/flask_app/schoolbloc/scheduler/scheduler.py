@@ -208,7 +208,7 @@ class Scheduler():
                 print('\033[92m Satisfied! \033[0m')
                 print('\033[92m {} \033[0m'.format(schedule))
                 # now save the schedule
-                self.save_schedule(schedule)
+                schedule.save()
                 return
             else:
                 # pop off the constraints so we can reset them
@@ -235,10 +235,3 @@ class Scheduler():
                 return collisions
         return collisions
     
-
-            
-    def save_schedule(self):
-        db_schedule = Schedule(name="Sample Schedule")
-        db.session.add(db_schedule)
-        db.session.flush()
-        schedule.save(db_schedule, db, self.time_blocks)
