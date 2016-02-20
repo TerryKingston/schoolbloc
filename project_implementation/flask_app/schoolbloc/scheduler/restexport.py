@@ -3,6 +3,8 @@ import logging
 from flask import request
 from flask.ext.restful import Resource, reqparse, abort
 from jinja2 import Template
+from sqlalchemy.orm.exc import NoResultFound
+
 from schoolbloc import db
 from sqlalchemy.exc import IntegrityError
 
@@ -79,6 +81,18 @@ def _get_constraint_foreign_name(orm, constraint):
         #foreign_name = relationship.target.name
     return foreign_name
 
+
+def _get_constraint_key_column_names(base_orm, foreign_orm):
+    # Get the column names for the foreign key ids in this constraint
+    for column in foreign_orm.__mapper__.columns.values():
+        for foreign_key in column.foreign_keys:
+            if foreign_key.column.table.name == base_orm.__tablename__:
+                this_id_name = column.name
+            else:
+                foreign_id_name = column.name
+    if not this_id_name or not foreign_id_name:  # Sanity check
+        raise Exception('Failed to pull out id column name')
+    return this_id_name, foreign_id_name
 
 def _generate_parser(orm):
     """
@@ -164,10 +178,70 @@ class TestRest(Resource):
                 del request_json['payload'][key]
         db.session.add(orm_obj)
 
-        # Add any new constraints
-        # Delete any old constraints
-        # Edit any existing constraints
+        # only stuff left in json_request should be the constraint data. If there
+        # is additional keys here, go ahead and error out instead of ignoring them
+        # (nothing has been commited to the db yet)
+        for constraint, data in request_json['payload'].items():
+            if 'method' not in data:
+                raise Exception('Must have method (add/edit/delete) in constraint payload')
+            if 'method' not in ('add', 'edit', 'delete'):
+                raise Exception('method in constraint payload must be add, edit, or delete')
 
+            orm_class = self._find_constraint_mapping_table(constraint)
+            this_id, foreign_id = _get_constraint_foreign_name(self.orm, orm_class)
+
+            if data['method'] == 'add':
+                try:
+                    tmp_kwargs = {}
+                    tmp_kwargs['active'] = data['active']
+                    tmp_kwargs['priority'] = data['priority']
+                    tmp_kwargs[this_id] = orm_obj.id
+                    tmp_kwargs[foreign_id] = data['id']
+                    db.session.add(orm_class(**tmp_kwargs))
+                except KeyError as e:
+                    raise Exception("missing key {} in constraint {}".format(str(e), constraint))
+
+            elif data['method'] == 'delete':
+                try:
+                    # filter operates on columns, not strings
+                    this_col = getattr(orm_class, this_id)
+                    foreign_col = getattr(orm_class, foreign_id)
+                    tmp_orm_obj = orm_class.query.filter(this_col == orm_obj.id,
+                                                         foreign_col == data['id']).one()
+                    db.session.delete(tmp_orm_obj)
+                except NoResultFound:
+                    raise Exception("Cannot find constraint of type {} with {}={} "
+                                    "and {}={}".format(orm_class.__tablename__,
+                                                       this_id, orm_obj.id,
+                                                       foreign_id, data['id']))
+
+            elif data['method'] == 'edit':
+                try:
+                    # filter operates on columns, not strings
+                    this_col = getattr(orm_class, this_id)
+                    foreign_col = getattr(orm_class, foreign_id)
+                    tmp_orm_obj = orm_class.query.filter(this_col == orm_obj.id,
+                                                         foreign_col == data['id']).one()
+
+                    for key, value in data.items():
+                        if key == 'id':
+                            setattr(tmp_orm_obj, foreign_id, value)
+                        elif key == 'active:':
+                            setattr(tmp_orm_obj, 'active', value)
+                        elif key == 'priority':
+                            setattr(tmp_orm_obj, 'priority', value)
+                        elif key == 'method':
+                            continue
+                        else:
+                            raise Exception('Bad key found in constraint json: {}'.format(key))
+                    db.session.add(tmp_orm_obj)
+                except NoResultFound:
+                    raise Exception("Cannot find constraint of type {} with {}={} "
+                                    "and {}={}".format(orm_class.__tablename__,
+                                                       this_id, orm_obj.id,
+                                                       foreign_id, data['id']))
+
+        # Save all changes made into the db, rollback and error if that fails
         try:
             db.session.commit()
         except IntegrityError as e:
@@ -257,21 +331,13 @@ class TestRestList(Resource):
         for constraint, data in request_json['payload'].items():
             try:
                 orm_class = self._find_constraint_mapping_table(constraint)
-                for column in orm_class.__mapper__.columns.values():
-                    for foreign_key in column.foreign_keys:
-                        if foreign_key.column.table.name == self.orm.__tablename__:
-                            this_id_name = column.name
-                        else:
-                            foreign_id_name = column.name
-                if not this_id_name or not foreign_id_name:  # Sanity check
-                    raise Exception('Failed to pull out id column name')
+                this_id, foreign_id = _get_constraint_foreign_name(self.orm, orm_class)
 
                 tmp_kwargs = {}
                 tmp_kwargs['active'] = data['active']
                 tmp_kwargs['priority'] = data['priority']
-                tmp_kwargs[this_id_name] = orm_obj.id
-                tmp_kwargs[foreign_id_name] = data['id']
-
+                tmp_kwargs[this_id] = orm_obj.id
+                tmp_kwargs[foreign_id] = data['id']
                 db.session.add(orm_class(**tmp_kwargs))
             except KeyError as e:
                 raise Exception("missing key {} in constraint {}".format(str(e), constraint))

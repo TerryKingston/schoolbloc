@@ -14,8 +14,7 @@
 // PUT /api/classroom/1
 "payload": {
 	"room_number": "L104",  // Changes this to L104, no affect if already L104
-    "avail_start_time": null,
-    "avail_end_time": null,
+    "avail_start_time": null,  // Remove avail_start_time
 	"teacher": [
 		{  // Add constraint
             "method": "add",
