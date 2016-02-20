@@ -150,22 +150,30 @@ class TestRest(Resource):
         return ret
 
     def put(self, orm_id):
-        # Argument parser
+        orm_obj = self._get_or_abort(orm_id)
         parser = _generate_parser(self.orm)
-        args = parser.parse_args()
+        request_json = request.get_json(force=True)
+        if 'payload' not in request_json:
+            raise Exception('missing key: "payload" from json request')
 
-        # Get current orm object or abort
-        orm_object = self._get_or_abort(orm_id)
+        # TODO verify json datatype to what parser says it should be
+        # As this is editing existing data, we will treat everything as optional
+        for key, value in request_json['payload'].items():
+            if key in parser['required_params'] or key in parser['optional_params']:
+                setattr(orm_obj, key, value)  # Update orm object with n
+                del request_json['payload'][key]
+        db.session.add(orm_obj)
 
-        # Update anything that was requested
-        columns = self.orm.__table__.columns.values()
-        for column in columns:
-            name = column.name
-            if name in args:
-                setattr(orm_object, name, args[name])
-        db.session.add(orm_object)
-        db.session.commit()
-        return {'success': True}
+        # Add any new constraints
+        # Delete any old constraints
+        # Edit any existing constraints
+
+        try:
+            db.session.commit()
+        except IntegrityError as e:
+            db.session.rollback()
+            return {'error': 'SQL integrity error: {}'.format(e)}, 409
+        return {'success': 'Added successfully'}, 200
 
     def delete(self, orm_id):
         orm_object = self._get_or_abort(orm_id)

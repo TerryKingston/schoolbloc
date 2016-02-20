@@ -1,54 +1,36 @@
 // PUT /api/<fact>
-"Payload": {
-	"fact": "unique_id",
-	"edit": [
+"payload": {
+	"key": "value",  // Updates this key to a new value
+	"constraint_type": [
 		{
-			"key": "",
-			"value": "",
-			"new_value": "",
-			"*disabled": false,
-			"*priority": "mandatory, high, low"
-		}
-	],
-	"add": [
-		{
-			"key": "",
-			"value": "",
-			"*disabled": false,
-			"*priority": "mandatory, high, low"
-		}
-	],
-	"delete": [
-		{
-			"key": "",
-			"value": ""
-		}
-	]
-}
-// example
-// PUT /api/classroom
-"Payload": {
-	"fact": "L103",
-	"edit": [
-		// editing value
-		{
-			"key": "size",
-			"value": "5-30",
-			"new_value": "0-30"
+            "method": "add, edit, delete",
+            "id": 3,  // If add, id of foreign constraint. If delete or edit, id of constraint itself
+			"key": "value",  // Sets key to value (add and edit only)
 		},
-		// editing priority and disabled
-		{
-			"key": "teacher",
-			"value": "Mrs. Buttersworth",
-			"priority": "mandatory", 
-			"disabled": true
-		}
 	],
-	// no add (basically like edit)
-	"delete": [
-		{
-			"key": "time",
-			"value": "12:00PM-1:15PM"
+}
+
+// example
+// PUT /api/classroom/1
+"payload": {
+	"room_number": "L104",  // Changes this to L104, no affect if already L104
+    "avail_start_time": null,
+    "avail_end_time": null,
+	"teacher": [
+		{  // Add constraint
+            "method": "add",
+            "id": 13,  // Teacher with primary id 13
+			"active": true,
+			"priority": "high"
+		},
+		{  // Edit constraint
+            "method": "edit",
+            "id": 2,  // Teacher with primary id of 2
+			"active": false, // Changes this constraint to not active
 		}
-	]
+        {  // Delete constraint
+            "method": "delete",
+            "id": 1,  // Teacher with primary id of 1
+        },
+	],
 }
