@@ -4,20 +4,68 @@
       <th ng-repeat="header in tableView.headers track by $index">{{header}}</th>
     </tr>
     <tr ng-repeat="row in tableView.rows track by $index">
+      <!-- if editor -->
+      <td class="table-editor" id="constraintEditor" colspan="{{tableView.headers.length}}" ng-if="row.type === 'editor'">
+        <div class="table-editor-flex">
+          <div class="table-editor-left">
+            <section>
+              <label class="table-editor-list">
+                {{'dynamicTable.CONSTRAINT_LIST' | translate}}:
+                <input list="constraintList" placeholder="{{'dynamicTable.CHOOSE_CONSTRAINT' | translate}}" ng-model="row.value">
+                <datalist id="constraintList">
+                  <option ng-repeat="constraint in row.constraints" value="{{constraint}}">{{constraint}}</option>
+                </datalist>
+              </label>
+              <div class="table-editor-priority">
+                <button class="priority-help">?</button>
+                <section class="priority-help-tooltip">
+                  <div class="tooltip-text">
+                    <p>!!(M)andatory: schedule will fail if it cannot be fulfilled.</p>
+                    <p>!!(H)igh: schedule is highly recommended to fulfill.</p>
+                    <p>!!(L)ow: schedule is suggested to fulfill.</p>
+                  </div>
+                  <div class="triangle-up"></div>
+                </section>
+                <label class="priority-text">{{'dynamicTable.PRIORITY' | translate}}:</label>
+                <button class="priority-mandatory" ng-class="{'priority-active': row.priority === 'mandatory'}" placeholder="{{'dynamicTable.MANDATORY' | translate}}" ng-click="changePriority(row, 'mandatory')">{{'dynamicTable.ABBR_MANDATORY' | translate}}</button>
+                <button class="priority-high" ng-class="{'priority-active': row.priority === 'high'}" placeholder="{{'dynamicTable.HIGH' | translate}}" ng-click="changePriority(row, 'high')">{{'dynamicTable.ABBR_HIGH' | translate}}</button>
+                <button class="priority-low" ng-class="{'priority-active': row.priority === 'low'}" placeholder="{{'dynamicTable.LOW' | translate}}" ng-click="changePriority(row, 'low')">{{'dynamicTable.ABBR_LOW' | translate}}</button>
+              </div>
+            </section>
+            <section class="flex-bottom-btn">
+              <button class="btn btn-recommended" ng-click="submitEditor(row, false)" ng-disabled="!row.value">{{'dynamicTable.SAVE' | translate}}</button>
+              <button class="btn btn-recommended" ng-bind-html="'dynamicTable.SAVE_ANOTHER' | translate" ng-click="submitEditor(row, true)" ng-disabled="!row.value"></button>
+            </section>
+          </div>
+          <div class="table-editor-right">
+            <a href="" ng-click="toggleFilters(row)">{{row.showFiltersText}}</a>
+            <div class="table-editor-filters" ng-class="{'table-editor-filters-hide': !row.showFilters}">
+              <label ng-repeat="filter in row.filters"><input type="checkbox" ng-model="filter.checked" ng-disabled="!row.showFilters">{{filter.text}}</label>
+            </div>
+          </div>
+        </div>
+      </td>
       <!-- if value-->
-      <td ng-repeat="rowEntry in row track by $index">
+      <td ng-if="!row.type" ng-repeat="rowEntry in row track by $index">
         <!-- cluster - NO entries -->
-        <div class="table-cluster" ng-if="rowEntry.type === 'array' && !rowEntry.value" ng-click="addConstraint()">
-          <button class="table-cluster-add" alt="{{'dynamicTable.ADD' | translate}}"></button>
+        <div class="table-cluster table-cluster-add" ng-if="rowEntry.type === 'array' && !rowEntry.value" ng-click="addConstraint()">
           <a class="table-cluster-add-text" href="" ng-click="addConstraint()">{{'dynamicTable.ADD' | translate}}</a>
+          <button class="table-cluster-add-btn" alt="{{'dynamicTable.ADD' | translate}}"></button>
         </div>
         <!-- cluster - entries -->
         <div class="table-cluster" ng-if="rowEntry.type === 'array' && rowEntry.value">
-          <button class="table-cluster-add" ng-click="addConstraint()" alt="{{'dynamicTable.ADD' | translate}}"></button>
           <a href="" ng-click="toggleShow(rowEntry)">{{rowEntry.text}}</a>
+          <button class="table-cluster-add-btn" ng-click="addConstraint()" alt="{{'dynamicTable.ADD' | translate}}"></button>
           </div>
           <div class="table-cluster-open" ng-show="rowEntry.show">
-            <div ng-repeat="element in rowEntry.value track by $index">{{element}}</div>
+            <div class="entry" ng-repeat="element in rowEntry.value track by $index">
+              <div class="entry-options">
+                <button class="entry-edit" alt="{{'dynamicTable.EDIT' | translate}}"></button>
+                <button class="entry-disable" alt="{{'dynamicTable.DISABLE' | translate}}"></button>
+                <button class="entry-delete" alt="{{'dynamicTable.DELETE' | translate}}"></button>
+              </div>
+              <div>{{element}}</div>
+            </div>
           </div>
         </div>
         <div ng-if="!rowEntry.type">{{rowEntry}}</div>

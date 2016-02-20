@@ -56,7 +56,7 @@ angular.module('sbAngularApp')
 
 
 }])
-.directive('sbMainNavBar', ['$window', '$translate', 'commonService', function($window, $translate, commonService) {
+.directive('sbMainNavBar', ['$window', '$translate', 'commonService', '$document', function($window, $translate, commonService, $document) {
 	/**
 	 * For manipulating the DOM
 	 * @param  scope   as configured in the controller
@@ -78,7 +78,15 @@ angular.module('sbAngularApp')
 		 * Updates the height of the window as it is resized.
 		 */
 		function updateWindowSize () {
-			scope.mainNavBar.navBarStyle.height = $window.innerHeight - 10 + "px"; // -10 for top-padding
+			// NOTE: later, if I don't want to make the nav bar fixed, we need to know what is larger: the browser window size or the body size and make the nav bar that size.
+			// Make sure to update this anytime the body height changes and not just on browser window resizes (as it currently is)
+			// // find the height of the body element and browser window and pick the larger of the two
+			//var bodyHeight = $document[0].body.scrollHeight;
+			var browserHeight = $window.innerHeight;
+			// if (bodyHeight > browserHeight) {
+			// 	browserHeight = bodyHeight;
+			// }
+			scope.mainNavBar.navBarStyle.height = browserHeight - 10 + "px"; // -10 for top-padding
 		}
 
 		/**
