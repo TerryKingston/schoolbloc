@@ -383,7 +383,6 @@ class TestRestList(Resource):
             return {'error': 'SQL integrity error: {}'.format(e)}, 409
         return {'success': 'Added successfully'}, 200
 
-
     def generate_docs(self):
         ids = []
         args = []
