@@ -52,6 +52,10 @@ POST request - create a new {{ orm }}. This will return '{success': 'Added succe
 )
 
 
+# TODO instead of raising exceptions, call abort with an appropiate json message
+#      and http status code
+
+
 def _get_constraint_foreign_name(orm, constraint):
     """
     Given an orm (model) and constraint (string), return the name of the
@@ -262,8 +266,7 @@ class TestRestList(Resource):
 
                 db.session.add(orm_class(**tmp_kwargs))
             except KeyError as e:
-                #raise Exception("missing key {} in constraint {}".format(str(e), constraint))
-                raise
+                raise Exception("missing key {} in constraint {}".format(str(e), constraint))
 
         # Save all new objects to db
         try:
