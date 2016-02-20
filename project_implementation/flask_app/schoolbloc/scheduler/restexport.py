@@ -74,6 +74,55 @@ def _get_constraint_foreign_name(orm, constraint):
     return foreign_name
 
 
+def _generate_parser(orm):
+    """
+    Adds all the columns of this orm to a parser
+
+    Here is what a parser might look like:
+
+    parser = {
+        'orm': 'Classroom',
+        'name': 'classrooms',  # orm.__tablename__
+        'required_params': {
+            'room_number': str,
+        },
+        'optional_params': {
+            'max_student_count': int,
+            'avail_start_time': int,
+            'avail_end_time': int,
+        },
+    }
+    """
+    parser = {'required_params': {}, 'optional_params': {}}
+    columns = orm.__table__.columns.values()
+    for column in columns:
+        name = column.name
+        col_type = column.type
+        required = not column.nullable  # nullable == not required
+
+        # TODO actually check form primary key, instead of assuming its called id
+        # Don't let someone specify a primary key
+        if name == 'id':
+            continue
+
+        # Store type of column
+        if type(col_type) is db.Integer:
+            type = int
+        elif type(col_type) is db.Boolean:
+            type = bool
+        elif type(col_type) is db.String:
+            type = str
+        else:
+            raise Exception("Unknown type {} found".format(col_type))
+
+        # Save data to parser
+        if required:
+            parser['requred_params'][name] = type
+        else:
+            parser['optional_params'][name] = type
+    return parser
+
+
 class TestRest(Resource):
 
     def get(self, orm_id):
@@ -98,7 +147,7 @@ class TestRest(Resource):
 
     def put(self, orm_id):
         # Argument parser
-        parser = self._generate_parser()
+        parser = _generate_parser(self.orm)
         args = parser.parse_args()
 
         # Get current orm object or abort
@@ -125,33 +174,6 @@ class TestRest(Resource):
         if not orm_object:
             abort(404, message="ID {} not found".format(orm_id))
         return orm_object
-
-    def _generate_parser(self):
-        """
-        Dynamically generate a reqparser for every Integer, Boolean, and String
-        object in this sqlalchemy table.
-        """
-        parser = reqparse.RequestParser()
-
-        columns = self.orm.__table__.columns.values()
-        for column in columns:
-            name = column.name
-            col_type = column.type
-
-            # Don't let someone change the primary id through the rest api
-            if name == 'id':
-                continue
-
-            if type(col_type) is db.Integer:
-                parser.add_argument(name, type=int, store_missing=False)
-            elif type(col_type) is db.Boolean:
-                parser.add_argument(name, store_missing=False)
-            elif type(col_type) is db.String:
-                parser.add_argument(name, store_missing=False)
-            else:
-                raise Exception("Unknown type {} found".format(col_type))
-
-        return parser
 
     def generate_docs(self):
         ids = []
@@ -195,8 +217,10 @@ class TestRestList(Resource):
         return ret
 
     def post(self):
-        parser = self._generate_parser()
+        parser = _generate_parser(self.orm)
         request_json = {}  # TODO get json from request
+
+        # TODO verify json datatype to what parser says it should be
 
         # Verify received json has required data, and make orm object from said data
         kwargs = {}
@@ -205,7 +229,7 @@ class TestRestList(Resource):
                 kwargs[param] = request_json['payload'][param]
                 del request_json['payload'][param]
             else:
-                raise Exception('param {} for {} not in payload'.format(param, primary_json['name']))
+                raise Exception('Required param {} for {} not in payload'.format(param, parser['name']))
         for param in parser['optional_params']:
             if param in request_json['optional_params']:
                 kwargs[param] = request_json['payload'][param]
@@ -215,17 +239,21 @@ class TestRestList(Resource):
 
         # only stuff left in json_request should be the constraint data. If there
         # is additional keys here, go ahead and error out instead of ignoring them
+        # (nothing has been commited to the db yet)
         for constraint, data in request_json.items():
-            if constraint not in parser:
-                raise Exception('Unexpected keyword found: {}'.format(constraint))
             try:
+                orm_class = self._find_constraint_mapping_table(constraint)
+                # TODO
+                this_id_name = 'classroom_id'
+                foreign_id_name = 'teacher_id'
+
                 tmp_kwargs = {}
                 tmp_kwargs['active'] = request_json[constraint]['active']
                 tmp_kwargs['priority'] = request_json[constraint]['priority']
-                # TODO get names of orm_key_id and foreigh_key_id
-                tmp_kwargs['foreign_key_id'] = request_json[constraint]['active']
-                tmp_kwargs['orm_key_id'] = orm_obj.id
-                db.session.add(data['orm'](**tmp_kwargs))
+                tmp_kwargs[this_id_name] = orm_obj.id
+                tmp_kwargs[foreign_id_name] = request_json[constraint]['id']
+
+                db.session.add(orm_class(**tmp_kwargs))
             except KeyError as e:
                 raise Exception("missing key {} in constraint {}".format(str(e), constraint))
 
@@ -237,98 +265,32 @@ class TestRestList(Resource):
             return {'error': 'SQL integrity error: {}'.format(e)}, 409
         return {'success': 'Added successfully'}, 200
 
-    def _generate_parser(self):
-        """ Adds all the columns of this orm to a parser """
-        # Example of what a parser might look like
-        parser = {
-            'orm': 'Classroom',
-            'name': 'classrooms',  # orm.__tablename__
-            'required_params': {
-                'room_number': str,
-            },
-            'optional_params': {
-                'max_student_count': int,
-                'avail_start_time': int,
-                'avail_end_time': int,
-            },
-            'constraints': {  # These should already exist in the db. All optional
-                'classrooms_courses': {  # orm.__tablename__
-                    'orm': 'ClassroomsCourse',
-                    'id': int,  # course.id (id instead of name for uniqueness)
-                    'active': bool,
-                    'priority': str,
-                },
-                'teachers': {
-                    'orm': 'ClassroomsTeacher',  # mapping table
-                    'id': int,  # Teacher id
-                    'active': bool,
-                    'priority': str,
-                },
-                'classrooms_timeblock': {
-                    'orm': 'ClassroomsTimeblock',
-                    'id': int,
-                    'active': bool,
-                    'priority': str,
-                },
-            }
-        }
-
-        parser = {'required_params': {}, 'optional_params': {}, 'constraints': {}}
-        columns = self.orm.__table__.columns.values()
-        for column in columns:
-            name = column.name
-            col_type = column.type
-            required = not column.nullable  # nullable == not required
-
-            # Don't let someone specify a primary key
-            if name == 'id':
-                continue
-
-            # Store type of columnt
-            if type(col_type) is db.Integer:
-                type = int
-            elif type(col_type) is db.Boolean:
-                type = bool
-            elif type(col_type) is db.String:
-                type = str
-            else:
-                raise Exception("Unknown type {} found".format(col_type))
-
-            # Save data to parser
-            if required:
-                parser['requred_params'][name] = type
-            else:
-                parser['optional_params'][name] = type
-        return parser
-
-    @staticmethod
-    def _generate_constraint(orm_constraint):
-        required_keys = ('#TODO_ID', 'active', 'priority')
-        columns = orm_constraint.__table__.columns.keys()
-        for key in required_keys:
-            if key not in columns:
-                raise Exception("Expected key {} not found in {}"
-                                .format(key, orm_constraint.__tablename__))
-
-        return {
-            'orm': orm_constraint,
-            'id': int,
-            'active': bool,
-            'priority': str,
-        }
-
-    def _generate_parser(self):
+    def _find_constraint_mapping_table(self, constraint_str):
         """
-        Dynamically generate a reqparser for every Integer, Boolean, and String
-        object in this sqlalchemy table.
+        If called on the orm object Classroom with the constraint_str 'teacher',
+        this should return ClassroomsTeachers (as it is the constraint mapping
+        table that ties Classroom and Teacher together. It searches
+        __restconstraints__ for this data.
+
+        The string needs to match what the actual relationship is called for
+        this to work. In this example, 'teacher' would work but 'teachers'
+        would fail because the relationship is defined as:
+        teacher = db.relationship("Teacher", backref="classrooms_teachers")
         """
-        parser = reqparse.RequestParser()
-        self._add_orm_to_parser(self.orm, parser)
         if not hasattr(self.orm, '__restconstraints__'):
-            return parser
-        for orm in self.orm.__restconstraints__:
-            parser[orm.__tablename__] = self._generate_constraint(orm)
-        return parser
+            raise Exception('no __restconstraints__ defined on {}'.format(self.orm))
+        for table_constraint in self.orm.__restconstraints__:
+            mapper_table = self.orm.__mapper__.relationships.get(table_constraint)
+            relationships = mapper_table.mapper.relationships.keys()
+            if len(relationships) != 2:
+                raise Exception('encountered a constraint mapping table that does not have '
+                                'two foreign keys')
+            if constraint_str in relationships:
+                # this is the table we are looking for. Return the actual ORM
+                # object, not the table name or relationship property objects
+                return mapper_table.mapper.class_
+        raise Exception('No table found under _restconstraints__ which maps'
+                        '{} to {}'.format(self.orm.__tablename__, constraint_str))
 
     def generate_docs(self):
         ids = []
