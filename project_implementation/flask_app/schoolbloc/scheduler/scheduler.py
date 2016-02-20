@@ -161,8 +161,8 @@ class Scheduler():
                                             self.max_class_size(course_id, room_id),
                                             0))
 
-
-        return ScheduleData(class_list)
+        timeblocks = Timeblock.query.all()
+        return ScheduleData(class_list, timeblocks)
 
 
     def make_schedule(self):
@@ -202,7 +202,7 @@ class Scheduler():
                 schedule = self.gen_sched_classes(solver.model(), class_count, sched_constraints)
             # now start assigning students to classes and see if we can find
             # a place for every student
-            collisions = self.place_students(schedule)
+            collisions = self.place_students(schedule, sched_constraints.student_requirement_set)
             if len(collisions) == 0:
                 print('\033[92m Satisfied! \033[0m')
                 print('\033[92m {} \033[0m'.format(schedule))
@@ -223,10 +223,12 @@ class Scheduler():
         raise SchedulerNoSolution()
 
 
-    def place_students(self, schedule):
+    def place_students(self, schedule, student_requirement_set):
         collisions = []
-        for student in self.sched_students:
-            collision = schedule.schedule_student(student)
+        for student_reqs in student_requirement_set:
+            collision = schedule.schedule_student(student_reqs.student_id, 
+                                                  student_reqs.required_course_ids, 
+                                                  student_reqs.optional_course_ids)
             if collision:
                 collisions.append(collision)
                 return collisions

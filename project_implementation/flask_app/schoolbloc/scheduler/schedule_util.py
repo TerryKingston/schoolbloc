@@ -2,9 +2,11 @@ from schoolbloc.scheduler.models import ScheduledClass, ScheduledClassesStudent
 from schoolbloc import db
 
 class ScheduleData:
-    def __init__(self, class_list):
+    def __init__(self, class_list, timeblocks):
         self.scheduled_classes = {}
         self.errors = []
+        self.timeblocks = timeblocks
+
         for cls in class_list:
             if cls.course_id not in self.scheduled_classes:
                 self.scheduled_classes[cls.course_id] = []
@@ -38,7 +40,7 @@ class ScheduleData:
         db.session.commit()
 
     # def schedule_student_required_classes(self, student):
-    #     for course_id in student.required_courses:
+    #     for course_id in student.required_course_ids:
     #         if not self._add_student_to_course(student, course_id):
     #             msg = "Failed adding course {} to student {}".format(course_id, student.id)
     #             self.errors.append(msg)
@@ -55,17 +57,18 @@ class ScheduleData:
     #             return False
     #     return True
 
-    def schedule_student(self, student):
+    def schedule_student(self, student_id, required_course_ids, optional_course_ids):
+        student = ScheduleStudent(student_id, required_course_ids, optional_course_ids, self.timeblocks)        
         print("placing student {}".format(student.id))
         return self.schedule_student_to_courses(student, 0)
             
     def schedule_student_to_courses(self, student, course_index):
-        if course_index >= len(student.required_courses):
+        if course_index >= len(student.required_course_ids):
             return None
         
         # loop through the list of scheduled classes for each course
         # to find one that is free
-        course_id = student.required_courses[course_index]
+        course_id = student.required_course_ids[course_index]
         collision = None
         for sch_class in self.scheduled_classes[course_id]:
             # if the time block for this class is not already 
@@ -142,7 +145,7 @@ class ScheduleClass:
 
 
 class ScheduleStudent:
-    def __init__(self, id, num_of_timeblocks, required_courses, optional_courses):
+    def __init__(self, id, required_course_ids, optional_course_ids, timeblocks):
         """
         Student object for building a schedules
 
@@ -153,22 +156,23 @@ class ScheduleStudent:
         :return:
         """
         self.id = id
+        self.required_course_ids = required_course_ids
+        self.optional_course_ids = optional_course_ids
+        # map timeblocks to classes
         self.timeblocks = {}
-        for i in range(num_of_timeblocks):
-            self.timeblocks[i] = None
-        self.required_courses = required_courses
-        self.optional_courses = optional_courses
+        for t in timeblocks:
+            self.timeblocks[t.id] = None 
 
-    def get_avail_timeblocks(self):
-        """
-        returns a list of timeblock ids that are not assigned to 
-        a course.
-        """
-        time_list = []
-        for timeblock_id, course in self.timeblocks.items():
-            if not course:
-                time_list.append(timeblock_id)
-        return time_list
+    # def get_avail_timeblocks(self):
+    #     """
+    #     returns a list of timeblock ids that are not assigned to 
+    #     a course.
+    #     """
+    #     time_list = []
+    #     for timeblock_id, course in self.timeblocks.items():
+    #         if not course:
+    #             time_list.append(timeblock_id)
+    #     return time_list
 
 class ScheduleCollision:
     def __init__(self, student, scheduled_class, collision_type):

@@ -30,7 +30,7 @@ class ScheduleConstraints:
         self.class_count = 0
         self.constraints = [] # the list of z3 constraints
         self.class_constraints = {} 
-        self.student_req_list = [] # list of StudentRequirement objects
+        self.student_requirement_set = [] # list of StudentRequirement objects
 
         self.prep_class_constraints()
         self.prep_z3_classes()
@@ -71,7 +71,8 @@ class ScheduleConstraints:
         for student in Student.query.all():
             # make a list of the required course ids for the student
             req_courses = self.calc_student_courses(student.id)
-            student_req_list.append(StudentRequirements(required_courses))
+            student_reqs = StudentRequirements(student.id, req_courses, [])
+            self.student_requirement_set.append(student_reqs)
 
             # detect if the student is over scheduled
             self.check_if_student_is_overscheduled(req_courses)
@@ -437,10 +438,10 @@ class ScheduleConstraints:
         return cons_list
 
 class StudentRequirements:
-    def __init__(self, student_id):
+    def __init__(self, student_id, required_course_ids, optional_course_ids):
         self.student_id = student_id
-        self.requred_course_ids = []
-        self.optional_course_ids = []
+        self.required_course_ids = required_course_ids
+        self.optional_course_ids = optional_course_ids
 
 
 class ClassConstraint:
