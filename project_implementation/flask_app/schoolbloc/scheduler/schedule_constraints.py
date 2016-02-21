@@ -6,6 +6,7 @@ from schoolbloc.config import config
 # a class represents a mapping of teacher, room, course, time, and students
 # Z3 will choose integers for teacher, room, course, and time. Its our job to
 # restrict the choices of integer to only valid IDs of correspoding DB objects
+
 SchClass = Datatype('SchClass')
 
 SchClass.declare('SchClass', ('teacher', IntSort()),
@@ -63,7 +64,7 @@ class ScheduleConstraints:
     def __init__(self):
         self.class_count = 0
         self.db_constraints = [] # the list of z3 constraints generated from the DB
-        self.course_time_constraints = [] # constraints generated from course-time collisions
+        self.course_time_constraints = {} # constraints generated from course-time collisions. student_id => constraint list
 
         self.class_constraints = {} 
         self.student_requirement_set = [] # list of StudentRequirement objects
@@ -77,8 +78,10 @@ class ScheduleConstraints:
         """
         returns the current set of constraints
         """
-        return self.db_constraints + self.course_time_constraints
-
+        constraints = self.db_constraints
+        for student_id, const_list in self.course_time_constraints.items():
+            constraints += const_list
+        return constraints
 
     def prep_z3_classes(self):
         self.z3_classes = [Const("class_%s" % (i + 1), SchClass) for i in range(self.class_count)] 
@@ -118,7 +121,7 @@ class ScheduleConstraints:
             self.student_requirement_set.append(student_reqs)
 
             # detect if the student is over scheduled
-            self.check_if_student_is_overscheduled(req_courses)
+            ScheduleConstraints.check_if_student_is_overscheduled(student, req_courses)
             # now go through the list and create courses when needed
             for course_id in req_courses:
                 if course_id not in self.class_constraints:
@@ -133,8 +136,8 @@ class ScheduleConstraints:
                     new_class = ClassConstraint(course_id)
                     self.class_constraints[course_id].insert(0, new_class)
                     self.class_count += 1
-
-    def check_if_student_is_overscheduled(self, required_courses):
+    @staticmethod
+    def check_if_student_is_overscheduled(student, required_courses):
         timeblock_count = Timeblock.query.count()
         if len(required_courses) > timeblock_count:
             msg = "Student {} course req ({}) is greater than time block count ({})".format(
@@ -142,24 +145,34 @@ class ScheduleConstraints:
             raise SchedulerNoSolution(msg)
             
     def gen_constraints_from_collisions(self, collisions):
+        # choose the student with the most collisions that doesn't already
+        # have a constraint made for them, and make a timeblock
+        # constraint to give them a course path
+        student_collision_list = {}
         for col in collisions:
-            msg = "{} collision on student {} course {}".format(
-                col.collision_type, col.student.id, col.scheduled_class.course_id)
-            print('\033[91m{}\033[0m'.format(msg))
-            # now make a constraint to avoid the collision
-            if col.collision_type == 'timeblock':
-                # self.add_class_of_course(col.scheduled_class.course_id)
-                # self.restrict_timeblocks(col.scheduled_class.course_id, col.scheduled_class.timeblock_id)
-                self.add_timeblock_constraints_for_student(col.student)
+            if col.collision_type == 'full class':
+                continue
+            student_id = col.student.id
+            if student_id not in student_collision_list:
+                student_collision_list[student_id] = []
+            student_collision_list[student_id].append(col)
 
-            elif col.collision_type == 'full class':
-                pass
+        max_count = 0
+        max_collision = None
+        for student_id, coll_list in student_collision_list.items():
+            if len(coll_list) > max_count and student_id not in self.course_time_constraints:
+                max_collision = coll_list[0]
+                max_count = len(coll_list)
+
+        # now make a constraint to avoid the collision
+        self.add_timeblock_constraints_for_student(max_collision.student)
+
 
     def add_class_for_course(self, course_id):
         class_const = ClassConstraint(course_id)
-        class_const.timeblock_ids = self.calc_avail_timeblocks(course_id)
-        class_const.teacher_ids = self.calc_avail_teachers(course_id)
-        class_const.room_ids = self.calc_avail_rooms(course_id)
+        # class_const.timeblock_ids = self.calc_avail_timeblocks(course_id)
+        # class_const.teacher_ids = self.calc_avail_teachers(course_id)
+        # class_const.room_ids = self.calc_avail_rooms(course_id)
         
         self.class_constraints[course_id].append(class_const)
         self.class_count += 1
@@ -195,7 +208,9 @@ class ScheduleConstraints:
                         and_list += [ self.time(path[i]) != self.time(path[j]) ]
             or_list += [ And(and_list) ]
 
-        self.course_time_constraints += [ Or(or_list) ]
+        if student.id not in self.course_time_constraints:
+            self.course_time_constraints[student.id] = []
+        self.course_time_constraints[student.id] += [ Or(or_list) ]
 
 
 

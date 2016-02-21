@@ -1,11 +1,14 @@
-from schoolbloc.scheduler.models import ScheduledClass, ScheduledClassesStudent
+from schoolbloc.scheduler.models import Timeblock, ScheduledClass, Schedule, ScheduledClassesStudent
 from schoolbloc import db
 
 class ScheduleData:
-    def __init__(self, class_list, timeblocks):
+    def __init__(self, class_list):
         self.scheduled_classes = {}
         self.errors = []
-        self.timeblocks = timeblocks
+
+        self.timeblocks = {}
+        for timeblock in Timeblock.query.all():
+            self.timeblocks[timeblock.id] = timeblock
 
         for cls in class_list:
             if cls.course_id not in self.scheduled_classes:
@@ -28,8 +31,8 @@ class ScheduleData:
         db.session.flush()
         for course_id, cls_list in self.scheduled_classes.items():
             for c in cls_list:
-                start_time = self.timeblocks[c.timeblock_id].start
-                end_time = self.timeblocks[c.timeblock_id].end
+                start_time = self.timeblocks[c.timeblock_id].start_time
+                end_time = self.timeblocks[c.timeblock_id].end_time
                 cls = ScheduledClass(schedule_id=db_schedule.id, teacher_id=c.teacher_id, course_id=c.course_id, 
                                      classroom_id=c.room_id, start_time=start_time, end_time=end_time)
                 db.session.add(cls)
@@ -62,33 +65,44 @@ class ScheduleData:
 
     def schedule_student(self, student_id, required_course_ids, optional_course_ids):
         student = ScheduleStudent(student_id, required_course_ids, optional_course_ids, self.timeblocks)        
-        print("placing student {}".format(student.id))
-        return self.schedule_student_to_courses(student, 0)
+        collisions = self.schedule_student_to_courses(student, 0)
+        return collisions
+
+    def clear_all_students(self):
+        for course_id, class_list in self.scheduled_classes.items():
+            for sch_class in class_list:
+                sch_class.drop_all_students()
             
     def schedule_student_to_courses(self, student, course_index):
+        """
+        returns a list of collisions that occurred when attempting to schedule the student
+        to the course. If the student is scheduled successfully, an empty list is returned
+        """
         if course_index >= len(student.required_course_ids):
-            return None
+            return []
         
+        collisions = []
         # loop through the list of scheduled classes for each course
         # to find one that is free
         course_id = student.required_course_ids[course_index]
-        collision = None
         for sch_class in self.scheduled_classes[course_id]:
             # if the time block for this class is not already 
             # filled with something else for this student, then use
             # this class and recursively assign the next class
             collision = sch_class.add_student(student)
-            if not collision:
-                collision = self.schedule_student_to_courses(student, course_index + 1)
-                if not collision:
-                    return None
+            if collision:
+                collisions.append(collision)
+                # add the collision to the list, then try the next class
+            else:
+                col_list = self.schedule_student_to_courses(student, course_index + 1)
+                if len(col_list) == 0:
+                    return [] # return an empty list to indicate the student was placed
                 else:
                     sch_class.drop_student(student)
+                    collisions += col_list
             # else, try the next class
-        msg = "Failed adding course {} to student {}".format(course_id, student.id)
-        self.errors.append(msg)
         # If we didn't find any classes that would work then return false
-        return collision
+        return collisions
 
 
     # def _add_student_to_course(self, student, course_id):
@@ -132,20 +146,21 @@ class ScheduleClass:
     def add_student(self, student):
         # Class full or student already schedules during this time
         if len(self.students) >= self.max_student_count:
-            print ("class for course {} is full".format(self.course_id))
+            # print("course {} count= {} max={}".format(self.course_id, len(self.students), self.max_student_count))
             return ScheduleCollision(student, self, "full class")
-        if student.timeblocks[self.timeblock_id]:
+        if student.timeblock_to_course[self.timeblock_id]:
             return ScheduleCollision(student, self, "timeblock")
 
         self.students.append(student)
-        student.timeblocks[self.timeblock_id] = self
+        student.timeblock_to_course[self.timeblock_id] = self
         return None
 
     def drop_student(self, student):
         self.students.remove(student)
-        student.timeblocks[self.timeblock_id] = None
+        student.timeblock_to_course[self.timeblock_id] = None
 
-
+    def drop_all_students(self):
+        self.students = []
 
 class ScheduleStudent:
     def __init__(self, id, required_course_ids, optional_course_ids, timeblocks):
@@ -162,9 +177,9 @@ class ScheduleStudent:
         self.required_course_ids = required_course_ids
         self.optional_course_ids = optional_course_ids
         # map timeblocks to classes
-        self.timeblocks = {}
-        for t in timeblocks:
-            self.timeblocks[t.id] = None 
+        self.timeblock_to_course = {}
+        for t_id, timeblock in timeblocks.items():
+            self.timeblock_to_course[t_id] = None 
 
     # def get_avail_timeblocks(self):
     #     """

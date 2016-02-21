@@ -80,9 +80,9 @@ class FullScheduleTests(unittest.TestCase):
                                                   lunch_end=1205,
                                                   class_duration=50)
 
-        stud_7th_list = TestUtil.generate_students(10)
-        stud_8th_list = TestUtil.generate_students(10)
-        stud_9th_list = TestUtil.generate_students(10)
+        stud_7th_list = TestUtil.generate_students(15)
+        stud_8th_list = TestUtil.generate_students(15)
+        stud_9th_list = TestUtil.generate_students(15)
 
         # Add the teachers
         teacher_list = [("S", "Owen"),("M", "Evans"), ("S", "Evans"), ("J", "Green"),
