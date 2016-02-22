@@ -13,16 +13,16 @@
                 {{'dynamicTable.CONSTRAINT_LIST' | translate}}:
                 <input list="constraintList" placeholder="{{'dynamicTable.CHOOSE_CONSTRAINT' | translate}}" ng-model="row.value">
                 <datalist id="constraintList">
-                  <option ng-repeat="constraint in row.constraints" value="{{constraint}}">{{constraint}}</option>
+                  <option ng-repeat="constraint in row.constraints track by $index" value="{{constraint}}">{{constraint}}</option>
                 </datalist>
               </label>
               <div class="table-editor-priority">
                 <button class="priority-help">?</button>
                 <section class="priority-help-tooltip">
                   <div class="tooltip-text">
-                    <p>!!(M)andatory: schedule will fail if it cannot be fulfilled.</p>
-                    <p>!!(H)igh: schedule is highly recommended to fulfill.</p>
-                    <p>!!(L)ow: schedule is suggested to fulfill.</p>
+                    <p>{{'dynamicTable.MANDATORY_TOOLTIP' | translate}}</p>
+                    <p>{{'dynamicTable.HIGH_TOOLTIP' | translate}}</p>
+                    <p>{{'dynamicTable.LOW_TOOLTIP' | translate}}</p>
                   </div>
                   <div class="triangle-up"></div>
                 </section>
@@ -40,7 +40,7 @@
           <div class="table-editor-right">
             <a href="" ng-click="toggleFilters(row)">{{row.showFiltersText}}</a>
             <div class="table-editor-filters" ng-class="{'table-editor-filters-hide': !row.showFilters}">
-              <label ng-repeat="filter in row.filters"><input type="checkbox" ng-model="filter.checked" ng-disabled="!row.showFilters">{{filter.text}}</label>
+              <label ng-repeat="filter in row.filters track by $index"><input type="checkbox" ng-model="filter.checked" ng-disabled="!row.showFilters">{{filter.text}}</label>
             </div>
           </div>
         </div>

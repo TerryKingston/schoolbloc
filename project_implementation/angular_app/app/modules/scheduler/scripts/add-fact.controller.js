@@ -29,6 +29,8 @@ angular.module('sbAngularApp')
 
 	};
 
+	$scope.translations = {};
+
 	$scope.toggleAddFact = function (show) {
 		$scope.addFactConfig.showAddFact = show;
 	};
@@ -75,11 +77,11 @@ angular.module('sbAngularApp')
 		var number = factInput.value;
 		number = parseInt(number);
 		if (isNaN(number)) {
-			factInput.error = "!!Input must be a number.";
+			factInput.error = $scope.translations.ERROR_MUST_NUMBER;
 			return;
 		}
 		if (number < 0) {
-			factInput.error = "!!Must be a positive integer.";
+			factInput.error = $scope.translations.ERROR_POS_INT;
 		}
 
 		factInput.error = null;
@@ -102,7 +104,7 @@ angular.module('sbAngularApp')
 		}
 		convertedInput = commonService.formatDateInput(convertedInput);
 		if (convertedInput === "ERROR") {
-			factInput.error = "!!Invalid input. Must follow: MM/DD/YYYY";
+			factInput.error = $scope.translations.ERROR_DATE;
 			return;
 		}
 		factInput.error = null;
@@ -116,7 +118,7 @@ angular.module('sbAngularApp')
 		}
 		convertedInput = commonService.formatTimeInput2S(convertedInput);
 		if (convertedInput === "ERROR") {
-			factInput.error = "!!Invalid input. Valid example: 9:35AM";
+			factInput.error = $scope.translations.ERROR_TIME;
 			return;
 		}
 		factInput.error = null;
@@ -125,14 +127,14 @@ angular.module('sbAngularApp')
 
 	function checkMin(factInput) {
 		if (!factInput.value.min && !factInput.value.min !== 0 && factInput.required) {
-			factInput.error = "!!Input is required.";
+			factInput.error = $scope.translations.ERROR_REQUIRED;
 			return;
 		}
 		if (factInput.value.min < 0) {
-			factInput.error = "!!Cannot have a negative value.";
+			factInput.error = $scope.translations.ERROR_NEG_VALUE;
 		} 
 		else if (factInput.value.min > factInput.value.max && factInput.value.max) {
-			factInput.error = "!!Cannot have the min > max."
+			factInput.error = $scope.translations.ERROR_MIN_MAX;
 		}
 		else {
 			factInput.error = null;
@@ -141,14 +143,14 @@ angular.module('sbAngularApp')
 
 	function checkMax(factInput) {
 		if (!factInput.value.max && !factInput.value.max !== 0 && factInput.required) {
-			factInput.error = "!!Input is required.";
+			factInput.error = $scope.translations.ERROR_REQUIRED;
 			return;
 		}
 		if (factInput.value.max < 1) {
-			factInput.error = "!!Must be a positive value.";
+			factInput.error = $scope.translations.ERROR_POS_INT;
 		} 
 		else if (factInput.value.min > factInput.value.max && factInput.value.min) {
-			factInput.error = "!!Cannot have the min > max."
+			factInput.error = $scope.translations.ERROR_MIN_MAX;
 		}
 		else {
 			factInput.error = null;
@@ -162,7 +164,7 @@ angular.module('sbAngularApp')
 			return true;
 		}
 		if (factInput.required && !factInput.value) {
-			factInput.error = "!!Input is required.";
+			factInput.error = $scope.translations.ERROR_REQUIRED;
 			return true;
 		}
 		return false;
@@ -182,7 +184,7 @@ angular.module('sbAngularApp')
 			return;
 		}
 
-		factInput.error = "!!Must be item from list.";
+		factInput.error = $scope.translations.ERROR_LIST_ITEM;
 		for (i = 0; i < factInput.possibleAnswers.length; i++) {
 			if (factInput.possibleAnswers[i] === factInput.value) {
 				factInput.error = null;
@@ -197,7 +199,7 @@ angular.module('sbAngularApp')
 			return;
 		}
 		
-		factInput.error = "!!Must be item from list.";
+		factInput.error = $scope.translations.ERROR_LIST_ITEM;
 		for (i = 0; i < factInput.facts.length; i++) {
 			if (factInput.facts[i] === factInput.value) {
 				factInput.error = null;
@@ -207,7 +209,45 @@ angular.module('sbAngularApp')
 
 	$scope.saveFact = function (addAnotherFact) {
 		var i,
-			ftc = $scope.addFactConfig.factTypeConfig;
+			duplicateMap,
+			ftc = $scope.addFactConfig.factTypeConfig,
+			fe;
+
+		// no config object given
+		if (!$scope.addFactConfig.factTypeConfig || !$scope.addFactConfig.factTypeConfig.length) {
+			$scope.addFactConfig.factEntry = null;
+			return;
+		}
+
+		// remove any empty added input fields
+		for (i = 0; i < ftc.length; i++) {
+			if (ftc[i].addedValue && (ftc[i].value === null || ftc[i].value === "")) {
+				$scope.removeInput(ftc[i], i);
+				// reduce i becaues we've reduced the array
+				i--;
+			}
+		}
+
+		// remove duplicate added input fields
+		duplicateMap = {};
+		for (i = 0; i < ftc.length; i++) {
+			if (ftc[i].addedValue) {
+				// if we already have that value for this input set, remove this one
+				if (duplicateMap[ftc[i].value]) {
+					$scope.removeInput(ftc[i], i);
+					// reduce i becaues we've reduced the array
+					i--;
+				}
+				else {
+					duplicateMap[ftc[i].value] = true;
+				}
+			}
+			// reset the duplicate checker for the next not-added input field
+			else {
+				duplicateMap = {};
+				duplicateMap[ftc[i].value] = true;
+			}
+		}
 
 		// check all input fields for errors
 		for (i = 0; i < ftc.length; i++) {
@@ -230,11 +270,6 @@ angular.module('sbAngularApp')
 
 		//// @TODO: set the factEntry keys according to the config object
 		// 
-		// no config object given
-		if (!$scope.addFactConfig.factTypeConfig || !$scope.addFactConfig.factTypeConfig.length) {
-			$scope.addFactConfig.factEntry = null;
-			return;
-		}
 		$scope.addFactConfig.factEntry = {};
 		fe = $scope.addFactConfig.factEntry;
 		for (i = 0; i < ftc.length; i++) {
@@ -242,10 +277,39 @@ angular.module('sbAngularApp')
 		}
 
 		// @TODO: reset the form
+		$scope.resetForm();
 
 		// if save instead of save & add another
 		if (!addAnotherFact) {
 			$scope.addFactConfig.showAddFact = false;
+		}
+	};
+
+	$scope.resetForm = function (factInput, index) {
+		var i,
+			ftc = $scope.addFactConfig.factTypeConfig;
+
+		// remove all added input fields
+		for (i = 0; i < ftc.length; i++) {
+			if (ftc[i].addedValue) {
+				$scope.removeInput(ftc[i], i);
+				// reduce i becaues we've reduced the array
+				i--;
+			}
+		}
+
+		// set all values to null
+		for (i = 0; i < ftc.length; i++) {
+			// special case for object value types
+			if (ftc[i].type === "minMax") {
+				ftc[i].value = {
+					min: null,
+					max: null
+				}
+			}
+			else {
+				ftc[i].value = null;
+			}
 		}
 	};
 
@@ -313,6 +377,38 @@ angular.module('sbAngularApp')
 
 		$translate("schedulerModule.ADDING_FACT").then(function (translation) {
 			$scope.addFactConfig.addingFactText = commonService.format(translation, [$scope.tableConfig.tableSelection]);
+		});
+
+		$translate("schedulerModule.ERROR_LIST_ITEM").then(function (translation) {
+			$scope.translations.ERROR_LIST_ITEM = translation;
+		});
+
+		$translate("schedulerModule.ERROR_MUST_NUMBER").then(function (translation) {
+			$scope.translations.ERROR_MUST_NUMBER = translation;
+		});
+
+		$translate("schedulerModule.ERROR_POS_INT").then(function (translation) {
+			$scope.translations.ERROR_POS_INT = translation;
+		});
+
+		$translate("schedulerModule.ERROR_DATE").then(function (translation) {
+			$scope.translations.ERROR_DATE = translation;
+		});
+
+		$translate("schedulerModule.ERROR_TIME").then(function (translation) {
+			$scope.translations.ERROR_TIME = translation;
+		});
+
+		$translate("schedulerModule.ERROR_NEG_VALUE").then(function (translation) {
+			$scope.translations.ERROR_NEG_VALUE = translation;
+		});
+
+		$translate("schedulerModule.ERROR_MIN_MAX").then(function (translation) {
+			$scope.translations.ERROR_MIN_MAX = translation;
+		});
+
+		$translate("schedulerModule.ERROR_REQUIRED").then(function (translation) {
+			$scope.translations.ERROR_REQUIRED = translation;
 		});
 	};
 

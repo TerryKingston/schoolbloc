@@ -83,6 +83,10 @@
 	"dynamicTable.SAVE_ANOTHER": "Save & Add Another",
 	"dynamicTable.FILTERS_SHOW": "Show Filters",
 	"dynamicTable.FILTERS_HIDE": "Hide Filters",
+	"dynamicTable.MANDATORY_TOOLTIP": "(M)andatory: schedule will fail if it cannot be fulfilled.",
+	"dynamicTable.HIGH_TOOLTIP": "(H)igh: schedule is highly recommended to fulfill.",
+	"dynamicTable.LOW_TOOLTIP": "(L)ow: schedule is suggested to fulfill.",
+	
 	"schedulerModule.TITLE": "Scheduler - Admin View",
 	"schedulerModule.SUBTITLE": "Viewing the facts & constraints for {0} term.",
 	"schedulerModule.SUBTITLE_ACTION": "Change Term",
@@ -113,5 +117,13 @@
 	"schedulerModule.MAX": "Max",
 	"schedulerModule.START": "Start",
 	"schedulerModule.END": "End",
-	"schedulerModule.DATE_PLACEHOLDER": "mm/dd/yyyy"
+	"schedulerModule.DATE_PLACEHOLDER": "mm/dd/yyyy",
+	"schedulerModule.ERROR_LIST_ITEM": "Must be item from list.",
+	"schedulerModule.ERROR_MUST_NUMBER": "Input must be a number.",
+	"schedulerModule.ERROR_POS_INT": "Must be a positive integer.",
+	"schedulerModule.ERROR_DATE": "Invalid input. Must follow: MM/DD/YYYY",
+	"schedulerModule.ERROR_TIME": "Invalid input. Valid example: 9:35AM",
+	"schedulerModule.ERROR_NEG_VALUE": "Cannot have a negative value.",
+	"schedulerModule.ERROR_MIN_MAX": "Cannot have the min > max.",
+	"schedulerModule.ERROR_REQUIRED": "Input is required."
 }
