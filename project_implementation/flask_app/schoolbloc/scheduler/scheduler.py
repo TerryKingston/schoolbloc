@@ -64,7 +64,9 @@ class Scheduler():
         self.class_constraints = {}
 
         self.custom_constraints = []
-
+        # Next, ask z3 for a configuration of course, teacher, room, and time.
+        self.solver = Solver()
+        self.solver.set(timeout=300000) # 5 min
 
     def __repr__(self):
         return "<day_start_time={} day_end_time={} break_length={} lunch_start={} lunch_end={} class_duration={}>".format(
@@ -170,36 +172,17 @@ class Scheduler():
         # first step, decide how many classes of each course we need
         # this is decided based on the need of the students, and what 
         # teachers and rooms are available for each course.
-
-        # figure out how many time blocks we have in a day and get an array
-        # of them. the index of the array represents the id of the time block 
-        # for z3 
         sched_constraints = ScheduleConstraints()
         class_count = sched_constraints.class_count
 
-        # We'll add all the constraints (implied and user provided). 
-        # timing_start = time.time()
-
-        # Next, ask z3 for a configuration of course, teacher, room, and time.
-        solver = Solver()
-        solver.set(timeout=300000) # 5 min
-        solver.push()
-
-        
-        attempts = 300
+        attempts = len(sched_constraints.student_requirement_set) / 10
         for i in range(attempts):
             print('\033[92m Attempt {} -----------------------------------------------\033[0m'.format(i + 1))
-            solver.push()
-            solver.add(sched_constraints.get_constraints())
+            self.push_constraints(sched_constraints.get_constraints())
 
             if solver.check() != sat:
-                # pop the current constraints and add another class. then recalculate the constraints
-                solver.pop()
-                solver.push()
                 print('\033[91m No sat, trying again with {} classes...\033[0m'.format(class_count))
                 raise SchedulerNoSolution('Not satisfiable')
-                # solver.add(sched_constraints.get_constraints())
-                # continue
             else:
                 schedule = self.gen_sched_classes(solver.model(), class_count, sched_constraints)
             # now start assigning students to classes and see if we can find
@@ -212,20 +195,34 @@ class Scheduler():
                 schedule.save()
                 return
             else:
-                # pop off the constraints so we can reset them
-                solver.pop()
-                # push a new 'constraint frame' so we can pop it later if needed
-                solver.push()
                 print('\033[91m Failed placing students, adding constraints and trying again...\033[0m')
                 sched_constraints.gen_constraints_from_collisions(collisions)
-                # send response constraints to be included in DB generated constraints
-                solver.add(sched_constraints.get_constraints())
+                self.set_constraints(sched_constraints.get_constraints())
+
+        sched_constraints.add_class_from_collisions(collisions)
 
         print('\033[91m Reached max attempts \033[0m')
         raise SchedulerNoSolution()
 
+    def push_constraints(self, constraints):
+        self.solver.push() # push a new 'constraint frame' so we can pop it later if needed
+        self.solver.add(constraints)
+
+    def set_constraints(self, constraints):
+        self.solver.pop() # pop off the constraints so we can reset them
+        self.solver.push() # push a new 'constraint frame' so we can pop it later if needed
+        self.solver.add(constraints)
+
 
     def place_students(self, schedule, student_requirement_set):
+        """
+        Attempts to place all the students in the schedule. This method will try to place the student
+        and if it fails, it will call a method to add targeted constraints then try placing the students again.
+
+        :param schedule: the ScheduleData constructed out of the z3
+        :param student_requirement_set:
+        :return: True if successfully placed all students, False otherwise
+        """
         # try every order of placing students, if they all fail, add constraints and try again
         all_collisions = []
         for i in range(len(student_requirement_set)):
@@ -239,7 +236,7 @@ class Scheduler():
                     #     student_reqs.student_id))
                     schedule.clear_all_students()
                     all_collisions += collisions
-                    random.shuffle(student_requirement_set)
+
                     break
             # if we placed every student then return an empty list indicating success
             if len(all_collisions) == 0:

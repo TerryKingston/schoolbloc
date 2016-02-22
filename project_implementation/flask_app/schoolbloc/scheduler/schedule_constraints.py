@@ -167,6 +167,31 @@ class ScheduleConstraints:
         # now make a constraint to avoid the collision
         self.add_timeblock_constraints_for_student(max_collision.student)
 
+    def add_class_from_collisions(self, collisions):
+        """
+        Adds a ClassConstraint to the set of class constraints. The course to use for the class is determined
+        by the given list of collisions. The most common course among the collisions is used.
+        :param collisions: A list of collision objects generated from the last attempt at scheduling
+        :return: None (use self.get_constraints() to see the results of this action)
+        """
+        # find the most popular course among the collisions
+        course_collision_list = {}
+        for col in collisions:
+            if col.collision_type == 'full class':
+                continue
+            course_id = col.scheduled_class.course_id
+            if course_id not in course_collision_list:
+                course_collision_list[course_id] = []
+            course_collision_list[course_id].append(col)
+
+        best_count = 0
+        best_collision = None
+        for course_id, coll_list in course_collision_list.items():
+            if len(coll_list) > best_count:
+                best_count = len(coll_list)
+                best_collision = coll_list[0]
+        # TODO: Finish implementation (add a class for the course to the list of ClassConstraints)
+
 
     def add_class_for_course(self, course_id):
         class_const = ClassConstraint(course_id)
