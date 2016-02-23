@@ -322,7 +322,7 @@ class Subject(db.Model, SqlalchemySerializer):
     A subject is a group of courses
     """
     __tablename__ = 'subjects'
-    __restconstraints__ = ['courses_subjects', 'student_groups_subjects', 'subjects_students', 'subjects_timeblocks']
+    __restconstraints__ = ['courses_subjects', 'student_groups_subjects', 'students_subjects', 'subjects_timeblocks']
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(255), nullable=False)
 
