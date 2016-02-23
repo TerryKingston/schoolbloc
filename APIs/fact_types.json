@@ -152,13 +152,13 @@
 		//	"multipleValues": true
 		//},
 		{
-			"key": "student group", // make sure this is actually connected
+			"key": "student_group", // make sure this is actually connected
 			"required": false,
 			"type": "constraint",
 			"multipleValues": true
 		},
 		{
-			"key": "required course", // make sure this is actually connected and named correctly
+			"key": "course", // make sure this is actually connected and named correctly
 			"required": false,
 			"type": "constraint",
 			"multipleValues": true
@@ -190,7 +190,7 @@
 			"multipleValues": true
 		},
 		{
-			"key": "required course", // make sure this is actually connected and named correctly
+			"key": "course", // make sure this is actually connected and named correctly
 			"required": false,
 			"type": "constraint",
 			"multipleValues": true

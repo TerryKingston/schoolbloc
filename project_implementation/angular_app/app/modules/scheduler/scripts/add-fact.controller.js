@@ -79,11 +79,12 @@ angular.module('sbAngularApp')
 		var number = factInput.value;
 		number = parseInt(number);
 		if (isNaN(number)) {
-			factInput.error = $scope.translations.ERROR_MUST_NUMBER;
+			factInput.error = $scope.translations.ERROR_POS_INT;
 			return;
 		}
-		if (number < 0) {
+		if (number <= 0) {
 			factInput.error = $scope.translations.ERROR_POS_INT;
+			return;
 		}
 
 		factInput.error = null;
@@ -161,11 +162,11 @@ angular.module('sbAngularApp')
 
 	function checkRequired(factInput) {
 		// if it's empty but not required, we don't want to do further checks
-		if (!factInput.required && !factInput.value) {
+		if (!factInput.required && (factInput.value === null || factInput.value === "")) {
 			factInput.error = null;
 			return true;
 		}
-		if (factInput.required && !factInput.value) {
+		if (factInput.required && (factInput.value === null || factInput.value === "")) {
 			factInput.error = $scope.translations.ERROR_REQUIRED;
 			return true;
 		}
@@ -397,15 +398,95 @@ angular.module('sbAngularApp')
 
 	function getDynamicTranslations() {
 		$translate("schedulerModule.ADD_FACT").then(function (translation) {
-			$scope.addFactConfig.addFactText = commonService.format(translation, [$scope.tableConfig.tableSelection]);
+			$scope.addFactConfig.addFactText = commonService.format(translation, [$scope.translations[$scope.tableConfig.tableSelection]]);
 		});
 
 		$translate("schedulerModule.ADDING_FACT").then(function (translation) {
-			$scope.addFactConfig.addingFactText = commonService.format(translation, [$scope.tableConfig.tableSelection]);
+			$scope.addFactConfig.addingFactText = commonService.format(translation, [$scope.translations[$scope.tableConfig.tableSelection]]);
 		});
 	}
 
 	function getTranslations() {
+		$translate("schedulerModule.SUBJECT").then(function (translation) {
+			$scope.translations.subject = translation;
+		});
+
+		$translate("schedulerModule.TEACHER").then(function (translation) {
+			$scope.translations.teacher = translation;
+		});
+
+		$translate("schedulerModule.COURSE").then(function (translation) {
+			$scope.translations.course = translation;
+		});
+
+		$translate("schedulerModule.STUDENT").then(function (translation) {
+			$scope.translations.student = translation;
+		});
+
+		$translate("schedulerModule.CLASSROOM").then(function (translation) {
+			$scope.translations.classroom = translation;
+		});
+
+		$translate("schedulerModule.STUDENT_GROUP").then(function (translation) {
+			$scope.translations.student_group = translation;
+		});
+
+		$translate("schedulerModule.NAME").then(function (translation) {
+			$scope.translations.name = translation;
+		});
+
+		$translate("schedulerModule.FIRST_NAME").then(function (translation) {
+			$scope.translations.first_name = translation;
+		});
+
+		$translate("schedulerModule.LAST_NAME").then(function (translation) {
+			$scope.translations.last_name = translation;
+		});
+
+		$translate("schedulerModule.ROOM_NUMBER").then(function (translation) {
+			$scope.translations.room_number = translation;
+		});
+
+		$translate("schedulerModule.STUDENT_COUNT").then(function (translation) {
+			$scope.translations.student_count = translation;
+		});
+
+		$translate("schedulerModule.MAX_STUDENT_COUNT").then(function (translation) {
+			$scope.translations.max_student_count = translation;
+		});
+
+		$translate("schedulerModule.MIN_STUDENT_COUNT").then(function (translation) {
+			$scope.translations.min_student_count = translation;
+		});
+
+		$translate("schedulerModule.AVAIL_START_TIME").then(function (translation) {
+			$scope.translations.avail_start_time = translation;
+		});
+
+		$translate("schedulerModule.AVAIL_END_TIME").then(function (translation) {
+			$scope.translations.avail_end_time = translation;
+		});
+
+		$translate("schedulerModule.START_TIME").then(function (translation) {
+			$scope.translations.start_time = translation;
+		});
+
+		$translate("schedulerModule.END_TIME").then(function (translation) {
+			$scope.translations.end_time = translation;
+		});
+
+		$translate("schedulerModule.TIMEBLOCK").then(function (translation) {
+			$scope.translations.timeblock = translation;
+		});
+
+		$translate("schedulerModule.DURATION").then(function (translation) {
+			$scope.translations.duration = translation;
+		});
+
+		$translate("schedulerModule.USER_ID").then(function (translation) {
+			$scope.translations.user_id = translation;
+		});
+
 		$translate("schedulerModule.ERROR_LIST_ITEM").then(function (translation) {
 			$scope.translations.ERROR_LIST_ITEM = translation;
 		});

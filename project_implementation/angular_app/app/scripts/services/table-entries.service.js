@@ -21,7 +21,7 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 	};
 
 	var tableTypes = {
-		"fact": ["classroom", "course", "student", "student group", "subject", "teacher", "timeblock"]
+		"fact": ["classroom", "course", "student", "student_group", "subject", "teacher", "timeblock"]
 	};
 
 	var factTypeConfig = {
@@ -145,7 +145,7 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 		],
 		"student": [
 			{
-				key: "id",
+				key: "user_id",
 				value: null,
 				error: null,
 				required: true,
@@ -178,7 +178,7 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 				possibleAnswers: ["female", "male", "other"]
 			},
 			{
-				key: "date of birth",
+				key: "date_of_birth",
 				value: null,
 				error: null,
 				required: true,
@@ -195,7 +195,7 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 				facts: null
 			},
 			{
-				key: "student group",
+				key: "student_group",
 				value: null,
 				error: null,
 				required: false,
@@ -204,7 +204,7 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 				facts: null
 			},
 			{
-				key: "required course",
+				key: "course",
 				value: null,
 				error: null,
 				required: false,
@@ -213,7 +213,7 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 				facts: null
 			}
 		],
-		"student group": [
+		"student_group": [
 			{
 				key: "name",
 				value: null,
@@ -241,7 +241,7 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 				facts: null
 			},
 			{
-				key: "required course",
+				key: "course",
 				value: null,
 				error: null,
 				required: false,
@@ -252,7 +252,7 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 		],
 		"subject": [
 			{
-				key: "subject name",
+				key: "name",
 				value: null,
 				error: null,
 				required: true,
@@ -490,7 +490,7 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 			}
 
 			// convert URL as for each fact type
-			if (factType === "time") {
+			if (factType === "timeblock") {
 				url = TIME_URL;
 			}
 			else if (factType === "subject") {
@@ -508,7 +508,7 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 			else if (factType === "course" || factType === "required course" ) {
 				url = COURSE_URL;
 			}
-			else if (factType === "student group") {
+			else if (factType === "student_group") {
 				url = STUDENT_GROUP_URL;
 			}
 			else {
@@ -550,7 +550,7 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 			}
 
 			// @TODO: change to get from back-end instead
-			if (factName === "time") {
+			if (factName === "timeblock") {
 				url = TIME_URL;
 				// deferred.resolve([
 				// 	{
@@ -595,7 +595,7 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 			else if (factName === "course" || factName === "required course" ) {
 				url = COURSE_URL;
 			}
-			else if (factName === "student group") {
+			else if (factName === "student_group") {
 				url = STUDENT_GROUP_URL;
 			}
 			else {
@@ -792,7 +792,7 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 					});
 				}
 				else {
-					console.error("tableEntriesService.getTableFacts: unexpected url reuturn: " + data.config.url);
+					console.error("tableEntriesService.getTableFacts: unexpected url return: " + data.config.url);
 				}
 				deferred.resolve(conformedData);
 			}, function(data) {
@@ -869,7 +869,7 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 			}
 
 			// @TODO: change to get from back-end instead
-			if (constraintName === "time") {
+			if (constraintName === "timeblock") {
 				url = TIME_URL;
 				// deferred.resolve({
 				// 	index: index,
@@ -896,7 +896,7 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 			else if (constraintName === "course" || constraintName === "required course" ) {
 				url = COURSE_URL;
 			}
-			else if (constraintName === "student group") {
+			else if (constraintName === "student_group") {
 				url = STUDENT_GROUP_URL;
 			}
 			else {

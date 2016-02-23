@@ -30,8 +30,8 @@ angular.module('sbAngularApp')
 		},
 		mainContainer: {
 			navBarConfig: {
-				view: "import export",
-				subView : null,
+				view: "scheduler",
+				subView : "facts and constraints",
 				profile: {
 					username: null,
 					role: null
