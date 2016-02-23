@@ -29,6 +29,8 @@ angular.module('sbAngularApp')
 
 	};
 
+	$scope.previousTableSelection = null;
+
 	$scope.translations = {};
 
 	$scope.toggleAddFact = function (show) {
@@ -288,7 +290,6 @@ angular.module('sbAngularApp')
 				fe[ftc[i].key] = ftc[i].value;
 			}
 		}
-		debugger;
 		tableEntriesService.addFact(fe, $scope.tableConfig.tableSelection).then(function (data) {
 			// reset the form
 			$scope.resetForm();
@@ -380,16 +381,21 @@ angular.module('sbAngularApp')
 			return;
 		}
 
-		getTranslations();
+		getDynamicTranslations();
 
+		// make sure we don't call the BE more than we need to
+		if ($scope.tableConfig.tableSelection === $scope.previousTableSelection) {
+			return;
+		}
+		$scope.previousTableSelection = $scope.tableConfig.tableSelection;
+		
 		// get the config object
 		$scope.addFactConfig.factTypeConfig = tableEntriesService.getFactTypeConfig($scope.tableConfig.tableSelection);
-
 		// make sure to grab the array of constraints for this fact type
 		tableEntriesService.updateFactTypeFacts($scope.tableConfig.tableSelection);
 	}
 
-	function getTranslations() {
+	function getDynamicTranslations() {
 		$translate("schedulerModule.ADD_FACT").then(function (translation) {
 			$scope.addFactConfig.addFactText = commonService.format(translation, [$scope.tableConfig.tableSelection]);
 		});
@@ -397,7 +403,9 @@ angular.module('sbAngularApp')
 		$translate("schedulerModule.ADDING_FACT").then(function (translation) {
 			$scope.addFactConfig.addingFactText = commonService.format(translation, [$scope.tableConfig.tableSelection]);
 		});
+	}
 
+	function getTranslations() {
 		$translate("schedulerModule.ERROR_LIST_ITEM").then(function (translation) {
 			$scope.translations.ERROR_LIST_ITEM = translation;
 		});
@@ -433,6 +441,7 @@ angular.module('sbAngularApp')
 
 	/**** initial setup ****/
 	getTableConfig(); 
+	getTranslations();
 }])
 .directive('sbAddFact', [function() {
 	/**

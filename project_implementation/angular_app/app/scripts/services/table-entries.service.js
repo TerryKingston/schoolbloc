@@ -11,7 +11,7 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 		STUDENT_GROUP_URL = SERVER_ROOT + "student_groups",
 		SUBJECT_URL = SERVER_ROOT + "subjects",
 		TEACHER_URL = SERVER_ROOT + "teachers",
-		TIME_URL = SERVER_ROOT + "time_blocks";
+		TIME_URL = SERVER_ROOT + "timeblocks";
 
 
 	// never reinstantiate: reference will be lost with bound controllers
@@ -21,13 +21,13 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 	};
 
 	var tableTypes = {
-		"fact": ["classroom", "course", "student", "student group", "subject", "teacher", "time"]
+		"fact": ["classroom", "course", "student", "student group", "subject", "teacher", "timeblock"]
 	};
 
 	var factTypeConfig = {
 		"classroom": [
 			{
-				key: "room number",
+				key: "room_number",
 				value: null,
 				error: null,
 				required: true,
@@ -35,14 +35,14 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 				multipleValues: false
 			},
 			{
-				key: "size",
+				key: "max_student_count",
 				value: null,
 				required: true,
 				type: "number",
 				multipleValues: false
 			},
 			{
-				key: "time",
+				key: "timeblock",
 				value: null,
 				error: null,
 				required: false,
@@ -80,24 +80,24 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 		],
 		"course": [
 			{
-				key: "course name",
+				key: "name",
 				value: null,
 				error: null,
 				required: true,
 				type: "uniqueText",
 				multipleValues: false
 			},
+			// {
+			// 	key: "term",
+			// 	value: null,
+			// 	error: null,
+			// 	required: true,
+			// 	type: "dropdown",
+			// 	multipleValues: false,
+			// 	possibleAnswers: ["year", "quarter"]
+			// },
 			{
-				key: "term",
-				value: null,
-				error: null,
-				required: true,
-				type: "dropdown",
-				multipleValues: false,
-				possibleAnswers: ["year", "quarter"]
-			},
-			{
-				key: "size",
+				key: "student_count",
 				value: {
 					min: null,
 					max: null
@@ -107,7 +107,7 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 				multipleValues: false
 			},
 			{
-				key: "time",
+				key: "timeblock",
 				value: null,
 				error: null,
 				required: false,
@@ -153,6 +153,22 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 				multipleValues: false
 			},
 			{
+				key: "first_name",
+				value: null,
+				error: null,
+				required: true,
+				type: "text",
+				multipleValues: false
+			},
+			{
+				key: "last_name",
+				value: null,
+				error: null,
+				required: true,
+				type: "text",
+				multipleValues: false
+			},
+			{
 				key: "gender",
 				value: null,
 				error: null,
@@ -160,14 +176,6 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 				type: "dropdown",
 				multipleValues: false,
 				possibleAnswers: ["female", "male", "other"]
-			},
-			{
-				key: "name",
-				value: null,
-				error: null,
-				required: true,
-				type: "text",
-				multipleValues: false
 			},
 			{
 				key: "date of birth",
@@ -178,7 +186,7 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 				multipleValues: false
 			},
 			{
-				key: "time",
+				key: "timeblock",
 				value: null,
 				error: null,
 				required: false,
@@ -207,7 +215,7 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 		],
 		"student group": [
 			{
-				key: "group name",
+				key: "name",
 				value: null,
 				error: null,
 				required: true,
@@ -215,7 +223,7 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 				multipleValues: false
 			},
 			{
-				key: "time",
+				key: "timeblock",
 				value: null,
 				error: null,
 				required: false,
@@ -252,7 +260,7 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 				multipleValues: false
 			},
 			{
-				key: "time",
+				key: "timeblock",
 				value: null,
 				error: null,
 				required: false,
@@ -290,7 +298,7 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 		],
 		"teacher": [
 			{
-				key: "id",
+				key: "user_id",
 				value: null,
 				error: null,
 				required: true,
@@ -298,7 +306,7 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 				multipleValues: false
 			},
 			{
-				key: "name",
+				key: "first_name",
 				value: null,
 				error: null,
 				required: true,
@@ -306,7 +314,15 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 				multipleValues: false
 			},
 			{
-				key: "time",
+				key: "last_name",
+				value: null,
+				error: null,
+				required: true,
+				type: "text",
+				multipleValues: false
+			},
+			{
+				key: "timeblock",
 				value: null,
 				error: null,
 				required: false,
@@ -342,16 +358,16 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 				facts: null
 			}
 		],
-		"time": [
+		"timeblock": [
 			{
-				key: "start time",
+				key: "start_time",
 				value: null,
 				required: true,
 				type: "startEnd",
 				multipleValues: false
 			},
 			{
-				key: "end time",
+				key: "end_time",
 				value: null,
 				required: true,
 				type: "startEnd",
