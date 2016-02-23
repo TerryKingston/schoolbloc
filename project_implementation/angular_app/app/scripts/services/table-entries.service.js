@@ -11,7 +11,7 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 		STUDENT_GROUP_URL = SERVER_ROOT + "student_groups",
 		SUBJECT_URL = SERVER_ROOT + "subjects",
 		TEACHER_URL = SERVER_ROOT + "teachers",
-		TIME_URL = SERVER_ROOT + "times";
+		TIME_URL = SERVER_ROOT + "time_blocks";
 
 
 	// never reinstantiate: reference will be lost with bound controllers
@@ -396,9 +396,121 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 		]
 	};
 
+	var getDubValue = function (value, id) {
+		return value + " #" + id;
+	};
+
+	var mapFactObjectToValue = function (entity, constraintArr) {
+		var i,
+			factValues = [],
+			// make an entity.factsMap object to map the constraintArr id to the unqiue factValues[x] that we create
+			factsMap = {},
+			keys,
+			value;
+
+		if (!entity) {
+			return;
+		}
+
+		if (!constraintArr || !Array.isArray(constraintArr)) {
+			entity.facts = {};
+			entity.facts.values = factValues;
+			entity.facts.map = factsMap;
+			return;
+		}
+
+		// go through the array of objects and change the object into a value (obj.first_name + obj.last_name = factValues[x])
+		for (i = 0; i < constraintArr.length; i++) {
+			value = "";
+			if (constraintArr[i].first_name) {
+				value = value + constraintArr[i].first_name + " ";
+			}
+			if (constraintArr[i].last_name) {
+				value = value + constraintArr[i].last_name + " ";
+			}
+			if (constraintArr[i].name) {
+				value = value + constraintArr[i].name + " ";
+			}
+			value = value.trim();
+
+			// if factValues[x] is equal to any factsMap key, we have a duplicate and we should alter all duplicates to contain factValues[x] + " (id)"
+			if (factsMap[value]) {
+				// keep this factsMap[value] for this check, but remove from factValues array so it doesn't show up in the view
+				// check if we need to create a mapping for the old value
+				if (!factsMap[getDubValue(value, factsMap[value])]) {
+					factsMap[getDubValue(value, factsMap[value])] = factsMap[value];
+				}
+				// create the new mapping
+				factsMap[getDubValue(value, constraintArr[i].id)] = constraintArr[i].id;
+			}
+			else {
+				factsMap[value] = constraintArr[i].id;
+			}
+		}
+
+		keys = Object.keys(factsMap);
+		// add values to factValues, but only the dub values if they exist
+		for (i = 0; i < keys.length; i++) {
+			// for example, do not add fM['bob'] if fM['bob (1)' exists]
+			if (!factsMap[getDubValue(keys[i], factsMap[keys[i]])]) {
+				factValues.push(keys[i]);
+			} 
+		}
+
+		entity.facts = {};
+		entity.facts.values = factValues;
+		entity.facts.map = factsMap;
+	};
+
 
 	return {
 
+		addFact: function(factEntry, factType) {
+			var url;
+			var deferred = $q.defer();
+			if (!factEntry) {
+				deferred.reject("ERROR: needed parameter not provided.")
+				return deferred.promise;
+			}
+
+			// convert URL as for each fact type
+			if (factType === "time") {
+				url = TIME_URL;
+			}
+			else if (factType === "subject") {
+				url = SUBJECT_URL;
+			}
+			else if (factType === "teacher") {
+				url = TEACHER_URL;
+			}
+			else if (factType === "student") {
+				url = STUDENT_URL;
+			}
+			else if (factType === "classroom") {
+				url = CLASSROOM_URL;
+			}
+			else if (factType === "course" || factType === "required course" ) {
+				url = COURSE_URL;
+			}
+			else if (factType === "student group") {
+				url = STUDENT_GROUP_URL;
+			}
+			else {
+				console.error("tableEntriesService.addFact: unexpected state: invalid factType: " + factType);
+				deferred.reject("ERROR: Unexpected front-end input.");
+				return deferred.promise;
+			}
+
+			// conform the url to change the port
+			url = commonService.conformUrl(url);
+
+			$http.post(url, factEntry).then(function(data) {
+				deferred.resolve(data.data);
+			}, function(data) {
+				deferred.reject(data.data);
+			});
+			return deferred.promise;
+		},
 
 		getTableConfiguration: function() {
 			var self = this;
@@ -417,38 +529,40 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 			var deferred = $q.defer();
 
 			if (!factName) {
-				return null;
+				deferred.reject("ERROR: needed parameter not provided.")
+				return deferred.promise;
 			}
 
 			// @TODO: change to get from back-end instead
 			if (factName === "time") {
-				deferred.resolve([
-					{
-						"time": "12:15PM-01:00PM",
-						"days": ["monday", "wednesday", "friday"],
-						"subjects": null,
-						"courses": null,
-						"teachers": null,
-						"classrooms": null
-					},
-					{
-						"time": "12:20PM-14:20PM",
-						"days": ["tuesday", "thursday", "friday"],
-						"subjects": null,
-						"courses": null,
-						"teachers": null,
-						"classrooms": null
-					},
-					{
-						"time": "2:00PM-2:45PM",
-						"days": ["monday", "wednesday", "friday"],
-						"subjects": null,
-						"courses": null,
-						"teachers": null,
-						"classrooms": null
-					}
-				]);
-				return deferred.promise;
+				url = TIME_URL;
+				// deferred.resolve([
+				// 	{
+				// 		"time": "12:15PM-01:00PM",
+				// 		"days": ["monday", "wednesday", "friday"],
+				// 		"subjects": null,
+				// 		"courses": null,
+				// 		"teachers": null,
+				// 		"classrooms": null
+				// 	},
+				// 	{
+				// 		"time": "12:20PM-14:20PM",
+				// 		"days": ["tuesday", "thursday", "friday"],
+				// 		"subjects": null,
+				// 		"courses": null,
+				// 		"teachers": null,
+				// 		"classrooms": null
+				// 	},
+				// 	{
+				// 		"time": "2:00PM-2:45PM",
+				// 		"days": ["monday", "wednesday", "friday"],
+				// 		"subjects": null,
+				// 		"courses": null,
+				// 		"teachers": null,
+				// 		"classrooms": null
+				// 	}
+				// ]);
+				// return deferred.promise;
 			}
 			else if (factName === "subject") {
 				url = SUBJECT_URL;
@@ -480,7 +594,7 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 			$http.get(url).then(function(data) {
 				// @TODO: this should automatically be conformed later
 				var conformedData = [], i;
-        var conformedElement = [];
+        		var conformedElement = [];
 				// conform based on url, since we have no other way of knowing what type it is
 				if (data.config.url.indexOf("student_groups") > 0) {
 					// blank
@@ -596,7 +710,6 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 					}
 				}
 				else if (data.config.url.indexOf("courses") > 0) {
-          //debugger
           for (i = 0; i < data.data.length; i++) {
 						conformedData.push({
 							"course": data.data[i].name,
@@ -693,50 +806,6 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 					// @TODO: display error message
 				});
 			}
-			// if (tableType === "fact", tableSelection === "course") {
-			// 	tableConfig.entries = [
-			// 		{
-			// 			course: "English III",
-			// 			subject: "English",
-			// 			teacher: "Karyl Heider",
-			// 			classroom: null,
-			// 			term: "Year",
-			// 			size: {
-			// 				min: 15,
-			// 				max: 30
-			// 			},
-			// 			time: {
-			// 				start: '1420',
-			// 				end: '1520'
-			// 			},
-			// 			disabled: true
-			// 		},
-			// 		{
-			// 			course: "Programming I",
-			// 			subject: null,
-			// 			teacher: null,
-			// 			classroom: [
-			// 				"1001", "1002"
-			// 			],
-			// 			term: "Quarter",
-			// 			size: {
-			// 				min: 8,
-			// 				max: 22
-			// 			},
-			// 			time: [
-			// 				{
-			// 					start: '1215',
-			// 					end: '1300'
-			// 				},
-			// 				{
-			// 					start: '1420',
-			// 					end: '1520'
-			// 				}
-			// 			],
-			// 			disabled: false
-			// 		}
-			// 	];
-			// }
 		},
 
 		getFactTypeConfig: function(factType) {
@@ -761,7 +830,7 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 			for (i = 0; i < ftc.length; i++) {
 				if (ftc[i].type === "constraint") {
 					self.getConstraintFacts(ftc[i].key, i).then(function (data) {
-						ftc[data.index].facts = data.data;
+						mapFactObjectToValue(ftc[data.index], data.data);
 					}, function (data) {
 						// @TODO: display error message
 						// where data.data === message
@@ -779,44 +848,40 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 			var deferred = $q.defer();
 
 			if (!constraintName) {
-				return null;
+				deferred.reject({data: "ERROR: needed parameter not provided.", index: index});
+				return deferred.promise;
 			}
 
 			// @TODO: change to get from back-end instead
 			if (constraintName === "time") {
-				deferred.resolve({
-					index: index,
-					data: [
-						"12:15PM-01:00PM",
-						"12:20PM-14:20PM",
-						"2:00PM-2:45PM"
-					]
-				});
-				return deferred.promise;
+				url = TIME_URL;
+				// deferred.resolve({
+				// 	index: index,
+				// 	data: [
+				// 		"12:15PM-01:00PM",
+				// 		"12:20PM-14:20PM",
+				// 		"2:00PM-2:45PM"
+				// 	]
+				// });
+				// return deferred.promise;
 			}
 			else if (constraintName === "subject") {
 				url = SUBJECT_URL;
-				//return ["Math", "English", "Programming", "Science", "History"]
 			}
 			else if (constraintName === "teacher") {
 				url = TEACHER_URL;
-				//return ["Karyl Heider", "Ralph Winterspoon", "Leeroy Jenkins", "Mrs. Buttersworth"]
 			}
 			else if (constraintName === "student") {
 				url = STUDENT_URL;
-				//return ["Harry Potter", "Frodo Baggins", "Luke Skywalker", "Tron"]
 			}
 			else if (constraintName === "classroom") {
 				url = CLASSROOM_URL;
-				//return ["1001", "1002", "203L", "West 123"]
 			}
 			else if (constraintName === "course" || constraintName === "required course" ) {
 				url = COURSE_URL;
-				//return ["English III"]
 			}
 			else if (constraintName === "student group") {
 				url = STUDENT_GROUP_URL;
-				//return ["4th grade", "5th grade", "6th grade", "student body"]
 			}
 			else {
 				console.error("tableEntriesService.getConstraintFacts: unexpected state: invalid constraintName: " + constraintName);
@@ -828,42 +893,7 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 			url = commonService.conformUrl(url);
 
 			$http.get(url).then(function(data) {
-				// @TODO: this should automatically be conformed later
-
-				var conformedData = [], i;
-				// conform based on url, since we have no other way of knowing what type it is
-				if (data.config.url.indexOf("student_groups") > 0) {
-					conformedData = ["4th grade", "5th grade", "6th grade", "student body"];
-				}
-				else if (data.config.url.indexOf("students") > 0) {
-					for (i = 0; i < data.data.length; i++) {
-						conformedData.push(data.data[i].first_name + " " + data.data[i].last_name);
-					}
-				}
-				else if (data.config.url.indexOf("teachers") > 0) {
-					for (i = 0; i < data.data.length; i++) {
-						conformedData.push(data.data[i].first_name + " " + data.data[i].last_name);
-					}
-				}
-				else if (data.config.url.indexOf("classrooms") > 0) {
-					for (i = 0; i < data.data.length; i++) {
-						conformedData.push(data.data[i].room_number);
-					}
-				}
-				else if (data.config.url.indexOf("courses") > 0) {
-					for (i = 0; i < data.data.length; i++) {
-						conformedData.push(data.data[i].name);
-					}
-				}
-				else if (data.config.url.indexOf("subjects") > 0) {
-					// blank
-					conformedData = ["Math", "English", "Programming", "Science", "History"];
-				}
-				else {
-					console.error("tableEntriesService.getConstraintFacts: unexpected url reuturn: " + data.config.url);
-				}
-				// @NOTE: don't forget about index
-				deferred.resolve({data: conformedData, index: index});
+				deferred.resolve({data: data.data, index: index});
 			}, function(data) {
 				deferred.reject({data: data.data, index: index});
 			});

@@ -200,8 +200,8 @@ angular.module('sbAngularApp')
 		}
 		
 		factInput.error = $scope.translations.ERROR_LIST_ITEM;
-		for (i = 0; i < factInput.facts.length; i++) {
-			if (factInput.facts[i] === factInput.value) {
+		for (i = 0; i < factInput.facts.values.length; i++) {
+			if (factInput.facts.values[i] === factInput.value) {
 				factInput.error = null;
 			}
 		}
@@ -255,7 +255,6 @@ angular.module('sbAngularApp')
 			if (ftc[i].type === "minMax") {
 				$scope.checkInput(ftc[i], "min");
 				$scope.checkInput(ftc[i], "min");
-
 			}
 			else {
 				$scope.checkInput(ftc[i]);
@@ -273,11 +272,31 @@ angular.module('sbAngularApp')
 		$scope.addFactConfig.factEntry = {};
 		fe = $scope.addFactConfig.factEntry;
 		for (i = 0; i < ftc.length; i++) {
-			fe[ftc[i].key] = null;
+			if (ftc[i].type === 'constraint') {
+				if (!fe[ftc[i].key] && ftc[i].value) {
+					fe[ftc[i].key] = [];
+				}
+				if (fe[ftc[i].key]) {
+					fe[ftc[i].key].push({
+						"id": ftc[i].facts.map[ftc[i].value],
+						"priority": "mandatory", // for now, it's always mandatory when we add
+						"active": true // for now, it's always true when we add
+					});
+				}
+			}
+			else {
+				fe[ftc[i].key] = ftc[i].value;
+			}
 		}
+		debugger;
+		tableEntriesService.addFact(fe, $scope.tableConfig.tableSelection).then(function (data) {
+			// reset the form
+			$scope.resetForm();
+		}, function(error) {
+			// @TODO: display error
+		});
 
-		// @TODO: reset the form
-		$scope.resetForm();
+		
 
 		// if save instead of save & add another
 		if (!addAnotherFact) {

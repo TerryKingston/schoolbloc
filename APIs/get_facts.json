@@ -2,11 +2,11 @@
 // matches the keys given in the fact_type depending on the fact type
 [
 	{
-		"id": primary_key_id,
+		"id": "primary_key_id",
 		"key": "value",
 		"specific constraints type": [
 			{
-				"id": primary_key_id
+				"id": "primary_key_id",
 				"value": "string represention of constraint foreign key",
 				"priority": "mandatory, high, low",
 				"active": "true or false"
