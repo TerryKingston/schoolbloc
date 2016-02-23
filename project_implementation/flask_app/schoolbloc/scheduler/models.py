@@ -29,6 +29,8 @@ class Course(db.Model, SqlalchemySerializer):
     A course is a specific learning area (i.e. Algebra III)
     """
     __tablename__ = 'courses'
+    __restconstraints__ = ['courses_student_group', 'courses_students', 'courses_subjects', 'courses_timeblocks',
+                           'courses_teachers', 'classrooms_courses']
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(128), nullable=False)
     duration = db.Column(db.Integer) # optional duration, will use global default if not specified
@@ -36,6 +38,10 @@ class Course(db.Model, SqlalchemySerializer):
     min_student_count = db.Column(db.Integer)
     avail_start_time = db.Column(db.Integer)
     avail_end_time = db.Column(db.Integer)
+
+    def __str__(self):
+        return "{} {}".format(self.name, self.duration, self.max_student_count, self.min_student_count,
+                              self.avail_start_time, self.avail_end_time)
 
 
 class CoursesStudent(db.Model, SqlalchemySerializer):
@@ -131,6 +137,9 @@ class Classroom(db.Model, SqlalchemySerializer):
     max_student_count = db.Column(db.Integer)
     avail_start_time = db.Column(db.Integer)
     avail_end_time = db.Column(db.Integer)
+
+    def __str__(self):
+        return "{} {}".format(self.room_number, self.max_student_count, self.avail_end_time, self.avail_start_time)
 
 
 class ClassroomsTeacher(db.Model, SqlalchemySerializer):
@@ -264,11 +273,15 @@ class Student(db.Model, SqlalchemySerializer):
     users.
     """
     __tablename__ = 'students'
+    __restconstraints__ = ['students_student_group', 'students_timeblocks', 'subjects_students']
     id = db.Column(db.Integer, primary_key=True)
     first_name = db.Column(db.String(128), nullable=False)
     last_name = db.Column(db.String(128), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     user = db.relationship("User", backref="student")
+
+    def __str__(self):
+        return "{} {}".format(self.first_name, self.last_name)
 
 
 class StudentsStudentGroup(db.Model, SqlalchemySerializer):
@@ -309,9 +322,12 @@ class Subject(db.Model, SqlalchemySerializer):
     A subject is a group of courses
     """
     __tablename__ = 'subjects'
+    __restconstraints__ = ['courses_subjects', 'student_groups_subjects', 'subjects_students', 'subjects_timeblocks']
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(255), nullable=False)
 
+    def __str__(self):
+        return "{} {}".format(self.name)
 
 class Teacher(db.Model, SqlalchemySerializer):
     """
@@ -425,6 +441,10 @@ class Timeblock(db.Model, SqlalchemySerializer):
     minute granularity (i.e. the value 1600 is 4 o'clock PM).
     """
     __tablename__ = 'timeblocks'
+    __restconstraints__ = ['classrooms_timeblock', 'courses_timeblocks', 'students_timeblocks', 'student_groups_timeblocks', 'teachers_timeblocks']
     id = db.Column(db.Integer, primary_key=True)
     start_time = db.Column(db.Integer, nullable=False)
     end_time = db.Column(db.Integer, nullable=False)
+
+    def __str__(self):
+        return "{} {}".format(self.start_time, self.end_time)

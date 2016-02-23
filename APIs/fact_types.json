@@ -1,93 +1,129 @@
 // just for a reference.
 {
-	"classroom": [
+	"classrooms”: [
 		{
-			"key": "room number",
+			"key": "room_number",
 			"required": true,
 			"type": "uniqueText",
 			"multipleValues": false
 		},
 		{
-			"key": "size",
+			"key": “max_student_count”,
 			"required": true,
 			"type": "number",
 			"multipleValues": false
 		},
 		{
-			"key": "time",
-			"required": false,
-			"type": "constraint",
-			"multipleValues": true
+			“key”: “avail_start_time”,
+			“required”: false,
+			“type”: “startEnd”,
+			“multipleValues”: true
 		},
 		{
-			"key": "subject",
-			"required": false,
-			"type": "constraint",
-			"multipleValues": true
-		},
-		{
-			"key": "teacher",
-			"required": false,
-			"type": "constraint",
-			"multipleValues": true
-		},
-		{
-			"key": "course",
-			"required": false,
-			"type": "constraint",
-			"multipleValues": true
+			“key”: “avail_end_time”,
+			“required”: false,
+			“type”: “startEnd”,
+			“multipleValues”: true
 		}
+		//{
+		//	"key": "time",
+		//	"required": false,
+		//	"type": "constraint",
+		//	"multipleValues": true
+		//},
+		//{
+		//	"key": "subject",
+		//	"required": false,
+		//	"type": "constraint",
+		//	"multipleValues": true
+		//},
+		//{
+		//	"key": "teacher",
+		//	"required": false,
+		//	"type": "constraint",
+		//	"multipleValues": true
+		//},
+		//{
+		//	"key": "course",
+		//	"required": false,
+		//	"type": "constraint",
+		//	"multipleValues": true
+		//}
 	],
-	"course": [
+	"courses”: [
 		{
-			"key": "course name",
+			"key": "name",
 			"required": true,
 			"type": "uniqueText",
 			"multipleValues": false
 		},
+		//{
+		//	"key": "term",
+		//	"required": true,
+		//	"type": "dropdown",
+		//	"multipleValues": false,
+		//	"possibleAnswers": ["year", "quarter"]
+		//},
+		//{
+		//	"key": "size",
+		//	"value": {
+		//		"min": null,
+		//		"max": null
+		//	},
+		//	"required": false,
+		//	"type": "minMax",
+		//	"multipleValues": false
+		//},
 		{
-			"key": "term",
-			"required": true,
-			"type": "dropdown",
-			"multipleValues": false,
-			"possibleAnswers": ["year", "quarter"]
+			“key”: “max_student_count”,
+			“required”: false,
+			“type”: “maxMin”,
+			“multipleValues”: true
 		},
 		{
-			"key": "size",
-			"value": {
-				"min": null,
-				"max": null
-			},
-			"required": false,
-			"type": "minMax",
-			"multipleValues": false
+			“key”: “min_student_count”,
+			“required”: false,
+			“type”: “maxMin”,
+			“multipleValues”: true
 		},
 		{
-			"key": "time",
-			"required": false,
-			"type": "constraint",
-			"multipleValues": true
-		},
-		{
-			"key": "subject",
-			"required": false,
-			"type": "constraint",
-			"multipleValues": true
-		},
-		{
-			"key": "teacher",
-			"required": false,
-			"type": "constraint",
-			"multipleValues": true
-		},
-		{
-			"key": "classroom",
+			"key": “duration”,
 			"required": false,
 			"type": "constraint",
 			"multipleValues": true
+		},
+		{
+			“key”: “avail_start_time”,
+			“required”: false,
+			“type”: “startEnd”,
+			“multipleValues”: true
+		},
+		{
+			“key”: “avail_end_time”,
+			“required”: false,
+			“type”: “startEnd”,
+			“multipleValues”: true
 		}
+		//{
+		//	"key": "subject",
+		//	"required": false,
+		//	"type": "constraint",
+		//	"multipleValues": true
+		//},
+		//{
+		//	"key": "teacher",
+		//	"required": false,
+		//	"type": "constraint",
+		//	"multipleValues": true
+		//},
+		//{
+		//	"key": "classroom",
+		//	"required": false,
+		//	"type": "constraint",
+		//	"multipleValues": true
+		//}
 	],
-	"student": [
+	"students”: [
 		{
 			"key": "id",
 			"required": true,
@@ -95,102 +131,89 @@
 			"multipleValues": false
 		},
 		{
-			"key": "gender",
-			"required": true,
-			"type": "dropdown",
-			"multipleValues": false,
-			"possibleAnswers": ["female", "male", "other"]
+			“key”: “first_name”,
+			“required”: true,
+			“type”: “constraint”,
+			“multipleValues”: false
 		},
+		{
+			“key”: “last_name”,
+			“required”: true,
+			“type”: “constraint”,
+			“multipleValues”: false
+		}
+		//{
+		//	"key": "gender",
+		//	"required": true,
+		//	"type": "dropdown",
+		//	"multipleValues": false,
+		//	"possibleAnswers": ["female", "male", "other"]
+		//},
+		//{
+		//	"key": "name",
+		//	"required": true,
+		//	"type": "text",
+		//	"multipleValues": false
+		//},
+		//{
+		//	"key": "date of birth",
+		//	"required": true,
+		//	"type": "date",
+		//	"multipleValues": false
+		//},
+		//{
+		//	"key": "time",
+		//	"required": false,
+		//	"type": "constraint",
+		//	"multipleValues": true
+		//},
+		//{
+		//	"key": "student group",
+		//	"required": false,
+		//	"type": "constraint",
+		//	"multipleValues": true
+		//},
+		//{
+		//	"key": "required course",
+		//	"required": false,
+		//	"type": "constraint",
+		//	"multipleValues": true
+		//}
+	],
+	"student_groups”: [
+		
 		{
 			"key": "name",
 			"required": true,
-			"type": "text",
-			"multipleValues": false
-		},
-		{
-			"key": "date of birth",
-			"required": true,
-			"type": "date",
-			"multipleValues": false
-		},
-		{
-			"key": "time",
-			"required": false,
-			"type": "constraint",
-			"multipleValues": true
-		},
-		{
-			"key": "student group",
-			"required": false,
-			"type": "constraint",
-			"multipleValues": true
-		},
-		{
-			"key": "required course",
-			"required": false,
-			"type": "constraint",
-			"multipleValues": true
-		}
-	],
-	"student group": [
-		{
-			"key": "group name",
-			"required": true,
 			"type": "uniqueText",
 			"multipleValues": false
 		},
 		{
-			"key": "time",
-			"required": false,
-			"type": "constraint",
-			"multipleValues": true
-		},
-		{
-			"key": "student",
-			"required": false,
-			"type": "constraint",
-			"multipleValues": true
-		},
-		{
-			"key": "required course",
-			"required": false,
-			"type": "constraint",
-			"multipleValues": true
-		}
-	],
-	"subject": [
-		{
-			"key": "subject name",
+			"key": "id",
 			"required": true,
 			"type": "uniqueText",
 			"multipleValues": false
-		},
-		{
-			"key": "time",
-			"required": false,
-			"type": "constraint",
-			"multipleValues": true
-		},
-		{
-			"key": "course",
-			"required": false,
-			"type": "constraint",
-			"multipleValues": true
-		},
-		{
-			"key": "teacher",
-			"required": false,
-			"type": "constraint",
-			"multipleValues": true
-		},
-		{
-			"key": "classroom",
-			"required": false,
-			"type": "constraint",
-			"multipleValues": true
 		}
+		//{
+		//	"key": "time",
+		//	"required": false,
+		//	"type": "constraint",
+		//	"multipleValues": true
+		//},
+		//{
+		//	"key": "student",
+		//	"required": false,
+		//	"type": "constraint",
+		//	"multipleValues": true
+		//},
+		//{
+		//	"key": "required course",
+		//	"required": false,
+		//	"type": "constraint",
+		//	"multipleValues": true
+		//}
 	],
-	"teacher": [
+	"subjects”: [
 		{
 			"key": "id",
 			"required": true,
@@ -200,71 +223,121 @@
 		{
 			"key": "name",
 			"required": true,
+			"type": "uniqueText",
+			"multipleValues": false
+		}
+		//{
+		//	"key": "time",
+		//	"required": false,
+		//	"type": "constraint",
+		//	"multipleValues": true
+		//},
+		//{
+		//	"key": "course",
+		//	"required": false,
+		//	"type": "constraint",
+		//	"multipleValues": true
+		//},
+		//{
+		//	"key": "teacher",
+		//	"required": false,
+		//	"type": "constraint",
+		//	"multipleValues": true
+		//},
+		//{
+		//	"key": "classroom",
+		//	"required": false,
+		//	"type": "constraint",
+		//	"multipleValues": true
+		//}
+	],
+	"teachers”: [
+		{
+			"key": "id",
+			"required": true,
+			"type": "uniqueText",
+			"multipleValues": false
+		},
+		{
+			"key": “first_name",
+			"required": true,
 			"type": "text",
 			"multipleValues": false
 		},
 		{
-			"key": "time",
-			"required": false,
-			"type": "constraint",
-			"multipleValues": true
+			"key": “last_name",
+			"required": true,
+			"type": "text",
+			"multipleValues": false
 		},
 		{
-			"key": "subject",
-			"required": false,
-			"type": "constraint",
-			"multipleValues": true
-		},
-		{
-			"key": "course",
-			"required": false,
-			"type": "constraint",
-			"multipleValues": true
-		},
-		{
-			"key": "classroom",
-			"required": false,
-			"type": "constraint",
-			"multipleValues": true
+			"key": “user_id",
+			"required": true,
+			"type": "uniqueText",
+			"multipleValues": false
 		}
+		//{
+		//	"key": "time",
+		//	"required": false,
+		//	"type": "constraint",
+		//	"multipleValues": true
+		//},
+		//{
+		//	"key": "subject",
+		//	"required": false,
+		//	"type": "constraint",
+		//	"multipleValues": true
+		//},
+		//{
+		//	"key": "course",
+		//	"required": false,
+		//	"type": "constraint",
+		//	"multipleValues": true
+		//},
+		//{
+		//	"key": "classroom",
+		//	"required": false,
+		//	"type": "constraint",
+		//	"multipleValues": true
+		//}
 	],
-	"time": [
+	"timeblocks”: [
 		{
-			"key": "start time",
+			"key": "start_time",
 			"required": true,
 			"type": "startEnd",
 			"multipleValues": false
 		},
 		{
-			"key": "end time",
+			"key": "end_time",
 			"required": true,
 			"type": "startEnd",
 			"multipleValues": false
-		},
-		{
-			"key": "days",
-			"required": true,
-			"type": "dropdown",
-			"multipleValues": true,
-			"possibleAnswers": ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday", "weekdays"]
-		},
-		{
-			"key": "subject",
-			"required": false,
-			"type": "constraint",
-			"multipleValues": true
-		},
-		{
-			"key": "course",
-			"required": false,
-			"type": "constraint",
-			"multipleValues": true
-		},
-		{
-			"key": "classroom",
-			"required": false,
-			"type": "constraint",
-			"multipleValues": true
 		}
+		//{
+		//	"key": "days",
+		//	"required": true,
+		//	"type": "dropdown",
+		//	"multipleValues": true,
+		//	"possibleAnswers": ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday", "weekdays"]
+		//},
+		//{
+		//	"key": "subject",
+		//	"required": false,
+		//	"type": "constraint",
+		//	"multipleValues": true
+		//},
+		//{
+		//	"key": "course",
+		//	"required": false,
+		//	"type": "constraint",
+		//	"multipleValues": true
+		//},
+		//{
+		//	"key": "classroom",
+		//	"required": false,
+		//	"type": "constraint",
+		//	"multipleValues": true
+		//}
 	]
 };
