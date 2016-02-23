@@ -92,8 +92,6 @@ def _get_constraint_foreign_name(orm, constraint):
     foreign table from the mapping table
     """
     # Get the relationship between the orm object and the mapping table
-    print(orm.__tablename__)
-    print(constraint)
     mapper_table = orm.__mapper__.relationships.get(constraint)
     relationships = mapper_table.mapper.relationships.items()
     if len(relationships) != 2:
