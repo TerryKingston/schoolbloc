@@ -35,6 +35,7 @@
             <section class="flex-bottom-btn">
               <button class="btn btn-recommended" ng-click="submitEditor(row, false)" ng-disabled="!row.value">{{'dynamicTable.SAVE' | translate}}</button>
               <button class="btn btn-recommended" ng-bind-html="'dynamicTable.SAVE_ANOTHER' | translate" ng-click="submitEditor(row, true)" ng-disabled="!row.value"></button>
+              <button class="btn btn-secondary" ng-click="cancelEditor()">{{"dynamicTable.CANCEL" | translate}}</button>
             </section>
           </div>
           <div class="table-editor-right">
@@ -64,12 +65,27 @@
                 <button class="entry-disable" alt="{{'dynamicTable.DISABLE' | translate}}"></button>
                 <button class="entry-delete" alt="{{'dynamicTable.DELETE' | translate}}"></button>
               </div>
-              <div>{{element}}</div>
+              <div>{{element.value}}</div>
             </div>
           </div>
         </div>
         <!-- not a cluster (value) -->
-        <div ng-if="!rowEntry.type">{{rowEntry}}</div>
+        <div ng-if="!rowEntry.type">
+          <!-- value -->
+          <div ng-if="rowEntry" class="entry">
+            <div class="entry-options">
+              <button class="entry-edit" alt="{{'dynamicTable.EDIT' | translate}}"></button>
+              <button class="entry-delete" alt="{{'dynamicTable.DELETE' | translate}}"></button>
+            </div>
+            <div>{{rowEntry}}</div>
+          </div>
+          <!-- no value -->
+          <div ng-if="!rowEntry" class="no-entry">
+            <button class="no-entry-edit" alt="{{'dynamicTable.EDIT' | translate}}"></button>
+            </div>
+          </div>
+        </div>
+        <!-- disable btn and other btn-size options -->
         <div ng-if="rowEntry.type === 'disabled'">
           <button class="table-row-disabled" ng-class="{'table-row-disabled-active': rowEntry.value, 'table-row-disabled-inactive': !rowEntry.value}" alt="{{'dynamicTable.DISABLE' | translate}}"></button>
           <button class="table-row-delete" alt="{{'dynamicTable.DELETE' | translate}}"></button>
