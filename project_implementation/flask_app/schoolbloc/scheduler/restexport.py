@@ -178,7 +178,7 @@ class TestRest(Resource):
         ret = orm_object.serialize()
         if not hasattr(self.orm, '__restconstraints__'):
             return ret
-        if not get_constraints or get_constraints.lower() == 'false':
+        if get_constraints and get_constraints.lower() == 'false':
             return ret
         for constraint in orm_object.__restconstraints__:
             foreign_name = _get_constraint_foreign_name(self.orm, constraint)
@@ -323,7 +323,7 @@ class TestRestList(Resource):
             if not hasattr(self.orm, '__restconstraints__'):
                 ret.append(tmp_ret)
                 continue
-            if not get_constraints or get_constraints.lower() == 'false':
+            if get_constraints and get_constraints.lower() == 'false':
                 ret.append(tmp_ret)
                 continue
             for constraint in orm_object.__restconstraints__:
