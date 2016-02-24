@@ -549,36 +549,8 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 				return deferred.promise;
 			}
 
-			// @TODO: change to get from back-end instead
 			if (factName === "timeblock") {
 				url = TIME_URL;
-				// deferred.resolve([
-				// 	{
-				// 		"time": "12:15PM-01:00PM",
-				// 		"days": ["monday", "wednesday", "friday"],
-				// 		"subjects": null,
-				// 		"courses": null,
-				// 		"teachers": null,
-				// 		"classrooms": null
-				// 	},
-				// 	{
-				// 		"time": "12:20PM-14:20PM",
-				// 		"days": ["tuesday", "thursday", "friday"],
-				// 		"subjects": null,
-				// 		"courses": null,
-				// 		"teachers": null,
-				// 		"classrooms": null
-				// 	},
-				// 	{
-				// 		"time": "2:00PM-2:45PM",
-				// 		"days": ["monday", "wednesday", "friday"],
-				// 		"subjects": null,
-				// 		"courses": null,
-				// 		"teachers": null,
-				// 		"classrooms": null
-				// 	}
-				// ]);
-				// return deferred.promise;
 			}
 			else if (factName === "subject") {
 				url = SUBJECT_URL;
@@ -608,6 +580,7 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 			url = commonService.conformUrl(url);
 
 			$http.get(url).then(function(data) {
+				debugger;
 				// @TODO: this should automatically be conformed later
 				var conformedData = [], i;
         		var conformedElement = [];

@@ -276,16 +276,20 @@ angular.module('sbAngularApp')
 		fe = $scope.addFactConfig.factEntry;
 		for (i = 0; i < ftc.length; i++) {
 			if (ftc[i].type === 'constraint') {
-				if (!fe[ftc[i].key] && ftc[i].value) {
+				if (!fe[ftc[i].key] && (ftc[i].value !== null && ftc[i].value !== "")) {
 					fe[ftc[i].key] = [];
 				}
-				if (fe[ftc[i].key]) {
+				if (fe[ftc[i].key] && (ftc[i].value !== null && ftc[i].value !== "")) {
 					fe[ftc[i].key].push({
 						"id": ftc[i].facts.map[ftc[i].value],
 						"priority": "mandatory", // for now, it's always mandatory when we add
 						"active": true // for now, it's always true when we add
 					});
 				}
+			}
+			else if (ftc[i].type === 'minMax') {
+				fe['min_' + ftc[i].key] = ftc[i].value.min;
+				fe['max_' + ftc[i].key] = ftc[i].value.max;
 			}
 			else {
 				fe[ftc[i].key] = ftc[i].value;
