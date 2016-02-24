@@ -10,7 +10,7 @@
  * Controller of the sbAngularApp
  */
 angular.module('sbAngularApp')
-.controller('DynamicTable', ['$scope', 'tableEntriesService', '$translate', '$location', '$anchorScroll', 'commonService', function($scope, tableEntriesService, $translate, $location, $anchorScroll, commonService) {
+.controller('DynamicTable', ['$scope', '$timeout', 'tableEntriesService', '$translate', '$location', '$anchorScroll', 'commonService', function($scope, $timeout, tableEntriesService, $translate, $location, $anchorScroll, commonService) {
 	this.components = [
 		'HTML5 Boilerplate',
 		'AngularJS',
@@ -47,6 +47,36 @@ angular.module('sbAngularApp')
     user_id: null
   };
 
+  $scope.editor = {
+    "type": "editor",
+    "rowId": null, // unique id
+    "rowIndex": null, // where it sits in row
+    "constraintType": "course",
+    "value": null,
+    "priority": "mandatory",
+    "constraints": ["test1"],
+    "showFilters": true,
+    "showFiltersText": $scope.tableText.hideFiltersText,
+    "filters": [
+      {
+        "text": "!!Hide rooms already marked as mandatory",
+        "checked": false
+      },
+      {
+        "text": "!!Hide rooms not constrained by English",
+        "checked": false
+      },
+      {
+        "text": "!!Hide rooms that do not fit the course max",
+        "checked": false
+      },
+      {
+        "text": "!!Hide rooms already constrained",
+        "checked": false
+      }
+    ]
+  };
+
 	function getTableEntries() {
 		$scope.tableConfig = tableEntriesService.getTableConfiguration();
 
@@ -54,7 +84,7 @@ angular.module('sbAngularApp')
 	}
 
 	function setupTableView() {
-		var i, row, j, k, entry, keys;
+		var i, row, j, k, entry, keys, headerObj;
 
     /**
      * Converts an object into a string,
@@ -77,20 +107,21 @@ angular.module('sbAngularApp')
       return obj;
     };
 
-		$scope.tableView = {
-			headers: [],
-			rows: []
-		};
+    $scope.tableView = {
+      headers: [],
+      headersIndex: 0,
+      rows: []
+    };
 
-		// no entries
-		if (!$scope.tableConfig.entries || !$scope.tableConfig.entries.length) {
-			return;
-		}
+    // no entries
+    if (!$scope.tableConfig.entries || !$scope.tableConfig.entries.length) {
+      return;
+    }
 
     // prepare headers
     $scope.tableView.headers = [];
     keys = Object.keys($scope.tableConfig.entries[0])
-		for (i = 0; i < keys.length; i++) {
+    for (i = 0; i < keys.length; i++) {
       // ignore ids
       if (keys[i] === "id") {
         continue;
@@ -149,40 +180,108 @@ angular.module('sbAngularApp')
         row.push(entry);
       }
       $scope.tableView.rows.push(row);
+    }
 
-      // DEBUG: adding constraint view
-      if (i === 0) {
-        $scope.tableView.rows.push({
-          "type": "editor",
-          "rowId": row[0], // unique id
-          "constraintType": "course",
-          "value": null,
-          "priority": "mandatory",
-          "constraints": ["test1"],
-          "showFilters": true,
-          "showFiltersText": $scope.tableText.hideFiltersText,
-          "filters": [
-            {
-              "text": "!!Hide rooms already marked as mandatory",
-              "checked": false
-            },
-            {
-              "text": "!!Hide rooms not constrained by English",
-              "checked": false
-            },
-            {
-              "text": "!!Hide rooms that do not fit the course max",
-              "checked": false
-            },
-            {
-              "text": "!!Hide rooms already constrained",
-              "checked": false
-            }
-          ]
-        });
-      }
-		}
-	}
+    // add header to rows before first row
+    headerObj = {
+      type: "header"
+    };
+    $scope.tableView.rows.splice($scope.tableView.headerIndex, 0, headerObj);
+  }
+
+  $scope.toggleFilters = function(editor) {
+    editor.showFilters = !editor.showFilters;
+    if (editor.showFilters) {
+      editor.showFiltersText = $scope.tableText.hideFiltersText;
+    }
+    else {
+      editor.showFiltersText = $scope.tableText.showFiltersText;
+    }
+  };
+
+  $scope.moveHeader = function(rowIndex) {
+    var headerObj = {
+      type: "header"
+    };
+
+    if (rowIndex === 0) {
+      rowIndex ++;
+    }
+    // remove old header row
+    $scope.tableView.rows.splice($scope.tableView.headerIndex, 1);
+    // update header row to rowIndex
+    $scope.tableView.headerIndex = rowIndex - 1;
+    $scope.tableView.rows.splice($scope.tableView.headerIndex, 0, headerObj);
+  }
+
+  $scope.resetHeader = function(rowIndex) {
+    $timeout(function() {
+        $scope.moveHeader(0);
+    }, 100);
+  }
+
+  $scope.changePriority = function(editor, priority) {
+    editor.priority = priority;
+  };
+
+  $scope.editConstraint = function(rowIndex) {
+    placeEditor(rowIndex);
+  };
+
+  $scope.addConstraint = function(rowIndex) {
+    placeEditor(rowIndex);
+  };
+
+  $scope.cancelEditor = function() {
+    resetEditor();
+  };
+
+  function placeEditor(rowIndex) {
+    // determine if row index is affected by an already in place editor, and reconfigure if needed
+    if ($scope.editor.rowIndex !== null && rowIndex > $scope.editor.rowIndex) {
+      rowIndex--;
+    }
+
+    // remove any previous editor
+    resetEditor();
+
+    // add editor into rows
+    $scope.editor.rowIndex = rowIndex;
+    $scope.tableView.rows.splice(rowIndex, 0, $scope.editor);
+    
+    // need timeout for it to be placed in html template
+    // scroll to the editor box
+    $timeout(function() {
+        $location.hash('constraintEditor');
+        $anchorScroll();
+    }, 100);
+  }
+
+  function resetEditor() {
+    if ($scope.editor.rowIndex !== null) {
+      $scope.tableView.rows.splice($scope.editor.rowIndex, 1);
+    }
+
+    $scope.editor.rowIndex = null;
+    $scope.editor.rowId = null;
+    $scope.editor.constraintType = null;
+    $scope.editor.value = null;
+    $scope.editor.priority = "mandatory";
+    $scope.editor.constraints = [];
+    $scope.editor.showFilters = true;
+    $scope.editor.filters = [];
+  }
+
+  $scope.toggleShow = function(rowEntry) {
+    rowEntry.show = !rowEntry.show;
+    if (rowEntry.show) {
+      rowEntry.text = rowEntry.openedText;
+    }
+    else {
+      rowEntry.text = rowEntry.closedText;
+    }
+  };
+
 
   function getTranslations() {
     $translate("dynamicTable.SUBJECT").then(function (translation) {
@@ -284,36 +383,6 @@ angular.module('sbAngularApp')
       $scope.tableText.hideFiltersText = translation;
     });
   }
-
-  $scope.toggleFilters = function(editor) {
-    editor.showFilters = !editor.showFilters;
-    if (editor.showFilters) {
-      editor.showFiltersText = $scope.tableText.hideFiltersText;
-    }
-    else {
-      editor.showFiltersText = $scope.tableText.showFiltersText;
-    }
-  };
-
-  $scope.changePriority = function(editor, priority) {
-    editor.priority = priority;
-  };
-
-  $scope.addConstraint = function() {
-    // scroll to the editor box
-    $location.hash('constraintEditor');
-    $anchorScroll();
-  };
-
-  $scope.toggleShow = function(rowEntry) {
-    rowEntry.show = !rowEntry.show;
-    if (rowEntry.show) {
-      rowEntry.text = rowEntry.openedText;
-    }
-    else {
-      rowEntry.text = rowEntry.closedText;
-    }
-  };
 
   $scope.$watch('tableConfig.entries', setupTableView);
 

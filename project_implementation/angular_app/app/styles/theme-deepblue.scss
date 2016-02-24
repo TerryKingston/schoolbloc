@@ -802,7 +802,7 @@ textarea {
   background-color: $table-background;
 }
 
-.dynamic-table tr:first-child {
+.dynamic-table .header-row {
   border: 1px solid $table-border;
 }
 
@@ -825,7 +825,7 @@ textarea {
   max-width: 150px;
   text-overflow: ellipsis;
   overflow: hidden;
-  transition: all 0.75s;
+  //transition: all 0.75s;
 }
 
 .dynamic-table .table-editor div {
