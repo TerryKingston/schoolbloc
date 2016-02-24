@@ -24,6 +24,29 @@ angular.module('sbAngularApp')
     openedArrayEntry: null
   };
 
+  $scope.translations = {
+    subject: null,
+    teacher: null,
+    course: null,
+    student: null,
+    classroom: null,
+    student_group: null,
+    name: null,
+    first_name: null,
+    last_name: null,
+    room_number: null,
+    student_count: null,
+    max_student_count: null,
+    min_student_count: null,
+    avail_start_time: null,
+    avail_end_time: null,
+    start_time: null,
+    end_time: null,
+    timeblock: null,
+    duration: null,
+    user_id: null
+  };
+
 	function getTableEntries() {
 		$scope.tableConfig = tableEntriesService.getTableConfiguration();
 
@@ -31,7 +54,7 @@ angular.module('sbAngularApp')
 	}
 
 	function setupTableView() {
-		var i, row, j, k, entry;
+		var i, row, j, k, entry, keys;
 
     /**
      * Converts an object into a string,
@@ -63,7 +86,17 @@ angular.module('sbAngularApp')
 		if (!$scope.tableConfig.entries || !$scope.tableConfig.entries.length) {
 			return;
 		}
-		$scope.tableView.headers = Object.keys($scope.tableConfig.entries[0]);
+
+    // prepare headers
+    $scope.tableView.headers = [];
+    keys = Object.keys($scope.tableConfig.entries[0])
+		for (i = 0; i < keys.length; i++) {
+      debugger;
+      $scope.tableView.headers.push({
+        value: keys[i],
+        text: $scope.translations[keys[i]]
+      });
+    }
 
 		for (i = 0; i < $scope.tableConfig.entries.length; i++) {
 			row = [];
@@ -145,6 +178,89 @@ angular.module('sbAngularApp')
 	}
 
   function getTranslations() {
+    $translate("dynamicTable.SUBJECT").then(function (translation) {
+      $scope.translations.subject = translation;
+    });
+
+    $translate("dynamicTable.TEACHER").then(function (translation) {
+      $scope.translations.teacher = translation;
+    });
+
+    $translate("dynamicTable.COURSE").then(function (translation) {
+      $scope.translations.course = translation;
+    });
+
+    $translate("dynamicTable.STUDENT").then(function (translation) {
+      $scope.translations.student = translation;
+    });
+
+    $translate("dynamicTable.CLASSROOM").then(function (translation) {
+      $scope.translations.classroom = translation;
+    });
+
+    $translate("dynamicTable.STUDENT_GROUP").then(function (translation) {
+      $scope.translations.student_group = translation;
+    });
+
+    $translate("dynamicTable.NAME").then(function (translation) {
+      $scope.translations.name = translation;
+    });
+
+    $translate("dynamicTable.FIRST_NAME").then(function (translation) {
+      $scope.translations.first_name = translation;
+    });
+
+    $translate("dynamicTable.LAST_NAME").then(function (translation) {
+      $scope.translations.last_name = translation;
+    });
+
+    $translate("dynamicTable.ROOM_NUMBER").then(function (translation) {
+      $scope.translations.room_number = translation;
+    });
+
+    $translate("dynamicTable.STUDENT_COUNT").then(function (translation) {
+      $scope.translations.student_count = translation;
+    });
+
+    $translate("dynamicTable.MAX_STUDENT_COUNT").then(function (translation) {
+      $scope.translations.max_student_count = translation;
+    });
+
+    $translate("dynamicTable.MIN_STUDENT_COUNT").then(function (translation) {
+      $scope.translations.min_student_count = translation;
+    });
+
+    $translate("dynamicTable.AVAIL_START_TIME").then(function (translation) {
+      $scope.translations.avail_start_time = translation;
+    });
+
+    $translate("dynamicTable.AVAIL_END_TIME").then(function (translation) {
+      $scope.translations.avail_end_time = translation;
+    });
+
+    $translate("dynamicTable.START_TIME").then(function (translation) {
+      $scope.translations.start_time = translation;
+    });
+
+    $translate("dynamicTable.END_TIME").then(function (translation) {
+      $scope.translations.end_time = translation;
+    });
+
+    $translate("dynamicTable.TIMEBLOCK").then(function (translation) {
+      $scope.translations.timeblock = translation;
+    });
+
+    $translate("dynamicTable.DURATION").then(function (translation) {
+      $scope.translations.duration = translation;
+    });
+
+    $translate("dynamicTable.USER_ID").then(function (translation) {
+      $scope.translations.user_id = translation;
+    });
+
+
+
+
     $translate("dynamicTable.CLOSED_TEXT").then(function (translation) {
       $scope.tableText.closedArrayEntry = translation;
     });

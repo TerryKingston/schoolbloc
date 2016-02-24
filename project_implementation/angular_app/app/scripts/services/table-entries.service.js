@@ -577,7 +577,7 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 			}
 
 			// conform the url to change the port
-			url = commonService.conformUrl(url);
+			url = commonService.conformUrl(url) + '?constraints=true';
 
 			$http.get(url).then(function(data) {
 				debugger;
@@ -841,18 +841,8 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 				return deferred.promise;
 			}
 
-			// @TODO: change to get from back-end instead
 			if (constraintName === "timeblock") {
 				url = TIME_URL;
-				// deferred.resolve({
-				// 	index: index,
-				// 	data: [
-				// 		"12:15PM-01:00PM",
-				// 		"12:20PM-14:20PM",
-				// 		"2:00PM-2:45PM"
-				// 	]
-				// });
-				// return deferred.promise;
 			}
 			else if (constraintName === "subject") {
 				url = SUBJECT_URL;
@@ -879,7 +869,7 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 			}
 
 			// conform the url to change the port
-			url = commonService.conformUrl(url);
+			url = commonService.conformUrl(url) + '?constraints=false';;
 
 			$http.get(url).then(function(data) {
 				deferred.resolve({data: data.data, index: index});
