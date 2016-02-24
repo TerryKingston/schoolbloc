@@ -140,7 +140,7 @@ class Classroom(db.Model, SqlalchemySerializer):
     avail_end_time = db.Column(db.Integer)
 
     def __str__(self):
-        return "{} {}".format(self.room_number, self.max_student_count, self.avail_end_time, self.avail_start_time)
+        return "{} {} {} {}".format(self.room_number, self.max_student_count, self.avail_end_time, self.avail_start_time)
 
 
 class ClassroomsTeacher(db.Model, SqlalchemySerializer):
@@ -338,6 +338,7 @@ class Teacher(db.Model, SqlalchemySerializer):
     The teacher object holds teacher specific info for teacher users.
     """
     __tablename__ = 'teachers'
+    __restconstraints__ = ['classrooms_teachers', 'teachers_timeblocks', 'courses_teachers']
     id = db.Column(db.Integer, primary_key=True)
     first_name = db.Column(db.String(128), nullable=False)
     last_name = db.Column(db.String(128), nullable=False)
@@ -347,7 +348,7 @@ class Teacher(db.Model, SqlalchemySerializer):
     avail_end_time = db.Column(db.Integer)
 
     def __str__(self):
-        return "{} {}".format(self.first_name, self.last_name)
+        return "{} {} {} {}".format(self.first_name, self.last_name, self.avail_end_time, self.avail_start_time)
     
 
 class CoursesTimeblock(db.Model, SqlalchemySerializer):
@@ -442,7 +443,8 @@ class Timeblock(db.Model, SqlalchemySerializer):
     minute granularity (i.e. the value 1600 is 4 o'clock PM).
     """
     __tablename__ = 'timeblocks'
-    __restconstraints__ = ['classrooms_timeblock', 'courses_timeblocks', 'students_timeblocks', 'student_groups_timeblocks', 'teachers_timeblocks']
+    __restconstraints__ = ['classrooms_timeblocks', 'courses_timeblocks', 'students_timeblocks',
+                           'student_groups_timeblocks', 'teachers_timeblocks']
     id = db.Column(db.Integer, primary_key=True)
     start_time = db.Column(db.Integer, nullable=False)
     end_time = db.Column(db.Integer, nullable=False)
