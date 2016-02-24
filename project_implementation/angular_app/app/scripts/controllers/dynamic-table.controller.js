@@ -91,18 +91,21 @@ angular.module('sbAngularApp')
     $scope.tableView.headers = [];
     keys = Object.keys($scope.tableConfig.entries[0])
 		for (i = 0; i < keys.length; i++) {
-      debugger;
+      // ignore ids
+      if (keys[i] === "id") {
+        continue;
+      }
       $scope.tableView.headers.push({
         value: keys[i],
         text: $scope.translations[keys[i]]
       });
     }
 
-		for (i = 0; i < $scope.tableConfig.entries.length; i++) {
-			row = [];
-			for (j = 0; j < $scope.tableView.headers.length; j++) {
+    for (i = 0; i < $scope.tableConfig.entries.length; i++) {
+      row = [];
+      for (j = 0; j < $scope.tableView.headers.length; j++) {
         // convert arrays into property objects as needed
-        entry = $scope.tableConfig.entries[i][$scope.tableView.headers[j]];
+        entry = $scope.tableConfig.entries[i][$scope.tableView.headers[j].value];
         if (Array.isArray(entry)) {
           // check if there is actually objects in the array
           if (!entry.length) {
@@ -114,7 +117,7 @@ angular.module('sbAngularApp')
           }
           else {
             for (k = 0; k < entry.length; k++) {
-              entry[k] = convertObjectToString(entry[k]);
+              entry[k].value = convertObjectToString(entry[k].value);
             }
             // specify that it is an array
             entry = {
@@ -130,17 +133,21 @@ angular.module('sbAngularApp')
             entry.text = entry.closedText;
           }
         }
-        else if ($scope.tableView.headers[j] === 'disabled') {
+        else if ($scope.tableView.headers[j].value === 'disabled') {
           entry = {
             value: entry,
             type: "disabled"
           }
         }
+        // ignore ids
+        else if ($scope.tableView.headers[j].value === 'id') {
+          continue;
+        }
         else {
           entry = convertObjectToString(entry);
         }
-				row.push(entry);
-			}
+        row.push(entry);
+      }
       $scope.tableView.rows.push(row);
 
       // DEBUG: adding constraint view
