@@ -29,7 +29,7 @@ class Course(db.Model, SqlalchemySerializer):
     A course is a specific learning area (i.e. Algebra III)
     """
     __tablename__ = 'courses'
-    __restconstraints__ = ['courses_student_group', 'courses_students', 'courses_subjects', 'courses_timeblocks',
+    __restconstraints__ = ['courses_student_groups', 'courses_students', 'courses_subjects', 'courses_timeblocks',
                            'courses_teachers', 'classrooms_courses']
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(128), nullable=False)
@@ -40,8 +40,9 @@ class Course(db.Model, SqlalchemySerializer):
     avail_end_time = db.Column(db.Integer)
 
     def __str__(self):
-        return "{} {}".format(self.name, self.duration, self.max_student_count, self.min_student_count,
-                              self.avail_start_time, self.avail_end_time)
+        return "{} {} {} {} {} {}".format(self.name, self.duration, self.max_student_count,
+                                          self.min_student_count, self.avail_start_time,
+                                          self.avail_end_time)
 
 
 class CoursesStudent(db.Model, SqlalchemySerializer):
@@ -327,7 +328,7 @@ class Subject(db.Model, SqlalchemySerializer):
     name = db.Column(db.String(255), nullable=False)
 
     def __str__(self):
-        return "{} {}".format(self.name)
+        return "{}".format(self.name)
 
 class Teacher(db.Model, SqlalchemySerializer):
     """
