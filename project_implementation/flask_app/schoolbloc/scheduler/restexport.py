@@ -173,9 +173,12 @@ def _generate_parser(orm):
 class TestRest(Resource):
 
     def get(self, orm_id):
+        get_constraints = request.args.get('constraints')
         orm_object = self._get_or_abort(orm_id)
         ret = orm_object.serialize()
         if not hasattr(self.orm, '__restconstraints__'):
+            return ret
+        if not get_constraints or get_constraints.lower() == 'false':
             return ret
         for constraint in orm_object.__restconstraints__:
             foreign_name = _get_constraint_foreign_name(self.orm, constraint)
@@ -312,11 +315,15 @@ class TestRest(Resource):
 class TestRestList(Resource):
 
     def get(self):
+        get_constraints = request.args.get('constraints')
         ret = []
         orm_objects = self.orm.query.all()
         for orm_object in orm_objects:
             tmp_ret = orm_object.serialize()
             if not hasattr(self.orm, '__restconstraints__'):
+                ret.append(tmp_ret)
+                continue
+            if not get_constraints or get_constraints.lower() == 'false':
                 ret.append(tmp_ret)
                 continue
             for constraint in orm_object.__restconstraints__:
