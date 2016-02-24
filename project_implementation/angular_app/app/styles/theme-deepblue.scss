@@ -846,6 +846,33 @@ textarea {
   cursor: pointer;
 }
 
+.dynamic-table .table-row-disabled,
+.dynamic-table .table-row-delete {
+  width: 20px;
+  height: 20px;
+  border: none;
+  cursor: pointer;
+  background-color: transparent;
+}
+
+.dynamic-table .table-row-delete {
+	opacity: 0;
+  background-image: $delete-icon;
+}
+
+.dynamic-table .table-row-disabled:hover {
+	opacity: 1;
+}
+
+.dynamic-table .table-row-disabled-active {
+	background-image: $disable-icon;
+}
+
+.dynamic-table .table-row-disabled-inactive {
+  opacity: 0;
+	background-image: $false-disable-icon;
+}
+
 .dynamic-table .entry:hover .entry-options {
   display: inline-block;
 }
@@ -911,7 +938,9 @@ textarea {
 }
 
 .dynamic-table tr:hover .table-cluster-add-btn,
-.dynamic-table tr:hover .table-cluster-add-text {
+.dynamic-table tr:hover .table-cluster-add-text,
+.dynamic-table tr:hover .table-row-delete,
+.dynamic-table tr:hover .table-row-disabled-inactive {
   opacity: 1;
 }
 

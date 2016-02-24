@@ -1,7 +1,7 @@
 <section class="table-wrapper">
   <table class="dynamic-table schedule-table" ng-if="tableView.rows && tableView.rows.length">
     <tr>
-      <th ng-repeat="header in tableView.headers track by $index">{{header}}</th>
+      <th ng-repeat="header in tableView.headers track by $index"><div ng-if="header !== 'disabled'">{{header}}</div></th>
     </tr>
     <tr ng-repeat="row in tableView.rows track by $index">
       <!-- if editor -->
@@ -68,7 +68,12 @@
             </div>
           </div>
         </div>
+        <!-- not a cluster (value) -->
         <div ng-if="!rowEntry.type">{{rowEntry}}</div>
+        <div ng-if="rowEntry.type === 'disabled'">
+          <button class="table-row-disabled" ng-class="{'table-row-disabled-active': rowEntry.value, 'table-row-disabled-inactive': !rowEntry.value}" alt="{{'dynamicTable.DISABLE' | translate}}"></button>
+          <button class="table-row-delete" alt="{{'dynamicTable.DELETE' | translate}}"></button>
+        </div>
       </td>
     </tr>
   </table>

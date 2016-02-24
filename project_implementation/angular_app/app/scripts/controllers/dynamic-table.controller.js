@@ -97,6 +97,12 @@ angular.module('sbAngularApp')
             entry.text = entry.closedText;
           }
         }
+        else if ($scope.tableView.headers[j] === 'disabled') {
+          entry = {
+            value: entry,
+            type: "disabled"
+          }
+        }
         else {
           entry = convertObjectToString(entry);
         }
