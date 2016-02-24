@@ -276,7 +276,7 @@ class StudentGroup(db.Model, SqlalchemySerializer):
     students = association_proxy('students_student_groups', 'student')
 
     def __str__(self):
-        return "{} {}".format(self.name, self.students)
+         return "{}".format(self.name)
 
 class StudentGroupsSubject(db.Model, SqlalchemySerializer):
     """
@@ -304,7 +304,7 @@ class Student(db.Model, SqlalchemySerializer):
     users.
     """
     __tablename__ = 'students'
-    __restconstraints__ = ['students_student_groups', 'students_timeblocks', 'students_subjects']
+    __restconstraints__ = ['students_student_groups', 'students_timeblocks', 'students_subjects', 'courses_students']
     id = db.Column(db.Integer, primary_key=True)
     first_name = db.Column(db.String(128), nullable=False)
     last_name = db.Column(db.String(128), nullable=False)
