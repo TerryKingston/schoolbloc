@@ -1,3 +1,4 @@
+# from schoolbloc.scheduler.scheduler import SchedulerNoSolution
 from z3 import *
 from schoolbloc.scheduler.models import *
 from schoolbloc.config import config
@@ -88,10 +89,14 @@ class ScheduleConstraints:
 
     def prep_implied_constraints(self):
         self.db_constraints += self.set_courses()
+        print('\033[92m class count: {} \033[0m'.format( self.class_count))
+        self.check_fact_utilization()
         self.db_constraints += self.prevent_room_time_collision()
-        self.db_constraints += self.prevent_teacher_time_collision() 
+        self.db_constraints += self.prevent_teacher_time_collision()
+        self.db_constraints += self.ensure_course_timeblock_paths()
 
     def prep_db_constraints(self):
+        # TODO: this full list of constraints should be applied to the ClassConstraint objects instead of being put in to z3
         self.db_constraints += self.constrain_course_rooms()
         self.db_constraints += self.constrain_room_time()
         self.db_constraints += self.constrain_course_time()
@@ -157,15 +162,20 @@ class ScheduleConstraints:
                 student_collision_list[student_id] = []
             student_collision_list[student_id].append(col)
 
-        max_count = 0
-        max_collision = None
+        best_count = 0
+        best_collision = None
         for student_id, coll_list in student_collision_list.items():
-            if len(coll_list) > max_count and student_id not in self.course_time_constraints:
-                max_collision = coll_list[0]
-                max_count = len(coll_list)
+            if len(coll_list) > best_count and student_id not in self.course_time_constraints:
+                best_collision = coll_list[0]
+                best_count = len(coll_list)
 
-        # now make a constraint to avoid the collision
-        self.add_timeblock_constraints_for_student(max_collision.student)
+        # if we didn't find a best_collision then do nothing
+        if best_collision:
+            # now make a constraint to avoid the collision
+            # self.add_timeblock_constraints_for_student(best_collision.student)
+            return True
+        else:
+            return False
 
     def add_class_from_collisions(self, collisions):
         """
@@ -190,37 +200,49 @@ class ScheduleConstraints:
             if len(coll_list) > best_count:
                 best_count = len(coll_list)
                 best_collision = coll_list[0]
-        # TODO: Finish implementation (add a class for the course to the list of ClassConstraints)
 
-
-    def add_class_for_course(self, course_id):
-        class_const = ClassConstraint(course_id)
-        # class_const.timeblock_ids = self.calc_avail_timeblocks(course_id)
-        # class_const.teacher_ids = self.calc_avail_teachers(course_id)
-        # class_const.room_ids = self.calc_avail_rooms(course_id)
-        
-        self.class_constraints[course_id].append(class_const)
+        # now add a class for that collisions course
+        course_id = best_collision.scheduled_class.course_id
+        new_class = ClassConstraint(course_id)
+        self.class_constraints[course_id].append(new_class)
         self.class_count += 1
-        print('\033[91m Added ClassConstraint: {}\033[0m'.format(class_const))
+        print('\033[91m Added Class for course: {}\033[0m'.format(course_id))
+        self.reset_constraints()
 
-    def add_timeblock_constraints_for_student(self, student):
+
+    # def add_class_for_course(self, course_id):
+    #     class_const = ClassConstraint(course_id)
+    #     # class_const.timeblock_ids = self.calc_avail_timeblocks(course_id)
+    #     # class_const.teacher_ids = self.calc_avail_teachers(course_id)
+    #     # class_const.room_ids = self.calc_avail_rooms(course_id)
+    #
+    #     self.class_constraints[course_id].append(class_const)
+    #     self.class_count += 1
+    #     print('\033[91m Added ClassConstraint: {}\033[0m'.format(class_const))
+
+    def add_timeblock_constraints_for_student(self, student_reqs):
         """
-        Go through the courses required by the student and add a constraint that 
+        Go through the courses required by the student and add a constraint that
         prevents timeblock collisions for any of the required courses
+
+        :type student_reqs: StudentRequirements
+        :param student_reqs: The set of student requirements for a single student
+        :rtype: List
+        :return: A list of z3 constraints
+
         """
-        print('\033[93m adding course time constraint for student: {}\033[0m'.format(student.id))
-        # build a 2 dimensional array representing the z3 indices of the 
+        # build a 2 dimensional array representing the z3 indices of the
         # required courses for the student. where the members if each each inner list 
         # represent the same course
-        course_indexes = [ [ c.z3_index for c in self.class_constraints[course_id] ] 
-                          for course_id in student.required_course_ids ]
+        course_indexes = [[ c.z3_index for c in self.class_constraints[course_id] ]
+                          for course_id in student_reqs.required_course_ids]
 
-        print('\033[93m course z3 index set:\n {}\033[0m'.format(course_indexes))
+        # print('\033[93m course z3 index set:\n {}\033[0m'.format(course_indexes))
 
         # now generate all the possible course paths for the student
         path_list = ScheduleConstraints.gen_course_path_list(course_indexes)
 
-        print('\033[93m all possible course paths:\n {}\033[0m'.format(path_list))
+        # print('\033[93m all possible course paths:\n {}\033[0m'.format(path_list))
 
         # now build a constraint that ensures at least one arrangement of times for 
         # the courses is free of timeblock collisions
@@ -233,9 +255,48 @@ class ScheduleConstraints:
                         and_list += [ self.time(path[i]) != self.time(path[j]) ]
             or_list += [ And(and_list) ]
 
-        if student.id not in self.course_time_constraints:
-            self.course_time_constraints[student.id] = []
-        self.course_time_constraints[student.id] += [ Or(or_list) ]
+        return [Or(or_list)]
+        # if student_reqs.id not in self.course_time_constraints:
+        #     self.course_time_constraints[student_reqs.id] = []
+        # self.course_time_constraints[student_reqs.id] += [Or(or_list)]
+
+    def ensure_course_timeblock_paths(self):
+        """
+        Returns a list of z3 constraints that ensure there is an available
+        course path for each student. (i.e. the courses they need have at least one
+        configuration where none of them have Timeblock conflicts)
+        """
+        const_list = []
+        for student_reqs in self.student_requirement_set:
+            const_list += self.add_timeblock_constraints_for_student(student_reqs)
+
+        return const_list
+
+    def check_fact_utilization(self):
+        """
+        Looks at the number of needed classes v.s. teachers, classrooms, and timeblocks to
+        see if the amount we have is close to the min required
+        """
+        timeblock_count = Timeblock.query.count()
+        classroom_count = Classroom.query.count()
+        teacher_count = Teacher.query.count()
+
+        classroom_max = classroom_count * timeblock_count
+        teacher_max = teacher_count * timeblock_count
+
+        if self.class_count > classroom_max:
+            print('\033[91m No solution, Not enough classrooms ({}) for the classes ({}), the max is {}\033[0m'.format(
+                classroom_count, self.class_count, classroom_max))
+            raise SchedulerNoSolution("Not enough classrooms")
+        else:
+            print('\033[92m classroom utilization: {}% \033[0m'.format( (self.class_count / classroom_max) * 100 ))
+
+        if self.class_count > teacher_max:
+            print('\033[91m No solution, Not enough teachers ({}) for the classes ({}), the max is {}\033[0m'.format(
+                teacher_count, self.class_count, teacher_max))
+            raise SchedulerNoSolution("Not enough teachers")
+        else:
+            print('\033[92m teacher utilization: {}% \033[0m'.format( (self.class_count / teacher_max) * 100 ))
 
 
 

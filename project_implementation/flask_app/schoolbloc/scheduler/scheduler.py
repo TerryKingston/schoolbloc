@@ -4,49 +4,8 @@ from schoolbloc.scheduler.models import *
 from schoolbloc.config import config
 from schoolbloc.scheduler.schedule_data import ScheduleClass, ScheduleStudent, ScheduleData
 from schoolbloc.scheduler.schedule_constraints import ScheduleConstraints, ClassConstraint
-from functools import wraps
-import time
-
-
-
-
-
-# class SchedulerStudent():
-#     """
-#     Helper class used to hold the student schedule info when trying to make a valid schedule
-#     """
-#     def __init__(self, student_id):
-#         self.student_id = student_id
-#         self.req_course_ids = [] # a list of id's of courses needed by the student
-#         self.sch_classes = [] # the scheduled classes the student is assigned to
-
-#     def add_class(self, sch_class):
-#         """
-#         Attempts to add the sch_class to the student. if the student is already
-#         assigned to a class with the same time block the class is not added and False 
-#         is returned. else, the schedule is added and True is returned
-#         """
-#         if self.is_time_taken(sch_class.time_block_index):
-#             return False
-#         else:
-#             self.sch_classes.push(sch_class)
-#             return True
-
-#     def drop_class(self, sched_class):
-#         """
-#         Drops the sch_class from the student if it has been assigned
-#         """
-#         for i in len(range(self.sched_classes)):
-#             if self.sched_classes[i].time_block_index == time_block_index:
-#                 self.sched_classes.pop(i)
-#                 return True
-#         return False
-
-#     def is_time_taken(self, time_block_index):
-#         for c in self.sched_classes:
-#             if c.time_block_index == time_block_index:
-#                 return True
-#         return False
+# TODO: remove this import when done testing
+from schoolbloc.scheduler.test_util import SchedulerTestUtilities as Test_Util
 
 class SchedulerNoSolution(Exception):
     pass
@@ -72,43 +31,6 @@ class Scheduler():
         return "<day_start_time={} day_end_time={} break_length={} lunch_start={} lunch_end={} class_duration={}>".format(
             self.day_start_time, self.day_end_time, self.break_length, self.lunch_start, self.lunch_end, self.class_duration)
 
-
-    # def place_student(self, sch_class_map, sch_student):
-    #
-    #     # go through each course assigned to the student and
-    #     # try to place them in one of the scheduled classes
-    #     # for that course
-    #     return self.assign_class_for_course(sch_class_map, sch_student, 0)
-    #
-    #
-    # def assign_class_for_course(self, sch_class_map, sch_student, course_index):
-    #     """
-    #     Recursively assigns the SchedulerStudent to all of its required courses (which are
-    #     defined by the req_course_ids property.)
-    #
-    #     sch_class_map = a map of ScheduledClass objects (i.e. {course_id => [<ScheduledClass>, <ScheduledClass> ...]} )
-    #     sch_student = ScheduerStudent object being assigned to courses
-    #     course_index = index into sch_student.req_course_ids for the current course being assigned
-    #     """
-    #     if course_index >= len(sch_student.req_course_ids):
-    #         return True
-    #
-    #     # loop through the list of scheduled classes for each course
-    #     # to find one that is free
-    #     course_id = sch_student.req_course_ids[course_index]
-    #     for sch_class in sch_class_map[course_id]:
-    #         # if the time block for this class is not already
-    #         # filled with something else for this student, then use
-    #         # this class and recursively assign the next class
-    #         if sch_student.add_class(sch_class):
-    #             if self.assign_class_for_course(sch_student, course_index + 1):
-    #                 return True
-    #             else:
-    #                 sch_student.drop_class(sch_class)
-    #         # else, try the next class
-    #
-    #     # If we didn't find any classes that would work then return false
-    #     return False
 
     def max_class_size(self, course_id=None, classroom_id=None):
         """ 
@@ -145,7 +67,7 @@ class Scheduler():
 
         sch_map = {}
 
-        print('\033[95m course_id | room_id | teacher_id | time_block \033[0m', file=sys.stderr)
+        # print('\033[95m course_id | room_id | teacher_id | time_block \033[0m', file=sys.stderr)
         
         class_list = []
         for i in range(class_count):
@@ -154,8 +76,8 @@ class Scheduler():
             teacher_id = int(str(model.evaluate(sched_constraints.teacher(i))))
             time_block_index = int(str(model.evaluate(sched_constraints.time(i))))
 
-            print('\033[92m     {}     |    {}    |      {}     |     {} \033[0m'.format(
-                  course_id, room_id, teacher_id, time_block_index), file=sys.stderr)
+            # print('\033[92m     {}     |    {}    |      {}     |     {} \033[0m'.format(
+            #       course_id, room_id, teacher_id, time_block_index), file=sys.stderr)
 
             class_list.append(ScheduleClass(course_id,
                                             room_id,
@@ -175,38 +97,43 @@ class Scheduler():
         sched_constraints = ScheduleConstraints()
         class_count = sched_constraints.class_count
 
-        attempts = len(sched_constraints.student_requirement_set) / 10
-        for i in range(attempts):
-            print('\033[92m Attempt {} -----------------------------------------------\033[0m'.format(i + 1))
-            self.push_constraints(sched_constraints.get_constraints())
+        # try a bunch of times before resorting to adding a class
+        attempts = int(len(sched_constraints.student_requirement_set) / 10)
+        self.solver.push()
 
-            if solver.check() != sat:
-                print('\033[91m No sat, trying again with {} classes...\033[0m'.format(class_count))
-                raise SchedulerNoSolution('Not satisfiable')
-            else:
-                schedule = self.gen_sched_classes(solver.model(), class_count, sched_constraints)
-            # now start assigning students to classes and see if we can find
-            # a place for every student
-            collisions = self.place_students(schedule, sched_constraints.student_requirement_set)
-            if len(collisions) == 0:
-                print('\033[92m Satisfied! \033[0m')
-                print('\033[92m {} \033[0m'.format(schedule))
-                # now save the schedule
-                schedule.save()
-                return
-            else:
-                print('\033[91m Failed placing students, adding constraints and trying again...\033[0m')
-                sched_constraints.gen_constraints_from_collisions(collisions)
+        for i in range(10):
+            collisions = []
+            for i in range(attempts):
+                # print('\033[92m Attempt {} -----------------------------------------------\033[0m'.format(i + 1))
                 self.set_constraints(sched_constraints.get_constraints())
 
-        sched_constraints.add_class_from_collisions(collisions)
+                if self.solver.check() != sat:
+                    print('\033[91m No sat, adding teachers...\033[0m'.format(class_count))
+                    # Test_Util.generate_teachers(10)
+                    # Test_Util.generate_classrooms(10)
+                    # raise SchedulerNoSolution('Not satisfiable')
+                else:
+                    schedule = self.gen_sched_classes(self.solver.model(), class_count, sched_constraints)
+                # now start assigning students to classes and see if we can find
+                # a place for every student
+                collisions = self.place_students(schedule, sched_constraints.student_requirement_set)
+                if len(collisions) == 0:
+                    print('\033[92m Satisfied! \033[0m')
+                    print('\033[92m {} \033[0m'.format(schedule))
+                    # now save the schedule
+                    schedule.save()
+                    return
+                else:
+                    # if sched_constraints.gen_constraints_from_collisions(collisions):
+                    # print('\033[91m Failed placing students, trying again...\033[0m')
+                    # else:
+                    #     break
+
+            print('\033[91m Failed placing students, adding another class and trying again...\033[0m')
+            sched_constraints.add_class_from_collisions(collisions)
 
         print('\033[91m Reached max attempts \033[0m')
         raise SchedulerNoSolution()
-
-    def push_constraints(self, constraints):
-        self.solver.push() # push a new 'constraint frame' so we can pop it later if needed
-        self.solver.add(constraints)
 
     def set_constraints(self, constraints):
         self.solver.pop() # pop off the constraints so we can reset them
