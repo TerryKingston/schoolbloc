@@ -113,14 +113,13 @@ class Scheduler():
         sched_constraints = ScheduleConstraints()
 
         # try a bunch of times before resorting to adding a class
-        attempts = int(len(sched_constraints.student_requirement_set) / 10)
+        # attempts = int(len(sched_constraints.student_requirement_set) / 10)
         self.solver.push()
 
         for i in range(50):
             start_time = time.time()
-            print("start time: {}".format(start_time))
             collisions = []
-            for i in range(attempts):
+            for i in range(50):
                 # print('\033[92m Attempt {} -----------------------------------------------\033[0m'.format(i + 1))
                 self.set_constraints(sched_constraints.get_constraints())
 
@@ -147,7 +146,6 @@ class Scheduler():
                     #     break
 
             end_time = time.time()
-            print("end time: {}".format(end_time))
             print('\033[91m Failed placing students, adding another class and trying again...\033[0m')
             print('\033[91m Execution time: {} (min)\033[0m'.format( int((end_time - start_time)/60)) )
             sched_constraints.add_class_from_collisions(collisions)

@@ -3,6 +3,7 @@ from z3 import *
 from schoolbloc.scheduler.models import *
 from schoolbloc.config import config
 import math
+import time
 
 # make the class z3 data type and define its constructor
 # a class represents a mapping of teacher, room, course, time, and students
@@ -107,10 +108,12 @@ class ScheduleConstraints:
         """
         Re-calculates the implied constraints and the database constraints
         """
+        start_time = time.time()
         self.db_constraints = []
         self.prep_z3_classes()
         self.prep_implied_constraints()
         self.prep_db_constraints()
+        print("reset constraints ( {} min )".format(round((time.time() - start_time)/60)))
 
     def prep_class_constraints(self):
         """
@@ -129,12 +132,14 @@ class ScheduleConstraints:
             ScheduleConstraints.check_if_student_is_overscheduled(student, req_courses)
             # now go through the list and create courses when needed
             for course_id in req_courses:
+                # only go up to 70% of the max class size for guessing how many classes we'll need
+                max_stud_count = int(ScheduleConstraints.max_student_count(course_id) * .7)
                 if course_id not in self.class_constraints:
                     new_class = ClassConstraint(course_id)
                     self.class_constraints[course_id] = [new_class]
                     self.class_count += 1
                 
-                elif self.class_constraints[course_id][0].student_count < ScheduleConstraints.max_student_count(course_id):
+                elif self.class_constraints[course_id][0].student_count < max_stud_count:
                     self.class_constraints[course_id][0].student_count += 1
                 
                 else:
@@ -270,6 +275,7 @@ class ScheduleConstraints:
         """
         const_list = []
         for student_reqs in self.student_requirement_set:
+            print("adding timeblock_course z3 constraint for student {}".format(student_reqs.student_id))
             const_list += self.add_timeblock_constraints_for_student(student_reqs)
 
         return const_list

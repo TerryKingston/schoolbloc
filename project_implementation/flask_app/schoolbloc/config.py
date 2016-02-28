@@ -10,7 +10,7 @@ _defaults = {
     'lunch_start': 1105, # there is no break between the prev class and lunch
     'lunch_end': 1205, # there is no break between the end of lunch and the next class
     'time_between_classes': 10, # amount of minutes between classes
-    'default_max_class_size' : 50
+    'default_max_class_size' : 30
 }
 
 # Named tuple (read only) which stores config values
