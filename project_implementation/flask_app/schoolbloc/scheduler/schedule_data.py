@@ -85,6 +85,8 @@ class ScheduleData:
         # loop through the list of scheduled classes for each course
         # to find one that is free
         course_id = student.required_course_ids[course_index]
+        if course_id not in self.scheduled_classes:
+            raise Exception("student {}, course {} not in scheduled classes".format(student.id, course_id))
         for sch_class in self.scheduled_classes[course_id]:
             # if the time block for this class is not already 
             # filled with something else for this student, then use
@@ -96,6 +98,10 @@ class ScheduleData:
             else:
                 col_list = self.schedule_student_to_courses(student, course_index + 1)
                 if len(col_list) == 0:
+                    # Success!, now reorder the scheduled class list to move this one to the end
+                    self.scheduled_classes[course_id].remove(sch_class)
+                    self.scheduled_classes[course_id].append(sch_class)
+                    # self.scheduled_classes[course_id].sort(cmp=lambda a, b: len(a.students) - len(b.students))
                     return [] # return an empty list to indicate the student was placed
                 else:
                     sch_class.drop_student(student)

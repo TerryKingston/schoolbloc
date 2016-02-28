@@ -2,6 +2,7 @@
 from z3 import *
 from schoolbloc.scheduler.models import *
 from schoolbloc.config import config
+import math
 
 # make the class z3 data type and define its constructor
 # a class represents a mapping of teacher, room, course, time, and students
@@ -67,13 +68,12 @@ class ScheduleConstraints:
         self.db_constraints = [] # the list of z3 constraints generated from the DB
         self.course_time_constraints = {} # constraints generated from course-time collisions. student_id => constraint list
 
-        self.class_constraints = {} 
+        self.class_constraints = {}
         self.student_requirement_set = [] # list of StudentRequirement objects
 
         self.prep_class_constraints()
-        self.prep_z3_classes()
-        self.prep_implied_constraints()
-        self.prep_db_constraints()
+        self.reset_constraints()
+
 
     def get_constraints(self):
         """
@@ -141,6 +141,7 @@ class ScheduleConstraints:
                     new_class = ClassConstraint(course_id)
                     self.class_constraints[course_id].insert(0, new_class)
                     self.class_count += 1
+
     @staticmethod
     def check_if_student_is_overscheduled(student, required_courses):
         timeblock_count = Timeblock.query.count()
@@ -206,7 +207,8 @@ class ScheduleConstraints:
         new_class = ClassConstraint(course_id)
         self.class_constraints[course_id].append(new_class)
         self.class_count += 1
-        print('\033[91m Added Class for course: {}\033[0m'.format(course_id))
+        course = Course.query.get(course_id)
+        print('\033[91m Added Class for course: {} {}\033[0m'.format(course.id, course.name))
         self.reset_constraints()
 
 
@@ -284,21 +286,24 @@ class ScheduleConstraints:
         classroom_max = classroom_count * timeblock_count
         teacher_max = teacher_count * timeblock_count
 
+        classroom_util = (self.class_count / classroom_max) * 100
+        teacher_util = (self.class_count / teacher_max) * 100
+
         if self.class_count > classroom_max:
             print('\033[91m No solution, Not enough classrooms ({}) for the classes ({}), the max is {}\033[0m'.format(
                 classroom_count, self.class_count, classroom_max))
             raise SchedulerNoSolution("Not enough classrooms")
         else:
-            print('\033[92m classroom utilization: {}% \033[0m'.format( (self.class_count / classroom_max) * 100 ))
+            print('\033[92m classroom utilization: {}% \033[0m'.format( classroom_util ))
 
         if self.class_count > teacher_max:
             print('\033[91m No solution, Not enough teachers ({}) for the classes ({}), the max is {}\033[0m'.format(
                 teacher_count, self.class_count, teacher_max))
             raise SchedulerNoSolution("Not enough teachers")
         else:
-            print('\033[92m teacher utilization: {}% \033[0m'.format( (self.class_count / teacher_max) * 100 ))
+            print('\033[92m teacher utilization: {}% \033[0m'.format( teacher_util))
 
-
+        # return math.max(classroom_util, teacher_util)
 
     # def prep_class_constraints(self):
     #     """
