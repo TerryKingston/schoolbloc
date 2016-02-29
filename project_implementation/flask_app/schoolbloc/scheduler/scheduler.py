@@ -119,7 +119,7 @@ class Scheduler():
         for i in range(50):
             start_time = time.time()
             collisions = []
-            for i in range(50):
+            for i in range(10):
                 # print('\033[92m Attempt {} -----------------------------------------------\033[0m'.format(i + 1))
                 self.set_constraints(sched_constraints.get_constraints())
 
@@ -133,7 +133,7 @@ class Scheduler():
                 # a place for every student
                 collisions = self.place_students(schedule, sched_constraints.student_requirement_set)
                 if len(collisions) == 0:
-                    print('\033[92m Satisfied! \033[0m')
+                    print('\033[92m Satisfied! (attempt {})\033[0m'.format(i))
                     print('\033[92m {} \033[0m'.format(schedule))
                     # now save the schedule
                     schedule.save()

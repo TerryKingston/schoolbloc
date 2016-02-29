@@ -68,7 +68,7 @@ class ScheduleConstraints:
         self.class_count = 0
         self.db_constraints = [] # the list of z3 constraints generated from the DB
         self.course_time_constraints = {} # constraints generated from course-time collisions. student_id => constraint list
-
+        self.course_index_list_cache = []
         self.class_constraints = {}
         self.student_requirement_set = [] # list of StudentRequirement objects
 
@@ -133,7 +133,7 @@ class ScheduleConstraints:
             # now go through the list and create courses when needed
             for course_id in req_courses:
                 # only go up to 70% of the max class size for guessing how many classes we'll need
-                max_stud_count = int(ScheduleConstraints.max_student_count(course_id) * .7)
+                max_stud_count = int(ScheduleConstraints.max_student_count(course_id) * 0.85)
                 if course_id not in self.class_constraints:
                     new_class = ClassConstraint(course_id)
                     self.class_constraints[course_id] = [new_class]
@@ -238,11 +238,20 @@ class ScheduleConstraints:
         :return: A list of z3 constraints
 
         """
+
         # build a 2 dimensional array representing the z3 indices of the
         # required courses for the student. where the members if each each inner list 
         # represent the same course
         course_indexes = [[ c.z3_index for c in self.class_constraints[course_id] ]
                           for course_id in student_reqs.required_course_ids]
+
+        # cache the course_indexes so we can skip this step when we see duplicates
+        for ci in self.course_index_list_cache:
+            if course_indexes == ci:
+                # print("found duplicate course index list, sikipping student {}".format(student_reqs.student_id))
+                return []
+
+        self.course_index_list_cache.append(course_indexes)
 
         # print('\033[93m course z3 index set:\n {}\033[0m'.format(course_indexes))
 
@@ -274,8 +283,9 @@ class ScheduleConstraints:
         configuration where none of them have Timeblock conflicts)
         """
         const_list = []
+        self.course_index_list_cache = []
         for student_reqs in self.student_requirement_set:
-            print("adding timeblock_course z3 constraint for student {}".format(student_reqs.student_id))
+            # print("adding timeblock_course z3 constraint for student {}".format(student_reqs.student_id))
             const_list += self.add_timeblock_constraints_for_student(student_reqs)
 
         return const_list

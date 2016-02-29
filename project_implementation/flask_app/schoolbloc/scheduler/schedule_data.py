@@ -101,7 +101,6 @@ class ScheduleData:
                     # Success!, now reorder the scheduled class list to move this one to the end
                     self.scheduled_classes[course_id].remove(sch_class)
                     self.scheduled_classes[course_id].append(sch_class)
-                    # self.scheduled_classes[course_id].sort(cmp=lambda a, b: len(a.students) - len(b.students))
                     return [] # return an empty list to indicate the student was placed
                 else:
                     sch_class.drop_student(student)
