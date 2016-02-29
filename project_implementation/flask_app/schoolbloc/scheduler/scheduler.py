@@ -32,7 +32,7 @@ class Scheduler():
             self.day_start_time, self.day_end_time, self.break_length, self.lunch_start, self.lunch_end, self.class_duration)
 
 
-    def max_class_size(self, course_id=None, classroom_id=None):
+    def max_class_size(self, course_id=None):
         """ 
         Determines the maximum student count based on the given course and/or classroom.
         The max count is the lesser of the two if both course and classroom are given.
@@ -45,19 +45,8 @@ class Scheduler():
         else:
             course = None
 
-        if classroom_id:
-            classroom = Classroom.query.get(classroom_id)
-        else:
-            classroom = None
-
         if course and course.max_student_count:
-            if classroom and classroom.max_student_count:
-                class_size = min(course.max_student_count, classroom.max_student_count)
-            else:
-                class_size = course.max_student_count
-        else:
-            if classroom and classroom.max_student_count:
-                class_size = classroom.max_student_count
+            class_size = course.max_student_count
 
         return class_size
 
@@ -94,7 +83,7 @@ class Scheduler():
                                             room_id,
                                             teacher_id,
                                             time_block_index,
-                                            self.max_class_size(course_id, room_id),
+                                            self.max_class_size(course_id),
                                             0))
 
         sched_data = ScheduleData(class_list)

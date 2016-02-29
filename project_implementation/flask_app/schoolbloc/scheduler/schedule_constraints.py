@@ -133,7 +133,7 @@ class ScheduleConstraints:
             # now go through the list and create courses when needed
             for course_id in req_courses:
                 # only go up to 70% of the max class size for guessing how many classes we'll need
-                max_stud_count = int(ScheduleConstraints.max_student_count(course_id) * 0.85)
+                max_stud_count = int(ScheduleConstraints.max_student_count(course_id) * 0.8)
                 if course_id not in self.class_constraints:
                     new_class = ClassConstraint(course_id)
                     self.class_constraints[course_id] = [new_class]
@@ -541,23 +541,14 @@ class ScheduleConstraints:
 
         cons_list = []
         for room in Classroom.query.all():
-            if room.avail_start_time or room.avail_end_time:
-                # figure out which time blocks can be assigned to the room
-                avail_time_ids = self.calc_avail_time_ids(room.avail_start_time, room.avail_end_time)
-                
+            room_times = ClassroomsTimeblock.query.filter_by(classroom_id=room.id).all()
+            if len(room_times) > 0:
+                # collect all the timeblocks mapped to this room
+                timeblock_ids = [ rt.timeblock_id for rt in room_times ]
                 cons_list += [ If(self.room(i) == room.id, 
-                                  Or([ self.time(i) == time_id for time_id in avail_time_ids ]),
+                                  Or([ self.time(i) == time_id for time_id in timeblock_ids ]),
                                   True)
-                               for i in range(self.class_count) ]
-            else:
-                room_times = ClassroomsTimeblock.query.filter_by(classroom_id=room.id).all()
-                if len(room_times) > 0:
-                    # collect all the timeblocks mapped to this room
-                    timeblock_ids = [ rt.timeblock_id for rt in room_times ]
-                    cons_list += [ If(self.room(i) == room.id, 
-                                      Or([ self.time(i) == time_id for time_id in timeblock_ids ]),
-                                      True)
-                                   for i in range(self.class_count)]
+                               for i in range(self.class_count)]
         return cons_list
     
     def constrain_teacher_time(self):
@@ -596,23 +587,14 @@ class ScheduleConstraints:
 
         cons_list = []
         for course in Teacher.query.all():
-            if course.avail_start_time or course.avail_end_time:
-                # figure out which time blocks can be assigned to the course
-                avail_time_ids = self.calc_avail_time_ids(course.avail_start_time, course.avail_end_time)
-                
+            course_times = CoursesTimeblock.query.filter_by(course_id=course.id).all()
+            if len(course_times) > 0:
+                # collect all the timeblocks mapped to this course
+                timeblock_ids = [ ct.timeblock_id for ct in course_times ]
                 cons_list += [ If(self.course(i) == course.id, 
-                                  Or([ self.time(i) == time_id for time_id in avail_time_ids ]),
+                                  Or([ self.time(i) == time_id for time_id in timeblock_ids ]),
                                   True)
-                               for i in range(self.class_count) ]
-            else:
-                course_times = CoursesTimeblock.query.filter_by(course_id=course.id).all()
-                if len(course_times) > 0:
-                    # collect all the timeblocks mapped to this course
-                    timeblock_ids = [ ct.timeblock_id for ct in course_times ]
-                    cons_list += [ If(self.course(i) == course.id, 
-                                      Or([ self.time(i) == time_id for time_id in timeblock_ids ]),
-                                      True)
-                                   for i in range(self.class_count)]
+                               for i in range(self.class_count)]
 
         return cons_list
 
