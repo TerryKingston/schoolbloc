@@ -36,13 +36,10 @@ class Course(db.Model, SqlalchemySerializer):
     duration = db.Column(db.Integer) # optional duration, will use global default if not specified
     max_student_count = db.Column(db.Integer)
     min_student_count = db.Column(db.Integer)
-    avail_start_time = db.Column(db.Integer)
-    avail_end_time = db.Column(db.Integer)
 
     def __str__(self):
-        return "{} {} {} {} {} {}".format(self.name, self.duration, self.max_student_count,
-                                          self.min_student_count, self.avail_start_time,
-                                          self.avail_end_time)
+        return "{} {} {} {}".format(self.name, self.duration, self.max_student_count,
+                                          self.min_student_count)
 
 
 class CoursesStudent(db.Model, SqlalchemySerializer):
@@ -147,12 +144,9 @@ class Classroom(db.Model, SqlalchemySerializer):
     __restconstraints__ = ['classrooms_teachers', 'classrooms_courses', 'classrooms_timeblocks']
     id = db.Column(db.Integer, primary_key=True)
     room_number = db.Column(db.Integer, nullable=False, unique=True)  # user assigned room number
-    max_student_count = db.Column(db.Integer)
-    avail_start_time = db.Column(db.Integer)
-    avail_end_time = db.Column(db.Integer)
 
     def __str__(self):
-        return "{} {} {} {}".format(self.room_number, self.max_student_count, self.avail_end_time, self.avail_start_time)
+        return "{}".format(self.room_number)
 
 
 class ClassroomsTeacher(db.Model, SqlalchemySerializer):
