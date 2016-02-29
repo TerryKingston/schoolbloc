@@ -6,9 +6,9 @@
   <section class="view-sub-content">
     <div class="input-row" ng-repeat="factInput in addFactConfig.factTypeConfig track by $index">
       <label>
-        <div>{{factInput.key}}<div class="required" ng-if="factInput.required">*</div></div>
+        <div>{{translations[factInput.key]}}<div class="required" ng-if="factInput.required">*</div></div>
         <input type="text" ng-if="factInput.type === 'text' || factInput.type === 'uniqueText'" ng-model="factInput.value" ng-blur="checkInput(factInput)">
-        <input type="number" ng-if="factInput.type === 'number'" min="0" ng-model="factInput.value" ng-blur="checkInput(factInput)">
+        <input type="number" ng-if="factInput.type === 'number'" min="0" ng-model="factInput.value" ng-blur="checkInput(factInput)"> 
         <input type="text" placeholder="{{'schedulerModule.DATE_PLACEHOLDER' | translate}}" ng-if="factInput.type === 'date'" ng-model="factInput.value" ng-blur="checkInput(factInput)">
         <div class="input-row-min-max" ng-if="factInput.type === 'minMax'">
           <div>{{"schedulerModule.MIN" | translate}}:</div>
@@ -23,13 +23,22 @@
           <div>{{"schedulerModule.END" | translate}}:</div>
           <input type="text" ng-model="factInput.value.end" ng-blur="checkInput(factInput, 'end')">
         </div> -->
-        <select ng-if="factInput.type === 'dropdown'" ng-model="factInput.value" ng-blur="checkInput(factInput)">
-          <option ng-repeat="option in factInput.possibleAnswers" value="{{option}}">{{option}}</option>
-        </select>
-        <div class="input-row-constraint" ng-if="factInput.type === 'constraint'">
-          <input list="{{factInput.key}}" ng-disabled="!factInput.facts.length" ng-model="factInput.value" ng-blur="checkInput(factInput)">
+
+        <!-- This way isn't working as upon adding a new day input, it remove the last input value from the view (but not the object) -->
+        <!-- <select ng-if="factInput.type === 'dropdown'" ng-model="factInput.value" ng-blur="checkInput(factInput)">
+          <option ng-repeat="option in factInput.possibleAnswers track by $index" value="{{option}}">{{option}}</option>
+        </select> -->
+
+        <div class="input-row-constraint" ng-if="factInput.type === 'dropdown'">
+          <input list="{{factInput.key}}" ng-disabled="!factInput.possibleAnswers.length" ng-model="factInput.value" ng-blur="checkInput(factInput)">
           <datalist id="{{factInput.key}}">
-            <option ng-repeat="fact in factInput.facts" value="{{fact}}">{{fact}}</option>
+            <option ng-repeat="option in factInput.possibleAnswers track by $index" value="{{option}}">{{option}}</option>
+          </datalist>
+        </div>
+        <div class="input-row-constraint" ng-if="factInput.type === 'constraint'">
+          <input list="{{factInput.key}}" ng-disabled="!factInput.facts.values.length" ng-model="factInput.value" ng-blur="checkInput(factInput)">
+          <datalist id="{{factInput.key}}">
+            <option ng-repeat="factValue in factInput.facts.values" value="{{factValue}}">{{factValue}}</option>
           </datalist>
         </div>
       </label>

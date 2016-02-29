@@ -1,5 +1,6 @@
-// DELETE /api/<fact>
-"Payload": "unique_id"
-// example
-// DELETE /api/classroom
-"Payload": "L013"
+// DELETE /api/<fact>/id
+
+// There is no payload or json to send to this request, just do a DELETE http
+// request to the url with the primary key id
+
+// Curl example: curl -X DELETE http://localhost:5000/api/classrooms/1

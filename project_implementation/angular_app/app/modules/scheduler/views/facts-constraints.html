@@ -1,11 +1,11 @@
 <section class="scheduler-container main-view-content">
-  <sb-suggestion-list config="config.suggestionListConfig"></sb-suggestion-list>
+  <!-- <sb-suggestion-list config="config.suggestionListConfig"></sb-suggestion-list> -->
   <!-- @TODO: make a directive for this nonsense... -->
   <div class="header-input-row">
     <label>
       <div>{{"schedulerModule.VIEWING" | translate}}</div>
-      <select ng-model="factSelection" ng-disabled="!factSelection" ng-change="updateSelection()">
-        <option ng-repeat="option in factSelections track by $index" value="{{option}}" ng-selected="$index === 0">{{option}}</option>
+      <select ng-model="factSelectionText" ng-disabled="!factSelectionText" ng-change="updateSelection()">
+        <option ng-repeat="option in factSelectionsText track by $index" value="{{option}}" ng-selected="$index === 0">{{option}}</option>
       </select>
     </label>
   </div>

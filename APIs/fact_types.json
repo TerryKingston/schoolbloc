@@ -1,24 +1,36 @@
 // just for a reference.
 {
-	"classroom": [
+	"classrooms": [
 		{
-			"key": "room number",
+			"key": "room_number",
 			"required": true,
 			"type": "uniqueText",
 			"multipleValues": false
 		},
 		{
-			"key": "size",
+			"key": "max_student_count",
 			"required": true,
 			"type": "number",
 			"multipleValues": false
 		},
 		{
-			"key": "time",
+			"key": "avail_start_time",
 			"required": false,
-			"type": "constraint",
-			"multipleValues": true
+			"type": "startEnd",
+			"multipleValues": true // should be false?
 		},
+		{
+			"key": "avail_end_time",
+			"required": false,
+			"type": "startEnd",
+			"multipleValues": true // should be false?
+		},
+		//{
+		//	"key": "time",
+		//	"required": false,
+		//	"type": "constraint",
+		//	"multipleValues": true
+		//},
 		{
 			"key": "subject",
 			"required": false,
@@ -38,35 +50,49 @@
 			"multipleValues": true
 		}
 	],
-	"course": [
+	"courses": [
 		{
-			"key": "course name",
+			"key": "name",
 			"required": true,
 			"type": "uniqueText",
 			"multipleValues": false
 		},
+		//{
+		//	"key": "term",
+		//	"required": true,
+		//	"type": "dropdown",
+		//	"multipleValues": false,
+		//	"possibleAnswers": ["year", "quarter"]
+		//},
 		{
-			"key": "term",
-			"required": true,
-			"type": "dropdown",
-			"multipleValues": false,
-			"possibleAnswers": ["year", "quarter"]
+			"key": "max_student_count",
+			"required": false,
+			"type": "maxMin",
+			"multipleValues": true // should be false?
 		},
 		{
-			"key": "size",
-			"value": {
-				"min": null,
-				"max": null
-			},
+			"key": "min_student_count",
 			"required": false,
-			"type": "minMax",
-			"multipleValues": false
+			"type": "maxMin",
+			"multipleValues": true // should be false?
 		},
 		{
-			"key": "time",
+			"key": "duration", // what is this?
 			"required": false,
-			"type": "constraint",
+			"type": "constraint", // probably not right
 			"multipleValues": true
+		},
+		{
+			"key": "avail_start_time",
+			"required": false,
+			"type": "startEnd",
+			"multipleValues": true // should be false?
+		},
+		{
+			"key": "avail_end_time",
+			"required": false,
+			"type": "startEnd",
+			"multipleValues": true // should be false?
 		},
 		{
 			"key": "subject",
@@ -87,128 +113,158 @@
 			"multipleValues": true
 		}
 	],
-	"student": [
+	"students": [
 		{
-			"key": "id",
+			"key": "id", // is this a school id or user_id?
 			"required": true,
 			"type": "uniqueText",
 			"multipleValues": false
 		},
 		{
-			"key": "gender",
+			"key": "first_name",
 			"required": true,
-			"type": "dropdown",
-			"multipleValues": false,
-			"possibleAnswers": ["female", "male", "other"]
+			"type": "constraint",
+			"multipleValues": false
+		},
+		{
+			"key": "last_name",
+			"required": true,
+			"type": "constraint",
+			"multipleValues": false
+		}
+		//{
+		//	"key": "gender",
+		//	"required": true,
+		//	"type": "dropdown",
+		//	"multipleValues": false,
+		//	"possibleAnswers": ["female", "male", "other"]
+		//},
+		//{
+		//	"key": "date of birth",
+		//	"required": true,
+		//	"type": "date",
+		//	"multipleValues": false
+		//},
+		//{
+		//	"key": "time",
+		//	"required": false,
+		//	"type": "constraint",
+		//	"multipleValues": true
+		//},
+		{
+			"key": "student_group", // make sure this is actually connected
+			"required": false,
+			"type": "constraint",
+			"multipleValues": true
+		},
+		{
+			"key": "course", // make sure this is actually connected and named correctly
+			"required": false,
+			"type": "constraint",
+			"multipleValues": true
+		}
+	],
+	"student_groups": [
+		{
+			"key": "name",
+			"required": true,
+			"type": "uniqueText",
+			"multipleValues": false
+		},
+		{
+			"key": "id", // don't need
+			"required": true,
+			"type": "uniqueText",
+			"multipleValues": false
+		}
+		//{
+		//	"key": "time",
+		//	"required": false,
+		//	"type": "constraint",
+		//	"multipleValues": true
+		//},
+		{
+			"key": "student", // make sure this is actually connected
+			"required": false,
+			"type": "constraint",
+			"multipleValues": true
+		},
+		{
+			"key": "course", // make sure this is actually connected and named correctly
+			"required": false,
+			"type": "constraint",
+			"multipleValues": true
+		}
+	],
+	"subjects": [
+		{
+			"key": "id", // don't need
+			"required": true,
+			"type": "uniqueText",
+			"multipleValues": false
 		},
 		{
 			"key": "name",
+			"required": true,
+			"type": "uniqueText",
+			"multipleValues": false
+		}
+		//{
+		//	"key": "time",
+		//	"required": false,
+		//	"type": "constraint",
+		//	"multipleValues": true
+		//},
+		{
+			"key": "course",
+			"required": false,
+			"type": "constraint",
+			"multipleValues": true
+		},
+		{
+			"key": "teacher",
+			"required": false,
+			"type": "constraint",
+			"multipleValues": true
+		},
+		{
+			"key": "classroom",
+			"required": false,
+			"type": "constraint",
+			"multipleValues": true
+		}
+	],
+	"teachers": [
+		{
+			"key": "id", // don't need
+			"required": true,
+			"type": "uniqueText",
+			"multipleValues": false
+		},
+		{
+			"key": "first_name",
 			"required": true,
 			"type": "text",
 			"multipleValues": false
 		},
 		{
-			"key": "date of birth",
-			"required": true,
-			"type": "date",
-			"multipleValues": false
-		},
-		{
-			"key": "time",
-			"required": false,
-			"type": "constraint",
-			"multipleValues": true
-		},
-		{
-			"key": "student group",
-			"required": false,
-			"type": "constraint",
-			"multipleValues": true
-		},
-		{
-			"key": "required course",
-			"required": false,
-			"type": "constraint",
-			"multipleValues": true
-		}
-	],
-	"student group": [
-		{
-			"key": "group name",
-			"required": true,
-			"type": "uniqueText",
-			"multipleValues": false
-		},
-		{
-			"key": "time",
-			"required": false,
-			"type": "constraint",
-			"multipleValues": true
-		},
-		{
-			"key": "student",
-			"required": false,
-			"type": "constraint",
-			"multipleValues": true
-		},
-		{
-			"key": "required course",
-			"required": false,
-			"type": "constraint",
-			"multipleValues": true
-		}
-	],
-	"subject": [
-		{
-			"key": "subject name",
-			"required": true,
-			"type": "uniqueText",
-			"multipleValues": false
-		},
-		{
-			"key": "time",
-			"required": false,
-			"type": "constraint",
-			"multipleValues": true
-		},
-		{
-			"key": "course",
-			"required": false,
-			"type": "constraint",
-			"multipleValues": true
-		},
-		{
-			"key": "teacher",
-			"required": false,
-			"type": "constraint",
-			"multipleValues": true
-		},
-		{
-			"key": "classroom",
-			"required": false,
-			"type": "constraint",
-			"multipleValues": true
-		}
-	],
-	"teacher": [
-		{
-			"key": "id",
-			"required": true,
-			"type": "uniqueText",
-			"multipleValues": false
-		},
-		{
-			"key": "name",
+			"key": "last_name",
 			"required": true,
 			"type": "text",
 			"multipleValues": false
 		},
 		{
-			"key": "time",
-			"required": false,
-			"type": "constraint",
-			"multipleValues": true
-		},
+			"key": "user_id",
+			"required": true,
+			"type": "uniqueText",
+			"multipleValues": false
+		}
+		//{
+		//	"key": "time",
+		//	"required": false,
+		//	"type": "constraint",
+		//	"multipleValues": true
+		//},
 		{
 			"key": "subject",
 			"required": false,
@@ -228,26 +284,26 @@
 			"multipleValues": true
 		}
 	],
-	"time": [
+	"timeblocks": [
 		{
-			"key": "start time",
+			"key": "start_time",
 			"required": true,
 			"type": "startEnd",
 			"multipleValues": false
 		},
 		{
-			"key": "end time",
+			"key": "end_time",
 			"required": true,
 			"type": "startEnd",
 			"multipleValues": false
 		},
-		{
-			"key": "days",
-			"required": true,
-			"type": "dropdown",
-			"multipleValues": true,
-			"possibleAnswers": ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday", "weekdays"]
-		},
+		//{
+		//	"key": "days",
+		//	"required": true,
+		//	"type": "dropdown",
+		//	"multipleValues": true,
+		//	"possibleAnswers": ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday", "weekdays"]
+		//},
 		{
 			"key": "subject",
 			"required": false,

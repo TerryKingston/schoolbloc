@@ -20,7 +20,7 @@
     </section>
     <section class="main-nav-bar-module-controls">
       <h3>{{"mainNavBar.MODULES" | translate}}</h3>
-      <div class="modules-list" ng-repeat="module in config.modules">
+      <div class="modules-list" ng-repeat="module in config.modules track by $index">
         <a href="" ng-click="mainNavBar.changeView(module.identifier)"><div class="main-control" ng-class="{'main-control-active': config.view === module.identifier || module.submoduleActive}" ng-bind-html="module.name"></div></a>
         <div class="submodules-list" ng-repeat="submodule in module.submodules">
           <a href="" ng-click="mainNavBar.changeSubView(submodule.identifier, module.identifier)"><div class="sub-control" ng-class="{'sub-control-active': config.subView === submodule.identifier}" ng-bind-html="submodule.name"></div></a>
@@ -31,4 +31,8 @@
   <div class="main-nav-bar-closed" ng-show="!mainNavBar.isOpen">
     <div class="hamburger-icon" ng-click="toggleNavBar(true)"></div>
   </div>
+</section>
+<section class="main-nav-bar-width-box">
+  <div class="main-nav-bar-open" ng-show="mainNavBar.isOpen"></div>
+  <div class="main-nav-bar-closed" ng-show="!mainNavBar.isOpen"></div>
 </section>

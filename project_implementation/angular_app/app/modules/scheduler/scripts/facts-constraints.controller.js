@@ -10,7 +10,7 @@
  * Controller of the sbAngularApp
  */
 angular.module('sbAngularApp')
-.controller('FactsConstraints', ['$scope', 'tableEntriesService', function($scope, tableEntriesService) {
+.controller('FactsConstraints', ['$scope', '$translate', 'tableEntriesService', function($scope, $translate, tableEntriesService) {
 	this.components = [
 		'HTML5 Boilerplate',
 		'AngularJS',
@@ -19,9 +19,32 @@ angular.module('sbAngularApp')
 
 	$scope.factSelections = null;
 	$scope.factSelection = null;
+	$scope.factSelectionText = null;
+	$scope.factSelectionsText = null;
+
+	function updateFactSelectionText() {
+		var i;
+
+		$scope.factSelectionsText = [];
+
+		if (!$scope.factSelections || !$scope.factSelections.length) {
+			return;
+		}
+		for (i = 0; i < $scope.factSelections.length; i++) {
+			$translate("schedulerModule." + $scope.factSelections[i].toUpperCase()).then(function (translation) {
+				$scope.factSelectionsText.push(translation);
+
+				// once the last one has been translated, update the factSelectionText
+				if ($scope.factSelectionsText.length === $scope.factSelections.length) {
+					$scope.factSelectionText = $scope.factSelectionsText[0];
+				}
+			});
+		}
+	}
 
 	function setupTableEntries() {
 		$scope.factSelections = tableEntriesService.getTableSelections("fact");
+		updateFactSelectionText();
 		if ($scope.factSelections && $scope.factSelections.length) {
 			$scope.factSelection = $scope.factSelections[0];
 			// setup fact view to be defined for a particular fact (in this case, 'classroom')
@@ -30,6 +53,13 @@ angular.module('sbAngularApp')
 	}
 
 	$scope.updateSelection = function() {
+		var i;
+		// convert from text to obj key
+		for (i = 0; i < $scope.factSelectionsText.length; i++) {
+			if ($scope.factSelectionsText[i] === $scope.factSelectionText) {
+				$scope.factSelection = $scope.factSelections[i];
+			}
+		}
 		// factSelection is set by ng-model in view
 		tableEntriesService.updateTableConfig("fact", $scope.factSelection);
 	}
