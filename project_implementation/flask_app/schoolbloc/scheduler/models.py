@@ -125,6 +125,7 @@ class CoursesSubject(db.Model, SqlalchemySerializer):
     course_id = db.Column(db.Integer, db.ForeignKey('courses.id'), nullable=False)
     subject_id = db.Column(db.Integer, db.ForeignKey('subjects.id'), nullable=False)
     active = db.Column(db.Boolean, nullable=False, default=True)
+    priority = db.Column(db.String(128), nullable=False)
     subject = db.relationship("Subject", backref="courses_subjects")
     course = db.relationship("Course", backref="courses_subjects")
 
