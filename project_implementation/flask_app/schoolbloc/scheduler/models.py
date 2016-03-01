@@ -141,12 +141,27 @@ class Classroom(db.Model, SqlalchemySerializer):
     a school building.
     """
     __tablename__ = 'classrooms'
-    __restconstraints__ = ['classrooms_teachers', 'classrooms_courses', 'classrooms_timeblocks']
+    __restconstraints__ = ['classrooms_teachers', 'classrooms_courses', 'classrooms_timeblocks',
+                           'classrooms_subjects']
     id = db.Column(db.Integer, primary_key=True)
     room_number = db.Column(db.Integer, nullable=False, unique=True)  # user assigned room number
 
     def __str__(self):
         return "{}".format(self.room_number)
+
+
+class ClassroomsSubject(db.Model, SqlalchemySerializer):
+    __tablename__ = 'classrooms_subjects'
+    id = db.Column(db.Integer, primary_key=True)
+    classroom_id = db.Column(db.Integer, db.ForeignKey('classrooms.id'), nullable=False)
+    subject_id = db.Column(db.Integer, db.ForeignKey('subjects.id'), nullable=False)
+    active = db.Column(db.Boolean, nullable=False, default=True)
+    priority = db.Column(db.String(128), nullable=False)
+    classroom = db.relationship("Classroom", backref="classrooms_subjects")
+    subject = db.relationship("Subject", backref="classrooms_subjects")
+
+    def __str__(self):
+        return "{} {}".format(self.classroom, self.subject)
 
 
 class ClassroomsTeacher(db.Model, SqlalchemySerializer):
@@ -360,6 +375,7 @@ class Subject(db.Model, SqlalchemySerializer):
     def __str__(self):
         return "{}".format(self.name)
 
+
 class Teacher(db.Model, SqlalchemySerializer):
     """
     ORM object for teachers stored in the database
@@ -368,7 +384,8 @@ class Teacher(db.Model, SqlalchemySerializer):
     The teacher object holds teacher specific info for teacher users.
     """
     __tablename__ = 'teachers'
-    __restconstraints__ = ['classrooms_teachers', 'teachers_timeblocks', 'courses_teachers']
+    __restconstraints__ = ['classrooms_teachers', 'teachers_timeblocks', 'courses_teachers',
+                           'teachers_subjects']
     id = db.Column(db.Integer, primary_key=True)
     first_name = db.Column(db.String(128), nullable=False)
     last_name = db.Column(db.String(128), nullable=False)
@@ -379,7 +396,21 @@ class Teacher(db.Model, SqlalchemySerializer):
 
     def __str__(self):
         return "{} {} {} {}".format(self.first_name, self.last_name, self.avail_end_time, self.avail_start_time)
-    
+
+
+class TeachersSubject(db.Model, SqlalchemySerializer):
+    __tablename__ = 'teachers_subjects'
+    id = db.Column(db.Integer, primary_key=True)
+    teacher_id = db.Column(db.Integer, db.ForeignKey('teachers.id'), nullable=False)
+    subject_id = db.Column(db.Integer, db.ForeignKey('subjects.id'), nullable=False)
+    active = db.Column(db.Boolean, nullable=False, default=True)
+    priority = db.Column(db.String(128), nullable=False)
+    teacher = db.relationship("Teacher", backref="teachers_subjects")
+    subject = db.relationship("Subject", backref="teachers_subjects")
+
+    def __str__(self):
+        return "{} {}".format(self.teacher, self.subject)
+
 
 class CoursesTimeblock(db.Model, SqlalchemySerializer):
     """
