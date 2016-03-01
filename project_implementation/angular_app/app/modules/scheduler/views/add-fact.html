@@ -52,6 +52,9 @@
         <div>{{"schedulerModule.SET_REPEAT" | translate}}</div>
       </a>
     </div>
+    <div class="add-fact-error" ng-if="addFactConfig.addFactErrorText">
+      {{addFactConfig.addFactErrorText}}
+    </div>
     <div class="btn-row">
       <button class="btn btn-recommended" ng-click="saveFact(false)">{{"schedulerModule.SAVE" | translate}}</button>
       <button class="btn btn-recommended" ng-click="saveFact(true)" ng-bind-html="'schedulerModule.SAVE_ANOTHER' | translate"></button>

@@ -35,6 +35,10 @@ angular.module('sbAngularApp')
 
 	$scope.toggleAddFact = function (show) {
 		$scope.addFactConfig.showAddFact = show;
+		// remove error if cancel
+		if (!show) {
+			$scope.addFactConfig.addFactErrorText = null;
+		}
 	};
 
 	$scope.checkInput = function (factInput, specifyType) {
@@ -298,16 +302,21 @@ angular.module('sbAngularApp')
 		tableEntriesService.addFact(fe, $scope.tableConfig.tableSelection).then(function (data) {
 			// reset the form
 			$scope.resetForm();
+
+			$scope.addFactConfig.addFactErrorText = null;
+			// if save instead of save & add another
+			if (!addAnotherFact) {
+				$scope.addFactConfig.showAddFact = false;
+			}
 		}, function(error) {
-			// @TODO: display error
+			$translate("schedulerModule.ADD_FACT_ERROR").then(function (translation) {
+				$scope.addFactConfig.addFactErrorText = translation;
+			});
 		});
 
 		
 
-		// if save instead of save & add another
-		if (!addAnotherFact) {
-			$scope.addFactConfig.showAddFact = false;
-		}
+		
 	};
 
 	$scope.resetForm = function (factInput, index) {
