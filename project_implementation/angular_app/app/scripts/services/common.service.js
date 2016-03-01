@@ -12,6 +12,9 @@ angular.module('sbAngularApp').factory('commonService', ['$translate', '$window'
 	function checkMilitaryTime(time) {
 		var timeValue;
 		// needs four characters: 0000
+		if (Number.isInteger(time)) {
+			time = time + "";
+		}
 		if (!time || !time.length || time.length !== 4) {
 			return false;
 		}
@@ -240,6 +243,24 @@ angular.module('sbAngularApp').factory('commonService', ['$translate', '$window'
 				return "ERROR";
 			}
 			return generateStandardTime(start) + "-" + generateStandardTime(end);
+		},
+
+		/**
+		 * Formats standard time into military time (0000 - 2359)
+		 * @param  {string} time standard format
+		 * @return {string}       	  Returns 'ERROR' if improper format of time, or a string in military time.
+		 */
+		formatSingleTimeS2M: function(time) {
+			var timeArr;
+			// requires a '-'' to be a range
+			if (!time || time.indexOf('-') >= 0) {
+				return 'ERROR';
+			}
+			// make sure start and end are valid
+			if (!checkStandardTime(time)) {
+				return "ERROR";
+			}
+			return generateMilitaryTime(time);
 		},
 
 		/**

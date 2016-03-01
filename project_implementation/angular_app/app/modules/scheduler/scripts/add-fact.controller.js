@@ -295,6 +295,9 @@ angular.module('sbAngularApp')
 				fe['min_' + ftc[i].key] = ftc[i].value.min;
 				fe['max_' + ftc[i].key] = ftc[i].value.max;
 			}
+			else if (ftc[i].type === 'startEnd') {
+				fe[ftc[i].key] = commonService.formatSingleTimeS2M(ftc[i].value);
+			}
 			else {
 				fe[ftc[i].key] = ftc[i].value;
 			}

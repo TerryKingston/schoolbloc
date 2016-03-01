@@ -162,14 +162,14 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 			}
 		],
 		"student": [
-			// {
-			// 	key: "user_id",
-			// 	value: null,
-			// 	error: null,
-			// 	required: true,
-			// 	type: "uniqueText",
-			// 	multipleValues: false
-			// },
+			{
+				key: "user_id",
+				value: null,
+				error: null,
+				required: true,
+				type: "uniqueText",
+				multipleValues: false
+			},
 			{
 				key: "first_name",
 				value: null,
