@@ -352,8 +352,7 @@ class TestRestList(Resource):
                 kwargs[param] = request_json[param]
                 del request_json[param]
             else:
-                abort(400, message='Required param {} for {} not in payload'
-                      .format(param, parser['name']))
+                abort(400, message='Required param {} not in payload'.format(param))
         for param in parser['optional_params']:
             if param in request_json:
                 kwargs[param] = request_json[param]
