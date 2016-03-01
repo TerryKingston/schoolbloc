@@ -394,7 +394,7 @@ class Teacher(db.Model, SqlalchemySerializer):
     avail_end_time = db.Column(db.Integer)
 
     def __str__(self):
-        return "{} {} {} {}".format(self.first_name, self.last_name, self.avail_end_time, self.avail_start_time)
+        return "{} {}".format(self.first_name, self.last_name)
 
 
 class TeachersSubject(db.Model, SqlalchemySerializer):
