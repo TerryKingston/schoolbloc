@@ -793,6 +793,13 @@ textarea {
   border: 1px solid $table-border;
 }
 
+.table-options-container {
+    position: absolute;
+    left: 700px;
+    margin-top: -43px;
+}
+
+
 .dynamic-table .table-capitalize {
   text-transform: capitalize;
 }
