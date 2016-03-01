@@ -295,7 +295,6 @@ angular.module('sbAngularApp')
 
   $scope.toggleAllEntries = function(index, show) {
     var i;
-    debugger;
     for (i = 0; i < $scope.tableView.rows.length; i++) {
       // skip the header
       if ($scope.tableView.rows[i].type === "header") {
