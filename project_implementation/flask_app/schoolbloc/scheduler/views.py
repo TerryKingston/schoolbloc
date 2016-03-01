@@ -59,7 +59,7 @@ def register_rest_orm(orm, get='admin', put='admin', post='admin',
     return cls, cls_list
 
 
-register_rest_orm(Course, get=['teacher', 'admin'], list=['teacher', 'admin'])
+register_rest_orm(Course)
 register_rest_orm(CoursesStudent)
 register_rest_orm(CoursesTeacher)
 register_rest_orm(CoursesStudentGroup)

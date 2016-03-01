@@ -1,3 +1,6 @@
+<div class="table-options-container">
+  <button class="btn btn-secondary" ng-click="toggleTableOptions(true)">{{'dynamicTable.TABLE_OPTIONS' | translate}}</button>
+</div>
 <section class="table-wrapper">
   <table class="dynamic-table schedule-table" ng-if="tableView.rows && tableView.rows.length" ng-mouseleave="resetHeader()">
     <!-- <thead>

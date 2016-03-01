@@ -34,13 +34,13 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 				type: "uniqueText",
 				multipleValues: false
 			},
-			{
-				key: "max_student_count",
-				value: null,
-				required: true,
-				type: "number",
-				multipleValues: false
-			},
+			// {
+			// 	key: "max_student_count",
+			// 	value: null,
+			// 	required: true,
+			// 	type: "number",
+			// 	multipleValues: false
+			// },
 			{
 				key: "timeblock",
 				value: null,
@@ -446,6 +446,12 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 			}
 			if (constraintArr[i].name) {
 				value = value + constraintArr[i].name + " ";
+			}
+			if (constraintArr[i].room_number) {
+				value = value + constraintArr[i].room_number + " ";
+			}
+			if ((constraintArr[i].start_time || constraintArr[i].start_time === 0) && (constraintArr[i].end_time || constraintArr[i].end_time === 0)) {
+				value = value + commonService.formatTimeM2S(constraintArr[i].start_time, constraintArr[i].end_time);
 			}
 			value = value.trim();
 

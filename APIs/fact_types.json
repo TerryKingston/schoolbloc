@@ -7,24 +7,6 @@
 			"type": "uniqueText",
 			"multipleValues": false
 		},
-		{
-			"key": "max_student_count",
-			"required": true,
-			"type": "number",
-			"multipleValues": false
-		},
-		{
-			"key": "avail_start_time",
-			"required": false,
-			"type": "startEnd",
-			"multipleValues": true // should be false?
-		},
-		{
-			"key": "avail_end_time",
-			"required": false,
-			"type": "startEnd",
-			"multipleValues": true // should be false?
-		},
 		//{
 		//	"key": "time",
 		//	"required": false,
@@ -81,18 +63,6 @@
 			"required": false,
 			"type": "constraint", // probably not right
 			"multipleValues": true
-		},
-		{
-			"key": "avail_start_time",
-			"required": false,
-			"type": "startEnd",
-			"multipleValues": true // should be false?
-		},
-		{
-			"key": "avail_end_time",
-			"required": false,
-			"type": "startEnd",
-			"multipleValues": true // should be false?
 		},
 		{
 			"key": "subject",
@@ -252,6 +222,18 @@
 			"required": true,
 			"type": "text",
 			"multipleValues": false
+		},
+		{
+			"key": "avail_start_time",
+			"required": false,
+			"type": "startEnd",
+			"multipleValues": true // should be false?
+		},
+		{
+			"key": "avail_end_time",
+			"required": false,
+			"type": "startEnd",
+			"multipleValues": true // should be false?
 		},
 		{
 			"key": "user_id",

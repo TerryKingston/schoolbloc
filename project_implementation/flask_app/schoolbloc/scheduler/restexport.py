@@ -71,19 +71,19 @@ def _find_constraint_mapping_table(orm, constraint_str):
     teacher = db.relationship("Teacher", backref="classrooms_teachers")
     """
     if not hasattr(orm, '__restconstraints__'):
-        raise Exception('no __restconstraints__ defined on {}'.format(orm))
+        abort(400, message='no __restconstraints__ defined on {}'.format(orm))
     for table_constraint in orm.__restconstraints__:
         mapper_table = orm.__mapper__.relationships.get(table_constraint)
         relationships = mapper_table.mapper.relationships.keys()
         if len(relationships) != 2:
-            raise Exception('encountered a constraint mapping table that does not have '
-                            'two foreign keys')
+            abort(400, message='encountered a constraint mapping table that does not have '
+                               'two foreign keys')
         if constraint_str in relationships:
             # this is the table we are looking for. Return the actual ORM
             # object, not the table name or relationship property objects
             return mapper_table.mapper.class_
-    raise Exception('No table found under __restconstraints__ which maps'
-                    '{} to {}'.format(orm.__tablename__, constraint_str))
+    abort(400, message='No table found under __restconstraints__ which maps'
+                       '{} to {}'.format(orm.__tablename__, constraint_str))
 
 
 def _get_constraint_foreign_name(orm, constraint):
@@ -95,8 +95,8 @@ def _get_constraint_foreign_name(orm, constraint):
     mapper_table = orm.__mapper__.relationships.get(constraint)
     relationships = mapper_table.mapper.relationships.items()
     if len(relationships) != 2:
-        raise Exception('encountered a constraint mapping table that does not have '
-                        'two foreign keys')
+        abort(400, message='encountered a constraint mapping table that does not have '
+                           'two foreign keys')
 
     # Figure out which relationship points back to the original orm_object,
     # and which one points to a foreign table
@@ -119,7 +119,7 @@ def _get_constraint_key_column_names(base_orm, foreign_orm):
             else:
                 foreign_id_name = column.name
     if not this_id_name or not foreign_id_name:  # Sanity check
-        raise Exception('Failed to pull out id column name')
+        abort(400, message='Failed to pull out id column name')
     return this_id_name, foreign_id_name
 
 
@@ -160,7 +160,7 @@ def _generate_parser(orm):
         elif type(col_type) is db.String:
             col_type = str
         else:
-            raise Exception("Unknown type {} found".format(col_type))
+            abort(400, message="Unknown type {} found".format(col_type))
 
         # Save data to parser
         if required:
@@ -189,7 +189,7 @@ class TestRest(Resource):
                     'id': foreign_orm.id,
                     'value': str(foreign_orm),
                     'active': mapper_orm.active,
-                    'priority': mapper_orm.active
+                    'priority': mapper_orm.priority
                 }
                 foreign_serialized.append(serialized)
             ret[foreign_name] = foreign_serialized
@@ -199,29 +199,27 @@ class TestRest(Resource):
         orm_obj = self._get_or_abort(orm_id)
         parser = _generate_parser(self.orm)
         request_json = request.get_json(force=True)
-        if 'payload' not in request_json:
-            raise Exception('missing key: "payload" from json request')
 
         # TODO verify json datatype to what parser says it should be
         # As this is editing existing data, we will treat everything as optional
         to_remove = []  # Cannot remove elements from dict while iterating
-        for key, value in request_json['payload'].items():
+        for key, value in request_json.items():
             if key in parser['required_params'] or key in parser['optional_params']:
                 setattr(orm_obj, key, value)  # Update orm object with n
                 to_remove.append(key)
         for key in to_remove:
-            del request_json['payload'][key]
+            del request_json[key]
         db.session.add(orm_obj)
 
         # only stuff left in json_request should be the constraint data. If there
         # is additional keys here, go ahead and error out instead of ignoring them
         # (nothing has been commited to the db yet)
-        for constraint, requests in request_json['payload'].items():
+        for constraint, requests in request_json.items():
             for data in requests:
                 if 'method' not in data:
-                    raise Exception('Must have method (add/edit/delete) in constraint payload')
+                    abort(400, message='Must have method (add/edit/delete) in constraint payload')
                 if data['method'] not in ('add', 'edit', 'delete'):
-                    raise Exception('method in constraint payload must be add, edit, or delete')
+                    abort(400, message='method in constraint payload must be add, edit, or delete')
 
                 orm_class = _find_constraint_mapping_table(self.orm, constraint)
                 this_id, foreign_id = _get_constraint_key_column_names(self.orm, orm_class)
@@ -235,7 +233,7 @@ class TestRest(Resource):
                         tmp_kwargs[foreign_id] = data['id']
                         db.session.add(orm_class(**tmp_kwargs))
                     except KeyError as e:
-                        raise Exception("missing key {} in constraint {}".format(str(e), constraint))
+                        abort(400, message="missing key {} in constraint {}".format(str(e), constraint))
 
                 elif data['method'] == 'delete':
                     try:
@@ -246,10 +244,10 @@ class TestRest(Resource):
                                                              foreign_col == data['id']).one()
                         db.session.delete(tmp_orm_obj)
                     except NoResultFound:
-                        raise Exception("Cannot find constraint of type {} with {}={} "
-                                        "and {}={}".format(orm_class.__tablename__,
-                                                           this_id, orm_obj.id,
-                                                           foreign_id, data['id']))
+                        abort(400, message="Cannot find constraint of type {} with {}={} "
+                                           "and {}={}".format(orm_class.__tablename__,
+                                                              this_id, orm_obj.id,
+                                                              foreign_id, data['id']))
 
                 elif data['method'] == 'edit':
                     try:
@@ -269,13 +267,13 @@ class TestRest(Resource):
                             elif key == 'method':
                                 continue
                             else:
-                                raise Exception('Bad key found in constraint json: {}'.format(key))
+                                abort(400, message='Bad key found in constraint json: {}'.format(key))
                         db.session.add(tmp_orm_obj)
                     except NoResultFound:
-                        raise Exception("Cannot find constraint of type {} with {}={} "
-                                        "and {}={}".format(orm_class.__tablename__,
-                                                           this_id, orm_obj.id,
-                                                           foreign_id, data['id']))
+                        abort(400, message="Cannot find constraint of type {} with {}={} "
+                                           "and {}={}".format(orm_class.__tablename__,
+                                                              this_id, orm_obj.id,
+                                                              foreign_id, data['id']))
 
         # Save all changes made into the db, rollback and error if that fails
         try:
@@ -335,7 +333,7 @@ class TestRestList(Resource):
                         'id': foreign_orm.id,
                         'value': str(foreign_orm),
                         'active': mapper_orm.active,
-                        'priority': mapper_orm.active
+                        'priority': mapper_orm.priority
                     }
                     foreign_serialized.append(serialized)
                 tmp_ret[foreign_name] = foreign_serialized
@@ -345,22 +343,21 @@ class TestRestList(Resource):
     def post(self):
         parser = _generate_parser(self.orm)
         request_json = request.get_json(force=True)
-        if 'payload' not in request_json:
-            raise Exception('missing key: "payload" from json request')
 
         # TODO verify json datatype to what parser says it should be
         # Verify received json has required data, and make orm object from said data
         kwargs = {}
         for param in parser['required_params']:
-            if param in request_json['payload']:
-                kwargs[param] = request_json['payload'][param]
-                del request_json['payload'][param]
+            if param in request_json:
+                kwargs[param] = request_json[param]
+                del request_json[param]
             else:
-                raise Exception('Required param {} for {} not in payload'.format(param, parser['name']))
+                abort(400, message='Required param {} for {} not in payload'
+                      .format(param, parser['name']))
         for param in parser['optional_params']:
-            if param in request_json['payload']:
-                kwargs[param] = request_json['payload'][param]
-                del request_json['payload'][param]
+            if param in request_json:
+                kwargs[param] = request_json[param]
+                del request_json[param]
         orm_obj = self.orm(**kwargs)
         db.session.add(orm_obj)
         db.session.flush()
@@ -368,19 +365,21 @@ class TestRestList(Resource):
         # only stuff left in json_request should be the constraint data. If there
         # is additional keys here, go ahead and error out instead of ignoring them
         # (nothing has been commited to the db yet)
-        for constraint, data in request_json['payload'].items():
-            try:
-                orm_class = _find_constraint_mapping_table(self.orm, constraint)
-                this_id, foreign_id = _get_constraint_key_column_names(self.orm, orm_class)
+        for constraint, data_list in request_json.items():
+            for data in data_list:
+                try:
+                    orm_class = _find_constraint_mapping_table(self.orm, constraint)
+                    this_id, foreign_id = _get_constraint_key_column_names(self.orm, orm_class)
 
-                tmp_kwargs = {}
-                tmp_kwargs['active'] = data['active']
-                tmp_kwargs['priority'] = data['priority']
-                tmp_kwargs[this_id] = orm_obj.id
-                tmp_kwargs[foreign_id] = data['id']
-                db.session.add(orm_class(**tmp_kwargs))
-            except KeyError as e:
-                raise Exception("missing key {} in constraint {}".format(str(e), constraint))
+                    print(constraint, data)
+                    tmp_kwargs = {}
+                    tmp_kwargs['active'] = data['active']
+                    tmp_kwargs['priority'] = data['priority']
+                    tmp_kwargs[this_id] = orm_obj.id
+                    tmp_kwargs[foreign_id] = data['id']
+                    db.session.add(orm_class(**tmp_kwargs))
+                except KeyError as e:
+                    abort(400, message="missing key {} in constraint {}".format(str(e), constraint))
 
         # Save all new objects to db
         try:
