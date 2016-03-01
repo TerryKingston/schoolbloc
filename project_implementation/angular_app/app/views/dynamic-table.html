@@ -1,5 +1,33 @@
-<div class="table-options-container">
-  <button class="btn btn-secondary" ng-click="toggleTableOptions(true)">{{'dynamicTable.TABLE_OPTIONS' | translate}}</button>
+<div class="table-options-btn-container">
+  <button class="btn btn-secondary" ng-click="toggleTableOptions()">{{'dynamicTable.TABLE_OPTIONS' | translate}}</button>
+</div>
+<div class="table-options-container" ng-show="tableOptions.show">
+  <h3>{{'dynamicTable.TABLE_OPTIONS' | translate}}</h3>
+  <label>
+    <input type="checkbox" ng-model="tableOptions.floatTableHeader" ng-click="resetHeader()">
+    <span>{{'dynamicTable.FLOAT_TABLE_HEADER' | translate}}</span>
+  </label>
+  <h4>{{'dynamicTable.SPECIFIC_COLUMN_OPTIONS' | translate}}</h4>
+  <table>
+    <tr ng-repeat="header in tableView.headers track by $index">
+      <td ng-if="header.text">{{header.text}}</td>
+      <td ng-if="!header.text">{{'dynamicTable.OPTIONS' | translate}}</td>
+      <td>
+        <label>
+          <input type="checkbox" ng-model="header.show">
+          <span>{{'dynamicTable.DISPLAY_COLUMN' | translate}}</span>
+        </label>
+      </td>
+      <td>{{'dynamicTable.ENTRIES' | translate}}:</td>
+      <td>
+        <button class="btn btn-link" ng-click="toggleAllEntries($index, true)">{{'dynamicTable.SHOW_ALL' | translate}}</button>
+      </td>
+      <td>
+        <button class="btn btn-link" ng-click="toggleAllEntries($index, false)">{{'dynamicTable.HIDE_ALL' | translate}}</button>
+      </td>
+    </tr>
+  </table>
+  <button class="btn btn-secondary" ng-click="toggleTableOptions(false)">{{'dynamicTable.CLOSE' | translate}}</button>
 </div>
 <section class="table-wrapper">
   <table class="dynamic-table schedule-table" ng-if="tableView.rows && tableView.rows.length" ng-mouseleave="resetHeader()">
@@ -10,7 +38,7 @@
     </thead> -->
     <tbody>
       <tr ng-repeat="row in tableView.rows track by $index" ng-init="rowIndex = $index" ng-mouseenter="moveHeader(rowIndex)" ng-class="{'header-row': row.type === 'header'}">
-        <th ng-if="row.type === 'header'" ng-repeat="header in tableView.headers track by $index">
+        <th ng-if="row.type === 'header'" ng-show="header.show" ng-repeat="header in tableView.headers track by $index">
           <div ng-if="header.value !== 'disabled'">{{header.text}}</div>
         </th>
         <!-- if editor -->
@@ -56,7 +84,7 @@
           </div>
         </td>
         <!-- if value-->
-        <td ng-if="!row.type" ng-repeat="rowEntry in row track by $index">
+        <td ng-if="!row.type" ng-repeat="rowEntry in row track by $index" ng-show="tableView.headers[$index].show">
           <!-- cluster - NO entries -->
           <div class="table-cluster table-cluster-add" ng-if="rowEntry.type === 'array' && !rowEntry.value" ng-click="addConstraint(rowIndex)">
             <a class="table-cluster-add-text" href="">{{'dynamicTable.ADD' | translate}}</a>
