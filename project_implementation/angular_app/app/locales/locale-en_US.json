@@ -107,6 +107,8 @@
 	"dynamicTable.CLASSROOM": "Classrooms",
 	"dynamicTable.STUDENT_GROUP": "Student groups",
 	"dynamicTable.TIMEBLOCK": "Times",
+	"dynamicTable.TABLE_OPTIONS": "Table Options",
+
 
 	"schedulerModule.TITLE": "Scheduler - Admin View",
 	"schedulerModule.SUBTITLE": "Viewing the facts & constraints for {0} term.",
