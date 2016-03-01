@@ -315,6 +315,16 @@ textarea {
   background-color: $secondary-gray-hover;
 }
 
+.btn-link {
+  background-color: transparent;
+  color: $secondary-link;
+  font-weight: 700;
+}
+
+.btn-link:hover {
+  text-decoration: underline;
+}
+
 .btn-danger {
   background-color: $alert-red;
   color: #FFF;
@@ -793,11 +803,63 @@ textarea {
   border: 1px solid $table-border;
 }
 
-.table-options-container {
+
+/* table options */
+.table-options-btn-container {
     position: absolute;
     left: 700px;
     margin-top: -43px;
 }
+
+.table-options-container {
+	margin: 10px 0;
+}
+
+.table-options-container {
+    border: 1px solid $table-border;
+    width: 530px;
+    padding: 10px;
+}
+
+.table-options-container h4 {
+    margin: 15px 0 0 0;
+}
+
+.table-options-container table {
+    margin: 10px 0 15px 0;
+}
+
+.table-options-container td {
+    padding: 0 5px;
+    line-height: 35px;
+}
+
+.table-options-container label span,
+.table-options-container td {
+    font-size: 14px;
+}
+
+.table-options-container tr:first-child {
+    border-top: none;
+}
+
+.table-options-container tr {
+    border-top: 1px solid $table-background-gray;
+}
+
+.table-options-container td:first-child {
+    font-weight: 700;
+}
+
+.table-options-container td:nth-child(2) {
+    padding-right: 15px;
+    border-right: 1px dotted $table-background-gray; 
+}
+
+.table-options-container td:nth-child(3) {
+    padding-left: 15px;
+}
+/* END table options */
 
 
 .dynamic-table .table-capitalize {

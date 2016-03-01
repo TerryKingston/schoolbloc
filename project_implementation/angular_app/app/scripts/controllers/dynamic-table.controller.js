@@ -24,6 +24,15 @@ angular.module('sbAngularApp')
     openedArrayEntry: null
   };
 
+  $scope.tableOptions = {
+    show: false,
+    floatTableHeader: false
+  };
+
+  $scope.headerObj = {
+    type: "header"
+  };
+
   $scope.translations = {
     subject: null,
     teacher: null,
@@ -128,7 +137,8 @@ angular.module('sbAngularApp')
       }
       $scope.tableView.headers.push({
         value: keys[i],
-        text: $scope.translations[keys[i]]
+        text: $scope.translations[keys[i]],
+        show: true
       });
     }
 
@@ -199,10 +209,21 @@ angular.module('sbAngularApp')
     }
   };
 
-  $scope.moveHeader = function(rowIndex) {
-    var headerObj = {
-      type: "header"
-    };
+  $scope.toggleTableOptions = function(show) {
+    if (typeof show === 'undefined') {
+      $scope.tableOptions.show = !$scope.tableOptions.show;
+    }
+    else {
+      $scope.tableOptions.show = show;
+    }
+  }
+
+  $scope.moveHeader = function(rowIndex, forceMove) {
+
+    // if floating table header is turned off, do not float it
+    if (!$scope.tableOptions.floatTableHeader && !forceMove) {
+      return;
+    }
 
     if (rowIndex === 0) {
       rowIndex ++;
@@ -211,12 +232,12 @@ angular.module('sbAngularApp')
     $scope.tableView.rows.splice($scope.tableView.headerIndex, 1);
     // update header row to rowIndex
     $scope.tableView.headerIndex = rowIndex - 1;
-    $scope.tableView.rows.splice($scope.tableView.headerIndex, 0, headerObj);
+    $scope.tableView.rows.splice($scope.tableView.headerIndex, 0, $scope.headerObj);
   }
 
   $scope.resetHeader = function(rowIndex) {
     $timeout(function() {
-        $scope.moveHeader(0);
+        $scope.moveHeader(0, true);
     }, 100);
   }
 
@@ -272,8 +293,25 @@ angular.module('sbAngularApp')
     $scope.editor.filters = [];
   }
 
-  $scope.toggleShow = function(rowEntry) {
-    rowEntry.show = !rowEntry.show;
+  $scope.toggleAllEntries = function(index, show) {
+    var i;
+    debugger;
+    for (i = 0; i < $scope.tableView.rows.length; i++) {
+      // skip the header
+      if ($scope.tableView.rows[i].type === "header") {
+        continue;
+      }
+      $scope.toggleShow($scope.tableView.rows[i][index], show);
+    }
+  }
+
+  $scope.toggleShow = function(rowEntry, forceShow) {
+    if (typeof forceShow === 'undefined') {
+      rowEntry.show = !rowEntry.show;
+    }
+    else {
+      rowEntry.show = forceShow;
+    }
     if (rowEntry.show) {
       rowEntry.text = rowEntry.openedText;
     }
@@ -367,11 +405,11 @@ angular.module('sbAngularApp')
 
 
 
-    $translate("dynamicTable.CLOSED_TEXT").then(function (translation) {
+    $translate("dynamicTable.SHOW_NUMBER").then(function (translation) {
       $scope.tableText.closedArrayEntry = translation;
     });
 
-    $translate("dynamicTable.OPENED_TEXT").then(function (translation) {
+    $translate("dynamicTable.HIDE_ALL").then(function (translation) {
       $scope.tableText.openedArrayEntry = translation;
     });
 
