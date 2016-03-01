@@ -133,7 +133,7 @@ class ScheduleConstraints:
             # now go through the list and create courses when needed
             for course_id in req_courses:
                 # only go up to 70% of the max class size for guessing how many classes we'll need
-                max_stud_count = int(ScheduleConstraints.max_student_count(course_id) * 0.8)
+                max_stud_count = int(ScheduleConstraints.max_student_count(course_id) * 0.75)
                 if course_id not in self.class_constraints:
                     new_class = ClassConstraint(course_id)
                     self.class_constraints[course_id] = [new_class]
