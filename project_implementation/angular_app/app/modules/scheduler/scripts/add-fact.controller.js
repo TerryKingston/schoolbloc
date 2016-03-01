@@ -308,15 +308,13 @@ angular.module('sbAngularApp')
 			if (!addAnotherFact) {
 				$scope.addFactConfig.showAddFact = false;
 			}
+			// update the table to contain the number information
+			tableEntriesService.updateTableConfig("fact", $scope.tableConfig.tableSelection);
 		}, function(error) {
 			$translate("schedulerModule.ADD_FACT_ERROR").then(function (translation) {
 				$scope.addFactConfig.addFactErrorText = translation;
 			});
 		});
-
-		
-
-		
 	};
 
 	$scope.resetForm = function (factInput, index) {
