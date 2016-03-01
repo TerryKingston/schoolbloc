@@ -38,8 +38,7 @@ class Course(db.Model, SqlalchemySerializer):
     min_student_count = db.Column(db.Integer)
 
     def __str__(self):
-        return "{} {} {} {}".format(self.name, self.duration, self.max_student_count,
-                                          self.min_student_count)
+        return "{}".format(self.name)
 
 
 class CoursesStudent(db.Model, SqlalchemySerializer):
@@ -108,7 +107,7 @@ class CoursesStudentGroup(db.Model, SqlalchemySerializer):
     course = db.relationship("Course", backref="courses_student_groups")
 
     def __str__(self):
-        return "{} {}".format(self.student_group, self.course)
+        return "{} {} {}".format(self.student_group, self.course, self.priority)
 
 
 class CoursesSubject(db.Model, SqlalchemySerializer):
@@ -161,7 +160,7 @@ class ClassroomsSubject(db.Model, SqlalchemySerializer):
     subject = db.relationship("Subject", backref="classrooms_subjects")
 
     def __str__(self):
-        return "{} {}".format(self.classroom, self.subject)
+        return "{} {} {}".format(self.classroom, self.subject, self.priority)
 
 
 class ClassroomsTeacher(db.Model, SqlalchemySerializer):
