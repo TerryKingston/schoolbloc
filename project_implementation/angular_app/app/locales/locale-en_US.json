@@ -113,6 +113,7 @@
 	"schedulerModule.SUBTITLE_ACTION": "Change Term",
 	"schedulerModule.VIEWING": "You are viewing:",
 	"schedulerModule.ADD_FACT": "Add {0}",
+	"schedulerModule.ADD_FACT_ERROR": "Error: cannot save entry.",
 	"schedulerModule.ADDING_FACT": "Adding a new {0}",
 	"schedulerModule.COURSE_NAME": "Course name",
 	"schedulerModule.TERM": "Term",

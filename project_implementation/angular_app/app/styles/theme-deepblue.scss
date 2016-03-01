@@ -1138,6 +1138,18 @@ textarea {
 }
 
 
+.view-sub-content .add-fact-error {
+    font-size: 14px;
+    color: $alert-red;
+    background-color: none;
+    width: 265px;
+    line-height: 30px;
+    padding: 0 10px;
+    margin: 10px 0;
+    border: solid 1px $alert-red;
+    border-left: solid 10px $alert-red;
+}
+
 .input-row .input-row-min-max,
 .input-row .input-row-constraint {
     width: 200px !important;

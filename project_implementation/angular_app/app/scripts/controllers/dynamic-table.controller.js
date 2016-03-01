@@ -215,6 +215,7 @@ angular.module('sbAngularApp')
   }
 
   $scope.resetHeader = function(rowIndex) {
+    console.log("leave");
     $timeout(function() {
         $scope.moveHeader(0);
     }, 100);
