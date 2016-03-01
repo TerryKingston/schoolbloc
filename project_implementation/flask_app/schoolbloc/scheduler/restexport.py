@@ -365,19 +365,23 @@ class TestRestList(Resource):
         # only stuff left in json_request should be the constraint data. If there
         # is additional keys here, go ahead and error out instead of ignoring them
         # (nothing has been commited to the db yet)
-        for constraint, data in request_json.items():
-            try:
-                orm_class = _find_constraint_mapping_table(self.orm, constraint)
-                this_id, foreign_id = _get_constraint_key_column_names(self.orm, orm_class)
+        print(request_json)
+        for constraint, data_list in request_json.items():
+            print(data_list)
+            for data in data_list:
+                try:
+                    orm_class = _find_constraint_mapping_table(self.orm, constraint)
+                    this_id, foreign_id = _get_constraint_key_column_names(self.orm, orm_class)
 
-                tmp_kwargs = {}
-                tmp_kwargs['active'] = data['active']
-                tmp_kwargs['priority'] = data['priority']
-                tmp_kwargs[this_id] = orm_obj.id
-                tmp_kwargs[foreign_id] = data['id']
-                db.session.add(orm_class(**tmp_kwargs))
-            except KeyError as e:
-                abort(404, message="missing key {} in constraint {}".format(str(e), constraint))
+                    print(constraint, data)
+                    tmp_kwargs = {}
+                    tmp_kwargs['active'] = data['active']
+                    tmp_kwargs['priority'] = data['priority']
+                    tmp_kwargs[this_id] = orm_obj.id
+                    tmp_kwargs[foreign_id] = data['id']
+                    db.session.add(orm_class(**tmp_kwargs))
+                except KeyError as e:
+                    abort(404, message="missing key {} in constraint {}".format(str(e), constraint))
 
         # Save all new objects to db
         try:
