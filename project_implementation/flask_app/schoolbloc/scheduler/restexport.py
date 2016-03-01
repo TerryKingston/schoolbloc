@@ -189,7 +189,7 @@ class TestRest(Resource):
                     'id': foreign_orm.id,
                     'value': str(foreign_orm),
                     'active': mapper_orm.active,
-                    'priority': mapper_orm.active
+                    'priority': mapper_orm.priority
                 }
                 foreign_serialized.append(serialized)
             ret[foreign_name] = foreign_serialized
@@ -333,7 +333,7 @@ class TestRestList(Resource):
                         'id': foreign_orm.id,
                         'value': str(foreign_orm),
                         'active': mapper_orm.active,
-                        'priority': mapper_orm.active
+                        'priority': mapper_orm.priority
                     }
                     foreign_serialized.append(serialized)
                 tmp_ret[foreign_name] = foreign_serialized
