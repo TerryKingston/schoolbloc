@@ -30,7 +30,7 @@ class Course(db.Model, SqlalchemySerializer):
     """
     __tablename__ = 'courses'
     __restconstraints__ = ['courses_student_groups', 'courses_students', 'courses_subjects', 'courses_timeblocks',
-                           'courses_teachers', 'classrooms_courses', 'scheduled_class']
+                           'courses_teachers', 'classrooms_courses']
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(128), nullable=False)
     duration = db.Column(db.Integer) # optional duration, will use global default if not specified
@@ -142,7 +142,7 @@ class Classroom(db.Model, SqlalchemySerializer):
     """
     __tablename__ = 'classrooms'
     __restconstraints__ = ['classrooms_teachers', 'classrooms_courses', 'classrooms_timeblocks',
-                           'classrooms_subjects', 'scheduled_class']
+                           'classrooms_subjects']
     id = db.Column(db.Integer, primary_key=True)
     room_number = db.Column(db.Integer, nullable=False, unique=True)  # user assigned room number
 
@@ -392,7 +392,7 @@ class Teacher(db.Model, SqlalchemySerializer):
     """
     __tablename__ = 'teachers'
     __restconstraints__ = ['classrooms_teachers', 'teachers_timeblocks', 'courses_teachers',
-                           'teachers_subjects', 'scheduled_class']
+                           'teachers_subjects']
     id = db.Column(db.Integer, primary_key=True)
     first_name = db.Column(db.String(128), nullable=False)
     last_name = db.Column(db.String(128), nullable=False)
