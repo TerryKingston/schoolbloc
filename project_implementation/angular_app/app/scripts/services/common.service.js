@@ -232,6 +232,18 @@ angular.module('sbAngularApp').factory('commonService', ['$translate', '$window'
 
 		/**
 		 * Formats military time (0000 - 2359) into standard time format
+		 * @param  {string} time military time
+		 * @return {string}       Returns 'ERROR' if improper format of time, or returns string of time in standard format.
+		 */
+		formatSingleTimeM2S: function(time) {
+			if (!checkMilitaryTime(time)) {
+				return "ERROR";
+			}
+			return generateStandardTime(time);
+		},
+
+		/**
+		 * Formats military time (0000 - 2359) into standard time format
 		 * @param  {string} start military time start
 		 * @param  {string} end   military time end
 		 * @return {string}       Returns 'ERROR' if improper format of timeRange, or returns string of start-end time in standard format.

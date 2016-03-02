@@ -695,9 +695,18 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 				// reset entries
 				tableConfig.entries = null;
 				self.getTableFacts(tableSelection).then(function (data) {
+					var i;
+					// fix time to be in standard time
+					for (i = 0; i < data.length; i++) {
+						if (data[i].start_time || data[i].start_time === 0) {
+							data[i].start_time = commonService.formatSingleTimeM2S(data[i].start_time);
+						}
+						if (data[i].end_time || data[i].end_time === 0) {
+							data[i].end_time = commonService.formatSingleTimeM2S(data[i].end_time);
+						}
+					}
 					tableConfig.entries = data;
 					// DEBUG: go ahead and add disabled for show casing
-					var i;
 					for (i = 0; i < tableConfig.entries.length; i++) {
 						tableConfig.entries[i].disabled = Math.random() < 0.2;
 					}

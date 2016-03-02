@@ -97,12 +97,17 @@
             </div>
             <div class="table-cluster-open" ng-show="rowEntry.show">
               <div class="entry" ng-repeat="element in rowEntry.value track by $index">
+                <div class="priority-label">
+                  <div class="priority-mandatory" placeholder="{{'dynamicTable.MANDATORY' | translate}}" ng-if="element.priority === 'mandatory'">{{'dynamicTable.ABBR_MANDATORY' | translate}}</div>
+                  <div class="priority-high" placeholder="{{'dynamicTable.HIGH' | translate}}" ng-if="element.priority === 'high'">{{'dynamicTable.ABBR_HIGH' | translate}}</div>
+                  <div class="priority-low" placeholder="{{'dynamicTable.LOW' | translate}}" ng-if="element.priority === 'low'">{{'dynamicTable.ABBR_LOW' | translate}}</div>
+                </div>
                 <div class="entry-options">
                   <button class="entry-edit" alt="{{'dynamicTable.EDIT' | translate}}" ng-click="editConstraint(rowIndex)"></button>
                   <button class="entry-disable" alt="{{'dynamicTable.DISABLE' | translate}}"></button>
                   <button class="entry-delete" alt="{{'dynamicTable.DELETE' | translate}}"></button>
                 </div>
-                <div>{{element.value}}</div>
+                <span>{{element.value}}</span>
               </div>
             </div>
           </div>
