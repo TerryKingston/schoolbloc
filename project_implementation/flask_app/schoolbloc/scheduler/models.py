@@ -305,7 +305,7 @@ class StudentGroup(db.Model, SqlalchemySerializer):
 
 class StudentGroupsSubject(db.Model, SqlalchemySerializer):
     """
-    ORM object for linking table between student_groups and subjects 
+    ORM object for linking table between student_groups and subjects
     """
     __tablename__ = 'student_groups_subjects'
     id = db.Column(db.Integer, primary_key=True)
@@ -330,7 +330,7 @@ class Student(db.Model, SqlalchemySerializer):
     """
     __tablename__ = 'students'
     __restconstraints__ = ['students_student_groups', 'students_timeblocks', 'students_subjects', 'courses_students',
-                           'student_groups_timeblocks', 'student_groups_subjects']
+                           'students_timeblocks', 'students_subjects']
     id = db.Column(db.Integer, primary_key=True)
     first_name = db.Column(db.String(128), nullable=False)
     last_name = db.Column(db.String(128), nullable=False)
@@ -555,7 +555,7 @@ class Timeblock(db.Model, SqlalchemySerializer):
     ORM object for time blocks stored in the database
 
     A time block represents a continuous block of time in one 24hr period.
-    The start time and end time are represented in 24h time as integers with 
+    The start time and end time are represented in 24h time as integers with
     minute granularity (i.e. the value 1600 is 4 o'clock PM).
     """
     __tablename__ = 'timeblocks'
