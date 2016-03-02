@@ -175,5 +175,6 @@
 	"schedulerModule.ERROR_TIME": "Invalid input. Valid example: 9:35AM",
 	"schedulerModule.ERROR_NEG_VALUE": "Cannot have a negative value.",
 	"schedulerModule.ERROR_MIN_MAX": "Cannot have the min > max.",
-	"schedulerModule.ERROR_REQUIRED": "Input is required."
+	"schedulerModule.ERROR_REQUIRED": "Input is required.",
+	"schedulerModule.ERROR_UNIQUE": "Input is not unique."
 }
