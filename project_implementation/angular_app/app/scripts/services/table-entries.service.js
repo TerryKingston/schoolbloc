@@ -141,6 +141,24 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 				type: "constraint",
 				multipleValues: true,
 				facts: null
+			},
+			{
+				key: "student_group",
+				value: null,
+				error: null,
+				required: false,
+				type: "constraint",
+				multipleValues: true,
+				facts: null
+			},
+			{
+				key: "student",
+				value: null,
+				error: null,
+				required: false,
+				type: "constraint",
+				multipleValues: true,
+				facts: null
 			}
 		],
 		"student": [
@@ -168,23 +186,23 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 				type: "text",
 				multipleValues: false
 			},
-			{
-				key: "gender",
-				value: null,
-				error: null,
-				required: true,
-				type: "dropdown",
-				multipleValues: false,
-				possibleAnswers: ["female", "male", "other"]
-			},
-			{
-				key: "date_of_birth",
-				value: null,
-				error: null,
-				required: true,
-				type: "date",
-				multipleValues: false
-			},
+			// {
+			// 	key: "gender",
+			// 	value: null,
+			// 	error: null,
+			// 	required: true,
+			// 	type: "dropdown",
+			// 	multipleValues: false,
+			// 	possibleAnswers: ["female", "male", "other"]
+			// },
+			// {
+			// 	key: "date_of_birth",
+			// 	value: null,
+			// 	error: null,
+			// 	required: true,
+			// 	type: "date",
+			// 	multipleValues: false
+			// },
 			{
 				key: "timeblock",
 				value: null,
@@ -196,6 +214,15 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 			},
 			{
 				key: "student_group",
+				value: null,
+				error: null,
+				required: false,
+				type: "constraint",
+				multipleValues: true,
+				facts: null
+			},
+			{
+				key: "subject",
 				value: null,
 				error: null,
 				required: false,
@@ -294,17 +321,35 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 				type: "constraint",
 				multipleValues: true,
 				facts: null
+			},
+			{
+				key: "student_group",
+				value: null,
+				error: null,
+				required: false,
+				type: "constraint",
+				multipleValues: true,
+				facts: null
+			},
+			{
+				key: "student",
+				value: null,
+				error: null,
+				required: false,
+				type: "constraint",
+				multipleValues: true,
+				facts: null
 			}
 		],
 		"teacher": [
-			{
-				key: "user_id",
-				value: null,
-				error: null,
-				required: true,
-				type: "uniqueText",
-				multipleValues: false
-			},
+			// {
+			// 	key: "user_id",
+			// 	value: null,
+			// 	error: null,
+			// 	required: true,
+			// 	type: "uniqueText",
+			// 	multipleValues: false
+			// },
 			{
 				key: "first_name",
 				value: null,
@@ -319,6 +364,20 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 				error: null,
 				required: true,
 				type: "text",
+				multipleValues: false
+			},
+			{
+				key: "start_time",
+				value: null,
+				required: false,
+				type: "startEnd",
+				multipleValues: false
+			},
+			{
+				key: "end_time",
+				value: null,
+				required: false,
+				type: "startEnd",
 				multipleValues: false
 			},
 			{
@@ -373,15 +432,15 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 				type: "startEnd",
 				multipleValues: false
 			},
-			{
-				key: "days",
-				value: null,
-				error: null,
-				required: true,
-				type: "dropdown",
-				multipleValues: true,
-				possibleAnswers: ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday", "weekdays"]
-			},
+			// {
+			// 	key: "days",
+			// 	value: null,
+			// 	error: null,
+			// 	required: true,
+			// 	type: "dropdown",
+			// 	multipleValues: true,
+			// 	possibleAnswers: ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday", "weekdays"]
+			// },
 			{
 				key: "subject",
 				value: null,
@@ -402,6 +461,33 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 			},
 			{
 				key: "classroom",
+				value: null,
+				error: null,
+				required: false,
+				type: "constraint",
+				multipleValues: true,
+				facts: null
+			},
+			{
+				key: "student_group",
+				value: null,
+				error: null,
+				required: false,
+				type: "constraint",
+				multipleValues: true,
+				facts: null
+			},
+			{
+				key: "student",
+				value: null,
+				error: null,
+				required: false,
+				type: "constraint",
+				multipleValues: true,
+				facts: null
+			},
+			{
+				key: "teacher",
 				value: null,
 				error: null,
 				required: false,
@@ -609,9 +695,18 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 				// reset entries
 				tableConfig.entries = null;
 				self.getTableFacts(tableSelection).then(function (data) {
+					var i;
+					// fix time to be in standard time
+					for (i = 0; i < data.length; i++) {
+						if (data[i].start_time || data[i].start_time === 0) {
+							data[i].start_time = commonService.formatSingleTimeM2S(data[i].start_time);
+						}
+						if (data[i].end_time || data[i].end_time === 0) {
+							data[i].end_time = commonService.formatSingleTimeM2S(data[i].end_time);
+						}
+					}
 					tableConfig.entries = data;
 					// DEBUG: go ahead and add disabled for show casing
-					var i;
 					for (i = 0; i < tableConfig.entries.length; i++) {
 						tableConfig.entries[i].disabled = Math.random() < 0.2;
 					}
