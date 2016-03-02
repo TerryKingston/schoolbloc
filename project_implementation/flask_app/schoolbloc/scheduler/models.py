@@ -294,8 +294,8 @@ class StudentGroup(db.Model, SqlalchemySerializer):
     A Collection of students
     """
     __tablename__ = 'student_groups'
-    __restconstraints__ = ['students_student_groups', 'students_timeblocks', 'students_subjects', 'courses_students',
-                           'student_groups_subjects']
+    __restconstraints__ = ['students_student_groups', 'student_groups_timeblocks',
+                           'student_groups_subjects', 'courses_student_groups']
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(128), nullable=False)
     students = association_proxy('students_student_groups', 'student')
