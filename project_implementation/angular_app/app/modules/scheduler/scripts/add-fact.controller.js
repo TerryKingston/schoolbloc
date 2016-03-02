@@ -95,6 +95,7 @@ angular.module('sbAngularApp')
 	}
 
 	function checkUniqueText(factInput) {
+		var i;
 		if (checkRequired(factInput)) {
 			return;
 		}
@@ -102,6 +103,13 @@ angular.module('sbAngularApp')
 		// @TODO: you've already received a list of all facts of this type 
 		// (it's used in the dynamic table directive)
 		// just check against that list
+		for (i = 0; i < $scope.tableConfig.entries.length; i++) {
+			// "" + becuase it could be an int
+			if (factInput.value === ("" + $scope.tableConfig.entries[i][factInput.key])) {
+				factInput.error = $scope.translations.ERROR_UNIQUE;
+				break;
+			}
+		}
 	}
 
 	function checkDate(factInput) {
@@ -531,6 +539,10 @@ angular.module('sbAngularApp')
 
 		$translate("schedulerModule.ERROR_REQUIRED").then(function (translation) {
 			$scope.translations.ERROR_REQUIRED = translation;
+		});
+
+		$translate("schedulerModule.ERROR_UNIQUE").then(function (translation) {
+			$scope.translations.ERROR_UNIQUE = translation;
 		});
 	};
 

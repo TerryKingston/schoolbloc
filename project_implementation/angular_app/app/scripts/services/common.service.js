@@ -164,6 +164,10 @@ angular.module('sbAngularApp').factory('commonService', ['$translate', '$window'
 		 * @return {string}       Formatted string.
 		 */
 		format: function(value, args) {
+			// sometimes, single values are sent in instead of an array.
+			if (!Array.isArray(args)) {
+				args = [args];
+			}
 			// @TODO: later, directly allow for: "This is a {0}".format("string")
 			// CITE: https://gist.github.com/litera/9634958
 			return value.replace(/\{(\d+)\}/g, function (match, capture) {

@@ -275,7 +275,16 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 				type: "constraint",
 				multipleValues: true,
 				facts: null
-			}
+			},
+			{
+				key: "subject",
+				value: null,
+				error: null,
+				required: false,
+				type: "constraint",
+				multipleValues: true,
+				facts: null
+			},
 		],
 		"subject": [
 			{
