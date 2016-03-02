@@ -133,7 +133,7 @@ class ScheduleConstraints:
             # now go through the list and create courses when needed
             for course_id in req_courses:
                 # only go up to 70% of the max class size for guessing how many classes we'll need
-                max_stud_count = int(ScheduleConstraints.max_student_count(course_id) * 0.75)
+                max_stud_count = int(ScheduleConstraints.max_student_count(course_id) * 0.8)
                 if course_id not in self.class_constraints:
                     new_class = ClassConstraint(course_id)
                     self.class_constraints[course_id] = [new_class]
@@ -154,6 +154,8 @@ class ScheduleConstraints:
             msg = "Student {} course req ({}) is greater than time block count ({})".format(
                 student.id, len(required_courses), timeblock_count)
             raise SchedulerNoSolution(msg)
+        elif len(required_courses) < timeblock_count:
+            print("\033[91m Warning: Student {} course requirements are less than full time \033[0m".format(student.id))
             
     def gen_constraints_from_collisions(self, collisions):
         # choose the student with the most collisions that doesn't already

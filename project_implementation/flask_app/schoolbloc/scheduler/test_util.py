@@ -3,6 +3,7 @@ from schoolbloc.users.models import User, Role
 from schoolbloc.scheduler.models import *
 from schoolbloc.config import config
 from random import *
+import sys
 
 class SchedulerTestUtilities():
     @staticmethod
@@ -76,15 +77,22 @@ class SchedulerTestUtilities():
 
 
     @staticmethod
-    def generate_students(n):
+    def generate_students(n, names=None):
         """ returns n students in a list after saving them to the DB """
-        s_user_list = [ User('s_user_%s' % random(), 'password', 'teacher') 
-                        for i in range(n)]
+        if names:
+            if len(names) < n:
+                raise ArgumentException("names list must be lenght == n")
+        else:
+            names = [ ['student_f_%s' % random(), 'student_l_%s' % random()] for i in range(n) ]
+
+        s_user_list = [ User("{} {}".format(names[i][0], names[i][1]), 'password', 'student') 
+                        for i in range(n) ]
+        
         for u in s_user_list: db.session.add(u)
         db.session.flush()
 
-        stud_list = [ Student(first_name="student_f_%s" % i, 
-                              last_name="student_l_%s" % i, 
+        stud_list = [ Student(first_name=names[i][0], 
+                              last_name=names[i][1], 
                               user_id=s_user_list[i].id) 
                       for i in range(n) ]
 
@@ -93,13 +101,19 @@ class SchedulerTestUtilities():
         return stud_list
 
     @staticmethod
-    def generate_teachers(n, avail_start_time=None, avail_end_time=None):
-        t_user_list = [ User('t_user_%s' % random(), 'password', 'teacher') for i in range(n)]
+    def generate_teachers(n, names=None, avail_start_time=None, avail_end_time=None):
+        if names:
+            if len(names) < n:
+                raise ArgumentException("names list must be lenght == n")
+        else:
+            names = [ ['teacher_f_%s' % random(), 'teacher_l_%s' % random()] for i in range(n) ]
+
+        t_user_list = [ User("{} {}".format(names[i][0], names[i][1]), 'password', 'teacher') for i in range(n) ]
         for u in t_user_list: db.session.add(u)
         db.session.flush()
 
-        teach_list = [ Teacher(first_name="teacher_f_%s" % i, 
-                               last_name="teacher_l_%s" % i, 
+        teach_list = [ Teacher(first_name=names[i][0], 
+                               last_name=names[i][1],
                                user_id=t_user_list[i].id,
                                avail_start_time=avail_start_time,
                                avail_end_time=avail_end_time) 
@@ -108,6 +122,20 @@ class SchedulerTestUtilities():
         for t in teach_list: db.session.add(t)
         db.session.commit()
         return teach_list
+
+    def get_names(n):
+        """
+        Returns a list of up to 350 names, in tuple form (first, last)
+        """
+        name_file = "schoolbloc/scheduler/student_names.txt"
+        name_list = []
+        with open(name_file) as names:
+            for line in names:
+                if len(line) > 0:
+                    name_list.append(line.split()[0:2])
+                    if len(name_list) >= n:
+                        return name_list
+        return name_list
 
     @staticmethod
     def generate_classrooms(n, max_student_count=None, avail_start_time=None, avail_end_time=None):
