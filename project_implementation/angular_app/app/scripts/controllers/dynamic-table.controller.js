@@ -18,11 +18,14 @@ angular.module('sbAngularApp')
 	];
 
 	$scope.tableConfig = null;
+  $scope.factTypeConfig = null;
 	$scope.tableView = null;
   $scope.tableText = {
     closedArrayEntry: null,
     openedArrayEntry: null
   };
+
+  $scope.selectedEntry = null;
 
   $scope.tableOptions = {
     show: false,
@@ -58,12 +61,17 @@ angular.module('sbAngularApp')
 
   $scope.editor = {
     "type": "editor",
-    "rowId": null, // unique id
+    "subType": null,
     "rowIndex": null, // where it sits in row
-    "constraintType": "course",
+    "key": null, // course, classroom, student_group
+    "factType": null, // uniqueText, number, constraint, etc
+    "selectedEntry": null, // reference to selected entry to keep track of edit
     "value": null,
+    "constraintId": null, // constraints are saved as ids in the back-end, we need to keep track of them
     "priority": "mandatory",
-    "constraints": ["test1"],
+    "facts": {
+      "values": []
+    },
     "showFilters": true,
     "showFiltersText": $scope.tableText.hideFiltersText,
     "filters": [
@@ -88,7 +96,6 @@ angular.module('sbAngularApp')
 
 	function getTableEntries() {
 		$scope.tableConfig = tableEntriesService.getTableConfiguration();
-
 		setupTableView();
 	}
 
@@ -126,6 +133,9 @@ angular.module('sbAngularApp')
     if (!$scope.tableConfig.entries || !$scope.tableConfig.entries.length) {
       return;
     }
+
+    // get the newest factTypeConfig object
+    $scope.factTypeConfig = tableEntriesService.getFactTypeConfig($scope.tableConfig.tableSelection);
 
     // prepare headers
     $scope.tableView.headers = [];
@@ -245,19 +255,31 @@ angular.module('sbAngularApp')
     editor.priority = priority;
   };
 
-  $scope.editConstraint = function(rowIndex) {
-    placeEditor(rowIndex);
+  $scope.editConstraint = function(rowIndex, entryIndex, entry) {    
+    placeEditor('edit-constraint', rowIndex, entryIndex, entry);
   };
 
-  $scope.addConstraint = function(rowIndex) {
-    placeEditor(rowIndex);
+  $scope.addConstraint = function(rowIndex, entryIndex) {
+    placeEditor('add-constraint', rowIndex, entryIndex, null);
   };
+
+  $scope.addProperty = function(rowIndex, entryIndex) {
+    placeEditor('add-property', rowIndex, entryIndex, null);
+  };
+
+  $scope.editProperty = function(rowIndex, entryIndex, entry) {
+    placeEditor('edit-property', rowIndex, entryIndex, entry);
+  };
+
 
   $scope.cancelEditor = function() {
     resetEditor();
   };
 
-  function placeEditor(rowIndex) {
+  function placeEditor(rowSubType, rowIndex, entryIndex, entry) {
+    var i, valueIdString;
+    // NOTE: do not modify editor here, resetEditor() happens below
+
     // determine if row index is affected by an already in place editor, and reconfigure if needed
     if ($scope.editor.rowIndex !== null && rowIndex > $scope.editor.rowIndex) {
       rowIndex--;
@@ -265,6 +287,70 @@ angular.module('sbAngularApp')
 
     // remove any previous editor
     resetEditor();
+
+    //// edit editor object to have needed properties
+    $scope.editor.subType = rowSubType;
+    $scope.editor.key = $scope.tableView.headers[entryIndex].value;
+    if ($scope.editor.key === 'min_student_count' || $scope.editor.key === 'max_student_count') {
+      $scope.editor.key = 'student_count';
+    }
+
+    // get factTypes based on config file
+    for (i = 0; i < $scope.factTypeConfig.length; i++) {
+      if ($scope.factTypeConfig[i].key === $scope.editor.key) {
+        $scope.editor.factType = $scope.factTypeConfig[i].type;
+        
+        // get constraint lists
+        if ($scope.editor.factType === 'constraint') {
+          $scope.editor.facts = $scope.factTypeConfig[i].facts;
+        }
+        break;
+      }
+    }
+
+    // set value/id as needed
+    // @TODO: for the special case of min-max, we have to go get the other property (either min or max),
+    // so that we can ensure that min <= max
+    if ($scope.editor.key === 'student_count') {
+      // would be null at this point since the factTypeConfig would be student_count instead of max/min_student_count
+      $scope.editor.value = {
+        min: null,
+        max: null
+      };
+      $scope.editor.value.min = $scope.tableConfig.entries[rowIndex]['min_student_count'];
+      $scope.editor.value.max = $scope.tableConfig.entries[rowIndex]['max_student_count'];
+    }
+    else if ($scope.editor.factType === 'constraint' && entry) {
+      if (entry.id) {
+        $scope.editor.constraintId = entry.id; 
+      }
+      if (entry.priority) {
+        $scope.editor.priority = entry.priority;
+      }
+      if (entry.value) {
+        $scope.editor.value = entry.value;
+      }
+    }
+    else {
+      $scope.editor.value = entry;
+    }
+
+    // alter value to match an id to value pairing, if need be
+    if ($scope.editor.factType === 'constraint' && $scope.editor.value) {
+      valueIdString = tableEntriesService.getValueWithIdString($scope.editor.value, $scope.editor.constraintId);
+      // check if value has been altered
+      if ($scope.editor.facts.map[valueIdString]) {
+        $scope.editor.value = valueIdString;
+      }
+    }
+
+    // deal with showing the selected entry
+    if ($scope.editor.factType === 'constraint') {
+      if (entry) {
+        entry.isSelected = true;
+      }
+      $scope.editor.selectedEntry = entry;
+    }
 
     // add editor into rows
     $scope.editor.rowIndex = rowIndex;
@@ -279,16 +365,26 @@ angular.module('sbAngularApp')
   }
 
   function resetEditor() {
+    // deal with removing the selected entry
+    if ($scope.editor.selectedEntry) {
+      $scope.editor.selectedEntry.isSelected = false;
+    }
+
     if ($scope.editor.rowIndex !== null) {
       $scope.tableView.rows.splice($scope.editor.rowIndex, 1);
     }
 
+    $scope.selectedEntry = null;
     $scope.editor.rowIndex = null;
-    $scope.editor.rowId = null;
-    $scope.editor.constraintType = null;
+    $scope.editor.subType = null;
+    $scope.editor.key = null;
+    $scope.editor.factType = null;
     $scope.editor.value = null;
+    $scope.editor.constraintId = null;
     $scope.editor.priority = "mandatory";
-    $scope.editor.constraints = [];
+    $scope.editor.facts = {
+      values: []
+    };
     $scope.editor.showFilters = true;
     $scope.editor.filters = [];
   }

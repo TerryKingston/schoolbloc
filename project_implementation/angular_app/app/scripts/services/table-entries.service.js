@@ -582,6 +582,10 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 
 	return {
 
+		getValueWithIdString: function(value, id) {
+			return getDubValue(value, id);
+		},
+
 		addFact: function(factEntry, factType) {
 			var url;
 			var deferred = $q.defer();
@@ -704,7 +708,7 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 				// reset entries
 				tableConfig.entries = null;
 				self.getTableFacts(tableSelection).then(function (data) {
-					var i;
+					var i, j, timeSplit;
 					// fix time to be in standard time
 					for (i = 0; i < data.length; i++) {
 						if (data[i].start_time || data[i].start_time === 0) {
@@ -712,6 +716,12 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 						}
 						if (data[i].end_time || data[i].end_time === 0) {
 							data[i].end_time = commonService.formatSingleTimeM2S(data[i].end_time);
+						}
+						if (data[i].timeblock && data[i].timeblock.length) {
+							for (j = 0; j < data[i].timeblock.length; j++) {
+								timeSplit = data[i].timeblock[j].value.split(" ");
+								data[i].timeblock[j].value = commonService.formatTimeM2S(timeSplit[0], timeSplit[1]);
+							}
 						}
 					}
 					tableConfig.entries = data;

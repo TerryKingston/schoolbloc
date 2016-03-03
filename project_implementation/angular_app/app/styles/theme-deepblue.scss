@@ -942,6 +942,12 @@ textarea {
   cursor: pointer;
 }
 
+.dynamic-table .entry-editer-selection {
+	border: 3px solid $text-black;
+  background-color: $table-background-gray;
+  padding: 0 5px;
+}
+
 .dynamic-table .entry span {
 	margin-left: 16px; // need this because the priority boxes are now absolutely positioned to avoid text-overflow: ellipse oddities
 }
@@ -1092,12 +1098,22 @@ textarea {
   margin: 8px 0;
 }
 
-.dynamic-table .table-editor .table-editor-list {
+.dynamic-table .table-editor label {
   font-size: 14px;
   font-weight: 700;
 }
 
-.dynamic-table .table-editor .table-editor-list input {
+.dynamic-table .table-editor label div {
+	display: inline;
+	margin-right: 20px;
+}
+
+.dynamic-table .table-editor .editor-min-max,
+.dynamic-table .table-editor .editor-min-max div {
+	margin-right: 0;
+}
+
+.dynamic-table .table-editor label input {
   font-size: 14px;
   height: 25px;
   box-sizing: border-box;
@@ -1105,7 +1121,6 @@ textarea {
   border-radius: 0;
   padding: 0 5px;
   width: 200px;
-  margin-left: 10px;
 }
 
 .dynamic-table .table-editor .table-editor-priority button {
@@ -1259,8 +1274,13 @@ textarea {
     width: 200px !important;
 }
 
-.input-row .input-row-min-max input {
+.input-row .input-row-min-max input,
+.dynamic-table .table-editor .editor-min-max input {
     width: 60px;
+}
+
+.editor-min-max .editor-min {
+	margin-right: 10px;
 }
 
 .input-row .input-row-min-max .input-row-min {

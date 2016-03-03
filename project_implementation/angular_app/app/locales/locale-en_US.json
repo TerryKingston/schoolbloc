@@ -95,7 +95,7 @@
 	"dynamicTable.ROOM_NUMBER": "Room",
 	"dynamicTable.MAX_STUDENT_COUNT": "Max",
 	"dynamicTable.MIN_STUDENT_COUNT": "Min",
-	"dynamicTable.STUDENT_COUNT": "Seats",
+	"dynamicTable.STUDENT_COUNT": "Student count",
 	"dynamicTable.AVAIL_START_TIME": "Start time",
 	"dynamicTable.AVAIL_END_TIME": "End time",
 	"dynamicTable.START_TIME": "Start time",
@@ -115,6 +115,9 @@
 	"dynamicTable.SPECIFIC_COLUMN_OPTIONS": "Specific column options",
 	"dynamicTable.OPTIONS": "Options",
 	"dynamicTable.DISPLAY_COLUMN": "Display column",
+	"dynamicTable.DATE_PLACEHOLDER": "mm/dd/yyyy",
+	"dynamicTable.MIN": "Min",
+	"dynamicTable.MAX": "Max",
 
 	"schedulerModule.TITLE": "Scheduler - Admin View",
 	"schedulerModule.SUBTITLE": "Viewing the facts & constraints for {0} term.",
