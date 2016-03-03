@@ -39,28 +39,7 @@ angular.module('sbAngularApp')
     type: "header"
   };
 
-  $scope.translations = {
-    subject: null,
-    teacher: null,
-    course: null,
-    student: null,
-    classroom: null,
-    student_group: null,
-    name: null,
-    first_name: null,
-    last_name: null,
-    room_number: null,
-    student_count: null,
-    max_student_count: null,
-    min_student_count: null,
-    avail_start_time: null,
-    avail_end_time: null,
-    start_time: null,
-    end_time: null,
-    timeblock: null,
-    duration: null,
-    user_id: null
-  };
+  $scope.translations = {};
 
   $scope.editor = {
     "type": "editor",
@@ -70,8 +49,10 @@ angular.module('sbAngularApp')
     "factType": null, // uniqueText, number, constraint, etc
     "selectedEntry": null, // reference to selected entry to keep track of edit
     "value": null,
+    "originalValue": null,
     "constraintId": null, // constraints are saved as ids in the back-end, we need to keep track of them
     "priority": "mandatory",
+    "error": null,
     "facts": {
       "values": []
     },
@@ -129,7 +110,8 @@ angular.module('sbAngularApp')
     $scope.tableView = {
       headers: [],
       headersIndex: 0,
-      rows: []
+      rows: [],
+      rowIds: []
     };
 
     resetEditor();
@@ -195,16 +177,17 @@ angular.module('sbAngularApp')
             type: "disabled"
           }
         }
-        // ignore ids
-        else if ($scope.tableView.headers[j].value === 'id') {
-          continue;
-        }
         else {
           entry = convertObjectToString(entry);
         }
         row.push(entry);
       }
       $scope.tableView.rows.push(row);
+    }
+
+    // deal with storing ids
+    for (i = 0; i < $scope.tableConfig.entries.length; i++) {
+      $scope.tableView.rowIds.push($scope.tableConfig.entries[i].id);
     }
 
     // add header to rows before first row
@@ -277,7 +260,36 @@ angular.module('sbAngularApp')
   };
 
   $scope.disableConstraint = function(rowIndex, entryIndex, entry) {
+    var i, apiCompliant, factId, method, key;
 
+    // determine if row index is affected by an already in place editor, and reconfigure if needed
+    if ($scope.editor.rowIndex !== null && rowIndex > $scope.editor.rowIndex) {
+      rowIndex--;
+    }
+
+    // convert to the API compliant version for sending to b.e.
+    apiCompliant = {};
+
+    method = "edit";
+    key = $scope.tableView.headers[entryIndex].value;
+
+    apiCompliant[key] = [
+      {
+        "method": method,
+        "id": entry.id,
+        "active": !entry.active
+      }
+    ];
+    
+    // rowIndex is one off because of header being in the row
+    factId = $scope.tableView.rowIds[rowIndex - 1];
+
+    tableEntriesService.editFact(apiCompliant, factId, $scope.tableConfig.tableSelection).then(function (data) {
+      // switch the disable btn
+      entry.active = !entry.active;
+    }, function(error) {
+      // do not switch the disable btn
+    });
   };
 
   $scope.deleteConstraint = function(rowIndex, entryIndex, entry) {
@@ -289,7 +301,7 @@ angular.module('sbAngularApp')
   };
 
   $scope.disableRow = function(rowIndex) {
-
+    // @TODO: there is no API to do this
   };
 
   $scope.deleteRow = function(rowIndex) {
@@ -323,17 +335,335 @@ angular.module('sbAngularApp')
    */
   $scope.confirmDeleteEntry = function() {
     // $scope.editor ...
+    var i, apiCompliant, factId, method;
+
+    // convert to the API compliant version for sending to b.e.
+    apiCompliant = {};
+    if ($scope.editor.factType === 'constraint') {
+      method = "delete";
+
+      apiCompliant[$scope.editor.key] = [
+        {
+          "method": method,
+          "id": $scope.editor.facts.map[$scope.editor.value]
+        }
+      ];
+    }
+    else if ($scope.editor.factType === 'minMax') {
+      // only delete one or the other
+      if ($scope.editor.value.selectedMin) {
+        apiCompliant['min_' + $scope.editor.key] = null;
+      }
+      else {
+        apiCompliant['max_' + $scope.editor.key] = null;
+      }
+    }
+    else {
+      apiCompliant[$scope.editor.key] = null;
+    }
+
+    // rowIndex is one off because of header being in the row
+    factId = $scope.tableView.rowIds[$scope.editor.rowIndex - 1];
+
+    tableEntriesService.editFact(apiCompliant, factId, $scope.tableConfig.tableSelection).then(function (data) {
+      // reset the form
+      $scope.cancelEditor();
+
+      // update the table to contain the new information
+      tableEntriesService.updateTableConfig("fact", $scope.tableConfig.tableSelection);
+    }, function(error) {
+      $translate("dynamicTable.EDITOR_ERROR").then(function (translation) {
+        $scope.editor.error = translation;
+      });
+    });
   };
 
   $scope.confirmDeleteRow = function() {
-    // $scope.editor ...
+    var i, factId, method;
+
+
+    // rowIndex is one off because of header being in the row
+    factId = $scope.tableView.rowIds[$scope.editor.rowIndex - 1];
+
+    tableEntriesService.deleteFact(factId, $scope.tableConfig.tableSelection).then(function (data) {
+      // reset the form
+      $scope.cancelEditor();
+
+      // update the table to contain the new information
+      tableEntriesService.updateTableConfig("fact", $scope.tableConfig.tableSelection);
+    }, function(error) {
+      $translate("dynamicTable.EDITOR_ERROR").then(function (translation) {
+        $scope.editor.error = translation;
+      });
+    });
+  };
+
+  $scope.confirmEditEntry = function() {
+    var i, apiCompliant, factId, method;
+
+    // check input field for errors
+    // special case since .value is an object
+    if ($scope.editor.factType === "minMax") {
+      $scope.checkInput($scope.editor, "min");
+      $scope.checkInput($scope.editor, "min");
+    }
+    else {
+      $scope.checkInput($scope.editor);
+    }
+    // if error, don't continue
+    if ($scope.editor.error) {
+      return;
+    }
+
+    // convert to the API compliant version for sending to b.e.
+    apiCompliant = {};
+    if ($scope.editor.factType === 'constraint') {
+      $scope.editor.subType === 'edit-constraint' ? method = "edit" : method = "add";
+
+      // we need to replace the old constraint with a new one
+      if (method === 'edit' && $scope.editor.value !== $scope.editor.originalValue) {
+        apiCompliant[$scope.editor.key] = [
+          {
+            "method": "add",
+            "id": $scope.editor.facts.map[$scope.editor.value],
+            "active": true,
+            "priority": $scope.editor.priority
+          },
+          {
+            "method": "delete",
+            "id": $scope.editor.facts.map[$scope.editor.originalValue]
+          } 
+        ];
+      }
+      else {
+        apiCompliant[$scope.editor.key] = [
+          {
+            "method": method,
+            "id": $scope.editor.facts.map[$scope.editor.value],
+            "priority": $scope.editor.priority
+          }
+        ];
+
+        // default disabled to be false for added, for edited, we ignore it to preserve the old state
+        if (method === 'add') {
+          apiCompliant[$scope.editor.key][0].active = true;
+        }
+      }
+    }
+    else if ($scope.editor.factType === 'minMax') {
+      apiCompliant['min_' + $scope.editor.key] = $scope.editor.value.min;
+      apiCompliant['max_' + $scope.editor.key] = $scope.editor.value.max;
+    }
+    else if ($scope.editor.factType === 'startEnd') {
+      apiCompliant[$scope.editor.key] = commonService.formatSingleTimeS2M($scope.editor.value);
+    }
+    else {
+      apiCompliant[$scope.editor.key] = $scope.editor.value;
+    }
+
+    // rowIndex is one off because of header being in the row
+    factId = $scope.tableView.rowIds[$scope.editor.rowIndex - 1];
+
+    tableEntriesService.editFact(apiCompliant, factId, $scope.tableConfig.tableSelection).then(function (data) {
+      // reset the form
+      $scope.cancelEditor();
+
+      // update the table to contain the new information
+      tableEntriesService.updateTableConfig("fact", $scope.tableConfig.tableSelection);
+    }, function(error) {
+      $translate("dynamicTable.EDITOR_ERROR").then(function (translation) {
+        $scope.editor.error = translation;
+      });
+    });
   };
 
   $scope.cancelEditor = function() {
     resetEditor();
   };
 
-  function placeEditor(rowSubType, rowIndex, entryIndex, entry) {
+  $scope.checkInput = function (factInput, specifyType) {
+    if (specifyType && specifyType === 'min') {
+      checkMin(factInput);
+    }
+    else if (specifyType && specifyType == 'max') {
+      checkMax(factInput);
+    }
+    else {
+      if (factInput.factType === "text") {
+        checkText(factInput);
+      }
+      else if (factInput.factType === "number") {
+        checkNumber(factInput);
+      }
+      else if (factInput.factType === "uniqueText") {
+        checkUniqueText(factInput);
+      }
+      else if (factInput.factType === "dropdown") {
+        checkDropdown(factInput);
+      }
+      else if (factInput.factType === "constraint") {
+        checkConstraint(factInput);
+      }
+      else if (factInput.factType === "startEnd") {
+        checkStartEnd(factInput);
+      }
+      else if (factInput.factType === "date") {
+        checkDate(factInput);
+      }
+      else {
+        console.error("dynamicTable.checkInput: unexpected state - invalid factInput type: " + factInput.factType);
+      }
+    }
+  };
+
+  function checkNumber(factInput) {
+    if (checkRequired(factInput)) {
+      return;
+    }
+    var number = factInput.value;
+    number = parseInt(number);
+    if (isNaN(number)) {
+      factInput.error = $scope.translations.ERROR_POS_INT;
+      return;
+    }
+    if (number <= 0) {
+      factInput.error = $scope.translations.ERROR_POS_INT;
+      return;
+    }
+
+    factInput.error = null;
+  }
+
+  function checkUniqueText(factInput) {
+    var i;
+    if (checkRequired(factInput)) {
+      return;
+    }
+    factInput.error = null;
+    // @TODO: you've already received a list of all facts of this type 
+    // (it's used in the dynamic table directive)
+    // just check against that list
+    for (i = 0; i < $scope.tableConfig.entries.length; i++) {
+      // "" + becuase it could be an int
+      if (factInput.value === ("" + $scope.tableConfig.entries[i][factInput.key])) {
+        factInput.error = $scope.translations.ERROR_UNIQUE;
+        break;
+      }
+    }
+  }
+
+  function checkDate(factInput) {
+    var convertedInput = factInput.value;
+    if (checkRequired(factInput)) {
+      return;
+    }
+    convertedInput = commonService.formatDateInput(convertedInput);
+    if (convertedInput === "ERROR") {
+      factInput.error = $scope.translations.ERROR_DATE;
+      return;
+    }
+    factInput.error = null;
+    factInput.value = convertedInput;
+  }
+
+  function checkStartEnd(factInput) {
+    var convertedInput = factInput.value;
+    if (checkRequired(factInput)) {
+      return;
+    }
+    convertedInput = commonService.formatTimeInput2S(convertedInput);
+    if (convertedInput === "ERROR") {
+      factInput.error = $scope.translations.ERROR_TIME;
+      return;
+    }
+    factInput.error = null;
+    factInput.value = convertedInput;
+  }
+
+  function checkMin(factInput) {
+    if (!factInput.value.min && !factInput.value.min !== 0 && factInput.required) {
+      factInput.error = $scope.translations.ERROR_REQUIRED;
+      return;
+    }
+    if (factInput.value.min < 0) {
+      factInput.error = $scope.translations.ERROR_NEG_VALUE;
+    } 
+    else if (factInput.value.min > factInput.value.max && factInput.value.max) {
+      factInput.error = $scope.translations.ERROR_MIN_MAX;
+    }
+    else {
+      factInput.error = null;
+    }
+  }
+
+  function checkMax(factInput) {
+    if (!factInput.value.max && !factInput.value.max !== 0 && factInput.required) {
+      factInput.error = $scope.translations.ERROR_REQUIRED;
+      return;
+    }
+    if (factInput.value.max < 1) {
+      factInput.error = $scope.translations.ERROR_POS_INT;
+    } 
+    else if (factInput.value.min > factInput.value.max && factInput.value.min) {
+      factInput.error = $scope.translations.ERROR_MIN_MAX;
+    }
+    else {
+      factInput.error = null;
+    }
+  }
+
+  function checkRequired(factInput) {
+    // if it's empty but not required, we don't want to do further checks
+    if (!factInput.required && (factInput.value === null || factInput.value === "")) {
+      factInput.error = null;
+      return true;
+    }
+    if (factInput.required && (factInput.value === null || factInput.value === "")) {
+      factInput.error = $scope.translations.ERROR_REQUIRED;
+      return true;
+    }
+    return false;
+  }
+
+  function checkText(factInput) {
+    if (checkRequired(factInput)) {
+      return;
+    }
+    factInput.error = null;
+  }
+
+  function checkDropdown(factInput) {
+    var i;
+
+    if (checkRequired(factInput)) {
+      return;
+    }
+
+    factInput.error = $scope.translations.ERROR_LIST_ITEM;
+    for (i = 0; i < factInput.possibleAnswers.length; i++) {
+      if (factInput.possibleAnswers[i] === factInput.value) {
+        factInput.error = null;
+      }
+    }
+  }
+
+  function checkConstraint(factInput) {
+    var i;
+
+    if (checkRequired(factInput)) {
+      return;
+    }
+    
+    factInput.error = $scope.translations.ERROR_LIST_ITEM;
+    for (i = 0; i < factInput.facts.values.length; i++) {
+      if (factInput.facts.values[i] === factInput.value) {
+        factInput.error = null;
+        return;
+      }
+    }
+  }
+
+  function placeEditor(rowSubType, rowIndex, entryIndex, entry, preventReposition) {
     var i, valueIdString;
     // NOTE: do not modify editor here, resetEditor() happens below
 
@@ -352,7 +682,20 @@ angular.module('sbAngularApp')
     //// edit editor object to have needed properties
     $scope.editor.subType = rowSubType;
     $scope.editor.key = $scope.tableView.headers[entryIndex].value;
-    if ($scope.editor.key === 'min_student_count' || $scope.editor.key === 'max_student_count') {
+    if ($scope.editor.key === 'min_student_count') {
+      $scope.editor.value = {
+        min: null,
+        max: null,
+        selectedMin: true
+      };
+      $scope.editor.key = 'student_count';
+    }
+    else if ($scope.editor.key === 'max_student_count') {
+      $scope.editor.value = {
+        min: null,
+        max: null,
+        selectedMin: false
+      };
       $scope.editor.key = 'student_count';
     }
 
@@ -374,12 +717,8 @@ angular.module('sbAngularApp')
     // so that we can ensure that min <= max
     if ($scope.editor.key === 'student_count') {
       // would be null at this point since the factTypeConfig would be student_count instead of max/min_student_count
-      $scope.editor.value = {
-        min: null,
-        max: null
-      };
-      $scope.editor.value.min = $scope.tableConfig.entries[rowIndex]['min_student_count'];
-      $scope.editor.value.max = $scope.tableConfig.entries[rowIndex]['max_student_count'];
+      $scope.editor.value.min = $scope.tableConfig.entries[rowIndex - 1]['min_student_count'];
+      $scope.editor.value.max = $scope.tableConfig.entries[rowIndex - 1]['max_student_count'];
     }
     else if ($scope.editor.factType === 'constraint' && entry) {
       if (entry.id) {
@@ -405,6 +744,9 @@ angular.module('sbAngularApp')
       }
     }
 
+    // preserve originalValue if replacing it (i.e. editing a constraint's name)
+    $scope.editor.originalValue = $scope.editor.value;
+
     // deal with showing the selected entry
     if ($scope.editor.factType === 'constraint') {
       if (entry) {
@@ -417,12 +759,14 @@ angular.module('sbAngularApp')
     $scope.editor.rowIndex = rowIndex;
     $scope.tableView.rows.splice(rowIndex, 0, $scope.editor);
     
-    // need timeout for it to be placed in html template
     // scroll to the editor box
-    $timeout(function() {
+    // need digest for the constraintEditor id to be placed in html template at the right place
+    if (!preventReposition) {
+      $timeout(function() {
         $location.hash('constraintEditor');
         $anchorScroll();
-    }, 100);
+      }, 100);
+    }
   }
 
   function resetEditor() {
@@ -438,12 +782,14 @@ angular.module('sbAngularApp')
     $scope.selectedRow.index = null;
     $scope.selectedRow.delete = false;
 
+    $scope.editor.error = null;
     $scope.editor.selectedEntry = null;
     $scope.editor.rowIndex = null;
     $scope.editor.subType = null;
     $scope.editor.key = null;
     $scope.editor.factType = null;
     $scope.editor.value = null;
+    $scope.editor.originalValue = null;
     $scope.editor.constraintId = null;
     $scope.editor.priority = "mandatory";
     $scope.editor.facts = {
@@ -561,8 +907,41 @@ angular.module('sbAngularApp')
       $scope.translations.user_id = translation;
     });
 
+    $translate("dynamicTable.ERROR_LIST_ITEM").then(function (translation) {
+      $scope.translations.ERROR_LIST_ITEM = translation;
+    });
 
+    $translate("dynamicTable.ERROR_MUST_NUMBER").then(function (translation) {
+      $scope.translations.ERROR_MUST_NUMBER = translation;
+    });
 
+    $translate("dynamicTable.ERROR_POS_INT").then(function (translation) {
+      $scope.translations.ERROR_POS_INT = translation;
+    });
+
+    $translate("dynamicTable.ERROR_DATE").then(function (translation) {
+      $scope.translations.ERROR_DATE = translation;
+    });
+
+    $translate("dynamicTable.ERROR_TIME").then(function (translation) {
+      $scope.translations.ERROR_TIME = translation;
+    });
+
+    $translate("dynamicTable.ERROR_NEG_VALUE").then(function (translation) {
+      $scope.translations.ERROR_NEG_VALUE = translation;
+    });
+
+    $translate("dynamicTable.ERROR_MIN_MAX").then(function (translation) {
+      $scope.translations.ERROR_MIN_MAX = translation;
+    });
+
+    $translate("dynamicTable.ERROR_REQUIRED").then(function (translation) {
+      $scope.translations.ERROR_REQUIRED = translation;
+    });
+
+    $translate("schedulerModule.ERROR_UNIQUE").then(function (translation) {
+      $scope.translations.ERROR_UNIQUE = translation;
+    });
 
     $translate("dynamicTable.SHOW_NUMBER").then(function (translation) {
       $scope.tableText.closedArrayEntry = translation;

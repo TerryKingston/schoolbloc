@@ -218,6 +218,7 @@ angular.module('sbAngularApp')
 		for (i = 0; i < factInput.facts.values.length; i++) {
 			if (factInput.facts.values[i] === factInput.value) {
 				factInput.error = null;
+				return;
 			}
 		}
 	}
@@ -319,7 +320,7 @@ angular.module('sbAngularApp')
 			if (!addAnotherFact) {
 				$scope.addFactConfig.showAddFact = false;
 			}
-			// update the table to contain the number information
+			// update the table to contain the new information
 			tableEntriesService.updateTableConfig("fact", $scope.tableConfig.tableSelection);
 		}, function(error) {
 			$translate("schedulerModule.ADD_FACT_ERROR").then(function (translation) {

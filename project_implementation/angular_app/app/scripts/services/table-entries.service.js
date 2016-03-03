@@ -633,6 +633,100 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 			return deferred.promise;
 		},
 
+		editFact: function(factEntry, factId, factType) {
+			var url;
+			var deferred = $q.defer();
+			if (!factEntry || !factId) {
+				deferred.reject("ERROR: needed parameter not provided.")
+				return deferred.promise;
+			}
+
+			// convert URL as for each fact type
+			if (factType === "timeblock") {
+				url = TIME_URL;
+			}
+			else if (factType === "subject") {
+				url = SUBJECT_URL;
+			}
+			else if (factType === "teacher") {
+				url = TEACHER_URL;
+			}
+			else if (factType === "student") {
+				url = STUDENT_URL;
+			}
+			else if (factType === "classroom") {
+				url = CLASSROOM_URL;
+			}
+			else if (factType === "course" || factType === "required course" ) {
+				url = COURSE_URL;
+			}
+			else if (factType === "student_group") {
+				url = STUDENT_GROUP_URL;
+			}
+			else {
+				console.error("tableEntriesService.addFact: unexpected state: invalid factType: " + factType);
+				deferred.reject("ERROR: Unexpected front-end input.");
+				return deferred.promise;
+			}
+
+			// conform the url to change the port
+			url = commonService.conformUrl(url + "/" + factId);
+
+			$http.put(url, factEntry).then(function(data) {
+				deferred.resolve(data.data);
+			}, function(data) {
+				deferred.reject(data.data);
+			});
+			return deferred.promise;
+		},
+
+		deleteFact: function(factId, factType) {
+			var url;
+			var deferred = $q.defer();
+			if (!factId) {
+				deferred.reject("ERROR: needed parameter not provided.")
+				return deferred.promise;
+			}
+
+			// convert URL as for each fact type
+			if (factType === "timeblock") {
+				url = TIME_URL;
+			}
+			else if (factType === "subject") {
+				url = SUBJECT_URL;
+			}
+			else if (factType === "teacher") {
+				url = TEACHER_URL;
+			}
+			else if (factType === "student") {
+				url = STUDENT_URL;
+			}
+			else if (factType === "classroom") {
+				url = CLASSROOM_URL;
+			}
+			else if (factType === "course" || factType === "required course" ) {
+				url = COURSE_URL;
+			}
+			else if (factType === "student_group") {
+				url = STUDENT_GROUP_URL;
+			}
+			else {
+				console.error("tableEntriesService.addFact: unexpected state: invalid factType: " + factType);
+				deferred.reject("ERROR: Unexpected front-end input.");
+				return deferred.promise;
+			}
+
+			// conform the url to change the port
+			url = commonService.conformUrl(url + "/" + factId);
+
+			$http.delete(url).then(function(data) {
+				deferred.resolve(data.data);
+			}, function(data) {
+				deferred.reject(data.data);
+			});
+			return deferred.promise;
+		},
+
 		getTableConfiguration: function() {
 			var self = this;
 

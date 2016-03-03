@@ -1034,8 +1034,11 @@ textarea {
 .dynamic-table .entry-options .entry-edit {
   background-color: $recommend-blue;
 }
-.dynamic-table .entry-options .entry-disable {
+.dynamic-table .entry-options .entry-disable-active {
   background-color: $alert-red;
+}
+.dynamic-table .entry-options .entry-disable-inactive {
+  background-color: $text-gray;
 }
 .dynamic-table .entry-options .entry-delete {
   background-color: $alert-color;
@@ -1049,6 +1052,10 @@ textarea {
 }
 .dynamic-table .entry-options .entry-delete:hover {
   background-image: $circle-delete-icon;
+}
+
+.dynamic-table .entry-disabled {
+	color: $alert-red;
 }
 
 .dynamic-table .no-entry .no-entry-edit {
@@ -1287,7 +1294,8 @@ textarea {
 }
 
 
-.add-fact-error {
+.add-fact-error,
+.editor-error {
     font-size: 14px;
     color: $alert-red;
     background-color: none;
@@ -1297,6 +1305,10 @@ textarea {
     margin: 10px 0;
     border: solid 1px $alert-red;
     border-left: solid 10px $alert-red;
+}
+
+.editor-error {
+	background-color: $alert-red-background !important;
 }
 
 .input-row .input-row-min-max,
