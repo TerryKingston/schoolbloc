@@ -42,9 +42,13 @@ $dashboard-dark-active: #324148;
 // colors - table
 $table-background: #dbe6ec;
 $table-background-gray: #ddd;
+$table-background-gray-light: #eee;
 $table-border: #bac9d0;
 $table-row-open: #CCEBFF;
 $table-background-row-hover: #F0F9FF;
+$alert-red-background: #FADCD2;
+$alert-red-background-hover: #F2C3B3;
+
 
 // sizes
 $icon-size: 22px;
@@ -905,9 +909,35 @@ textarea {
   max-width: none;
 }
 
+.dynamic-table .delete-warning-row {
+  border: 1px solid $alert-red;
+  background-color: $alert-red-background;
+}
+
+.dynamic-table .delete-warning-row:hover {
+  border: 1px solid $alert-red;
+  background-color: $alert-red-background-hover;
+}
+
 .dynamic-table td div:hover,
 .dynamic-table th div:hover {
   max-width: 300px;
+}
+
+.dynamic-table .table-editor .editor-prompt-text {
+	font-weight: 700;
+	font-size: 16px;
+	color: $text-gray;
+}
+
+.dynamic-table .table-editor .editor-prompt-entry {
+	border: 1px solid $text-gray;
+	border-left-width: 10px;
+	padding: 0 10px;
+}
+
+.dynamic-table .table-editor .prompt-entry-key {
+	font-weight: 700;
 }
 
 .dynamic-table .table-editor div:hover {

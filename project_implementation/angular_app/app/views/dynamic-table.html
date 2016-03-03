@@ -37,14 +37,54 @@
       </tr>
     </thead> -->
     <tbody>
-      <tr ng-repeat="row in tableView.rows track by $index" ng-init="rowIndex = $index" ng-mouseenter="moveHeader(rowIndex)" ng-class="{'header-row': row.type === 'header'}">
+      <tr ng-repeat="row in tableView.rows track by $index" ng-init="rowIndex = $index" ng-mouseenter="moveHeader(rowIndex)" ng-class="{'header-row': row.type === 'header', 'delete-warning-row': (rowIndex === selectedRow.index && selectedRow.delete)}">
         <th ng-if="row.type === 'header'" ng-show="header.show" ng-repeat="header in tableView.headers track by $index">
           <div ng-if="header.value !== 'disabled'">{{header.text}}</div>
         </th>
-        <!-- if editor -->
+        <!-- EDITOR -->
         <td class="table-editor" id="constraintEditor" colspan="{{tableView.headers.length}}" ng-if="row.type === 'editor'">
-          <!-- property -->
-          <div ng-if="row.subType === 'edit-property' || row.subType === 'edit-constraint' || row.subType === 'add-property' || row.subType === 'add-constraint'" class="table-editor-flex">
+          <!-- DELETE row -->
+          <div class="table-editor-flex" ng-if="row.subType === 'delete-row'">
+            <div class="table-editor-left">
+              <section>
+                <div class="editor-prompt-text">{{'dynamicTable.CONFIRM_REMOVE_ROW' | translate}}</div>
+              </section>
+              <section class="flex-bottom-btn">
+                <button class="btn btn-danger" ng-click="confirmDeleteRow()">{{'dynamicTable.REMOVE' | translate}}</button>
+                <button class="btn btn-secondary" ng-click="cancelEditor()">{{"dynamicTable.CANCEL" | translate}}</button>
+              </section>
+            </div>
+            <div class="table-editor-right">
+              <a href="" ng-click="toggleFilters(row)">{{row.showFiltersText}}</a>
+              <div class="table-editor-filters" ng-class="{'table-editor-filters-hide': !row.showFilters}">
+                <label ng-repeat="filter in row.filters track by $index"><input type="checkbox" ng-model="filter.checked" ng-disabled="!row.showFilters">{{filter.text}}</label>
+              </div>
+            </div>
+          </div>
+          <!-- DELETE property or constraint -->
+          <div class="table-editor-flex" ng-if="row.subType === 'delete-property' || row.subType === 'delete-constraint'">
+            <div class="table-editor-left">
+              <section>
+                <div class="editor-prompt-text">{{'dynamicTable.CONFIRM_REMOVE' | translate}}</div>
+                <div class="editor-prompt-entry">
+                  <span class="prompt-entry-key">{{translations[row.key]}}:</span>
+                  <span class="prompt-entry-value">{{row.value}}</span>
+                </div>
+              </section>
+              <section class="flex-bottom-btn">
+                <button class="btn btn-danger" ng-click="confirmDeleteEntry()">{{'dynamicTable.REMOVE' | translate}}</button>
+                <button class="btn btn-secondary" ng-click="cancelEditor()">{{"dynamicTable.CANCEL" | translate}}</button>
+              </section>
+            </div>
+            <div class="table-editor-right">
+              <a href="" ng-click="toggleFilters(row)">{{row.showFiltersText}}</a>
+              <div class="table-editor-filters" ng-class="{'table-editor-filters-hide': !row.showFilters}">
+                <label ng-repeat="filter in row.filters track by $index"><input type="checkbox" ng-model="filter.checked" ng-disabled="!row.showFilters">{{filter.text}}</label>
+              </div>
+            </div>
+          </div>
+          <!-- EDIT property or constraint -->
+          <div class="table-editor-flex" ng-if="row.subType === 'edit-property' || row.subType === 'edit-constraint' || row.subType === 'add-property' || row.subType === 'add-constraint'" >
             <div class="table-editor-left">
               <section>
                 <label>
@@ -123,8 +163,8 @@
                 </div>
                 <div class="entry-options">
                   <button class="entry-edit" alt="{{'dynamicTable.EDIT' | translate}}" ng-click="editConstraint(rowIndex, rowEntryIndex, element)"></button>
-                  <button class="entry-disable" alt="{{'dynamicTable.DISABLE' | translate}}"></button>
-                  <button class="entry-delete" alt="{{'dynamicTable.DELETE' | translate}}"></button>
+                  <button class="entry-disable" alt="{{'dynamicTable.DISABLE' | translate}}" ng-click="disableConstraint(rowIndex, rowEntryIndex, element)"></button>
+                  <button class="entry-delete" alt="{{'dynamicTable.DELETE' | translate}}" ng-click="deleteConstraint(rowIndex, rowEntryIndex, element)"></button>
                 </div>
                 <span>{{element.value}}</span>
               </div>
@@ -136,7 +176,7 @@
             <div ng-if="rowEntry" class="entry">
               <div class="entry-options">
                 <button class="entry-edit" alt="{{'dynamicTable.EDIT' | translate}}" ng-click="editProperty(rowIndex, rowEntryIndex, rowEntry)"></button>
-                <button class="entry-delete" alt="{{'dynamicTable.DELETE' | translate}}"></button>
+                <button class="entry-delete" alt="{{'dynamicTable.DELETE' | translate}}" ng-click="deleteProperty(rowIndex, rowEntryIndex, rowEntry)"></button>
               </div>
               <div>{{rowEntry}}</div>
             </div>
@@ -148,8 +188,8 @@
           </div>
           <!-- disable btn and other btn-size options -->
           <div ng-if="rowEntry.type === 'disabled'">
-            <button class="table-row-disabled" ng-class="{'table-row-disabled-active': rowEntry.value, 'table-row-disabled-inactive': !rowEntry.value}" alt="{{'dynamicTable.DISABLE' | translate}}"></button>
-            <button class="table-row-delete" alt="{{'dynamicTable.DELETE' | translate}}"></button>
+            <button class="table-row-disabled" ng-class="{'table-row-disabled-active': rowEntry.value, 'table-row-disabled-inactive': !rowEntry.value}" alt="{{'dynamicTable.DISABLE' | translate}}" ng-click="disableRow(rowIndex)"></button>
+            <button class="table-row-delete" alt="{{'dynamicTable.DELETE' | translate}}" ng-click="deleteRow(rowIndex)"></button>
           </div>
         </td>
       </tr>

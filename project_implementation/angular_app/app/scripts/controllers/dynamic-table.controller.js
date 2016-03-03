@@ -25,7 +25,10 @@ angular.module('sbAngularApp')
     openedArrayEntry: null
   };
 
-  $scope.selectedEntry = null;
+  $scope.selectedRow = {
+    index: null,
+    delete: false
+  };
 
   $scope.tableOptions = {
     show: false,
@@ -128,6 +131,8 @@ angular.module('sbAngularApp')
       headersIndex: 0,
       rows: []
     };
+
+    resetEditor();
 
     // no entries
     if (!$scope.tableConfig.entries || !$scope.tableConfig.entries.length) {
@@ -271,6 +276,58 @@ angular.module('sbAngularApp')
     placeEditor('edit-property', rowIndex, entryIndex, entry);
   };
 
+  $scope.disableConstraint = function(rowIndex, entryIndex, entry) {
+
+  };
+
+  $scope.deleteConstraint = function(rowIndex, entryIndex, entry) {
+    placeEditor('delete-constraint', rowIndex, entryIndex, entry);
+  };
+
+  $scope.deleteProperty = function(rowIndex, entryIndex, entry) {
+    placeEditor('delete-property', rowIndex, entryIndex, entry);
+  };
+
+  $scope.disableRow = function(rowIndex) {
+
+  };
+
+  $scope.deleteRow = function(rowIndex) {
+    // determine if row index is affected by an already in place editor, and reconfigure if needed
+    if ($scope.editor.rowIndex !== null && rowIndex > $scope.editor.rowIndex) {
+      rowIndex--;
+    }
+
+    resetEditor();
+
+    // because now the rowIndex is the editor
+    $scope.selectedRow.index = rowIndex + 1;
+    $scope.selectedRow.delete = true;
+
+    $scope.editor.subType = 'delete-row';
+
+    // add editor into rows
+    $scope.editor.rowIndex = rowIndex;
+    $scope.tableView.rows.splice(rowIndex, 0, $scope.editor);
+    
+    // need timeout for it to be placed in html template
+    // scroll to the editor box
+    $timeout(function() {
+        $location.hash('constraintEditor');
+        $anchorScroll();
+    }, 100);
+  };
+
+  /**
+   * Delete a single constraint binding
+   */
+  $scope.confirmDeleteEntry = function() {
+    // $scope.editor ...
+  };
+
+  $scope.confirmDeleteRow = function() {
+    // $scope.editor ...
+  };
 
   $scope.cancelEditor = function() {
     resetEditor();
@@ -287,6 +344,10 @@ angular.module('sbAngularApp')
 
     // remove any previous editor
     resetEditor();
+
+    // because now the rowIndex is the editor
+    $scope.selectedRow.index = rowIndex + 1;
+    $scope.selectedRow.delete = false;
 
     //// edit editor object to have needed properties
     $scope.editor.subType = rowSubType;
@@ -374,7 +435,10 @@ angular.module('sbAngularApp')
       $scope.tableView.rows.splice($scope.editor.rowIndex, 1);
     }
 
-    $scope.selectedEntry = null;
+    $scope.selectedRow.index = null;
+    $scope.selectedRow.delete = false;
+
+    $scope.editor.selectedEntry = null;
     $scope.editor.rowIndex = null;
     $scope.editor.subType = null;
     $scope.editor.key = null;
