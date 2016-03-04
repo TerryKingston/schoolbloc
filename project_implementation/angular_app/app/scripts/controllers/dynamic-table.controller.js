@@ -19,6 +19,7 @@ angular.module('sbAngularApp')
 
 	$scope.tableConfig = null;
   $scope.factTypeConfig = null;
+  $scope.factTypeConfigMap = null;
 	$scope.tableView = null;
   $scope.tableText = {
     closedArrayEntry: null,
@@ -123,6 +124,12 @@ angular.module('sbAngularApp')
 
     // get the newest factTypeConfig object
     $scope.factTypeConfig = tableEntriesService.getFactTypeConfig($scope.tableConfig.tableSelection);
+
+    $scope.factTypeConfigMap = {};
+    // convert to map instead of array
+    for (i = 0; i < $scope.factTypeConfig.length; i++) {
+      $scope.factTypeConfigMap[$scope.factTypeConfig[i].key] = $scope.factTypeConfig[i];
+    }
 
     // prepare headers
     $scope.tableView.headers = [];
@@ -700,15 +707,12 @@ angular.module('sbAngularApp')
     }
 
     // get factTypes based on config file
-    for (i = 0; i < $scope.factTypeConfig.length; i++) {
-      if ($scope.factTypeConfig[i].key === $scope.editor.key) {
-        $scope.editor.factType = $scope.factTypeConfig[i].type;
-        
-        // get constraint lists
-        if ($scope.editor.factType === 'constraint') {
-          $scope.editor.facts = $scope.factTypeConfig[i].facts;
-        }
-        break;
+    if ($scope.factTypeConfigMap[$scope.editor.key]) {
+      $scope.editor.factType = $scope.factTypeConfigMap[$scope.editor.key].type;
+      
+      // get constraint lists
+      if ($scope.editor.factType === 'constraint') {
+        $scope.editor.facts = $scope.$scope.factTypeConfigMap[$scope.editor.key].facts;
       }
     }
 

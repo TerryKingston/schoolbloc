@@ -110,7 +110,7 @@
                     </datalist>
                   </div>
                 </label>
-                <div class="table-editor-priority" ng-if="row.subType === 'edit-constraint' || row.subType === 'add-constraint'">
+                <div class="table-editor-priority" ng-if="(row.subType === 'edit-constraint' || row.subType === 'add-constraint') && row.priority !== 'forced'">
                   <button class="priority-help">?</button>
                   <section class="priority-help-tooltip">
                     <div class="tooltip-text">
@@ -175,7 +175,7 @@
             <div ng-if="rowEntry" class="entry">
               <div class="entry-options">
                 <button class="entry-edit" alt="{{'dynamicTable.EDIT' | translate}}" ng-click="editProperty(rowIndex, rowEntryIndex, rowEntry)"></button>
-                <button class="entry-delete" alt="{{'dynamicTable.DELETE' | translate}}" ng-click="deleteProperty(rowIndex, rowEntryIndex, rowEntry)"></button>
+                <button class="entry-delete" alt="{{'dynamicTable.DELETE' | translate}}" ng-if="!factTypeConfigMap[tableView.headers[rowEntryIndex].value].required" ng-click="deleteProperty(rowIndex, rowEntryIndex, rowEntry)"></button>
               </div>
               <div>{{rowEntry}}</div>
             </div>
