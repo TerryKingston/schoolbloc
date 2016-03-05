@@ -156,6 +156,7 @@ class FullScheduleTests(unittest.TestCase):
 
         # add a teacher for this subject
         db.session.add(TeachersSubject(teacher_id=math_teacher_1.id, subject_id=sub_7th_math.id))
+        db.session.add(TeachersSubject(teacher_id=math_teacher_2.id, subject_id=sub_7th_math.id))
 
         csubs = [ CoursesSubject(course_id=c.id, subject_id=sub_7th_math.id) for c in cl_7th_math ]
         for cs in csubs: db.session.add(cs)

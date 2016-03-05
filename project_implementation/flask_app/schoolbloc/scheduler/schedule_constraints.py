@@ -654,7 +654,14 @@ class ClassConstraint:
         self.timeblock_high_ids = [ timeblock.id for timeblock in Timeblock.query.all() ]
         self.timeblock_low_ids = [ timeblock.id for timeblock in Timeblock.query.all() ]
 
-        self.apply_course_teacher()
+        # now apply the constraints to this class
+        # self.apply_course_teacher()
+        # self.apply_classroom_course()
+        # self.apply_course_timeblock()
+
+        self.teacher_ids = self.teacher_mand_ids
+        self.classroom_ids = self.classroom_mand_ids
+        self.timeblock_ids = self.timeblock_mand_ids
 
 
     def __repr__(self):
@@ -701,18 +708,18 @@ class ClassConstraint:
         self.timeblock_high_ids = [ cc.timeblock_id for cc in high_list ]
         self.timeblock_low_ids = [ cc.timeblock_id for cc in low_list ]
 
-    def apply_classroom_teacher(self):
-        """
-        Narrow the field of teachers and classrooms based on ClassroomsTeacher constraints
-        """
-        # class ClassroomsTeacher(db.Model, SqlalchemySerializer):
+    # def apply_classroom_teacher(self):
+    #     """
+    #     Narrow the field of teachers and classrooms based on ClassroomsTeacher constraints
+    #     """
+    #     # class ClassroomsTeacher(db.Model, SqlalchemySerializer):
         
-        all_mand_cts = ClassroomsTeacher.query.filter_by(priority='mandatory')
-        all_low_cts = ClassroomsTeacher.query.filter_by(priority='high')
-        all_low_cts = ClassroomsTeacher.query.filter_by(priority='low')
-        # start with our list of teachers and limit the classrooms
+    #     all_mand_cts = ClassroomsTeacher.query.filter_by(priority='mandatory')
+    #     all_low_cts = ClassroomsTeacher.query.filter_by(priority='high')
+    #     all_low_cts = ClassroomsTeacher.query.filter_by(priority='low')
+    #     # start with our list of teachers and limit the classrooms
 
-        ClassroomsTeacher.query.filter_by(classroom_id=?, teacher_id=?)
+    #     ClassroomsTeacher.query.filter_by(classroom_id=?, teacher_id=?)
 
 
 
