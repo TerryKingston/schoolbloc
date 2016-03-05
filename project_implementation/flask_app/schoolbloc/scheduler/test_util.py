@@ -62,7 +62,7 @@ class SchedulerTestUtilities():
         hrs = (time / 100)
         mins = time - hrs * 100
 
-        return hrs * 60 + mins
+        return int(hrs * 60 + mins)
 
     @staticmethod
     def convert_minutes_to_time(minutes):
@@ -73,7 +73,7 @@ class SchedulerTestUtilities():
         hrs = (minutes / 60) * 100
         mins = minutes % 60
 
-        return hrs + mins
+        return int(hrs + mins)
 
 
     @staticmethod

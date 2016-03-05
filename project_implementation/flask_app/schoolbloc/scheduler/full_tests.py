@@ -197,7 +197,7 @@ class FullScheduleTests(unittest.TestCase):
 
         course_7th_sci = Course(name="Int Science (7)", duration=82, 
                             min_student_count=0,
-                            max_student_count=30)
+                            max_student_count=25)
         db.session.add(course_7th_sci)
         db.session.flush()
 
@@ -206,7 +206,7 @@ class FullScheduleTests(unittest.TestCase):
 
         course_8th_sci = Course(name="Int Science (8)", duration=82, 
                             min_student_count=0,
-                            max_student_count=30)
+                            max_student_count=25)
         db.session.add(course_8th_sci)
         db.session.flush()
 
@@ -215,17 +215,17 @@ class FullScheduleTests(unittest.TestCase):
 
         course_9th_sci = Course(name="Int Science (9)", duration=82, 
                             min_student_count=0,
-                            max_student_count=30)
+                            max_student_count=25)
         db.session.add(course_9th_sci)
 
         course_7th_la = Course(name="Language Arts (7)", duration=82, 
                             min_student_count=0,
-                            max_student_count=30)
+                            max_student_count=25)
         db.session.add(course_7th_la)
 
         course_8th_la = Course(name="Language Arts (8)", duration=82, 
                             min_student_count=0,
-                            max_student_count=30)
+                            max_student_count=25)
         db.session.add(course_8th_la)
         db.session.flush()
 
@@ -235,7 +235,7 @@ class FullScheduleTests(unittest.TestCase):
 
         course_9th_la = Course(name="Language Arts (9)", duration=82, 
                             min_student_count=0,
-                            max_student_count=30)
+                            max_student_count=35)
         db.session.add(course_9th_la)
         db.session.flush()
 
@@ -245,7 +245,7 @@ class FullScheduleTests(unittest.TestCase):
 
         course_7th_pe = Course(name="PE/Health (7)", duration=82, 
                             min_student_count=0,
-                            max_student_count=30)
+                            max_student_count=50)
         db.session.add(course_7th_pe)
         db.session.flush()
 
@@ -254,7 +254,7 @@ class FullScheduleTests(unittest.TestCase):
 
         course_8th_pe = Course(name="PE/Health (8)", duration=82, 
                             min_student_count=0,
-                            max_student_count=30)
+                            max_student_count=50)
         db.session.add(course_8th_pe)
         db.session.flush()
 
@@ -264,7 +264,7 @@ class FullScheduleTests(unittest.TestCase):
 
         course_9th_pe = Course(name="PE/Health (9)", duration=82, 
                             min_student_count=0,
-                            max_student_count=30)
+                            max_student_count=50)
         db.session.add(course_9th_pe)
         db.session.flush()
 
@@ -274,7 +274,7 @@ class FullScheduleTests(unittest.TestCase):
 
         course_leadership = Course(name="Leadership", duration=82, 
                             min_student_count=0,
-                            max_student_count=30)
+                            max_student_count=25)
         db.session.add(course_leadership)
 
         sub_soc_stud = Subject(name="Social Studies")                               
@@ -297,7 +297,7 @@ class FullScheduleTests(unittest.TestCase):
         db.session.add(sub_tech)
         cl_tech = [ Course(name=c_name, duration=82, 
                             min_student_count=0,
-                            max_student_count=30)  
+                            max_student_count=15)  
                         for c_name in ["Technology", "Computer Essentials", "Robotics" "Computer Tech", "Pre Engineering", "Auto"] ]
         for c in cl_tech: db.session.add(c)
         db.session.flush()
@@ -311,7 +311,7 @@ class FullScheduleTests(unittest.TestCase):
         db.session.add(sub_learning)
         cl_learning = [ Course(name=c_name, duration=82, 
                             min_student_count=0,
-                            max_student_count=30)  
+                            max_student_count=35)  
                         for c_name in ["Learning Strategies", "College & Career Awareness"] ]
         for c in cl_learning: db.session.add(c)
         db.session.flush()
