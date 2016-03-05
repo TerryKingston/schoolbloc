@@ -90,7 +90,24 @@ class FullScheduleTests(unittest.TestCase):
         #                 ("V", "Obrien"), ("M. Omer"), ("J", "Palmer"), ("V", "Stowell"), 
         #                 ("D", "Thomas")]
 
-        teach_list = TestUtil.generate_teachers(20, names[300:320])
+        # teach_list = TestUtil.generate_teachers(20, names[300:320])
+        music_teacher_1 = TestUtil.generate_teachers(1, names[300:301])[0]
+        music_teacher_2 = TestUtil.generate_teachers(1, names[301:302])[0]
+        math_teacher_1 = TestUtil.generate_teachers(1, names[302:303])[0]
+        math_teacher_2 = TestUtil.generate_teachers(1, names[303:304])[0]
+        math_teacher_3 = TestUtil.generate_teachers(1, names[304:305])[0]
+        math_teacher_4 = TestUtil.generate_teachers(1, names[305:306])[0]
+        sci_teacher_1 = TestUtil.generate_teachers(1, names[306:307])[0]
+        lang_teacher_1 = TestUtil.generate_teachers(1, names[307:308])[0]
+        lang_teacher_2 = TestUtil.generate_teachers(1, names[308:309])[0]
+        pe_teacher_1 = TestUtil.generate_teachers(1, names[309:310])[0]
+        soc_teacher_1 = TestUtil.generate_teachers(1, names[310:311])[0]
+        soc_teacher_2 = TestUtil.generate_teachers(1, names[311:312])[0]
+        tech_teacher_1 = TestUtil.generate_teachers(1, names[312:313])[0]
+        learn_teacher_1 = TestUtil.generate_teachers(1, names[313:314])[0]
+        pe_teacher_2 = TestUtil.generate_teachers(1, names[314:315])[0]
+        pe_teacher_3 = TestUtil.generate_teachers(1, names[315:316])[0]
+        extra_teachers = TestUtil.generate_teachers(4, names[316:320])
 
         # Add the rooms
         room_numbers = [203, 215, 220, 216, 109, 207, 201, 205, 210, 214, 
@@ -100,14 +117,14 @@ class FullScheduleTests(unittest.TestCase):
         db.session.flush()
         
         # attach some teachers to some rooms
-        db.session.add(ClassroomsTeacher(teacher_id=teach_list[0].id, classroom_id=classroom_list[0].id))
-        db.session.add(ClassroomsTeacher(teacher_id=teach_list[2].id, classroom_id=classroom_list[2].id))
-        db.session.add(ClassroomsTeacher(teacher_id=teach_list[5].id, classroom_id=classroom_list[5].id))
-        db.session.add(ClassroomsTeacher(teacher_id=teach_list[6].id, classroom_id=classroom_list[6].id))
-        db.session.add(ClassroomsTeacher(teacher_id=teach_list[10].id, classroom_id=classroom_list[10].id))
-        db.session.add(ClassroomsTeacher(teacher_id=teach_list[12].id, classroom_id=classroom_list[12].id))
-        db.session.add(ClassroomsTeacher(teacher_id=teach_list[18].id, classroom_id=classroom_list[15].id))
-        db.session.add(ClassroomsTeacher(teacher_id=teach_list[19].id, classroom_id=classroom_list[16].id))
+        db.session.add(ClassroomsTeacher(teacher_id=music_teacher_1.id, classroom_id=classroom_list[0].id))
+        db.session.add(ClassroomsTeacher(teacher_id=math_teacher_1.id, classroom_id=classroom_list[2].id))
+        db.session.add(ClassroomsTeacher(teacher_id=math_teacher_4.id, classroom_id=classroom_list[5].id))
+        db.session.add(ClassroomsTeacher(teacher_id=sci_teacher_1.id, classroom_id=classroom_list[6].id))
+        db.session.add(ClassroomsTeacher(teacher_id=soc_teacher_1.id, classroom_id=classroom_list[10].id))
+        db.session.add(ClassroomsTeacher(teacher_id=tech_teacher_1.id, classroom_id=classroom_list[12].id))
+        db.session.add(ClassroomsTeacher(teacher_id=extra_teachers[0].id, classroom_id=classroom_list[15].id))
+        db.session.add(ClassroomsTeacher(teacher_id=extra_teachers[1].id, classroom_id=classroom_list[16].id))
 
         # Add courses and subjects
         sub_music = Subject(name="Music")
@@ -122,8 +139,8 @@ class FullScheduleTests(unittest.TestCase):
         db.session.flush()
 
         # add a teacher for this subject
-        db.session.add(TeachersSubject(teacher_id=teach_list[0].id, subject_id=sub_music.id))
-        db.session.add(TeachersSubject(teacher_id=teach_list[1].id, subject_id=sub_music.id))
+        db.session.add(TeachersSubject(teacher_id=music_teacher_1.id, subject_id=sub_music.id))
+        db.session.add(TeachersSubject(teacher_id=music_teacher_2.id, subject_id=sub_music.id))
 
         csubs = [ CoursesSubject(course_id=c.id, subject_id=sub_music.id) for c in cl_music ]
         for cs in csubs: db.session.add(cs)
@@ -138,7 +155,7 @@ class FullScheduleTests(unittest.TestCase):
         db.session.flush()
 
         # add a teacher for this subject
-        db.session.add(TeachersSubject(teacher_id=teach_list[2].id, subject_id=sub_7th_math.id))
+        db.session.add(TeachersSubject(teacher_id=math_teacher_1.id, subject_id=sub_7th_math.id))
 
         csubs = [ CoursesSubject(course_id=c.id, subject_id=sub_7th_math.id) for c in cl_7th_math ]
         for cs in csubs: db.session.add(cs)
@@ -154,9 +171,9 @@ class FullScheduleTests(unittest.TestCase):
         db.session.flush()
 
         # add a teacher for this subject
-        db.session.add(TeachersSubject(teacher_id=teach_list[3].id, subject_id=sub_8th_math.id))
-        db.session.add(TeachersSubject(teacher_id=teach_list[4].id, subject_id=sub_8th_math.id))
-        db.session.add(TeachersSubject(teacher_id=teach_list[5].id, subject_id=sub_8th_math.id))
+        db.session.add(TeachersSubject(teacher_id=math_teacher_2.id, subject_id=sub_8th_math.id))
+        db.session.add(TeachersSubject(teacher_id=math_teacher_3.id, subject_id=sub_8th_math.id))
+        db.session.add(TeachersSubject(teacher_id=math_teacher_4.id, subject_id=sub_8th_math.id))
 
         csubs = [ CoursesSubject(course_id=c.id, subject_id=sub_8th_math.id) for c in cl_8th_math ]
         for cs in csubs: db.session.add(cs)
@@ -172,8 +189,8 @@ class FullScheduleTests(unittest.TestCase):
         db.session.flush()
 
         # add a teacher for this subject
-        db.session.add(TeachersSubject(teacher_id=teach_list[2].id, subject_id=sub_9th_math.id))
-        db.session.add(TeachersSubject(teacher_id=teach_list[3].id, subject_id=sub_9th_math.id))
+        db.session.add(TeachersSubject(teacher_id=math_teacher_1.id, subject_id=sub_9th_math.id))
+        db.session.add(TeachersSubject(teacher_id=math_teacher_2.id, subject_id=sub_9th_math.id))
 
         csubs = [ CoursesSubject(course_id=c.id, subject_id=sub_9th_math.id) for c in cl_9th_math ]
         for cs in csubs: db.session.add(cs)
@@ -185,7 +202,7 @@ class FullScheduleTests(unittest.TestCase):
         db.session.flush()
 
         # add a teacher for this course
-        db.session.add(CoursesTeacher(teacher_id=teach_list[5].id, course_id=course_7th_sci.id))
+        db.session.add(CoursesTeacher(teacher_id=math_teacher_4.id, course_id=course_7th_sci.id))
 
         course_8th_sci = Course(name="Int Science (8)", duration=82, 
                             min_student_count=0,
@@ -194,7 +211,7 @@ class FullScheduleTests(unittest.TestCase):
         db.session.flush()
 
         # add a teacher for this course
-        db.session.add(CoursesTeacher(teacher_id=teach_list[6].id, course_id=course_7th_sci.id))
+        db.session.add(CoursesTeacher(teacher_id=sci_teacher_1.id, course_id=course_7th_sci.id))
 
         course_9th_sci = Course(name="Int Science (9)", duration=82, 
                             min_student_count=0,
@@ -213,8 +230,8 @@ class FullScheduleTests(unittest.TestCase):
         db.session.flush()
 
         # add a teacher for this course
-        db.session.add(CoursesTeacher(teacher_id=teach_list[7].id, course_id=course_8th_la.id))
-        db.session.add(CoursesTeacher(teacher_id=teach_list[8].id, course_id=course_8th_la.id))
+        db.session.add(CoursesTeacher(teacher_id=lang_teacher_1.id, course_id=course_8th_la.id))
+        db.session.add(CoursesTeacher(teacher_id=lang_teacher_2.id, course_id=course_8th_la.id))
 
         course_9th_la = Course(name="Language Arts (9)", duration=82, 
                             min_student_count=0,
@@ -223,8 +240,8 @@ class FullScheduleTests(unittest.TestCase):
         db.session.flush()
 
         # add a teacher for this course
-        db.session.add(CoursesTeacher(teacher_id=teach_list[7].id, course_id=course_9th_la.id))
-        db.session.add(CoursesTeacher(teacher_id=teach_list[8].id, course_id=course_9th_la.id))
+        db.session.add(CoursesTeacher(teacher_id=lang_teacher_1.id, course_id=course_9th_la.id))
+        db.session.add(CoursesTeacher(teacher_id=lang_teacher_2.id, course_id=course_9th_la.id))
 
         course_7th_pe = Course(name="PE/Health (7)", duration=82, 
                             min_student_count=0,
@@ -233,7 +250,7 @@ class FullScheduleTests(unittest.TestCase):
         db.session.flush()
 
         # add a teacher for this course
-        db.session.add(CoursesTeacher(teacher_id=teach_list[9].id, course_id=course_7th_pe.id))
+        db.session.add(CoursesTeacher(teacher_id=pe_teacher_1.id, course_id=course_7th_pe.id))
 
         course_8th_pe = Course(name="PE/Health (8)", duration=82, 
                             min_student_count=0,
@@ -242,7 +259,8 @@ class FullScheduleTests(unittest.TestCase):
         db.session.flush()
 
         # add a teacher for this course
-        db.session.add(CoursesTeacher(teacher_id=teach_list[9].id, course_id=course_8th_pe.id))
+        db.session.add(CoursesTeacher(teacher_id=pe_teacher_2.id, course_id=course_8th_pe.id))
+        db.session.add(CoursesTeacher(teacher_id=pe_teacher_3.id, course_id=course_8th_pe.id))
 
         course_9th_pe = Course(name="PE/Health (9)", duration=82, 
                             min_student_count=0,
@@ -251,7 +269,8 @@ class FullScheduleTests(unittest.TestCase):
         db.session.flush()
 
         # add a teacher for this course
-        db.session.add(CoursesTeacher(teacher_id=teach_list[9].id, course_id=course_9th_pe.id))
+        db.session.add(CoursesTeacher(teacher_id=pe_teacher_2.id, course_id=course_9th_pe.id))
+        db.session.add(CoursesTeacher(teacher_id=pe_teacher_3.id, course_id=course_9th_pe.id))
 
         course_leadership = Course(name="Leadership", duration=82, 
                             min_student_count=0,
@@ -268,8 +287,8 @@ class FullScheduleTests(unittest.TestCase):
         db.session.flush()
 
         # add a teacher for this course
-        db.session.add(TeachersSubject(teacher_id=teach_list[10].id, subject_id=sub_soc_stud.id))
-        db.session.add(TeachersSubject(teacher_id=teach_list[11].id, subject_id=sub_soc_stud.id))
+        db.session.add(TeachersSubject(teacher_id=soc_teacher_1.id, subject_id=sub_soc_stud.id))
+        db.session.add(TeachersSubject(teacher_id=soc_teacher_2.id, subject_id=sub_soc_stud.id))
 
         csubs = [ CoursesSubject(course_id=c.id, subject_id=sub_soc_stud.id) for c in cl_soc_stud ]
         for cs in csubs: db.session.add(cs)
@@ -283,7 +302,7 @@ class FullScheduleTests(unittest.TestCase):
         for c in cl_tech: db.session.add(c)
         db.session.flush()
 
-        db.session.add(TeachersSubject(teacher_id=teach_list[12].id, subject_id=sub_tech.id))
+        db.session.add(TeachersSubject(teacher_id=tech_teacher_1.id, subject_id=sub_tech.id))
      
         csubs = [ CoursesSubject(course_id=c.id, subject_id=sub_tech.id) for c in cl_tech ]
         for cs in csubs: db.session.add(cs)
@@ -297,7 +316,7 @@ class FullScheduleTests(unittest.TestCase):
         for c in cl_learning: db.session.add(c)
         db.session.flush()
 
-        db.session.add(TeachersSubject(teacher_id=teach_list[13].id, subject_id=sub_learning.id))
+        db.session.add(TeachersSubject(teacher_id=learn_teacher_1.id, subject_id=sub_learning.id))
 
         csubs = [ CoursesSubject(course_id=c.id, subject_id=sub_learning.id) for c in cl_learning ]
         for cs in csubs: db.session.add(cs)
