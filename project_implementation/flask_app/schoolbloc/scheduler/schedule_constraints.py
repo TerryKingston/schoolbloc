@@ -517,6 +517,7 @@ class ScheduleConstraints:
                               Or([ self.teacher(i) == t_id for t_id in t_id_list]), 
                               True) 
                            for i in range(self.class_count) ]
+        return cons_list
 
     def calc_avail_time_ids(self, start_time=None, end_time=None):
         times = []
