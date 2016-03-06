@@ -1,8 +1,19 @@
 import logging
-from schoolbloc import db
+from schoolbloc import db, app
+from sqlalchemy import event
+from sqlalchemy.engine import Engine
 from sqlalchemy.ext.associationproxy import association_proxy
 
 log = logging.getLogger(__name__)
+
+
+@event.listens_for(Engine, "connect")
+def set_sqlite_pragma(dbapi_connection, connection_record):
+    """ Turn on foreign key support if using sqlite3 """
+    if app.config.get('SQLALCHEMY_DATABASE_URI').startswith('sqlite'):
+        cursor = dbapi_connection.cursor()
+        cursor.execute("PRAGMA foreign_keys=ON")
+        cursor.close()
 
 
 class SqlalchemySerializer:
