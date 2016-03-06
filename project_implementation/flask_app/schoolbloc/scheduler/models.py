@@ -49,6 +49,7 @@ class Classroom(db.Model, SqlalchemySerializer):
                            'classrooms_subjects']
     id = db.Column(db.Integer, primary_key=True)
     room_number = db.Column(db.Integer, nullable=False, unique=True)  # user assigned room number
+    classrooms_subjects = db.relationship("ClassroomsSubject", back_populates="classroom", passive_deletes=True)
 
     def __str__(self):
         return "{}".format(self.room_number)
@@ -122,6 +123,7 @@ class Subject(db.Model, SqlalchemySerializer):
                            'teachers_subjects', 'teachers_subjects', 'subjects_timeblocks', 'classrooms_subjects']
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(255), nullable=False)
+    classrooms_subjects = db.relationship("ClassroomsSubject", back_populates="subject", passive_deletes=True)
 
     def __str__(self):
         return "{}".format(self.name)
@@ -191,12 +193,12 @@ class ClassroomsSubject(db.Model, SqlalchemySerializer):
     """ ORM object for linking table between classrooms and subjects tables """
     __tablename__ = 'classrooms_subjects'
     id = db.Column(db.Integer, primary_key=True)
-    classroom_id = db.Column(db.Integer, db.ForeignKey('classrooms.id'), nullable=False)
-    subject_id = db.Column(db.Integer, db.ForeignKey('subjects.id'), nullable=False)
+    classroom_id = db.Column(db.Integer, db.ForeignKey('classrooms.id', ondelete="CASCADE"), nullable=False)
+    subject_id = db.Column(db.Integer, db.ForeignKey('subjects.id', ondelete="CASCADE"), nullable=False)
     active = db.Column(db.Boolean, nullable=False, default=True)
     priority = db.Column(db.String(128), nullable=False, default='low')
-    classroom = db.relationship("Classroom", backref="classrooms_subjects")
-    subject = db.relationship("Subject", backref="classrooms_subjects")
+    classroom = db.relationship("Classroom", back_populates="classrooms_subjects")
+    subject = db.relationship("Subject", back_populates="classrooms_subjects")
 
     def __str__(self):
         return "{} {} {}".format(self.classroom, self.subject, self.priority)
