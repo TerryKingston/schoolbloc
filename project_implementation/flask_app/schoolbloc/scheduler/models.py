@@ -1,4 +1,6 @@
 import logging
+from collections import OrderedDict
+
 from schoolbloc import db, app
 from sqlalchemy import event
 from sqlalchemy.engine import Engine
@@ -22,7 +24,7 @@ class SqlalchemySerializer:
     provides a serialize method that will be utilized by our rest endpoints
     """
     def serialize(self):
-        results = {}
+        results = OrderedDict()
 
         # Serialize the list of columns. Don't print out foreign keys, as those
         # get dereference into their full objects bellow
@@ -452,10 +454,9 @@ class Schedule(db.Model, SqlalchemySerializer):
         return "{}".format(self.name)
 
     def serialize(self, expanded=False):
-        ret = {
-            'id': self.id,
-            'name': self.name,
-        }
+        ret = OrderedDict()
+        ret['id'] = self.id
+        ret['name'] =  self.name,
         if expanded:
             ret['classes'] = [s.serialize() for s in self.scheduled_classes]
         return ret
