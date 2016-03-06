@@ -7,18 +7,6 @@
 			"type": "uniqueText",
 			"multipleValues": false
 		},
-		//{
-		//	"key": "time",
-		//	"required": false,
-		//	"type": "constraint",
-		//	"multipleValues": true
-		//},
-		{
-			"key": "subject",
-			"required": false,
-			"type": "constraint",
-			"multipleValues": true
-		},
 		{
 			"key": "teacher",
 			"required": false,
@@ -27,6 +15,18 @@
 		},
 		{
 			"key": "course",
+			"required": false,
+			"type": "constraint",
+			"multipleValues": true
+		},
+		{
+			"key": "subject",
+			"required": false,
+			"type": "constraint",
+			"multipleValues": true
+		},
+		{
+			"key": "timeblock",
 			"required": false,
 			"type": "constraint",
 			"multipleValues": true
@@ -47,22 +47,16 @@
 		//	"possibleAnswers": ["year", "quarter"]
 		//},
 		{
-			"key": "max_student_count",
-			"required": false,
-			"type": "maxMin",
-			"multipleValues": true // should be false?
-		},
-		{
 			"key": "min_student_count",
 			"required": false,
 			"type": "maxMin",
 			"multipleValues": true // should be false?
 		},
 		{
-			"key": "duration", // what is this?
+			"key": "max_student_count",
 			"required": false,
-			"type": "constraint", // probably not right
-			"multipleValues": true
+			"type": "maxMin",
+			"multipleValues": true // should be false?
 		},
 		{
 			"key": "subject",
@@ -77,7 +71,31 @@
 			"multipleValues": true
 		},
 		{
+			"key": "student",
+			"required": false,
+			"type": "constraint",
+			"multipleValues": true
+		},
+		{
+			"key": "student_group",
+			"required": false,
+			"type": "constraint",
+			"multipleValues": true
+		},
+		{
 			"key": "classroom",
+			"required": false,
+			"type": "constraint",
+			"multipleValues": true
+		},
+		// {
+		// 	"key": "duration", // what is this?
+		// 	"required": false,
+		// 	"type": "constraint", // probably not right
+		// 	"multipleValues": true
+		// },
+		{
+			"key": "timeblock",
 			"required": false,
 			"type": "constraint",
 			"multipleValues": true
@@ -85,7 +103,7 @@
 	],
 	"students": [
 		{
-			"key": "id", // is this a school id or user_id?
+			"key": "user_id", // still need this
 			"required": true,
 			"type": "uniqueText",
 			"multipleValues": false
@@ -122,13 +140,25 @@
 		//	"multipleValues": true
 		//},
 		{
-			"key": "student_group", // make sure this is actually connected
+			"key": "student_group",
 			"required": false,
 			"type": "constraint",
 			"multipleValues": true
 		},
 		{
-			"key": "course", // make sure this is actually connected and named correctly
+			"key": "course",
+			"required": false,
+			"type": "constraint",
+			"multipleValues": true
+		},
+		{
+			"key": "subject",
+			"required": false,
+			"type": "constraint",
+			"multipleValues": true
+		},
+		{
+			"key": "timeblock",
 			"required": false,
 			"type": "constraint",
 			"multipleValues": true
@@ -142,25 +172,25 @@
 			"multipleValues": false
 		},
 		{
-			"key": "id", // don't need
-			"required": true,
-			"type": "uniqueText",
-			"multipleValues": false
-		}
-		//{
-		//	"key": "time",
-		//	"required": false,
-		//	"type": "constraint",
-		//	"multipleValues": true
-		//},
-		{
-			"key": "student", // make sure this is actually connected
+			"key": "student",
 			"required": false,
 			"type": "constraint",
 			"multipleValues": true
 		},
 		{
-			"key": "course", // make sure this is actually connected and named correctly
+			"key": "course",
+			"required": false,
+			"type": "constraint",
+			"multipleValues": true
+		},
+		{
+			"key": "subject",
+			"required": false,
+			"type": "constraint",
+			"multipleValues": true
+		},
+		{
+			"key": "timeblock",
 			"required": false,
 			"type": "constraint",
 			"multipleValues": true
@@ -168,23 +198,11 @@
 	],
 	"subjects": [
 		{
-			"key": "id", // don't need
-			"required": true,
-			"type": "uniqueText",
-			"multipleValues": false
-		},
-		{
 			"key": "name",
 			"required": true,
 			"type": "uniqueText",
 			"multipleValues": false
-		}
-		//{
-		//	"key": "time",
-		//	"required": false,
-		//	"type": "constraint",
-		//	"multipleValues": true
-		//},
+		},
 		{
 			"key": "course",
 			"required": false,
@@ -198,7 +216,25 @@
 			"multipleValues": true
 		},
 		{
+			"key": "student",
+			"required": false,
+			"type": "constraint",
+			"multipleValues": true
+		},
+		{
+			"key": "student_group",
+			"required": false,
+			"type": "constraint",
+			"multipleValues": true
+		},
+		{
 			"key": "classroom",
+			"required": false,
+			"type": "constraint",
+			"multipleValues": true
+		},
+		{
+			"key": "timeblock",
 			"required": false,
 			"type": "constraint",
 			"multipleValues": true
@@ -206,11 +242,11 @@
 	],
 	"teachers": [
 		{
-			"key": "id", // don't need
+			"key": "user_id", // still need this
 			"required": true,
 			"type": "uniqueText",
 			"multipleValues": false
-		},
+		}
 		{
 			"key": "first_name",
 			"required": true,
@@ -236,17 +272,11 @@
 			"multipleValues": true // should be false?
 		},
 		{
-			"key": "user_id",
-			"required": true,
-			"type": "uniqueText",
-			"multipleValues": false
-		}
-		//{
-		//	"key": "time",
-		//	"required": false,
-		//	"type": "constraint",
-		//	"multipleValues": true
-		//},
+			"key": "course",
+			"required": false,
+			"type": "constraint",
+			"multipleValues": true
+		},
 		{
 			"key": "subject",
 			"required": false,
@@ -254,13 +284,13 @@
 			"multipleValues": true
 		},
 		{
-			"key": "course",
+			"key": "classroom",
 			"required": false,
 			"type": "constraint",
 			"multipleValues": true
 		},
 		{
-			"key": "classroom",
+			"key": "timeblock",
 			"required": false,
 			"type": "constraint",
 			"multipleValues": true
@@ -287,13 +317,31 @@
 		//	"possibleAnswers": ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday", "weekdays"]
 		//},
 		{
-			"key": "subject",
+			"key": "teacher",
+			"required": false,
+			"type": "constraint",
+			"multipleValues": true
+		},
+		{
+			"key": "student",
+			"required": false,
+			"type": "constraint",
+			"multipleValues": true
+		},
+		{
+			"key": "student_group",
 			"required": false,
 			"type": "constraint",
 			"multipleValues": true
 		},
 		{
 			"key": "course",
+			"required": false,
+			"type": "constraint",
+			"multipleValues": true
+		},
+		{
+			"key": "subject",
 			"required": false,
 			"type": "constraint",
 			"multipleValues": true

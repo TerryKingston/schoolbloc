@@ -15,7 +15,7 @@ angular.module('sbAngularApp').factory('commonService', ['$translate', '$window'
 		if (Number.isInteger(time)) {
 			time = time + "";
 		}
-		if (!time || !time.length || time.length !== 4) {
+		if (!time || !time.length || time.length > 4) {
 			return false;
 		}
 		timeValue = parseInt(time);

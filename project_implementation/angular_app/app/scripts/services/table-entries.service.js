@@ -42,7 +42,16 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 			// 	multipleValues: false
 			// },
 			{
-				key: "timeblock",
+				key: "teacher",
+				value: null,
+				error: null,
+				required: false,
+				type: "constraint",
+				multipleValues: true,
+				facts: null
+			},
+			{
+				key: "course",
 				value: null,
 				error: null,
 				required: false,
@@ -60,16 +69,7 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 				facts: null
 			},
 			{
-				key: "teacher",
-				value: null,
-				error: null,
-				required: false,
-				type: "constraint",
-				multipleValues: true,
-				facts: null
-			},
-			{
-				key: "course",
+				key: "timeblock",
 				value: null,
 				error: null,
 				required: false,
@@ -107,15 +107,6 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 				multipleValues: false
 			},
 			{
-				key: "timeblock",
-				value: null,
-				error: null,
-				required: false,
-				type: "constraint",
-				multipleValues: true,
-				facts: null
-			},
-			{
 				key: "subject",
 				value: null,
 				error: null,
@@ -134,7 +125,7 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 				facts: null
 			},
 			{
-				key: "classroom",
+				key: "student",
 				value: null,
 				error: null,
 				required: false,
@@ -152,7 +143,16 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 				facts: null
 			},
 			{
-				key: "student",
+				key: "classroom",
+				value: null,
+				error: null,
+				required: false,
+				type: "constraint",
+				multipleValues: true,
+				facts: null
+			},
+			{
+				key: "timeblock",
 				value: null,
 				error: null,
 				required: false,
@@ -204,7 +204,7 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 			// 	multipleValues: false
 			// },
 			{
-				key: "timeblock",
+				key: "student_group",
 				value: null,
 				error: null,
 				required: false,
@@ -213,7 +213,7 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 				facts: null
 			},
 			{
-				key: "student_group",
+				key: "course",
 				value: null,
 				error: null,
 				required: false,
@@ -230,8 +230,9 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 				multipleValues: true,
 				facts: null
 			},
+			
 			{
-				key: "course",
+				key: "timeblock",
 				value: null,
 				error: null,
 				required: false,
@@ -248,15 +249,6 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 				required: true,
 				type: "uniqueText",
 				multipleValues: false
-			},
-			{
-				key: "timeblock",
-				value: null,
-				error: null,
-				required: false,
-				type: "constraint",
-				multipleValues: true,
-				facts: null
 			},
 			{
 				key: "student",
@@ -285,6 +277,15 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 				multipleValues: true,
 				facts: null
 			},
+			{
+				key: "timeblock",
+				value: null,
+				error: null,
+				required: false,
+				type: "constraint",
+				multipleValues: true,
+				facts: null
+			}
 		],
 		"subject": [
 			{
@@ -294,15 +295,6 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 				required: true,
 				type: "uniqueText",
 				multipleValues: false
-			},
-			{
-				key: "timeblock",
-				value: null,
-				error: null,
-				required: false,
-				type: "constraint",
-				multipleValues: true,
-				facts: null
 			},
 			{
 				key: "course",
@@ -323,7 +315,7 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 				facts: null
 			},
 			{
-				key: "classroom",
+				key: "student",
 				value: null,
 				error: null,
 				required: false,
@@ -341,7 +333,16 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 				facts: null
 			},
 			{
-				key: "student",
+				key: "classroom",
+				value: null,
+				error: null,
+				required: false,
+				type: "constraint",
+				multipleValues: true,
+				facts: null
+			},
+			{
+				key: "timeblock",
 				value: null,
 				error: null,
 				required: false,
@@ -390,7 +391,7 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 				multipleValues: false
 			},
 			{
-				key: "timeblock",
+				key: "course",
 				value: null,
 				error: null,
 				required: false,
@@ -408,7 +409,7 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 				facts: null
 			},
 			{
-				key: "course",
+				key: "classroom",
 				value: null,
 				error: null,
 				required: false,
@@ -417,7 +418,7 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 				facts: null
 			},
 			{
-				key: "classroom",
+				key: "timeblock",
 				value: null,
 				error: null,
 				required: false,
@@ -451,34 +452,7 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 			// 	possibleAnswers: ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday", "weekdays"]
 			// },
 			{
-				key: "subject",
-				value: null,
-				error: null,
-				required: false,
-				type: "constraint",
-				multipleValues: true,
-				facts: null
-			},
-			{
-				key: "course",
-				value: null,
-				error: null,
-				required: false,
-				type: "constraint",
-				multipleValues: true,
-				facts: null
-			},
-			{
-				key: "classroom",
-				value: null,
-				error: null,
-				required: false,
-				type: "constraint",
-				multipleValues: true,
-				facts: null
-			},
-			{
-				key: "student_group",
+				key: "teacher",
 				value: null,
 				error: null,
 				required: false,
@@ -496,7 +470,35 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 				facts: null
 			},
 			{
-				key: "teacher",
+				key: "student_group",
+				value: null,
+				error: null,
+				required: false,
+				type: "constraint",
+				multipleValues: true,
+				facts: null
+			},
+			{
+				key: "course",
+				value: null,
+				error: null,
+				required: false,
+				type: "constraint",
+				multipleValues: true,
+				facts: null
+			},
+			{
+				key: "subject",
+				value: null,
+				error: null,
+				required: false,
+				type: "constraint",
+				multipleValues: true,
+				facts: null
+			},
+			
+			{
+				key: "classroom",
 				value: null,
 				error: null,
 				required: false,
