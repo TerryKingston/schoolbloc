@@ -33,12 +33,7 @@ class Scheduler():
 
 
     def max_class_size(self, course_id=None):
-        """ 
-        Determines the maximum student count based on the given course and/or classroom.
-        The max count is the lesser of the two if both course and classroom are given.
-        """
-        
-        class_size = config.default_max_class_size
+        max_count = config.default_max_class_size
 
         if course_id: 
             course = Course.query.get(course_id)
@@ -46,9 +41,22 @@ class Scheduler():
             course = None
 
         if course and course.max_student_count:
-            class_size = course.max_student_count
+            max_count = course.max_student_count
 
-        return class_size
+        return max_count
+
+    def min_class_size(self, course_id=None):
+        min_count = config.default_min_class_size
+
+        if course_id: 
+            course = Course.query.get(course_id)
+        else:
+            course = None
+
+        if course and course.min_student_count:
+            min_count = course.min_student_count
+
+        return min_count
 
     
 
@@ -67,7 +75,7 @@ class Scheduler():
 
 
 
-        # print('\033[95m course_id | room_id | teacher_id | time_block \033[0m', file=sys.stderr)
+        #print('\033[95m course_id | room_id | teacher_id | time_block \033[0m', file=sys.stderr)
         
         class_list = []
         for i in range(sched_constraints.class_count):
@@ -76,15 +84,15 @@ class Scheduler():
             teacher_id = int(str(model.evaluate(sched_constraints.teacher(i))))
             time_block_index = int(str(model.evaluate(sched_constraints.time(i))))
 
-            # print('\033[92m     {}     |    {}    |      {}     |     {} \033[0m'.format(
-            #       course_id, room_id, teacher_id, time_block_index), file=sys.stderr)
+            #print('\033[92m     {}     |    {}    |      {}     |     {} \033[0m'.format(
+            #      course_id, room_id, teacher_id, time_block_index), file=sys.stderr)
 
             class_list.append(ScheduleClass(course_id,
                                             room_id,
                                             teacher_id,
                                             time_block_index,
                                             self.max_class_size(course_id),
-                                            0))
+                                            self.min_class_size(course_id)))
 
         sched_data = ScheduleData(class_list)
         # print("schedule data")
@@ -108,7 +116,7 @@ class Scheduler():
         for i in range(50):
             start_time = time.time()
             collisions = []
-            for i in range(10):
+            for i in range(30):
                 # print('\033[92m Attempt {} -----------------------------------------------\033[0m'.format(i + 1))
                 self.set_constraints(sched_constraints.get_constraints())
 
@@ -122,6 +130,10 @@ class Scheduler():
                 # a place for every student
                 collisions = self.place_students(schedule, sched_constraints.student_requirement_set)
                 if len(collisions) == 0:
+                    # finally make sure we met all the min student counts
+                    if not schedule.min_student_counts_satisfied():
+                        raise SchedulerNoSolution('Min student count not met')
+
                     print('\033[92m Satisfied! (attempt {})\033[0m'.format(i))
                     print('\033[92m {} \033[0m'.format(schedule))
                     # now save the schedule

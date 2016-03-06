@@ -132,8 +132,7 @@ class ScheduleConstraints:
             ScheduleConstraints.check_if_student_is_overscheduled(student, req_courses)
             # now go through the list and create courses when needed
             for course_id in req_courses:
-                # only go up to 70% of the max class size for guessing how many classes we'll need
-                max_stud_count = int(ScheduleConstraints.max_student_count(course_id) * 0.9)
+                max_stud_count = int(ScheduleConstraints.max_student_count(course_id) * .9)
                 course = Course.query.get(course_id)
 
                 if course_id not in self.class_constraints:
@@ -302,8 +301,6 @@ class ScheduleConstraints:
         teacher_utils = {}
         classroom_utils = {}
 
-        print('\033[92m Checking fact utilization --------------------------\033[0m')
-        
         for course_id, class_list in self.class_constraints.items():
             # make sure theres enough teachers for the number of courses
             teacher_ids = class_list[0].teacher_ids
@@ -898,20 +895,20 @@ class ClassConstraint:
 
 
 
-    def calc_avail_timeblocks(self):
-        """
-        Takes a course_id and returns a list of timeblock_ids available to the course based
-        on constraints in the DB
-        """
-        # pull the classrooms_course constraints
-        self.timeblock_mand_const = CoursesTimeblock.query.filter_by(priority='mandatory', course_id=self.course_id).all()
-        self.timeblock_high_const = CoursesTimeblock.query.filter_by(priority='high', course_id=self.course_id).all()
-        self.timeblock_low_const = CoursesTimeblock.query.filter_by(priority='low', course_id=self.course_id).all()
+#    def calc_avail_timeblocks(self):
+#        """
+#        Takes a course_id and returns a list of timeblock_ids available to the course based
+#        on constraints in the DB
+#        """
+#        # pull the classrooms_course constraints
+#        self.timeblock_mand_const = CoursesTimeblock.query.filter_by(priority='mandatory', course_id=self.course_id).all()
+#        self.timeblock_high_const = CoursesTimeblock.query.filter_by(priority='high', course_id=self.course_id).all()
+#        self.timeblock_low_const = CoursesTimeblock.query.filter_by(priority='low', course_id=self.course_id).all()
 
-        # now define the current set of timeblocks for this course. 
-        if len(self.timeblock_mand_const) > 0:
-            self.timeblock_ids = [ timeblock.id for timeblock in self.timeblock_mand_const ]
-        elif len(self.timeblock_high_const) > 0:
-            self.timeblock_ids = [ timeblock.id for timeblock in self.timeblock_high_const ]
-        elif len(self.timeblock_low_const) > 0:
-            self.timeblock_ids = [ timeblock.id for timeblock in self.timeblock_low_const ]
+#        # now define the current set of timeblocks for this course. 
+#        if len(self.timeblock_mand_const) > 0:
+#            self.timeblock_ids = [ timeblock.id for timeblock in self.timeblock_mand_const ]
+#        elif len(self.timeblock_high_const) > 0:
+#            self.timeblock_ids = [ timeblock.id for timeblock in self.timeblock_high_const ]
+#        elif len(self.timeblock_low_const) > 0:
+#            self.timeblock_ids = [ timeblock.id for timeblock in self.timeblock_low_const ]

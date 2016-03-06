@@ -99,8 +99,11 @@ class ScheduleData:
                 col_list = self.schedule_student_to_courses(student, course_index + 1)
                 if len(col_list) == 0:
                     # Success!, now reorder the scheduled class list to move this one to the end
-                    self.scheduled_classes[course_id].remove(sch_class)
-                    self.scheduled_classes[course_id].append(sch_class)
+                    # if its student count is greater than min and greater than 3/4 max size
+                    s_count = len(sch_class.students)
+                    if s_count > sch_class.min_student_count and s_count > int(0.75 * sch_class.max_student_count):
+                        self.scheduled_classes[course_id].remove(sch_class)
+                        self.scheduled_classes[course_id].append(sch_class)
                     return [] # return an empty list to indicate the student was placed
                 else:
                     sch_class.drop_student(student)
@@ -109,6 +112,15 @@ class ScheduleData:
         # If we didn't find any classes that would work then return false
         return collisions
 
+    def min_student_counts_satisfied(self):
+        """
+        Returns true if the min student counts of all classes have been met. False otherwise
+        """
+        for course_id, sch_class_list in self.scheduled_classes.items():
+            for sch_class in sch_class_list:
+                if len(sch_class.students) < sch_class.min_student_count:
+                    return False
+        return True
 
     # def _add_student_to_course(self, student, course_id):
     #     """
