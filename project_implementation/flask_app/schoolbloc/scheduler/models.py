@@ -21,7 +21,7 @@ class SqlalchemySerializer:
     Provides a base model for our database tables and constraints. This
     provides a serialize method that will be utilized by our rest endpoints
     """
-    def serialize(self, base_set=None):
+    def serialize(self):
         results = {}
 
         # Serialize the list of columns. Don't print out foreign keys, as those
@@ -451,6 +451,15 @@ class Schedule(db.Model, SqlalchemySerializer):
     def __str__(self):
         return "{}".format(self.name)
 
+    def serialize(self, expanded=False):
+        ret = {
+            'id': self.id,
+            'name': self.name,
+        }
+        if expanded:
+            ret['classes'] = [s.serialize() for s in self.scheduled_classes]
+        return ret
+
 
 class ScheduledClass(db.Model, SqlalchemySerializer):
     """
@@ -469,7 +478,7 @@ class ScheduledClass(db.Model, SqlalchemySerializer):
     course_id = db.Column(db.Integer, db.ForeignKey('courses.id'), nullable=False)
     course = db.relationship("Course", backref="scheduled_class")
     students = association_proxy('scheduled_classes_student', 'student')
-    start_time = db.Column(db.Integer, nullable=False) # time in 24 hr format (i.e. 1454)
+    start_time = db.Column(db.Integer, nullable=False)  # time in 24 hr format (i.e. 1454)
     end_time = db.Column(db.Integer, nullable=False)
 
     def __init__(self, schedule_id, course_id, classroom_id, teacher_id, start_time, end_time):
@@ -484,9 +493,25 @@ class ScheduledClass(db.Model, SqlalchemySerializer):
         self.classroom_id = classroom_id
         self.teacher_id = teacher_id
 
-    def __repr__(self):
-        return "<id: {}, start: {}, end: {}, course_id: {}, classroom_id: {}, teacher_id: {}>".format(
-                self.id, self.start_time, self.end_time, self.course_id, self.classroom_id, self.teacher_id)
+    def serialize(self):
+        return {
+            'id': self.id,
+            'classroom': {
+                'value': str(self.classroom),
+                'id': self.classroom_id,
+            },
+            'course': {
+                'value': str(self.course),
+                'id': self.course_id,
+            },
+            'teacher': {
+                'value': str(self.teacher),
+                'id': self.teacher_id,
+            },
+            'students': [{'value': str(s), 'id': s.id} for s in self.students],
+            'start_time': self.start_time,
+            'end_time': self.end_time,
+        }
 
 
 class ScheduledClassesStudent(db.Model, SqlalchemySerializer):
