@@ -612,7 +612,7 @@ class Schedule(db.Model, SqlalchemySerializer):
     def serialize(self, expanded=False):
         ret = OrderedDict()
         ret['id'] = self.id
-        ret['name'] =  self.name,
+        ret['name'] = self.name,
         if expanded:
             ret['classes'] = [s.serialize() for s in self.scheduled_classes]
         return ret
@@ -652,27 +652,18 @@ class ScheduledClass(db.Model, SqlalchemySerializer):
 
     def __repr__(self):
         return "<id: {}, start: {}, end: {}, course_id: {}, classroom_id: {}, teacher_id: {}>".format(
-                self.id, self.start_time, self.end_time, self.course_id, self.classroom_id, self.teacher_id)
+               self.id, self.start_time, self.end_time, self.course_id, self.classroom_id, self.teacher_id)
 
     def serialize(self):
-        return {
-            'id': self.id,
-            'classroom': {
-                'value': str(self.classroom),
-                'id': self.classroom_id,
-            },
-            'course': {
-                'value': str(self.course),
-                'id': self.course_id,
-            },
-            'teacher': {
-                'value': str(self.teacher),
-                'id': self.teacher_id,
-            },
-            'students': [{'value': str(s), 'id': s.id} for s in self.students],
-            'start_time': self.start_time,
-            'end_time': self.end_time,
-        }
+        ret = OrderedDict()
+        ret['id'] = self.id,
+        ret['classroom'] = {'value': str(self.classroom), 'id': self.classroom_id}
+        ret['course'] = {'value': str(self.course), 'id': self.course_id}
+        ret['teacher'] = {'value': str(self.teacher), 'id': self.teacher_id}
+        ret['students'] = [{'value': str(s), 'id': s.id} for s in self.students]
+        ret['start_time'] = self.start_time
+        ret['end_time'] = self.end_time
+        return ret
 
 
 class ScheduledClassesStudent(db.Model, SqlalchemySerializer):
