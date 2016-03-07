@@ -604,6 +604,7 @@ class Schedule(db.Model, SqlalchemySerializer):
     __tablename__ = 'schedules'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(40), nullable=False)
+    created_at = db.Column(db.DateTime, nullable=False)
     # backref scheduled_classes
 
     def __str__(self):
