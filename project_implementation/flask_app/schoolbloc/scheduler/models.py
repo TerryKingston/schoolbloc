@@ -93,8 +93,24 @@ class Course(db.Model, SqlalchemySerializer):
     min_student_count = db.Column(db.Integer)
 
     # Relationships
-    classrooms_courses = db.relationship("ClassroomsCourse", back_populates="course",
+    classrooms_courses = db.relationship("ClassroomsCourse",
+                                         back_populates="course",
                                          passive_deletes=True)
+    courses_students = db.relationship("CoursesStudent",
+                                       back_populates="course",
+                                       passive_deletes=True)
+    courses_student_groups = db.relationship("CoursesStudentGroup",
+                                             back_populates="course",
+                                             passive_deletes=True)
+    courses_subjects = db.relationship("CoursesSubject",
+                                       back_populates="course",
+                                       passive_deletes=True)
+    courses_timeblocks = db.relationship("CoursesTimeblock",
+                                         back_populates="course",
+                                         passive_deletes=True)
+    courses_teachers = db.relationship("CoursesTeacher",
+                                       back_populates="course",
+                                       passive_deletes=True)
 
     def __str__(self):
         return "{}".format(self.name)
@@ -108,14 +124,32 @@ class Student(db.Model, SqlalchemySerializer):
     the app. The Student object holds student specific info for student
     users.
     """
+    # Name and rest constraints for API generation
     __tablename__ = 'students'
-    __restconstraints__ = ['students_student_groups', 'students_timeblocks', 'students_subjects', 'courses_students',
-                           'students_timeblocks', 'students_subjects']
+    __restconstraints__ = ['students_student_groups', 'students_timeblocks',
+                           'students_subjects', 'courses_students',
+                           'students_subjects']
+
+    # Columns
     id = db.Column(db.Integer, primary_key=True)
     first_name = db.Column(db.String(128), nullable=False)
     last_name = db.Column(db.String(128), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+
+    # Relationships
     user = db.relationship("User", backref="student")
+    courses_students = db.relationship("CoursesStudent",
+                                       back_populates="student",
+                                       passive_deletes=True)
+    students_student_groups = db.relationship("StudentsStudentGroup",
+                                              back_populates="student",
+                                              passive_deletes=True)
+    students_subjects = db.relationship("StudentsSubject",
+                                        back_populates="student",
+                                        passive_deletes=True)
+    students_timeblocks = db.relationship("StudentsTimeblock",
+                                          back_populates="student",
+                                          passive_deletes=True)
 
     def __str__(self):
         return "{} {}".format(self.first_name, self.last_name)
@@ -127,12 +161,29 @@ class StudentGroup(db.Model, SqlalchemySerializer):
 
     A Collection of students
     """
+    # Name and rest constraints for API generation
     __tablename__ = 'student_groups'
     __restconstraints__ = ['students_student_groups', 'student_groups_timeblocks',
                            'student_groups_subjects', 'courses_student_groups']
+
+    # Columns
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(128), nullable=False)
     students = association_proxy('students_student_groups', 'student')
+
+    # Relationships
+    courses_student_groups = db.relationship("CoursesStudentGroup",
+                                             back_populates="student_group",
+                                             passive_deletes=True)
+    student_groups_subjects = db.relationship("StudentGroupsSubject",
+                                              back_populates="student_group",
+                                              passive_deletes=True)
+    student_groups_timeblocks = db.relationship("StudentGroupsTimeblock",
+                                                back_populates="student_group",
+                                                passive_deletes=True)
+    students_student_groups = db.relationship("StudentsStudentGroup",
+                                              back_populates="student_group",
+                                              passive_deletes=True)
 
     def __str__(self):
         return "{}".format(self.name)
@@ -148,8 +199,7 @@ class Subject(db.Model, SqlalchemySerializer):
     __tablename__ = 'subjects'
     __restconstraints__ = ['courses_subjects', 'student_groups_subjects',
                            'students_subjects', 'subjects_timeblocks',
-                           'teachers_subjects', 'teachers_subjects',
-                           'subjects_timeblocks', 'classrooms_subjects']
+                           'teachers_subjects', 'classrooms_subjects']
 
     # Columns
     id = db.Column(db.Integer, primary_key=True)
@@ -159,6 +209,21 @@ class Subject(db.Model, SqlalchemySerializer):
     classrooms_subjects = db.relationship("ClassroomsSubject",
                                           back_populates="subject",
                                           passive_deletes=True)
+    courses_subjects = db.relationship("CoursesSubject",
+                                       back_populates="subject",
+                                       passive_deletes=True)
+    student_groups_subjects = db.relationship("StudentGroupsSubject",
+                                              back_populates="subject",
+                                              passive_deletes=True)
+    students_subjects = db.relationship("StudentsSubject",
+                                        back_populates="subject",
+                                        passive_deletes=True)
+    subjects_timeblocks = db.relationship("SubjectsTimeblock",
+                                          back_populates="subject",
+                                          passive_deletes=True)
+    teachers_subjects = db.relationship("TeachersSubject",
+                                        back_populates="subject",
+                                        passive_deletes=True)
 
     def __str__(self):
         return "{}".format(self.name)
@@ -189,6 +254,15 @@ class Teacher(db.Model, SqlalchemySerializer):
     classrooms_teachers = db.relationship("ClassroomsTeacher",
                                           back_populates="teacher",
                                           passive_deletes=True)
+    courses_teachers = db.relationship("CoursesTeacher",
+                                       back_populates="teacher",
+                                       passive_deletes=True)
+    teachers_subjects = db.relationship("TeachersSubject",
+                                        back_populates="teacher",
+                                        passive_deletes=True)
+    teachers_timeblocks = db.relationship("TeachersTimeblock",
+                                          back_populates="teacher",
+                                          passive_deletes=True)
 
     def __str__(self):
         return "{} {}".format(self.first_name, self.last_name)
@@ -217,6 +291,21 @@ class Timeblock(db.Model, SqlalchemySerializer):
     classrooms_timeblocks = db.relationship("ClassroomsTimeblock",
                                             back_populates="timeblock",
                                             passive_deletes=True)
+    courses_timeblocks = db.relationship("CoursesTimeblock",
+                                         back_populates="timeblock",
+                                         passive_deletes=True)
+    student_groups_timeblocks = db.relationship("StudentGroupsTimeblock",
+                                                back_populates="timeblock",
+                                                passive_deletes=True)
+    students_timeblocks = db.relationship("StudentsTimeblock",
+                                          back_populates="timeblock",
+                                          passive_deletes=True)
+    subjects_timeblocks = db.relationship("SubjectsTimeblock",
+                                          back_populates="timeblock",
+                                          passive_deletes=True)
+    teachers_timeblocks = db.relationship("TeachersTimeblock",
+                                          back_populates="timeblock",
+                                          passive_deletes=True)
 
     def __str__(self):
         return "{} {}".format(self.start_time, self.end_time)
@@ -230,12 +319,10 @@ class ClassroomsCourse(db.Model, SqlalchemySerializer):
     """ ORM object for linking table between classrooms and teachers tables """
     __tablename__ = 'classrooms_courses'
 
-    # Data Columns
+    # Columns
     id = db.Column(db.Integer, primary_key=True)
     active = db.Column(db.Boolean, nullable=False, default=True)
     priority = db.Column(db.String(128), nullable=False, default='low')
-
-    # Foreign Key Columns
     classroom_id = db.Column(db.Integer, db.ForeignKey('classrooms.id', ondelete='CASCADE'), nullable=False)
     course_id = db.Column(db.Integer, db.ForeignKey('courses.id', ondelete='CASCADE'), nullable=False)
 
@@ -248,12 +335,10 @@ class ClassroomsSubject(db.Model, SqlalchemySerializer):
     """ ORM object for linking table between classrooms and subjects tables """
     __tablename__ = 'classrooms_subjects'
 
-    # Data Columns
+    # Columns
     id = db.Column(db.Integer, primary_key=True)
     active = db.Column(db.Boolean, nullable=False, default=True)
     priority = db.Column(db.String(128), nullable=False, default='low')
-
-    # Foreign Key Columns
     classroom_id = db.Column(db.Integer, db.ForeignKey('classrooms.id', ondelete="CASCADE"), nullable=False)
     subject_id = db.Column(db.Integer, db.ForeignKey('subjects.id', ondelete="CASCADE"), nullable=False)
 
@@ -270,8 +355,6 @@ class ClassroomsTeacher(db.Model, SqlalchemySerializer):
     id = db.Column(db.Integer, primary_key=True)
     active = db.Column(db.Boolean, nullable=False, default=True)
     priority = db.Column(db.String(128), nullable=False, default='low')
-
-    # Foreign Key Columns
     classroom_id = db.Column(db.Integer, db.ForeignKey('classrooms.id', ondelete="CASCADE"), nullable=False)
     teacher_id = db.Column(db.Integer, db.ForeignKey('teachers.id', ondelete="CASCADE"), nullable=False)
 
@@ -290,8 +373,6 @@ class ClassroomsTimeblock(db.Model, SqlalchemySerializer):
     id = db.Column(db.Integer, primary_key=True)
     active = db.Column(db.Boolean, nullable=False, default=True)
     priority = db.Column(db.String(128), nullable=False, default='low')
-
-    # Foreign Key Columns
     classroom_id = db.Column(db.Integer, db.ForeignKey('classrooms.id', ondelete="CASCADE"), nullable=False)
     timeblock_id = db.Column(db.Integer, db.ForeignKey('timeblocks.id', ondelete="CASCADE"), nullable=False)
 
@@ -303,164 +384,216 @@ class ClassroomsTimeblock(db.Model, SqlalchemySerializer):
 class CoursesStudent(db.Model, SqlalchemySerializer):
     """ ORM object for linking table between courses and students tables """
     __tablename__ = 'courses_students'
+
+    # Columns
     id = db.Column(db.Integer, primary_key=True)
-    course_id = db.Column(db.Integer, db.ForeignKey('courses.id'), nullable=False)
-    student_id = db.Column(db.Integer, db.ForeignKey('students.id'), nullable=False)
     active = db.Column(db.Boolean, nullable=False, default=True)
     priority = db.Column(db.String(128), nullable=False, default='low')
-    student = db.relationship("Student", backref="courses_students")
-    course = db.relationship("Course", backref="courses_students")
+    course_id = db.Column(db.Integer, db.ForeignKey('courses.id', ondelete="CASCADE"), nullable=False)
+    student_id = db.Column(db.Integer, db.ForeignKey('students.id', ondelete="CASCADE"), nullable=False)
+
+    # Relationships
+    student = db.relationship("Student", back_populates="courses_students")
+    course = db.relationship("Course", back_populates="courses_students")
 
 
 class CoursesStudentGroup(db.Model, SqlalchemySerializer):
     """ ORM object for linking table between courses and student groups tables """
     __tablename__ = 'courses_student_groups'
+
+    # Columns
     id = db.Column(db.Integer, primary_key=True)
-    course_id = db.Column(db.Integer, db.ForeignKey('courses.id'), nullable=False)
-    student_group_id = db.Column(db.Integer, db.ForeignKey('student_groups.id'), nullable=False)
     active = db.Column(db.Boolean, nullable=False, default=True)
     priority = db.Column(db.String(128), nullable=False, default='low')
-    student_group = db.relationship("StudentGroup", backref="courses_student_groups")
-    course = db.relationship("Course", backref="courses_student_groups")
+    course_id = db.Column(db.Integer, db.ForeignKey('courses.id', ondelete="CASCADE"), nullable=False)
+    student_group_id = db.Column(db.Integer, db.ForeignKey('student_groups.id', ondelete="CASCADE"), nullable=False)
+
+    # Relationships
+    student_group = db.relationship("StudentGroup", back_populates="courses_student_groups")
+    course = db.relationship("Course", back_populates="courses_student_groups")
 
 
 class CoursesSubject(db.Model, SqlalchemySerializer):
     """ ORM object for linking table between courses and subjects tables """
     __tablename__ = 'courses_subjects'
+
+    # Columns
     id = db.Column(db.Integer, primary_key=True)
-    course_id = db.Column(db.Integer, db.ForeignKey('courses.id'), nullable=False)
-    subject_id = db.Column(db.Integer, db.ForeignKey('subjects.id'), nullable=False)
     active = db.Column(db.Boolean, nullable=False, default=True)
     priority = db.Column(db.String(128), nullable=False, default='low')
-    subject = db.relationship("Subject", backref="courses_subjects")
-    course = db.relationship("Course", backref="courses_subjects")
+    course_id = db.Column(db.Integer, db.ForeignKey('courses.id', ondelete="CASCADE"), nullable=False)
+    subject_id = db.Column(db.Integer, db.ForeignKey('subjects.id', ondelete="CASCADE"), nullable=False)
+
+    # Relationships
+    subject = db.relationship("Subject", back_populates="courses_subjects")
+    course = db.relationship("Course", back_populates="courses_subjects")
 
 
 class CoursesTimeblock(db.Model, SqlalchemySerializer):
     """ ORM Object for linking table between courses and timeblocks """
-    __tablename__= 'courses_timeblocks'
+    __tablename__ = 'courses_timeblocks'
+
+    # Columns
     id = db.Column(db.Integer, primary_key=True)
-    course_id = db.Column(db.Integer, db.ForeignKey('courses.id'), nullable=False)
-    timeblock_id = db.Column(db.Integer, db.ForeignKey('timeblocks.id'), nullable=False)
     active = db.Column(db.Boolean, nullable=False, default=True)
     priority = db.Column(db.String(128), nullable=False, default='low')
-    course = db.relationship("Course", backref='courses_timeblocks')
-    timeblock = db.relationship("Timeblock", backref='courses_timeblocks')
+    course_id = db.Column(db.Integer, db.ForeignKey('courses.id', ondelete="CASCADE"), nullable=False)
+    timeblock_id = db.Column(db.Integer, db.ForeignKey('timeblocks.id', ondelete="CASCADE"), nullable=False)
+
+    # Relationships
+    course = db.relationship("Course", back_populates='courses_timeblocks')
+    timeblock = db.relationship("Timeblock", back_populates='courses_timeblocks')
 
 
 class CoursesTeacher(db.Model, SqlalchemySerializer):
     """ ORM object for linking table between courses and teachers tables """
     __tablename__ = 'courses_teachers'
+
+    # Columns
     id = db.Column(db.Integer, primary_key=True)
-    course_id = db.Column(db.Integer, db.ForeignKey('courses.id'), nullable=False)
-    teacher_id = db.Column(db.Integer, db.ForeignKey('teachers.id'), nullable=False)
     active = db.Column(db.Boolean, nullable=False, default=True)
     priority = db.Column(db.String(128), nullable=False, default='low')
-    teacher = db.relationship("Teacher", backref="courses_teachers")
-    course = db.relationship("Course", backref="courses_teachers")
+    course_id = db.Column(db.Integer, db.ForeignKey('courses.id', ondelete="CASCADE"), nullable=False)
+    teacher_id = db.Column(db.Integer, db.ForeignKey('teachers.id', ondelete="CASCADE"), nullable=False)
+
+    # Relationships
+    teacher = db.relationship("Teacher", back_populates="courses_teachers")
+    course = db.relationship("Course", back_populates="courses_teachers")
 
 
 class StudentGroupsSubject(db.Model, SqlalchemySerializer):
     """ ORM object for linking table between student_groups and subjects """
     __tablename__ = 'student_groups_subjects'
+
+    # Columns
     id = db.Column(db.Integer, primary_key=True)
-    student_group_id = db.Column(db.Integer, db.ForeignKey('student_groups.id'), nullable=False)
-    subject_id = db.Column(db.Integer, db.ForeignKey('subjects.id'), nullable=False)
     active = db.Column(db.Boolean, nullable=False, default=True)
     priority = db.Column(db.String(128), nullable=False, default='low')
-    student_group = db.relationship("StudentGroup", backref="student_groups_subjects")
-    subject = db.relationship("Subject", backref="student_groups_subjects")
+    student_group_id = db.Column(db.Integer, db.ForeignKey('student_groups.id', ondelete="CASCADE"), nullable=False)
+    subject_id = db.Column(db.Integer, db.ForeignKey('subjects.id', ondelete="CASCADE"), nullable=False)
+
+    # Relationships
+    student_group = db.relationship("StudentGroup", back_populates="student_groups_subjects")
+    subject = db.relationship("Subject", back_populates="student_groups_subjects")
 
 
 class StudentGroupsTimeblock(db.Model, SqlalchemySerializer):
     """
     ORM Object for linking table between classrooms and timeblocks
     """
-    __tablename__= 'student_groups_timeblocks'
+    __tablename__ = 'student_groups_timeblocks'
+
+    # Columns
     id = db.Column(db.Integer, primary_key=True)
-    student_group_id = db.Column(db.Integer, db.ForeignKey('student_groups.id'), nullable=False)
-    timeblock_id = db.Column(db.Integer, db.ForeignKey('timeblocks.id'), nullable=False)
     active = db.Column(db.Boolean, nullable=False, default=True)
     priority = db.Column(db.String(128), nullable=False, default='low')
-    student_group = db.relationship("StudentGroup", backref='student_groups_timeblocks')
-    timeblock = db.relationship("Timeblock", backref='student_groups_timeblocks')
+    student_group_id = db.Column(db.Integer, db.ForeignKey('student_groups.id', ondelete="CASCADE"), nullable=False)
+    timeblock_id = db.Column(db.Integer, db.ForeignKey('timeblocks.id', ondelete="CASCADE"), nullable=False)
+
+    # Relationships
+    student_group = db.relationship("StudentGroup", back_populates='student_groups_timeblocks')
+    timeblock = db.relationship("Timeblock", back_populates='student_groups_timeblocks')
 
 
 class StudentsStudentGroup(db.Model, SqlalchemySerializer):
     """ ORM object for linking table between students and student_groups tables """
     __tablename__ = 'students_student_groups'
+
+    # Columns
     id = db.Column(db.Integer, primary_key=True)
-    student_id = db.Column(db.Integer, db.ForeignKey('students.id'), nullable=False)
-    student_group_id = db.Column(db.Integer, db.ForeignKey('student_groups.id'), nullable=False)
     priority = db.Column(db.String(128), nullable=False, default='low')
     active = db.Column(db.Boolean, nullable=False, default=True)
-    student = db.relationship("Student", backref="students_student_groups")
-    student_group = db.relationship("StudentGroup", backref="students_student_groups")
+    student_id = db.Column(db.Integer, db.ForeignKey('students.id', ondelete="CASCADE"), nullable=False)
+    student_group_id = db.Column(db.Integer, db.ForeignKey('student_groups.id', ondelete="CASCADE"), nullable=False)
+
+    # Relationships
+    student = db.relationship("Student", back_populates="students_student_groups")
+    student_group = db.relationship("StudentGroup", back_populates="students_student_groups")
 
 
 class StudentsSubject(db.Model, SqlalchemySerializer):
     """ ORM Object for linking table between students and subjects """
     __tablename__ = 'subjects_students'
+
+    # Columns
     id = db.Column(db.Integer, primary_key=True)
-    student_id = db.Column(db.Integer, db.ForeignKey('students.id'), nullable=False)
-    subject_id = db.Column(db.Integer, db.ForeignKey('subjects.id'), nullable=False)
     priority = db.Column(db.String(128), nullable=False, default='low')
     active = db.Column(db.Boolean, nullable=False, default=True)
-    student = db.relationship("Student", backref="students_subjects")
-    subject = db.relationship("Subject", backref="students_subjects")
+    student_id = db.Column(db.Integer, db.ForeignKey('students.id', ondelete="CASCADE"), nullable=False)
+    subject_id = db.Column(db.Integer, db.ForeignKey('subjects.id', ondelete="CASCADE"), nullable=False)
+
+    # Relationships
+    student = db.relationship("Student", back_populates="students_subjects")
+    subject = db.relationship("Subject", back_populates="students_subjects")
 
 
 class StudentsTimeblock(db.Model, SqlalchemySerializer):
     """
     ORM Object for linking table between classrooms and timeblocks
     """
-    __tablename__= 'students_timeblocks'
+    __tablename__ = 'students_timeblocks'
+
+    # Columns
     id = db.Column(db.Integer, primary_key=True)
-    student_id = db.Column(db.Integer, db.ForeignKey('students.id'), nullable=False)
-    timeblock_id = db.Column(db.Integer, db.ForeignKey('timeblocks.id'), nullable=False)
     active = db.Column(db.Boolean, nullable=False, default=True)
     priority = db.Column(db.String(128), nullable=False, default='low')
-    student = db.relationship("Student", backref='students_timeblocks')
-    timeblock = db.relationship("Timeblock", backref='students_timeblocks')
+    student_id = db.Column(db.Integer, db.ForeignKey('students.id', ondelete="CASCADE"), nullable=False)
+    timeblock_id = db.Column(db.Integer, db.ForeignKey('timeblocks.id', ondelete="CASCADE"), nullable=False)
+
+    # Relationships
+    student = db.relationship("Student", back_populates='students_timeblocks')
+    timeblock = db.relationship("Timeblock", back_populates='students_timeblocks')
 
 
 class SubjectsTimeblock(db.Model, SqlalchemySerializer):
     """
     ORM Object for linking table between subjects and timeblocks
     """
-    __tablename__= 'subjects_timeblocks'
+    __tablename__ = 'subjects_timeblocks'
+
+    # Columns
     id = db.Column(db.Integer, primary_key=True)
-    subject_id = db.Column(db.Integer, db.ForeignKey('subjects.id'), nullable=False)
-    timeblock_id = db.Column(db.Integer, db.ForeignKey('timeblocks.id'), nullable=False)
     active = db.Column(db.Boolean, nullable=False, default=True)
     priority = db.Column(db.String(128), nullable=False, default='low')
-    subject = db.relationship("Subject", backref='subjects_timeblocks')
-    timeblock = db.relationship("Timeblock", backref='subjects_timeblocks')
+    subject_id = db.Column(db.Integer, db.ForeignKey('subjects.id', ondelete="CASCADE"), nullable=False)
+    timeblock_id = db.Column(db.Integer, db.ForeignKey('timeblocks.id', ondelete="CASCADE"), nullable=False)
+
+    # Relationships
+    subject = db.relationship("Subject", back_populates='subjects_timeblocks')
+    timeblock = db.relationship("Timeblock", back_populates='subjects_timeblocks')
 
 
 class TeachersSubject(db.Model, SqlalchemySerializer):
     __tablename__ = 'teachers_subjects'
+
+    # Columns
     id = db.Column(db.Integer, primary_key=True)
-    teacher_id = db.Column(db.Integer, db.ForeignKey('teachers.id'), nullable=False)
-    subject_id = db.Column(db.Integer, db.ForeignKey('subjects.id'), nullable=False)
     active = db.Column(db.Boolean, nullable=False, default=True)
     priority = db.Column(db.String(128), nullable=False, default='low')
-    teacher = db.relationship("Teacher", backref="teachers_subjects")
-    subject = db.relationship("Subject", backref="teachers_subjects")
+    teacher_id = db.Column(db.Integer, db.ForeignKey('teachers.id', ondelete="CASCADE"), nullable=False)
+    subject_id = db.Column(db.Integer, db.ForeignKey('subjects.id', ondelete="CASCADE"), nullable=False)
+
+    # Relationships
+    teacher = db.relationship("Teacher", back_populates="teachers_subjects")
+    subject = db.relationship("Subject", back_populates="teachers_subjects")
 
 
 class TeachersTimeblock(db.Model, SqlalchemySerializer):
     """
     ORM Object for linking table between teachers and timeblocks
     """
-    __tablename__= 'teachers_timeblocks'
+    __tablename__ = 'teachers_timeblocks'
+
+    # Columns
     id = db.Column(db.Integer, primary_key=True)
-    teacher_id = db.Column(db.Integer, db.ForeignKey('teachers.id'), nullable=False)
-    timeblock_id = db.Column(db.Integer, db.ForeignKey('timeblocks.id'), nullable=False)
     active = db.Column(db.Boolean, nullable=False, default=True)
     priority = db.Column(db.String(128), nullable=False, default='low')
-    teacher = db.relationship("Teacher", backref='teachers_timeblocks')
-    timeblock = db.relationship("Timeblock", backref='teachers_timeblocks')
+    teacher_id = db.Column(db.Integer, db.ForeignKey('teachers.id', ondelete="CASCADE"), nullable=False)
+    timeblock_id = db.Column(db.Integer, db.ForeignKey('timeblocks.id', ondelete="CASCADE"), nullable=False)
+
+    # Relationships
+    teacher = db.relationship("Teacher", back_populates='teachers_timeblocks')
+    timeblock = db.relationship("Timeblock", back_populates='teachers_timeblocks')
 
 
 ############
