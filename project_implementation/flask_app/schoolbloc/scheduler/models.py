@@ -613,7 +613,7 @@ class Schedule(db.Model, SqlalchemySerializer):
     def serialize(self, expanded=False):
         ret = OrderedDict()
         ret['id'] = self.id
-        ret['name'] = self.name,
+        ret['name'] = self.name
         ret['created_at'] = str(self.created_at)
         if expanded:
             ret['classes'] = [s.serialize() for s in self.scheduled_classes]
