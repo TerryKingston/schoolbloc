@@ -5,9 +5,73 @@
  */
 angular.module('sbAngularApp').factory('schedulerService', ['$q', '$http', 'commonService', function($q, $http, commonService) {
 	var GET_SCHEDULES = "api/schedules";
+	var scheduleConfig = {
+		scheduleList: null,
+		selectedSchedule: null
+	};
 
 	return {
 		
+		getScheduleConfig: function() {
+			return scheduleConfig;
+		},
+
+		updateScheduleList: function() {
+			var url = commonService.conformUrl(GET_SCHEDULES);
+
+			$http.get(url).then(function(data) {
+				scheduleConfig.scheduleList = data.data;
+			}, function(data) {
+				// @TODO: how should we deal with this error?
+				scheduleConfig.scheduleList = [];
+			});
+		},
+
+		getSchedule: function(id) {
+			var deferred = $q.defer();
+			var url;
+
+			if (id === null) {
+				deferred.reject("No id given.");
+				return deferred.promise;
+			}
+
+			url = commonService.conformUrl(GET_SCHEDULES + "/" + id);
+
+			$http.get(url).then(function(data) {
+				scheduleConfig.selectedSchedule = data.data;
+				deferred.resolve(scheduleConfig.selectedSchedule);
+			}, function(data) {
+				// @TODO: how should we deal with this error?
+				scheduleConfig.selectedSchedule = null;
+				deferred.reject(data);
+			});
+			return deferred.promise;
+		},
+
+		deleteSchedule: function(id) {
+			var deferred = $q.defer();
+			var url;
+
+			if (id === null) {
+				deferred.reject("No id given.");
+				return deferred.promise;
+			}
+
+			url = commonService.conformUrl(GET_SCHEDULES + "/" + id);
+
+			$http.delete(url).then(function(data) {
+				scheduleConfig.scheduleList = data.data;
+				scheduleConfig.selectedSchedule = null;
+				deferred.resolve(data.data);
+			}, function(data) {
+				// @TODO: how should we deal with this error?
+				scheduleConfig.selectedSchedule = null;
+				deferred.reject(data);
+			});
+			return deferred.promise;
+		},
+
 		/**
 		 * Attemps to generate schedule based on facts and constraints.
 		 * @return {array} returns an array representing a fulfilled schedule
@@ -16,98 +80,13 @@ angular.module('sbAngularApp').factory('schedulerService', ['$q', '$http', 'comm
 			var deferred = $q.defer();
 			var url = commonService.conformUrl(GET_SCHEDULES);
 
-			$http.get(url).then(function(data) {
-				deferred.resolve(data.data[0].scheduled_classes);
-				// 	// TODO: for now, return the most recently generated schedule
-				// if (data.data && data.data.length) {
-				// 	deferred.resolve(data.data[data.data.length - 1]);
-				// 	return;
-				// }
-				// deferred.reject("Incorrect format");
+			$http.post(url).then(function(data) {
+				deferred.resolve(data.data);
 			}, function(data) {
-				deferred.reject(data.data);
+				deferred.reject(data);
 			});
 			
 			return deferred.promise;
-
-			// NOTE test method:
-			// var data = [ 
-			// 	{ 
-			// 		"teacher": {
-			// 			"id": 1, 
-			// 			"first_name": "Severus", 
-			// 			"last_name": "Snape"
-			// 		}, 
-			// 		"classroom": {
-			// 			"id": 1, 
-			// 			"room_number": "101", 
-			// 			"max_student_count": 15
-			// 		}, 
-			// 		"start_time": "0800", 
-			// 		"end_time": "1000", 
-			// 		"course": {
-			// 			"id": 1, 
-			// 			"name": "Remedial Potions", 
-			// 			"duration": 120, 
-			// 			"max_student_count": 30, 
-			// 			"min_student_count": 10
-			// 		},
-			// 		"students": [ 
-			// 			{
-			// 				"id": 1, 
-			// 				"first_name": "Harry", 
-			// 				"last_name": "Potter"
-			// 			}, 
-			// 			{
-			// 				"id": 2, 
-			// 				"first_name": "Ron", 
-			// 				"last_name": "Weasly"
-			// 			}
-			// 		] 
-			// 	},
-			// 	{ 
-			// 		"teacher": {
-			// 			"id": 1, 
-			// 			"first_name": "Albus", 
-			// 			"last_name": "Dumbledore"
-			// 		}, 
-			// 		"classroom": {
-			// 			"id": 1, 
-			// 			"room_number": "L103", 
-			// 			"max_student_count": 50
-			// 		}, 
-			// 		"start_time": "1400", 
-			// 		"end_time": "1600",
-			// 		"course": {
-			// 			"id": 1, 
-			// 			"name": "Defense Against Dark Arts", 
-			// 			"duration": 120, 
-			// 			"max_student_count": 120, 
-			// 			"min_student_count": 30
-			// 		},
-			// 		"students": [ 
-			// 			{
-			// 				"id": 1, 
-			// 				"first_name": "Harry", 
-			// 				"last_name": "Potter"
-			// 			}, 
-			// 			{
-			// 				"id": 3, 
-			// 				"first_name": "Amos", 
-			// 				"last_name": "Diggory"
-			// 			},
-			// 			{
-			// 				"id": 4, 
-			// 				"first_name": "Fleur", 
-			// 				"last_name": "Delacour"
-			// 			}
-			// 		]
-			// 	}
-			// ];
-			
-			// deferred.resolve(data);
-			
-			// return deferred.promise;
 		},
 
 		/**

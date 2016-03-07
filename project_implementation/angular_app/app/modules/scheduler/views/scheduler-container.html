@@ -1,35 +1,43 @@
 <section class="scheduler-container main-view-content">
   <div class="error-box" ng-if="config.error">{{config.error}}</div>
   <button class="btn btn-recommended" ng-click="generateSchedule()" ng-show="!config.showSchedule" ng-disabled="config.loadingGenerate">{{"schedulerModule.GENERATE_SCHEDULE" | translate}}</button>
-  <button class="btn btn-recommended" ng-click="exportSchedule()" ng-show="config.showSchedule">{{"schedulerModule.EXPORT_SCHEDULE" | translate}}</button>
-  <button class="btn btn-danger" ng-click="deleteSchedule()" ng-show="config.showSchedule">{{"schedulerModule.DELETE_SCHEDULE" | translate}}</button>
-  <!-- <button class="btn btn-secondary" ng-click="debugFlushDB()" ng-show="config.showSchedule">!!Flush DB</button> -->
-
-  <section class="table-wrapper" ng-if="config.showSchedule">
-    <table class="dynamic-table schedule-table">
-      <tr>
-        <th>{{"schedulerModule.COURSE" | translate}}</th>
-        <th>{{"schedulerModule.TEACHER" | translate}}</th>
-        <th>{{"schedulerModule.TIME" | translate}}</th>
-        <th>{{"schedulerModule.CLASSROOM" | translate}}</th>
-        <th>{{"schedulerModule.STUDENTS" | translate}}</th>
-      </tr>
-      <tr ng-repeat="row in schedule track by $index">
-        <td>{{row.course.name}}</td>
-        <td>{{row.teacher.first_name}} {{row.teacher.last_name}}</td>
-        <td>{{row.start_time}}-{{row.end_time}}</td>
-        <td>{{row.classroom.room_number}}</td>
-        <td class="table-cluster" ng-click="toggleCluster($index, 'students')">
-          <div class="table-cluster-closed" ng-show="!clusterList[$index].students.show">
-            <!-- TODO: this should be set to LOCALE after demo -->
-            <a href="">!!View {{row.students.length}} Students</a>
-          </div>
-          <div class="table-cluster-open" ng-show="clusterList[$index].students.show">
-            <div ng-repeat="student in row.students">{{student.first_name}} {{student.last_name}}</div>
-          </div>
-        </td>
-      </tr>
-    </table>
+  <section ng-if="scheduleConfig.scheduleList && scheduleConfig.scheduleList.length">
+    <div ng-repeat="schedule in scheduleList track by $index">
+      <a href="" ng-click="selectSchedule(schedule)">{{schedule.date}}</a>
+    </div>
   </section>
 
+
+  <section ng-if="config.showSchedule">
+    <button class="btn btn-recommended" ng-click="exportSchedule()">{{"schedulerModule.EXPORT_SCHEDULE" | translate}}</button>
+    <button class="btn btn-danger" ng-click="deleteSchedule()">{{"schedulerModule.DELETE_SCHEDULE" | translate}}</button>
+    <!-- <button class="btn btn-secondary" ng-click="debugFlushDB()" ng-show="config.showSchedule">!!Flush DB</button> -->
+
+    <section class="table-wrapper">
+      <table class="dynamic-table schedule-table">
+        <tr>
+          <th>{{"schedulerModule.COURSE" | translate}}</th>
+          <th>{{"schedulerModule.TEACHER" | translate}}</th>
+          <th>{{"schedulerModule.TIME" | translate}}</th>
+          <th>{{"schedulerModule.CLASSROOM" | translate}}</th>
+          <th>{{"schedulerModule.STUDENTS" | translate}}</th>
+        </tr>
+        <tr ng-repeat="row in schedule track by $index">
+          <td>{{row.course.name}}</td>
+          <td>{{row.teacher.first_name}} {{row.teacher.last_name}}</td>
+          <td>{{row.start_time}}-{{row.end_time}}</td>
+          <td>{{row.classroom.room_number}}</td>
+          <td class="table-cluster" ng-click="toggleCluster($index, 'students')">
+            <div class="table-cluster-closed" ng-show="!clusterList[$index].students.show">
+              <!-- TODO: this should be set to LOCALE after demo -->
+              <a href="">!!View {{row.students.length}} Students</a>
+            </div>
+            <div class="table-cluster-open" ng-show="clusterList[$index].students.show">
+              <div ng-repeat="student in row.students">{{student.first_name}} {{student.last_name}}</div>
+            </div>
+          </td>
+        </tr>
+      </table>
+    </section>
+  </section>
 </section>

@@ -28,7 +28,7 @@ angular.module('sbAngularApp')
 		}
 	};
 }])
-.directive('sbSchedulerModule', [ function() {
+.directive('sbSchedulerModule', ['schedulerService', function(schedulerService) {
 	/**
 	 * For manipulating the DOM
 	 * @param  scope   as configured in the controller
@@ -36,7 +36,13 @@ angular.module('sbAngularApp')
 	 * @param  attrs   hash object with key-value pairs of normalized attribute names and their corresponding attribute values.
 	 */
 	function link(scope, element, attrs) {
+		scope.$watch('config.subView', viewChange);
 
+		function viewChange() {
+			if (scope.config.subView === null && scope.config.view === 'scheduler') {
+				schedulerService.updateScheduleList();
+			}
+		}
 	}
 
 	/**

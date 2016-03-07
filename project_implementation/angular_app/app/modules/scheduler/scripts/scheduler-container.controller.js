@@ -21,9 +21,15 @@ angular.module('sbAngularApp')
 		showSchedule: false,
 		loadingGenerate: false,
 		error: null
-	}
+	};
 	$scope.schedule = [];
 	$scope.clusterList = [];
+
+	$scope.scheduleConfig = {};
+
+	$scope.selectSchedule = function(schedule) {
+		schedulerService.getSchedule(schedule.id);
+	};
 
 	/**
 	 * Refreshes the clusterList based on 
@@ -135,6 +141,13 @@ angular.module('sbAngularApp')
 		}
 		$scope.clusterList[index][rowAttribute].show = !$scope.clusterList[index][rowAttribute].show;
 	};
+
+	function getScheduleConfig() {
+		$scope.scheduleConfig = schedulerService.getScheduleConfig();
+	}
+
+	/**** initial setup ****/
+	getScheduleConfig();
 }])
 .directive('sbSchedulerContainer', [ function() {
 	/**
