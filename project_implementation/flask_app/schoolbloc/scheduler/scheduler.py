@@ -131,8 +131,8 @@ class Scheduler():
                 collisions = self.place_students(schedule, sched_constraints.student_requirement_set)
                 if len(collisions) == 0:
                     # finally make sure we met all the min student counts
-                    if not schedule.min_student_counts_satisfied():
-                        raise SchedulerNoSolution('Min student count not met')
+                    # if not schedule.min_student_counts_satisfied():
+                    #     raise SchedulerNoSolution('Min student count not met')
 
                     print('\033[92m Satisfied! (attempt {})\033[0m'.format(i))
                     print('\033[92m {} \033[0m'.format(schedule))
