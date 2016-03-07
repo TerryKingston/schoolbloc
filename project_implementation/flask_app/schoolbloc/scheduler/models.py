@@ -614,6 +614,7 @@ class Schedule(db.Model, SqlalchemySerializer):
         ret = OrderedDict()
         ret['id'] = self.id
         ret['name'] = self.name,
+        ret['created_at'] = self.created_at
         if expanded:
             ret['classes'] = [s.serialize() for s in self.scheduled_classes]
         return ret
