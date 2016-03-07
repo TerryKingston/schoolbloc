@@ -243,9 +243,6 @@ class ClassroomsCourse(db.Model, SqlalchemySerializer):
     classroom = db.relationship("Classroom", back_populates="classrooms_courses")
     course = db.relationship("Course", back_populates="classrooms_courses")
 
-    def __str__(self):
-        return "{} {}".format(self.classroom, self.course)
-
 
 class ClassroomsSubject(db.Model, SqlalchemySerializer):
     """ ORM object for linking table between classrooms and subjects tables """
@@ -264,9 +261,6 @@ class ClassroomsSubject(db.Model, SqlalchemySerializer):
     classroom = db.relationship("Classroom", back_populates="classrooms_subjects")
     subject = db.relationship("Subject", back_populates="classrooms_subjects")
 
-    def __str__(self):
-        return "{} {} {}".format(self.classroom, self.subject, self.priority)
-
 
 class ClassroomsTeacher(db.Model, SqlalchemySerializer):
     """ ORM object for linking table between classrooms and teachers tables """
@@ -284,9 +278,6 @@ class ClassroomsTeacher(db.Model, SqlalchemySerializer):
     # Relationships
     classroom = db.relationship("Classroom", back_populates="classrooms_teachers")
     teacher = db.relationship("Teacher", back_populates="classrooms_teachers")
-
-    def __str__(self):
-        return "{} {}".format(self.classroom, self.teacher)
 
 
 class ClassroomsTimeblock(db.Model, SqlalchemySerializer):
@@ -308,9 +299,6 @@ class ClassroomsTimeblock(db.Model, SqlalchemySerializer):
     classroom = db.relationship("Classroom", back_populates='classrooms_timeblocks')
     timeblock = db.relationship("Timeblock", back_populates='classrooms_timeblocks')
 
-    def __str__(self):
-        return "{} {}".format(self.classroom, self.timeblock)
-
 
 class CoursesStudent(db.Model, SqlalchemySerializer):
     """ ORM object for linking table between courses and students tables """
@@ -322,9 +310,6 @@ class CoursesStudent(db.Model, SqlalchemySerializer):
     priority = db.Column(db.String(128), nullable=False, default='low')
     student = db.relationship("Student", backref="courses_students")
     course = db.relationship("Course", backref="courses_students")
-
-    def __str__(self):
-        return "{} {}".format(self.student, self.course)
 
 
 class CoursesStudentGroup(db.Model, SqlalchemySerializer):
@@ -338,9 +323,6 @@ class CoursesStudentGroup(db.Model, SqlalchemySerializer):
     student_group = db.relationship("StudentGroup", backref="courses_student_groups")
     course = db.relationship("Course", backref="courses_student_groups")
 
-    def __str__(self):
-        return "{} {} {}".format(self.student_group, self.course, self.priority)
-
 
 class CoursesSubject(db.Model, SqlalchemySerializer):
     """ ORM object for linking table between courses and subjects tables """
@@ -352,9 +334,6 @@ class CoursesSubject(db.Model, SqlalchemySerializer):
     priority = db.Column(db.String(128), nullable=False, default='low')
     subject = db.relationship("Subject", backref="courses_subjects")
     course = db.relationship("Course", backref="courses_subjects")
-
-    def __str__(self):
-        return "{} {}".format(self.subject, self.course)
 
 
 class CoursesTimeblock(db.Model, SqlalchemySerializer):
@@ -368,9 +347,6 @@ class CoursesTimeblock(db.Model, SqlalchemySerializer):
     course = db.relationship("Course", backref='courses_timeblocks')
     timeblock = db.relationship("Timeblock", backref='courses_timeblocks')
 
-    def __str__(self):
-        return "{} {}".format(self.course, self.timeblock)
-
 
 class CoursesTeacher(db.Model, SqlalchemySerializer):
     """ ORM object for linking table between courses and teachers tables """
@@ -383,9 +359,6 @@ class CoursesTeacher(db.Model, SqlalchemySerializer):
     teacher = db.relationship("Teacher", backref="courses_teachers")
     course = db.relationship("Course", backref="courses_teachers")
 
-    def __str__(self):
-        return "{} {}".format(self.teacher, self.course)
-
 
 class StudentGroupsSubject(db.Model, SqlalchemySerializer):
     """ ORM object for linking table between student_groups and subjects """
@@ -397,9 +370,6 @@ class StudentGroupsSubject(db.Model, SqlalchemySerializer):
     priority = db.Column(db.String(128), nullable=False, default='low')
     student_group = db.relationship("StudentGroup", backref="student_groups_subjects")
     subject = db.relationship("Subject", backref="student_groups_subjects")
-
-    def __str__(self):
-        return "{} {}".format(self.student_group, self.subject)
 
 
 class StudentGroupsTimeblock(db.Model, SqlalchemySerializer):
@@ -415,9 +385,6 @@ class StudentGroupsTimeblock(db.Model, SqlalchemySerializer):
     student_group = db.relationship("StudentGroup", backref='student_groups_timeblocks')
     timeblock = db.relationship("Timeblock", backref='student_groups_timeblocks')
 
-    def __str__(self):
-        return "{} {}".format(self.student_group, self.timeblock)
-
 
 class StudentsStudentGroup(db.Model, SqlalchemySerializer):
     """ ORM object for linking table between students and student_groups tables """
@@ -430,9 +397,6 @@ class StudentsStudentGroup(db.Model, SqlalchemySerializer):
     student = db.relationship("Student", backref="students_student_groups")
     student_group = db.relationship("StudentGroup", backref="students_student_groups")
 
-    def __str__(self):
-        return "{} {}".format(self.student, self.student_group)
-
 
 class StudentsSubject(db.Model, SqlalchemySerializer):
     """ ORM Object for linking table between students and subjects """
@@ -444,9 +408,6 @@ class StudentsSubject(db.Model, SqlalchemySerializer):
     active = db.Column(db.Boolean, nullable=False, default=True)
     student = db.relationship("Student", backref="students_subjects")
     subject = db.relationship("Subject", backref="students_subjects")
-
-    def __str__(self):
-        return "{} {}".format(self.student, self.subject)
 
 
 class StudentsTimeblock(db.Model, SqlalchemySerializer):
@@ -462,9 +423,6 @@ class StudentsTimeblock(db.Model, SqlalchemySerializer):
     student = db.relationship("Student", backref='students_timeblocks')
     timeblock = db.relationship("Timeblock", backref='students_timeblocks')
 
-    def __str__(self):
-        return "{} {}".format(self.student, self.timeblock)
-
 
 class SubjectsTimeblock(db.Model, SqlalchemySerializer):
     """
@@ -479,9 +437,6 @@ class SubjectsTimeblock(db.Model, SqlalchemySerializer):
     subject = db.relationship("Subject", backref='subjects_timeblocks')
     timeblock = db.relationship("Timeblock", backref='subjects_timeblocks')
 
-    def __str__(self):
-        return "{} {}".format(self.subject, self.timeblock)
-
 
 class TeachersSubject(db.Model, SqlalchemySerializer):
     __tablename__ = 'teachers_subjects'
@@ -492,9 +447,6 @@ class TeachersSubject(db.Model, SqlalchemySerializer):
     priority = db.Column(db.String(128), nullable=False, default='low')
     teacher = db.relationship("Teacher", backref="teachers_subjects")
     subject = db.relationship("Subject", backref="teachers_subjects")
-
-    def __str__(self):
-        return "{} {}".format(self.teacher, self.subject)
 
 
 class TeachersTimeblock(db.Model, SqlalchemySerializer):
@@ -509,9 +461,6 @@ class TeachersTimeblock(db.Model, SqlalchemySerializer):
     priority = db.Column(db.String(128), nullable=False, default='low')
     teacher = db.relationship("Teacher", backref='teachers_timeblocks')
     timeblock = db.relationship("Timeblock", backref='teachers_timeblocks')
-
-    def __str__(self):
-        return "{} {}".format(self.teacher, self.timeblock)
 
 
 ############
@@ -567,6 +516,10 @@ class ScheduledClass(db.Model, SqlalchemySerializer):
         self.course_id = course_id
         self.classroom_id = classroom_id
         self.teacher_id = teacher_id
+
+    def __repr__(self):
+        return "<id: {}, start: {}, end: {}, course_id: {}, classroom_id: {}, teacher_id: {}>".format(
+                self.id, self.start_time, self.end_time, self.course_id, self.classroom_id, self.teacher_id)
 
     def serialize(self):
         return {
