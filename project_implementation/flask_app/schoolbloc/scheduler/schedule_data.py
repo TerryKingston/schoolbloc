@@ -1,5 +1,6 @@
 from schoolbloc.scheduler.models import Timeblock, ScheduledClass, Schedule, ScheduledClassesStudent
 from schoolbloc import db
+from datetime import datetime
 
 class ScheduleData:
     def __init__(self, class_list):
@@ -26,7 +27,7 @@ class ScheduleData:
         return rep
 
     def save(self):
-        db_schedule = Schedule(name="Sample Schedule")
+        db_schedule = Schedule(name="Sample Schedule", created_at=datetime.now())
         db.session.add(db_schedule)
         db.session.flush()
         for course_id, cls_list in self.scheduled_classes.items():

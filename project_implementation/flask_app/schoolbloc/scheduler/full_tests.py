@@ -15,6 +15,13 @@ class FullScheduleTests(unittest.TestCase):
         self.db_fd, app.config['DATABASE'] = tempfile.mkstemp()
         app.config['TESTING'] = True
         self.app = app.test_client()
+        self.reset_db()
+
+    def tearDown(self):
+        os.close(self.db_fd)
+        os.unlink(app.config['DATABASE'])
+
+    def reset_db(self):
         db.drop_all()
         db.create_all()
         # flaskr.init_db()
@@ -28,11 +35,6 @@ class FullScheduleTests(unittest.TestCase):
         db.session.add(User(username='student2', password='student2', role_type='student'))
         db.session.add(User(username='student3', password='student3', role_type='student'))
         db.session.commit()
-
-
-    def tearDown(self):
-        os.close(self.db_fd)
-        os.unlink(app.config['DATABASE'])
 
     # def setUp(self):
     #     """ Uses an in memory sqlite database for testing """
@@ -66,6 +68,19 @@ class FullScheduleTests(unittest.TestCase):
     #     return stud_list
         
     def test_vg_fall_2015_a_day(self):
+        self.build_vg_dataset()
+
+        # make the schedule
+        scheduler = Scheduler() 
+        
+        # self.assertEqual(scheduler.calc_course_count(), {})
+        # with timeout(seconds=30):
+        scheduler.make_schedule()
+        scheduler.make_schedule()
+        scheduler.make_schedule()
+
+    def build_vg_dataset(self):
+
         """ Full test of vanguards schedule A day data for fall semester of 2015 """
 
         timeblocks = TestUtil.generate_timeblocks(day_start_time=905,
@@ -415,12 +430,7 @@ class FullScheduleTests(unittest.TestCase):
 
         db.session.commit()
 
-        # make the schedule
-        scheduler = Scheduler() 
         
-        # self.assertEqual(scheduler.calc_course_count(), {})
-        # with timeout(seconds=30):
-        scheduler.make_schedule()
 
         # did we get a student-course maping for the CoursesStudentGroups?
         # s_ids = []
