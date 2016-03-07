@@ -37,23 +37,80 @@
       </tr>
     </thead> -->
     <tbody>
-      <tr ng-repeat="row in tableView.rows track by $index" ng-init="rowIndex = $index" ng-mouseenter="moveHeader(rowIndex)" ng-class="{'header-row': row.type === 'header'}">
+      <tr ng-repeat="row in tableView.rows track by $index" ng-init="rowIndex = $index" ng-mouseenter="moveHeader(rowIndex)" ng-class="{'header-row': row.type === 'header', 'delete-warning-row': (rowIndex === selectedRow.index && selectedRow.delete)}">
         <th ng-if="row.type === 'header'" ng-show="header.show" ng-repeat="header in tableView.headers track by $index">
           <div ng-if="header.value !== 'disabled'">{{header.text}}</div>
         </th>
-        <!-- if editor -->
+        <!-- EDITOR -->
         <td class="table-editor" id="constraintEditor" colspan="{{tableView.headers.length}}" ng-if="row.type === 'editor'">
-          <div class="table-editor-flex">
+          <!-- DELETE row -->
+          <div class="table-editor-flex" ng-if="row.subType === 'delete-row'">
             <div class="table-editor-left">
               <section>
-                <label class="table-editor-list">
-                  {{'dynamicTable.CONSTRAINT_LIST' | translate}}:
-                  <input list="constraintList" placeholder="{{'dynamicTable.CHOOSE_CONSTRAINT' | translate}}" ng-model="row.value">
-                  <datalist id="constraintList">
-                    <option ng-repeat="constraint in row.constraints track by $index" value="{{constraint}}">{{constraint}}</option>
-                  </datalist>
+                <div class="editor-prompt-text">{{'dynamicTable.CONFIRM_REMOVE_ROW' | translate}}</div>
+              </section>
+              <div class="editor-error" ng-if="row.error" ng-bind-html="row.error"></div>
+              <section class="flex-bottom-btn">
+                <button class="btn btn-danger" ng-click="confirmDeleteRow()">{{'dynamicTable.REMOVE' | translate}}</button>
+                <button class="btn btn-secondary" ng-click="cancelEditor()">{{"dynamicTable.CANCEL" | translate}}</button>
+              </section>
+            </div>
+          </div>
+          <!-- DELETE property or constraint -->
+          <div class="table-editor-flex" ng-if="row.subType === 'delete-property' || row.subType === 'delete-constraint'">
+            <div class="table-editor-left">
+              <section>
+                <div class="editor-prompt-text">{{'dynamicTable.CONFIRM_REMOVE' | translate}}</div>
+                <div class="editor-prompt-entry" ng-if="row.factType !== 'minMax'">
+                  <span class="prompt-entry-key">{{translations[row.key]}}:</span>
+                  <span class="prompt-entry-value">{{row.value}}</span>
+                </div>
+                <div class="editor-prompt-entry" ng-if="row.factType === 'minMax' && row.value.selectedMin">
+                  <span class="prompt-entry-key">{{translations[row.key]}} ({{'dynamicTable.MIN' | translate}}):</span>
+                  <span class="prompt-entry-value">{{row.value.min}}</span>
+                </div>
+                <div class="editor-prompt-entry" ng-if="row.factType === 'minMax' && !row.value.selectedMin">
+                  <span class="prompt-entry-key">{{translations[row.key]}} ({{'dynamicTable.MAX' | translate}}):</span>
+                  <span class="prompt-entry-value">{{row.value.max}}</span>
+                </div>
+              </section>
+              <div class="editor-error" ng-if="row.error" ng-bind-html="row.error"></div>
+              <section class="flex-bottom-btn">
+                <button class="btn btn-danger" ng-click="confirmDeleteEntry()">{{'dynamicTable.REMOVE' | translate}}</button>
+                <button class="btn btn-secondary" ng-click="cancelEditor()">{{"dynamicTable.CANCEL" | translate}}</button>
+              </section>
+            </div>
+          </div>
+          <!-- EDIT property or constraint -->
+          <div class="table-editor-flex" ng-if="row.subType === 'edit-property' || row.subType === 'edit-constraint' || row.subType === 'add-property' || row.subType === 'add-constraint'" >
+            <div class="table-editor-left">
+              <section>
+                <label>
+                  <div>{{translations[row.key]}}</div>
+                  <input type="text" ng-if="row.factType === 'text' || row.factType === 'uniqueText'" ng-model="row.value" ng-blur="checkInput(row)">
+                  <input type="number" ng-if="row.factType === 'number'" min="0" ng-model="row.value" ng-blur="checkInput(row)"> 
+                  <input type="text" placeholder="{{'dynamicTable.DATE_PLACEHOLDER' | translate}}" ng-if="row.factType === 'date'" ng-model="row.value" ng-blur="checkInput(row)">
+                  <div class="editor-min-max" ng-if="row.factType === 'minMax'">
+                    <div>{{"dynamicTable.MIN" | translate}}:</div>
+                    <input class="editor-min" type="number" min="0" ng-model="row.value.min" ng-blur="checkInput(row, 'min')">
+                    <div>{{"dynamicTable.MAX" | translate}}:</div>
+                    <input type="number" min="1" ng-model="row.value.max" ng-blur="checkInput(row, 'max')">
+                  </div>
+                  <input ng-if="row.factType == 'startEnd'" type="text" ng-model="row.value" ng-blur="checkInput(row)">
+                  <div class="editor-constraint" ng-if="row.factType === 'dropdown'">
+                    <input list="editorDropdown" ng-disabled="!row.possibleAnswers.length" ng-model="row.value" ng-blur="checkInput(row)">
+                    <datalist id="editorDropdown">
+                      <option ng-repeat="option in row.possibleAnswers track by $index" value="{{option}}">{{option}}</option>
+                    </datalist>
+                  </div>
+                  <div class="editor-constraint" ng-if="row.factType === 'constraint'">
+                    <input list="editorConstraint" ng-disabled="!row.facts.values.length" ng-model="row.value" ng-blur="checkInput(row)">
+                    <datalist id="editorConstraint">
+                      <option ng-repeat="factValue in row.facts.values" value="{{factValue}}">{{factValue}}</option>
+                    </datalist>
+                  </div>
                 </label>
-                <div class="table-editor-priority">
+                <div class="table-editor-priority" ng-if="(row.subType === 'edit-constraint' || row.subType === 'add-constraint') && row.priority !== 'forced'">
                   <button class="priority-help">?</button>
                   <section class="priority-help-tooltip">
                     <div class="tooltip-text">
@@ -69,9 +126,10 @@
                   <button class="priority-low" ng-class="{'priority-active': row.priority === 'low'}" placeholder="{{'dynamicTable.LOW' | translate}}" ng-click="changePriority(row, 'low')">{{'dynamicTable.ABBR_LOW' | translate}}</button>
                 </div>
               </section>
+              <div class="editor-error" ng-if="row.error" ng-bind-html="row.error"></div>
               <section class="flex-bottom-btn">
-                <button class="btn btn-recommended" ng-click="submitEditor(row, false)" ng-disabled="!row.value">{{'dynamicTable.SAVE' | translate}}</button>
-                <button class="btn btn-recommended" ng-bind-html="'dynamicTable.SAVE_ANOTHER' | translate" ng-click="submitEditor(row, true)" ng-disabled="!row.value"></button>
+                <button class="btn btn-recommended" ng-click="confirmEditEntry(false)" ng-disabled="!row.value">{{'dynamicTable.SAVE' | translate}}</button>
+                <!-- <button class="btn btn-recommended" ng-if="row.subType === 'add-constraint'" ng-bind-html="'dynamicTable.SAVE_ANOTHER' | translate" ng-click="confirmEditEntry(true)" ng-disabled="!row.value"></button> -->
                 <button class="btn btn-secondary" ng-click="cancelEditor()">{{"dynamicTable.CANCEL" | translate}}</button>
               </section>
             </div>
@@ -83,49 +141,54 @@
             </div>
           </div>
         </td>
-        <!-- if value-->
-        <td ng-if="!row.type" ng-repeat="rowEntry in row track by $index" ng-show="tableView.headers[$index].show">
-          <!-- cluster - NO entries -->
-          <div class="table-cluster table-cluster-add" ng-if="rowEntry.type === 'array' && !rowEntry.value" ng-click="addConstraint(rowIndex)">
+        <!-- if property or constraint -->
+        <td ng-if="!row.type" ng-repeat="rowEntry in row track by $index" ng-init="rowEntryIndex = $index" ng-show="tableView.headers[$index].show">
+          <!-- constraint (cluster - NO entries) -->
+          <div class="table-cluster table-cluster-add" ng-if="rowEntry.type === 'array' && !rowEntry.value" ng-click="addConstraint(rowIndex, rowEntryIndex)">
             <a class="table-cluster-add-text" href="">{{'dynamicTable.ADD' | translate}}</a>
             <button class="table-cluster-add-btn" alt="{{'dynamicTable.ADD' | translate}}"></button>
           </div>
-          <!-- cluster - entries -->
+          <!-- constraint (cluster - entries) -->
           <div class="table-cluster" ng-if="rowEntry.type === 'array' && rowEntry.value">
             <a href="" ng-click="toggleShow(rowEntry)">{{rowEntry.text}}</a>
-            <button class="table-cluster-add-btn" ng-click="addConstraint(rowIndex)" alt="{{'dynamicTable.ADD' | translate}}"></button>
+            <button class="table-cluster-add-btn" ng-click="addConstraint(rowIndex, rowEntryIndex)" alt="{{'dynamicTable.ADD' | translate}}"></button>
             </div>
             <div class="table-cluster-open" ng-show="rowEntry.show">
-              <div class="entry" ng-repeat="element in rowEntry.value track by $index">
-                <div class="entry-options">
-                  <button class="entry-edit" alt="{{'dynamicTable.EDIT' | translate}}" ng-click="editConstraint(rowIndex)"></button>
-                  <button class="entry-disable" alt="{{'dynamicTable.DISABLE' | translate}}"></button>
-                  <button class="entry-delete" alt="{{'dynamicTable.DELETE' | translate}}"></button>
+              <div class="entry" ng-repeat="element in rowEntry.value track by $index" ng-class="{'entry-editer-selection': element.isSelected}">
+                <div class="priority-label">
+                  <div class="priority-mandatory" placeholder="{{'dynamicTable.MANDATORY' | translate}}" ng-if="element.priority === 'mandatory'">{{'dynamicTable.ABBR_MANDATORY' | translate}}</div>
+                  <div class="priority-high" placeholder="{{'dynamicTable.HIGH' | translate}}" ng-if="element.priority === 'high'">{{'dynamicTable.ABBR_HIGH' | translate}}</div>
+                  <div class="priority-low" placeholder="{{'dynamicTable.LOW' | translate}}" ng-if="element.priority === 'low'">{{'dynamicTable.ABBR_LOW' | translate}}</div>
                 </div>
-                <div>{{element.value}}</div>
+                <div class="entry-options">
+                  <button class="entry-edit" alt="{{'dynamicTable.EDIT' | translate}}" ng-click="editConstraint(rowIndex, rowEntryIndex, element)"></button>
+                  <button class="entry-disable" alt="{{'dynamicTable.DISABLE' | translate}}" ng-class="{'entry-disable-active': !element.active, 'entry-disable-inactive': element.active}" ng-click="disableConstraint(rowIndex, rowEntryIndex, element)"></button>
+                  <button class="entry-delete" alt="{{'dynamicTable.DELETE' | translate}}" ng-click="deleteConstraint(rowIndex, rowEntryIndex, element)"></button>
+                </div>
+                <span ng-class="{'entry-disabled': !element.active}">{{element.value}}</span>
               </div>
             </div>
           </div>
-          <!-- not a cluster (value) -->
+          <!-- property (not a cluster) -->
           <div ng-if="!rowEntry.type">
             <!-- value -->
             <div ng-if="rowEntry" class="entry">
               <div class="entry-options">
-                <button class="entry-edit" alt="{{'dynamicTable.EDIT' | translate}}"></button>
-                <button class="entry-delete" alt="{{'dynamicTable.DELETE' | translate}}"></button>
+                <button class="entry-edit" alt="{{'dynamicTable.EDIT' | translate}}" ng-click="editProperty(rowIndex, rowEntryIndex, rowEntry)"></button>
+                <button class="entry-delete" alt="{{'dynamicTable.DELETE' | translate}}" ng-if="!factTypeConfigMap[tableView.headers[rowEntryIndex].value].required" ng-click="deleteProperty(rowIndex, rowEntryIndex, rowEntry)"></button>
               </div>
               <div>{{rowEntry}}</div>
             </div>
             <!-- no value -->
             <div ng-if="!rowEntry" class="no-entry">
-              <button class="no-entry-edit" alt="{{'dynamicTable.EDIT' | translate}}"></button>
+              <button class="no-entry-edit" alt="{{'dynamicTable.EDIT' | translate}}" ng-click="addProperty(rowIndex, rowEntryIndex)"></button>
               </div>
             </div>
           </div>
           <!-- disable btn and other btn-size options -->
           <div ng-if="rowEntry.type === 'disabled'">
-            <button class="table-row-disabled" ng-class="{'table-row-disabled-active': rowEntry.value, 'table-row-disabled-inactive': !rowEntry.value}" alt="{{'dynamicTable.DISABLE' | translate}}"></button>
-            <button class="table-row-delete" alt="{{'dynamicTable.DELETE' | translate}}"></button>
+            <button class="table-row-disabled" ng-class="{'table-row-disabled-active': rowEntry.value, 'table-row-disabled-inactive': !rowEntry.value}" alt="{{'dynamicTable.DISABLE' | translate}}" ng-click="disableRow(rowIndex)"></button>
+            <button class="table-row-delete" alt="{{'dynamicTable.DELETE' | translate}}" ng-click="deleteRow(rowIndex)"></button>
           </div>
         </td>
       </tr>

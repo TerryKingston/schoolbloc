@@ -1,5 +1,5 @@
 from flask import Blueprint
-from flask.ext.restful import Api
+from flask.ext.restful import Api, Resource, abort
 from schoolbloc import auth_required
 from schoolbloc.scheduler.restexport import TestRest, TestRestList
 from schoolbloc.scheduler.models import *
@@ -51,14 +51,11 @@ def register_rest_orm(orm, get='admin', put='admin', post='admin',
     api.add_resource(cls, '/api/{}/<int:orm_id>'.format(name))
     api.add_resource(cls_list, '/api/{}'.format(name))
 
-    # Print api docs
-    #print(cls.generate_docs(cls))
-    #print(cls_list.generate_docs(cls_list))
-
     # Return the classes, so that the caller can overwrite a function if desired
     return cls, cls_list
 
 
+# Expose facts and constraints over rest api
 register_rest_orm(Course)
 register_rest_orm(CoursesStudent)
 register_rest_orm(CoursesTeacher)
@@ -67,9 +64,6 @@ register_rest_orm(CoursesSubject)
 register_rest_orm(Classroom)
 register_rest_orm(ClassroomsTeacher)
 register_rest_orm(ClassroomsCourse)
-register_rest_orm(Schedule)
-register_rest_orm(ScheduledClass)
-register_rest_orm(ScheduledClassesStudent)
 register_rest_orm(StudentGroup)
 register_rest_orm(Student)
 register_rest_orm(StudentsStudentGroup)
@@ -84,3 +78,35 @@ register_rest_orm(StudentsTimeblock)
 register_rest_orm(SubjectsTimeblock)
 register_rest_orm(TeachersTimeblock)
 register_rest_orm(Timeblock)
+
+
+# Rest api for full schedules
+class ScheduleApi(Resource):
+
+    def get(self, schedule_id):
+        schedule = Schedule.query.get(schedule_id)
+        if not schedule:
+            abort(404, message="Schedule {} not found".format(schedule_id))
+        return schedule.serialize(expanded=True)
+
+    def delete(self, schedule_id):
+        schedule = Schedule.query.get(schedule_id)
+        if not schedule:
+            abort(404, message="Schedule {} not found".format(schedule_id))
+        db.session.delete(schedule)
+        db.session.commit()
+        return {'success': True}
+
+
+class ScheduleListApi(Resource):
+
+    def get(self):
+        schedules = Schedule.query.all()
+        return [s.serialize(expanded=False) for s in schedules]
+
+    def post(self):
+        # TODO this is what calls into terrys code
+        return {'success', True}
+
+api.add_resource(ScheduleApi, '/api/schedules/<int:schedule_id>')
+api.add_resource(ScheduleListApi, '/api/schedules')

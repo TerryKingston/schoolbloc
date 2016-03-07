@@ -71,7 +71,8 @@ def _find_constraint_mapping_table(orm, constraint_str):
     teacher = db.relationship("Teacher", backref="classrooms_teachers")
     """
     if not hasattr(orm, '__restconstraints__'):
-        abort(400, message='no __restconstraints__ defined on {}'.format(orm))
+        abort(400, message='Received constraint {}, however no constraints are defined '
+                           'in __restconstraints__. Is the model correct?'.format(constraint_str))
     for table_constraint in orm.__restconstraints__:
         mapper_table = orm.__mapper__.relationships.get(table_constraint)
         relationships = mapper_table.mapper.relationships.keys()
@@ -352,8 +353,7 @@ class TestRestList(Resource):
                 kwargs[param] = request_json[param]
                 del request_json[param]
             else:
-                abort(400, message='Required param {} for {} not in payload'
-                      .format(param, parser['name']))
+                abort(400, message='Required param {} not in payload'.format(param))
         for param in parser['optional_params']:
             if param in request_json:
                 kwargs[param] = request_json[param]

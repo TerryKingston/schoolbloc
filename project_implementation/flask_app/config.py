@@ -11,6 +11,7 @@ from datetime import timedelta
 DEBUG = True
 SECRET_KEY = 'supersecretkeychangeme'
 SQLALCHEMY_DATABASE_URI = 'sqlite:///../schoolbloc.db'
+SQLALCHEMY_TRACK_MODIFICATIONS = False
 TMP_FOLDER = '///../tmp/'
 SESSION_KEY_BITS = 128
 SESSION_SET_TTL = True
@@ -18,3 +19,4 @@ ERROR_404_HELP = False
 JWT_EXPIRATION_DELTA = timedelta(hours=24)
 UPLOAD_FOLDER = '/tmp'
 ALLOWED_EXTENSIONS = set(['csv'])
+RESTFUL_JSON = {'sort_keys': False}

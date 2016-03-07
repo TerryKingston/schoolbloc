@@ -12,7 +12,10 @@ angular.module('sbAngularApp').factory('commonService', ['$translate', '$window'
 	function checkMilitaryTime(time) {
 		var timeValue;
 		// needs four characters: 0000
-		if (!time || !time.length || time.length !== 4) {
+		if (Number.isInteger(time)) {
+			time = time + "";
+		}
+		if (!time || !time.length || time.length > 4) {
 			return false;
 		}
 		timeValue = parseInt(time);
@@ -161,6 +164,10 @@ angular.module('sbAngularApp').factory('commonService', ['$translate', '$window'
 		 * @return {string}       Formatted string.
 		 */
 		format: function(value, args) {
+			// sometimes, single values are sent in instead of an array.
+			if (!Array.isArray(args)) {
+				args = [args];
+			}
 			// @TODO: later, directly allow for: "This is a {0}".format("string")
 			// CITE: https://gist.github.com/litera/9634958
 			return value.replace(/\{(\d+)\}/g, function (match, capture) {
@@ -229,6 +236,18 @@ angular.module('sbAngularApp').factory('commonService', ['$translate', '$window'
 
 		/**
 		 * Formats military time (0000 - 2359) into standard time format
+		 * @param  {string} time military time
+		 * @return {string}       Returns 'ERROR' if improper format of time, or returns string of time in standard format.
+		 */
+		formatSingleTimeM2S: function(time) {
+			if (!checkMilitaryTime(time)) {
+				return "ERROR";
+			}
+			return generateStandardTime(time);
+		},
+
+		/**
+		 * Formats military time (0000 - 2359) into standard time format
 		 * @param  {string} start military time start
 		 * @param  {string} end   military time end
 		 * @return {string}       Returns 'ERROR' if improper format of timeRange, or returns string of start-end time in standard format.
@@ -240,6 +259,24 @@ angular.module('sbAngularApp').factory('commonService', ['$translate', '$window'
 				return "ERROR";
 			}
 			return generateStandardTime(start) + "-" + generateStandardTime(end);
+		},
+
+		/**
+		 * Formats standard time into military time (0000 - 2359)
+		 * @param  {string} time standard format
+		 * @return {string}       	  Returns 'ERROR' if improper format of time, or a string in military time.
+		 */
+		formatSingleTimeS2M: function(time) {
+			var timeArr;
+			// requires a '-'' to be a range
+			if (!time || time.indexOf('-') >= 0) {
+				return 'ERROR';
+			}
+			// make sure start and end are valid
+			if (!checkStandardTime(time)) {
+				return "ERROR";
+			}
+			return generateMilitaryTime(time);
 		},
 
 		/**

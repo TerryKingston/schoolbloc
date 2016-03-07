@@ -42,7 +42,16 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 			// 	multipleValues: false
 			// },
 			{
-				key: "timeblock",
+				key: "teacher",
+				value: null,
+				error: null,
+				required: false,
+				type: "constraint",
+				multipleValues: true,
+				facts: null
+			},
+			{
+				key: "course",
 				value: null,
 				error: null,
 				required: false,
@@ -60,16 +69,7 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 				facts: null
 			},
 			{
-				key: "teacher",
-				value: null,
-				error: null,
-				required: false,
-				type: "constraint",
-				multipleValues: true,
-				facts: null
-			},
-			{
-				key: "course",
+				key: "timeblock",
 				value: null,
 				error: null,
 				required: false,
@@ -107,15 +107,6 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 				multipleValues: false
 			},
 			{
-				key: "timeblock",
-				value: null,
-				error: null,
-				required: false,
-				type: "constraint",
-				multipleValues: true,
-				facts: null
-			},
-			{
 				key: "subject",
 				value: null,
 				error: null,
@@ -134,7 +125,34 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 				facts: null
 			},
 			{
+				key: "student",
+				value: null,
+				error: null,
+				required: false,
+				type: "constraint",
+				multipleValues: true,
+				facts: null
+			},
+			{
+				key: "student_group",
+				value: null,
+				error: null,
+				required: false,
+				type: "constraint",
+				multipleValues: true,
+				facts: null
+			},
+			{
 				key: "classroom",
+				value: null,
+				error: null,
+				required: false,
+				type: "constraint",
+				multipleValues: true,
+				facts: null
+			},
+			{
+				key: "timeblock",
 				value: null,
 				error: null,
 				required: false,
@@ -168,25 +186,282 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 				type: "text",
 				multipleValues: false
 			},
+			// {
+			// 	key: "gender",
+			// 	value: null,
+			// 	error: null,
+			// 	required: true,
+			// 	type: "dropdown",
+			// 	multipleValues: false,
+			// 	possibleAnswers: ["female", "male", "other"]
+			// },
+			// {
+			// 	key: "date_of_birth",
+			// 	value: null,
+			// 	error: null,
+			// 	required: true,
+			// 	type: "date",
+			// 	multipleValues: false
+			// },
 			{
-				key: "gender",
+				key: "student_group",
 				value: null,
 				error: null,
-				required: true,
-				type: "dropdown",
-				multipleValues: false,
-				possibleAnswers: ["female", "male", "other"]
+				required: false,
+				type: "constraint",
+				multipleValues: true,
+				facts: null
 			},
 			{
-				key: "date_of_birth",
+				key: "course",
+				value: null,
+				error: null,
+				required: false,
+				type: "constraint",
+				multipleValues: true,
+				facts: null
+			},
+			{
+				key: "subject",
+				value: null,
+				error: null,
+				required: false,
+				type: "constraint",
+				multipleValues: true,
+				facts: null
+			},
+			
+			{
+				key: "timeblock",
+				value: null,
+				error: null,
+				required: false,
+				type: "constraint",
+				multipleValues: true,
+				facts: null
+			}
+		],
+		"student_group": [
+			{
+				key: "name",
 				value: null,
 				error: null,
 				required: true,
-				type: "date",
+				type: "uniqueText",
 				multipleValues: false
 			},
 			{
+				key: "student",
+				value: null,
+				error: null,
+				required: false,
+				type: "constraint",
+				multipleValues: true,
+				facts: null
+			},
+			{
+				key: "course",
+				value: null,
+				error: null,
+				required: false,
+				type: "constraint",
+				multipleValues: true,
+				facts: null
+			},
+			{
+				key: "subject",
+				value: null,
+				error: null,
+				required: false,
+				type: "constraint",
+				multipleValues: true,
+				facts: null
+			},
+			{
 				key: "timeblock",
+				value: null,
+				error: null,
+				required: false,
+				type: "constraint",
+				multipleValues: true,
+				facts: null
+			}
+		],
+		"subject": [
+			{
+				key: "name",
+				value: null,
+				error: null,
+				required: true,
+				type: "uniqueText",
+				multipleValues: false
+			},
+			{
+				key: "course",
+				value: null,
+				error: null,
+				required: false,
+				type: "constraint",
+				multipleValues: true,
+				facts: null
+			},
+			{
+				key: "teacher",
+				value: null,
+				error: null,
+				required: false,
+				type: "constraint",
+				multipleValues: true,
+				facts: null
+			},
+			{
+				key: "student",
+				value: null,
+				error: null,
+				required: false,
+				type: "constraint",
+				multipleValues: true,
+				facts: null
+			},
+			{
+				key: "student_group",
+				value: null,
+				error: null,
+				required: false,
+				type: "constraint",
+				multipleValues: true,
+				facts: null
+			},
+			{
+				key: "classroom",
+				value: null,
+				error: null,
+				required: false,
+				type: "constraint",
+				multipleValues: true,
+				facts: null
+			},
+			{
+				key: "timeblock",
+				value: null,
+				error: null,
+				required: false,
+				type: "constraint",
+				multipleValues: true,
+				facts: null
+			}
+		],
+		"teacher": [
+			// {
+			// 	key: "user_id",
+			// 	value: null,
+			// 	error: null,
+			// 	required: true,
+			// 	type: "uniqueText",
+			// 	multipleValues: false
+			// },
+			{
+				key: "first_name",
+				value: null,
+				error: null,
+				required: true,
+				type: "text",
+				multipleValues: false
+			},
+			{
+				key: "last_name",
+				value: null,
+				error: null,
+				required: true,
+				type: "text",
+				multipleValues: false
+			},
+			{
+				key: "start_time",
+				value: null,
+				required: false,
+				type: "startEnd",
+				multipleValues: false
+			},
+			{
+				key: "end_time",
+				value: null,
+				required: false,
+				type: "startEnd",
+				multipleValues: false
+			},
+			{
+				key: "course",
+				value: null,
+				error: null,
+				required: false,
+				type: "constraint",
+				multipleValues: true,
+				facts: null
+			},
+			{
+				key: "subject",
+				value: null,
+				error: null,
+				required: false,
+				type: "constraint",
+				multipleValues: true,
+				facts: null
+			},
+			{
+				key: "classroom",
+				value: null,
+				error: null,
+				required: false,
+				type: "constraint",
+				multipleValues: true,
+				facts: null
+			},
+			{
+				key: "timeblock",
+				value: null,
+				error: null,
+				required: false,
+				type: "constraint",
+				multipleValues: true,
+				facts: null
+			}
+		],
+		"timeblock": [
+			{
+				key: "start_time",
+				value: null,
+				required: true,
+				type: "startEnd",
+				multipleValues: false
+			},
+			{
+				key: "end_time",
+				value: null,
+				required: true,
+				type: "startEnd",
+				multipleValues: false
+			},
+			// {
+			// 	key: "days",
+			// 	value: null,
+			// 	error: null,
+			// 	required: true,
+			// 	type: "dropdown",
+			// 	multipleValues: true,
+			// 	possibleAnswers: ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday", "weekdays"]
+			// },
+			{
+				key: "teacher",
+				value: null,
+				error: null,
+				required: false,
+				type: "constraint",
+				multipleValues: true,
+				facts: null
+			},
+			{
+				key: "student",
 				value: null,
 				error: null,
 				required: false,
@@ -211,124 +486,6 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 				type: "constraint",
 				multipleValues: true,
 				facts: null
-			}
-		],
-		"student_group": [
-			{
-				key: "name",
-				value: null,
-				error: null,
-				required: true,
-				type: "uniqueText",
-				multipleValues: false
-			},
-			{
-				key: "timeblock",
-				value: null,
-				error: null,
-				required: false,
-				type: "constraint",
-				multipleValues: true,
-				facts: null
-			},
-			{
-				key: "student",
-				value: null,
-				error: null,
-				required: false,
-				type: "constraint",
-				multipleValues: true,
-				facts: null
-			},
-			{
-				key: "course",
-				value: null,
-				error: null,
-				required: false,
-				type: "constraint",
-				multipleValues: true,
-				facts: null
-			}
-		],
-		"subject": [
-			{
-				key: "name",
-				value: null,
-				error: null,
-				required: true,
-				type: "uniqueText",
-				multipleValues: false
-			},
-			{
-				key: "timeblock",
-				value: null,
-				error: null,
-				required: false,
-				type: "constraint",
-				multipleValues: true,
-				facts: null
-			},
-			{
-				key: "course",
-				value: null,
-				error: null,
-				required: false,
-				type: "constraint",
-				multipleValues: true,
-				facts: null
-			},
-			{
-				key: "teacher",
-				value: null,
-				error: null,
-				required: false,
-				type: "constraint",
-				multipleValues: true,
-				facts: null
-			},
-			{
-				key: "classroom",
-				value: null,
-				error: null,
-				required: false,
-				type: "constraint",
-				multipleValues: true,
-				facts: null
-			}
-		],
-		"teacher": [
-			{
-				key: "user_id",
-				value: null,
-				error: null,
-				required: true,
-				type: "uniqueText",
-				multipleValues: false
-			},
-			{
-				key: "first_name",
-				value: null,
-				error: null,
-				required: true,
-				type: "text",
-				multipleValues: false
-			},
-			{
-				key: "last_name",
-				value: null,
-				error: null,
-				required: true,
-				type: "text",
-				multipleValues: false
-			},
-			{
-				key: "timeblock",
-				value: null,
-				error: null,
-				required: false,
-				type: "constraint",
-				multipleValues: true,
-				facts: null
 			},
 			{
 				key: "subject",
@@ -339,67 +496,7 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 				multipleValues: true,
 				facts: null
 			},
-			{
-				key: "course",
-				value: null,
-				error: null,
-				required: false,
-				type: "constraint",
-				multipleValues: true,
-				facts: null
-			},
-			{
-				key: "classroom",
-				value: null,
-				error: null,
-				required: false,
-				type: "constraint",
-				multipleValues: true,
-				facts: null
-			}
-		],
-		"timeblock": [
-			{
-				key: "start_time",
-				value: null,
-				required: true,
-				type: "startEnd",
-				multipleValues: false
-			},
-			{
-				key: "end_time",
-				value: null,
-				required: true,
-				type: "startEnd",
-				multipleValues: false
-			},
-			{
-				key: "days",
-				value: null,
-				error: null,
-				required: true,
-				type: "dropdown",
-				multipleValues: true,
-				possibleAnswers: ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday", "weekdays"]
-			},
-			{
-				key: "subject",
-				value: null,
-				error: null,
-				required: false,
-				type: "constraint",
-				multipleValues: true,
-				facts: null
-			},
-			{
-				key: "course",
-				value: null,
-				error: null,
-				required: false,
-				type: "constraint",
-				multipleValues: true,
-				facts: null
-			},
+			
 			{
 				key: "classroom",
 				value: null,
@@ -487,6 +584,10 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 
 	return {
 
+		getValueWithIdString: function(value, id) {
+			return getDubValue(value, id);
+		},
+
 		addFact: function(factEntry, factType) {
 			var url;
 			var deferred = $q.defer();
@@ -527,6 +628,100 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 			url = commonService.conformUrl(url);
 
 			$http.post(url, factEntry).then(function(data) {
+				deferred.resolve(data.data);
+			}, function(data) {
+				deferred.reject(data.data);
+			});
+			return deferred.promise;
+		},
+
+		editFact: function(factEntry, factId, factType) {
+			var url;
+			var deferred = $q.defer();
+			if (!factEntry || !factId) {
+				deferred.reject("ERROR: needed parameter not provided.")
+				return deferred.promise;
+			}
+
+			// convert URL as for each fact type
+			if (factType === "timeblock") {
+				url = TIME_URL;
+			}
+			else if (factType === "subject") {
+				url = SUBJECT_URL;
+			}
+			else if (factType === "teacher") {
+				url = TEACHER_URL;
+			}
+			else if (factType === "student") {
+				url = STUDENT_URL;
+			}
+			else if (factType === "classroom") {
+				url = CLASSROOM_URL;
+			}
+			else if (factType === "course" || factType === "required course" ) {
+				url = COURSE_URL;
+			}
+			else if (factType === "student_group") {
+				url = STUDENT_GROUP_URL;
+			}
+			else {
+				console.error("tableEntriesService.addFact: unexpected state: invalid factType: " + factType);
+				deferred.reject("ERROR: Unexpected front-end input.");
+				return deferred.promise;
+			}
+
+			// conform the url to change the port
+			url = commonService.conformUrl(url + "/" + factId);
+
+			$http.put(url, factEntry).then(function(data) {
+				deferred.resolve(data.data);
+			}, function(data) {
+				deferred.reject(data.data);
+			});
+			return deferred.promise;
+		},
+
+		deleteFact: function(factId, factType) {
+			var url;
+			var deferred = $q.defer();
+			if (!factId) {
+				deferred.reject("ERROR: needed parameter not provided.")
+				return deferred.promise;
+			}
+
+			// convert URL as for each fact type
+			if (factType === "timeblock") {
+				url = TIME_URL;
+			}
+			else if (factType === "subject") {
+				url = SUBJECT_URL;
+			}
+			else if (factType === "teacher") {
+				url = TEACHER_URL;
+			}
+			else if (factType === "student") {
+				url = STUDENT_URL;
+			}
+			else if (factType === "classroom") {
+				url = CLASSROOM_URL;
+			}
+			else if (factType === "course" || factType === "required course" ) {
+				url = COURSE_URL;
+			}
+			else if (factType === "student_group") {
+				url = STUDENT_GROUP_URL;
+			}
+			else {
+				console.error("tableEntriesService.addFact: unexpected state: invalid factType: " + factType);
+				deferred.reject("ERROR: Unexpected front-end input.");
+				return deferred.promise;
+			}
+
+			// conform the url to change the port
+			url = commonService.conformUrl(url + "/" + factId);
+
+			$http.delete(url).then(function(data) {
 				deferred.resolve(data.data);
 			}, function(data) {
 				deferred.reject(data.data);
@@ -609,9 +804,24 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 				// reset entries
 				tableConfig.entries = null;
 				self.getTableFacts(tableSelection).then(function (data) {
+					var i, j, timeSplit;
+					// fix time to be in standard time
+					for (i = 0; i < data.length; i++) {
+						if (data[i].start_time || data[i].start_time === 0) {
+							data[i].start_time = commonService.formatSingleTimeM2S(data[i].start_time);
+						}
+						if (data[i].end_time || data[i].end_time === 0) {
+							data[i].end_time = commonService.formatSingleTimeM2S(data[i].end_time);
+						}
+						if (data[i].timeblock && data[i].timeblock.length) {
+							for (j = 0; j < data[i].timeblock.length; j++) {
+								timeSplit = data[i].timeblock[j].value.split(" ");
+								data[i].timeblock[j].value = commonService.formatTimeM2S(timeSplit[0], timeSplit[1]);
+							}
+						}
+					}
 					tableConfig.entries = data;
 					// DEBUG: go ahead and add disabled for show casing
-					var i;
 					for (i = 0; i < tableConfig.entries.length; i++) {
 						tableConfig.entries[i].disabled = Math.random() < 0.2;
 					}

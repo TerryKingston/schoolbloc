@@ -3,9 +3,10 @@
 	"key": "value",  // Updates this key to a new value
 	"constraint_type": [
 		{
-            "method": "add, edit, delete",
+            "method": "add | edit | delete",
             "id": 3,  // If add, id of foreign constraint. If delete or edit, id of constraint itself
-			"key": "value",  // Sets key to value (add and edit only)
+			"active": false, // whether or not the constraint is disabled
+			"priority": "mandatory | high | low"
 		},
 	],
 }

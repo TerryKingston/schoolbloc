@@ -95,6 +95,7 @@ angular.module('sbAngularApp')
 	}
 
 	function checkUniqueText(factInput) {
+		var i;
 		if (checkRequired(factInput)) {
 			return;
 		}
@@ -102,6 +103,13 @@ angular.module('sbAngularApp')
 		// @TODO: you've already received a list of all facts of this type 
 		// (it's used in the dynamic table directive)
 		// just check against that list
+		for (i = 0; i < $scope.tableConfig.entries.length; i++) {
+			// "" + becuase it could be an int
+			if (factInput.value === ("" + $scope.tableConfig.entries[i][factInput.key])) {
+				factInput.error = $scope.translations.ERROR_UNIQUE;
+				break;
+			}
+		}
 	}
 
 	function checkDate(factInput) {
@@ -210,6 +218,7 @@ angular.module('sbAngularApp')
 		for (i = 0; i < factInput.facts.values.length; i++) {
 			if (factInput.facts.values[i] === factInput.value) {
 				factInput.error = null;
+				return;
 			}
 		}
 	}
@@ -295,6 +304,9 @@ angular.module('sbAngularApp')
 				fe['min_' + ftc[i].key] = ftc[i].value.min;
 				fe['max_' + ftc[i].key] = ftc[i].value.max;
 			}
+			else if (ftc[i].type === 'startEnd') {
+				fe[ftc[i].key] = commonService.formatSingleTimeS2M(ftc[i].value);
+			}
 			else {
 				fe[ftc[i].key] = ftc[i].value;
 			}
@@ -308,7 +320,7 @@ angular.module('sbAngularApp')
 			if (!addAnotherFact) {
 				$scope.addFactConfig.showAddFact = false;
 			}
-			// update the table to contain the number information
+			// update the table to contain the new information
 			tableEntriesService.updateTableConfig("fact", $scope.tableConfig.tableSelection);
 		}, function(error) {
 			$translate("schedulerModule.ADD_FACT_ERROR").then(function (translation) {
@@ -528,6 +540,10 @@ angular.module('sbAngularApp')
 
 		$translate("schedulerModule.ERROR_REQUIRED").then(function (translation) {
 			$scope.translations.ERROR_REQUIRED = translation;
+		});
+
+		$translate("schedulerModule.ERROR_UNIQUE").then(function (translation) {
+			$scope.translations.ERROR_UNIQUE = translation;
 		});
 	};
 
