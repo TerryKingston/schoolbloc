@@ -27,58 +27,33 @@ angular.module('sbAngularApp')
 
 	$scope.scheduleConfig = {};
 
-	$scope.selectSchedule = function(schedule) {
-		schedulerService.getSchedule(schedule.id);
+	$scope.selectSchedule = function(id) {
+		schedulerService.getSchedule(id);
 	};
-
-	/**
-	 * Refreshes the clusterList based on 
-	 * @param  {array} schedule schedule to replace.  If none, schedule is removed
-	 */
-	function refreshSchedule(schedule) {
-		var i;
-
-		if (!schedule) {
-			$scope.schedule = [];
-			$scope.config.showSchedule = false;
-			$scope.clusterList = [];
-			return;
-		}
-		$scope.schedule = schedule;
-		// only show it if the schedule has entries
-		$scope.config.showSchedule = !!$scope.schedule.length;
-
-		// match clusterList size to size of schedule rows
-		$scope.clusterList = [];
-		if ($scope.schedule.length) {
-			for (i = 0; i < $scope.schedule.length; i++) {
-				$scope.clusterList.push({});
-			}
-		}
-	}
 
 	/**
 	 * Request the generated schedule from the back-end
 	 */
 	$scope.generateSchedule = function() {
 		$scope.config.loadingGenerate = true;
-		schedulerService.generateSchedule().then(function(data) {
-			$scope.config.loadingGenerate = false;
-			$scope.config.error = null;
-			refreshSchedule(data);
-		}, function(error) {
-			$scope.config.loadingGenerate = false;
-			$scope.config.error = "Error: could not generate a schedule."
-			refreshSchedule();
-		});
+		// schedulerService.generateSchedule().then(function(data) {
+		// 	$scope.config.loadingGenerate = false;
+		// 	$scope.config.error = null;
+		// }, function(error) {
+		// 	$scope.config.loadingGenerate = false;
+		// 	$scope.config.error = "Error: could not generate a schedule."
+		// });
 	};
 
 	/**
 	 * Remove the schedule from the front-end view
 	 */
 	$scope.deleteSchedule = function() {
-		// @TODO: actually remove the schedule
-		refreshSchedule();
+		schedulerService.deleteSchedule().then(function(data) {
+			$scope.config.error = null;
+		}, function(error) {
+			$scope.config.error = "Error: could not generate a schedule."
+		});		
 	};
 
 	/**
@@ -129,17 +104,16 @@ angular.module('sbAngularApp')
 
 	/**
 	 * Toggles whether or not to show a row cluster (like 21 students)
-	 * @param  {number} index        of row
+	 * @param  {number} row        with rowAttribute
 	 * @param  {string} rowAttribute name of attribute that is clustered
-	 * @return {[type]}              [description]
 	 */
-	$scope.toggleCluster = function(index, rowAttribute) {
-		if (!$scope.clusterList[index][rowAttribute]) {
-			$scope.clusterList[index][rowAttribute] = {
-				show: false
-			}; 
+	$scope.toggleCluster = function(row, rowAttribute) {
+		if (!row["show_" + rowAttribute]) {
+			row["show_" + rowAttribute] = true;
 		}
-		$scope.clusterList[index][rowAttribute].show = !$scope.clusterList[index][rowAttribute].show;
+		else {
+			row["show_" + rowAttribute] = !row["show_" + rowAttribute];
+		}
 	};
 
 	function getScheduleConfig() {

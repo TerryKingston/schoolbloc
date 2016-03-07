@@ -39,7 +39,15 @@ angular.module('sbAngularApp').factory('schedulerService', ['$q', '$http', 'comm
 			url = commonService.conformUrl(GET_SCHEDULES + "/" + id);
 
 			$http.get(url).then(function(data) {
+				var i;
+				var ss;
 				scheduleConfig.selectedSchedule = data.data;
+				ss = scheduleConfig.selectedSchedule;
+				// update the schedule's time to match standard time
+				for (i = 0; i < ss.classes.length; i++) {
+					ss.classes[i].time = commonService.formatTimeM2S(ss.classes[i].start_time, ss.classes[i].end_time);
+				}
+
 				deferred.resolve(scheduleConfig.selectedSchedule);
 			}, function(data) {
 				// @TODO: how should we deal with this error?

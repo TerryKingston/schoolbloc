@@ -192,5 +192,6 @@
 	"schedulerModule.ERROR_NEG_VALUE": "Cannot have a negative value.",
 	"schedulerModule.ERROR_MIN_MAX": "Cannot have the min > max.",
 	"schedulerModule.ERROR_REQUIRED": "Input is required.",
-	"schedulerModule.ERROR_UNIQUE": "Input is not unique."
+	"schedulerModule.ERROR_UNIQUE": "Input is not unique.",
+	"schedulerModule.VIEW_SCHEDULES": "Select a schedule to view:"
 }

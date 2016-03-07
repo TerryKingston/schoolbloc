@@ -1328,3 +1328,22 @@ textarea {
 .input-row .input-row-min-max .input-row-min {
     margin-right: 5px;
 }
+
+.scheduler-container .schedule-list {
+	margin-top: 40px;
+}
+
+.scheduler-container .schedule-list div {
+	height: 35px;
+	line-height: 35px;
+}
+
+.scheduler-container .schedule-list div a {
+	font-size: 16px;
+	color: $primary-link;
+	font-weight: 700;
+}
+
+.scheduler-container .schedule-list div a:hover {
+	text-decoration: underline;
+}
