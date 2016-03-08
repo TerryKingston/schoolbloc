@@ -234,7 +234,6 @@ angular.module('sbAngularApp')
 			$scope.addFactConfig.factEntry = null;
 			return;
 		}
-
 		// remove any empty added input fields
 		for (i = 0; i < ftc.length; i++) {
 			if (ftc[i].addedValue && (ftc[i].value === null || ftc[i].value === "")) {
@@ -304,7 +303,7 @@ angular.module('sbAngularApp')
 				fe['min_' + ftc[i].key] = ftc[i].value.min;
 				fe['max_' + ftc[i].key] = ftc[i].value.max;
 			}
-			else if (ftc[i].type === 'startEnd') {
+			else if (ftc[i].type === 'startEnd' && (ftc[i].value !== null && ftc[i].value !== "")) {
 				fe[ftc[i].key] = commonService.formatSingleTimeS2M(ftc[i].value);
 			}
 			else {

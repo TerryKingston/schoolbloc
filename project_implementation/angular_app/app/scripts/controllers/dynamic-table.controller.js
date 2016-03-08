@@ -712,7 +712,7 @@ angular.module('sbAngularApp')
       
       // get constraint lists
       if ($scope.editor.factType === 'constraint') {
-        $scope.editor.facts = $scope.$scope.factTypeConfigMap[$scope.editor.key].facts;
+        $scope.editor.facts = $scope.factTypeConfigMap[$scope.editor.key].facts;
       }
     }
 
