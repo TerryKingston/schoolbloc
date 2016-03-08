@@ -68,6 +68,9 @@ class Classroom(db.Model, SqlalchemySerializer):
     classrooms_timeblocks = db.relationship("ClassroomsTimeblock",
                                             back_populates="classroom",
                                             passive_deletes=True)
+    scheduled_class = db.relationship("ScheduledClass",
+                                      back_populates="classroom",
+                                      passive_deletes=True)
 
     def __str__(self):
         return "{}".format(self.room_number)
@@ -88,9 +91,9 @@ class Course(db.Model, SqlalchemySerializer):
     # Columns
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(128), nullable=False)
-    duration = db.Column(db.Integer)  # optional duration, will use global default if not specified
-    max_student_count = db.Column(db.Integer)
     min_student_count = db.Column(db.Integer)
+    max_student_count = db.Column(db.Integer)
+    duration = db.Column(db.Integer)  # optional duration, will use global default if not specified
 
     # Relationships
     classrooms_courses = db.relationship("ClassroomsCourse",
@@ -111,6 +114,9 @@ class Course(db.Model, SqlalchemySerializer):
     courses_teachers = db.relationship("CoursesTeacher",
                                        back_populates="course",
                                        passive_deletes=True)
+    scheduled_class = db.relationship("ScheduledClass",
+                                      back_populates="course",
+                                      passive_deletes=True)
 
     def __str__(self):
         return "{}".format(self.name)
@@ -150,6 +156,9 @@ class Student(db.Model, SqlalchemySerializer):
     students_timeblocks = db.relationship("StudentsTimeblock",
                                           back_populates="student",
                                           passive_deletes=True)
+    scheduled_classes_student = db.relationship("ScheduledClassesStudent",
+                                                back_populates="student",
+                                                passive_deletes=True)
 
     def __str__(self):
         return "{} {}".format(self.first_name, self.last_name)
@@ -263,6 +272,9 @@ class Teacher(db.Model, SqlalchemySerializer):
     teachers_timeblocks = db.relationship("TeachersTimeblock",
                                           back_populates="teacher",
                                           passive_deletes=True)
+    scheduled_class = db.relationship("ScheduledClass",
+                                        back_populates="teacher",
+                                        passive_deletes=True)
 
     def __str__(self):
         return "{} {}".format(self.first_name, self.last_name)
@@ -605,7 +617,8 @@ class Schedule(db.Model, SqlalchemySerializer):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(40), nullable=False)
     created_at = db.Column(db.DateTime, nullable=False)
-    # backref scheduled_classes
+    scheduled_classes = db.relationship("ScheduledClass", back_populates="schedule",
+                                        passive_deletes=True)
 
     def __str__(self):
         return "{}".format(self.name)
@@ -613,7 +626,8 @@ class Schedule(db.Model, SqlalchemySerializer):
     def serialize(self, expanded=False):
         ret = OrderedDict()
         ret['id'] = self.id
-        ret['name'] = self.name,
+        ret['name'] = self.name
+        ret['created_at'] = str(self.created_at)
         if expanded:
             ret['classes'] = [s.serialize() for s in self.scheduled_classes]
         return ret
@@ -627,17 +641,22 @@ class ScheduledClass(db.Model, SqlalchemySerializer):
     """
     __tablename__ = 'scheduled_classes'
     id = db.Column(db.Integer, primary_key=True)
-    schedule_id = db.Column(db.Integer, db.ForeignKey('schedules.id'), nullable=False)
-    schedule = db.relationship('Schedule', backref='scheduled_classes')
-    classroom_id = db.Column(db.Integer, db.ForeignKey('classrooms.id'), nullable=False)
-    classroom = db.relationship("Classroom", backref="scheduled_class")
-    teacher_id = db.Column(db.Integer, db.ForeignKey('teachers.id'), nullable=False)
-    teacher = db.relationship("Teacher", backref="scheduled_class")
-    course_id = db.Column(db.Integer, db.ForeignKey('courses.id'), nullable=False)
-    course = db.relationship("Course", backref="scheduled_class")
-    students = association_proxy('scheduled_classes_student', 'student')
     start_time = db.Column(db.Integer, nullable=False)  # time in 24 hr format (i.e. 1454)
     end_time = db.Column(db.Integer, nullable=False)
+    schedule_id = db.Column(db.Integer, db.ForeignKey('schedules.id', ondelete="CASCADE"), nullable=False)
+    classroom_id = db.Column(db.Integer, db.ForeignKey('classrooms.id', ondelete="CASCADE"), nullable=False)
+    teacher_id = db.Column(db.Integer, db.ForeignKey('teachers.id', ondelete="CASCADE"), nullable=False)
+    course_id = db.Column(db.Integer, db.ForeignKey('courses.id', ondelete="CASCADE"), nullable=False)
+
+    schedule = db.relationship('Schedule', back_populates='scheduled_classes')
+    classroom = db.relationship("Classroom", back_populates="scheduled_class")
+    teacher = db.relationship("Teacher", back_populates="scheduled_class")
+    course = db.relationship("Course", back_populates="scheduled_class")
+    scheduled_classes_student = db.relationship("ScheduledClassesStudent",
+                                                back_populates="scheduled_class",
+                                                passive_deletes=True)
+
+    students = association_proxy('scheduled_classes_student', 'student')
 
     def __init__(self, schedule_id, course_id, classroom_id, teacher_id, start_time, end_time):
         # validate start and end time
@@ -675,10 +694,11 @@ class ScheduledClassesStudent(db.Model, SqlalchemySerializer):
     """
     __tablename__ = 'scheduled_classes_students'
     id = db.Column(db.Integer, primary_key=True)
-    scheduled_class_id = db.Column(db.Integer, db.ForeignKey('scheduled_classes.id'), nullable=False)
-    scheduled_class = db.relationship("ScheduledClass", backref="scheduled_classes_student")
-    student_id = db.Column(db.Integer, db.ForeignKey('students.id'), nullable=False)
-    student = db.relationship("Student", backref="scheduled_classes_student")
+    scheduled_class_id = db.Column(db.Integer, db.ForeignKey('scheduled_classes.id', ondelete="CASCADE"), nullable=False)
+    student_id = db.Column(db.Integer, db.ForeignKey('students.id', ondelete="CASCADE"), nullable=False)
+
+    scheduled_class = db.relationship("ScheduledClass", back_populates="scheduled_classes_student")
+    student = db.relationship("Student", back_populates="scheduled_classes_student")
 
     def __str__(self):
         return "{} {}".format(self.scheduled_class, self.student)
