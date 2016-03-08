@@ -377,14 +377,14 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 				multipleValues: false
 			},
 			{
-				key: "start_time",
+				key: "avail_start_time",
 				value: null,
 				required: false,
 				type: "startEnd",
 				multipleValues: false
 			},
 			{
-				key: "end_time",
+				key: "avail_end_time",
 				value: null,
 				required: false,
 				type: "startEnd",
