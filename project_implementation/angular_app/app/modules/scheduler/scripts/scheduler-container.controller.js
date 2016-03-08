@@ -52,7 +52,7 @@ angular.module('sbAngularApp')
 		schedulerService.deleteSchedule().then(function(data) {
 			$scope.config.error = null;
 		}, function(error) {
-			$scope.config.error = "Error: could not generate a schedule."
+			$scope.config.error = "Error: could not generate a schedule.";
 		});		
 	};
 
@@ -61,22 +61,16 @@ angular.module('sbAngularApp')
 	 * @todo : allow for other file types in export
 	 */
 	$scope.exportSchedule = function() {	
-		var scheduleId = "", filename, data, blob,
-			e, a;	
-
-		if (!$scope.schedule || !$scope.schedule.length) {
-			console.log("scheduler-container.exportSchedule: reached an unexpected state");
-			refreshSchedule();
-			return;
-		}
+		var filename, scheduleId = "", data, blob,
+			e, a;
 
 		// generate file name
-		if ($scope.schedule.id) {
-			scheduleId = $scope.schedule.id;
+		if ($scope.scheduleConfig.selectedSchedule.id) {
+			scheduleId = $scope.scheduleConfig.selectedSchedule.id;
 		}
 		filename = "schedule_" + scheduleId + ".json";
 
-		data = JSON.stringify($scope.schedule, null, '\t');
+		data = JSON.stringify($scope.scheduleConfig.selectedSchedule, null, '\t');
 
 		// create a fake a tag that has a url to the json file, then fake click it
 		// CITE: http://bgrins.github.io/devtools-snippets/#console-save
