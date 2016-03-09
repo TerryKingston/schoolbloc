@@ -49,7 +49,7 @@ class Classroom(db.Model, SqlalchemySerializer):
     # Name and rest constraints for API generation
     __tablename__ = 'classrooms'
     __restconstraints__ = ['classrooms_teachers', 'classrooms_courses',
-                           'classrooms_timeblocks', 'classrooms_subjects']
+                           'classrooms_subjects', 'classrooms_timeblocks']
 
     # Columns
     id = db.Column(db.Integer, primary_key=True)
@@ -84,9 +84,9 @@ class Course(db.Model, SqlalchemySerializer):
     """
     # Name and rest constraints for API generation
     __tablename__ = 'courses'
-    __restconstraints__ = ['courses_student_groups', 'courses_students',
-                           'courses_subjects', 'courses_timeblocks',
-                           'courses_teachers', 'classrooms_courses']
+    __restconstraints__ = ['courses_subjects', 'courses_teachers',
+                            'courses_students', 'courses_student_groups',
+                            'classrooms_courses', 'courses_timeblocks']
 
     # Columns
     id = db.Column(db.Integer, primary_key=True)
@@ -132,15 +132,14 @@ class Student(db.Model, SqlalchemySerializer):
     """
     # Name and rest constraints for API generation
     __tablename__ = 'students'
-    __restconstraints__ = ['students_student_groups', 'students_timeblocks',
-                           'students_subjects', 'courses_students',
-                           'students_subjects']
+    __restconstraints__ = ['students_student_groups', 'courses_students',
+                           'students_subjects', 'students_timeblocks']
 
     # Columns
     id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     first_name = db.Column(db.String(128), nullable=False)
     last_name = db.Column(db.String(128), nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
 
     # Relationships
     user = db.relationship("User", backref="student")
@@ -172,8 +171,8 @@ class StudentGroup(db.Model, SqlalchemySerializer):
     """
     # Name and rest constraints for API generation
     __tablename__ = 'student_groups'
-    __restconstraints__ = ['students_student_groups', 'student_groups_timeblocks',
-                           'student_groups_subjects', 'courses_student_groups']
+    __restconstraints__ = ['students_student_groups', 'courses_student_groups',
+                           'student_groups_subjects', 'student_groups_timeblocks']
 
     # Columns
     id = db.Column(db.Integer, primary_key=True)
@@ -206,9 +205,9 @@ class Subject(db.Model, SqlalchemySerializer):
     """
     # Name and rest constraints for API generation
     __tablename__ = 'subjects'
-    __restconstraints__ = ['courses_subjects', 'student_groups_subjects',
-                           'students_subjects', 'subjects_timeblocks',
-                           'teachers_subjects', 'classrooms_subjects']
+    __restconstraints__ = ['courses_subjects', 'teachers_subjects',
+                           'students_subjects', 'student_groups_subjects',
+                            'classrooms_subjects', 'subjects_timeblocks']
 
     # Columns
     id = db.Column(db.Integer, primary_key=True)
@@ -247,17 +246,17 @@ class Teacher(db.Model, SqlalchemySerializer):
     """
     # Name and rest constraints for API generation
     __tablename__ = 'teachers'
-    __restconstraints__ = ['classrooms_teachers', 'teachers_timeblocks',
-                           'courses_teachers', 'teachers_subjects']
+    __restconstraints__ = ['courses_teachers', 'teachers_subjects',
+                           'classrooms_teachers', 'teachers_timeblocks']
 
     # Columns
     id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     first_name = db.Column(db.String(128), nullable=False)
     last_name = db.Column(db.String(128), nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    user = db.relationship("User", backref="teacher")
     avail_start_time = db.Column(db.Integer)
     avail_end_time = db.Column(db.Integer)
+    user = db.relationship("User", backref="teacher")
 
     # Relationships
     classrooms_teachers = db.relationship("ClassroomsTeacher",
@@ -290,9 +289,9 @@ class Timeblock(db.Model, SqlalchemySerializer):
     """
     # Name and rest constraints for API generation
     __tablename__ = 'timeblocks'
-    __restconstraints__ = ['classrooms_timeblocks', 'courses_timeblocks',
-                           'students_timeblocks', 'student_groups_timeblocks',
-                           'teachers_timeblocks', 'subjects_timeblocks']
+    __restconstraints__ = ['teachers_timeblocks','students_timeblocks',
+                           'student_groups_timeblocks', 'courses_timeblocks',
+                           'subjects_timeblocks', 'classrooms_timeblocks']
 
     # Columns
     id = db.Column(db.Integer, primary_key=True)
