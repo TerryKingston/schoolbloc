@@ -734,6 +734,9 @@ class TeacherConstraint:
                                         in_classroom_high_ids,
                                         in_classroom_low_ids)
 
+    def reset_solutions(self):
+        self.cur_classroom_index = 0
+
     def next_solution(self):
         classroom_constraints = self.get_classroom_constraints()
         classroom_constraint = None
@@ -747,10 +750,11 @@ class TeacherConstraint:
                 timeblock_id = classroom_constraint.next_solution()
                 if not timeblock_id:
                     self.cur_classroom_index += 1
-                    print("cur_classroom_index += 1")
+                    print("cur_classroom_index {}".format(self.cur_classroom_index))
                     if self.cur_classroom_index >= len(classroom_constraints):
                         return False
                     else:
+                        classroom_constraint.reset_solutions()
                         classroom_constraint = classroom_constraints[self.cur_classroom_index]
 
         return classroom_constraint.classroom_id, timeblock_id
@@ -957,10 +961,13 @@ class ClassroomConstraint:
         timeblock_ids = self.get_timeblock_ids()
         if self.cur_timeblock_index >= len(timeblock_ids):
             return False
-        else:
-            return timeblock_ids[self.cur_timeblock_index]
+        next_id = timeblock_ids[self.cur_timeblock_index]
         self.cur_timeblock_index += 1
-        print("cur_timeblock_index += 1")
+        print("cur_timeblock_index {}".format(self.cur_timeblock_index))
+        return next_id
+
+    def reset_solutions(self):
+        self.cur_timeblock_index = 0
     # def next_timeblock_constraint(self):
     #     """
     #     Returns the next timeblock constraint in the set. If we are at the end of the set, False is returned
@@ -1100,15 +1107,18 @@ class ClassConstraint:
             
             teacher_constraint = teacher_constraints[self.cur_teacher_index]
             while not timeblock_id and not classroom_id:
-                classroom_id, timeblock_id = teacher_constraint.next_solution()
-                if not timeblock_id or not classroom_id:
+                id_list = teacher_constraint.next_solution()
+                if not id_list:
                     self.cur_teacher_index += 1
-                    print("cur_teacher_index =+ 1")
+                    print("cur_teacher_index {}".format(self.cur_teacher_index))
                     if self.cur_teacher_index >= len(teacher_constraints):
                         return False
                     else:
+                        teacher_constraint.reset_solutions()
                         teacher_constraint = teacher_constraints[self.cur_teacher_index]
-
+                else:
+                    classroom_id = id_list[0] 
+                    timeblock_id = id_list[1]
 
         return ClassSolution(self.course_id, classroom_id, teacher_constraint.teacher_id, timeblock_id)
 
