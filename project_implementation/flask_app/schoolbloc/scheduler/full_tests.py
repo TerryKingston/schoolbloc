@@ -24,7 +24,6 @@ class FullScheduleTests(unittest.TestCase):
     def reset_db(self):
         db.drop_all()
         db.create_all()
-        # flaskr.init_db()
 
         db.session.add(Role(role_type='admin'))
         db.session.add(Role(role_type='teacher'))
@@ -76,8 +75,8 @@ class FullScheduleTests(unittest.TestCase):
         # self.assertEqual(scheduler.calc_course_count(), {})
         # with timeout(seconds=30):
         scheduler.make_schedule()
-        scheduler.make_schedule()
-        scheduler.make_schedule()
+        # scheduler.make_schedule()
+        # scheduler.make_schedule()
 
     def build_vg_dataset(self):
 

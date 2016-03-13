@@ -60,45 +60,60 @@ class Scheduler():
 
     
 
-    def gen_sched_classes(self, model, sched_constraints):
+    # def gen_sched_classes(self, model, sched_constraints):
 
-        sch_map = {}
-        # print("\033[92m Gen Schedule------------------------------------\33[0m")
-        # print("class constraints")
-        # real_class_count = 0
-        # const_course_list = []
-        # for course_id, const_list in sched_constraints.class_constraints.items():
-        #     const_course_list += [ course_id for i in range(len(const_list)) ]
-        #     real_class_count += len(const_list)
-        # print(const_course_list)
-        # print("real class count = {}".format(real_class_count))
+    #     sch_map = {}
+    #     # print("\033[92m Gen Schedule------------------------------------\33[0m")
+    #     # print("class constraints")
+    #     # real_class_count = 0
+    #     # const_course_list = []
+    #     # for course_id, const_list in sched_constraints.class_constraints.items():
+    #     #     const_course_list += [ course_id for i in range(len(const_list)) ]
+    #     #     real_class_count += len(const_list)
+    #     # print(const_course_list)
+    #     # print("real class count = {}".format(real_class_count))
 
 
 
-        #print('\033[95m course_id | room_id | teacher_id | time_block \033[0m', file=sys.stderr)
+    #     #print('\033[95m course_id | room_id | teacher_id | time_block \033[0m', file=sys.stderr)
         
+    #     class_list = []
+    #     for i in range(sched_constraints.class_count):
+    #         course_id = int(str(model.evaluate(sched_constraints.course(i))))
+    #         room_id = int(str(model.evaluate(sched_constraints.room(i))))
+    #         teacher_id = int(str(model.evaluate(sched_constraints.teacher(i))))
+    #         time_block_index = int(str(model.evaluate(sched_constraints.time(i))))
+
+    #         #print('\033[92m     {}     |    {}    |      {}     |     {} \033[0m'.format(
+    #         #      course_id, room_id, teacher_id, time_block_index), file=sys.stderr)
+
+    #         class_list.append(ScheduleClass(course_id,
+    #                                         room_id,
+    #                                         teacher_id,
+    #                                         time_block_index,
+    #                                         self.max_class_size(course_id),
+    #                                         self.min_class_size(course_id)))
+
+    #     sched_data = ScheduleData(class_list)
+    #     # print("schedule data")
+    #     # print("class course ids: {}".format([ c.course_id for c in class_list]))
+    #     # print("result count = {}".format(len(class_list)))
+    #     # print("\033[92m end------------------------------------\33[0m")
+
+    #     return sched_data
+
+    def gen_sched_classes(self, solution_set, sched_constraints):
+
         class_list = []
-        for i in range(sched_constraints.class_count):
-            course_id = int(str(model.evaluate(sched_constraints.course(i))))
-            room_id = int(str(model.evaluate(sched_constraints.room(i))))
-            teacher_id = int(str(model.evaluate(sched_constraints.teacher(i))))
-            time_block_index = int(str(model.evaluate(sched_constraints.time(i))))
-
-            #print('\033[92m     {}     |    {}    |      {}     |     {} \033[0m'.format(
-            #      course_id, room_id, teacher_id, time_block_index), file=sys.stderr)
-
-            class_list.append(ScheduleClass(course_id,
-                                            room_id,
-                                            teacher_id,
-                                            time_block_index,
+        for solution in solution_set:
+            class_list.append(ScheduleClass(solution.course_id,
+                                            solution.classroom_id,
+                                            solution.teacher_id,
+                                            solution.timeblock_id,
                                             self.max_class_size(course_id),
                                             self.min_class_size(course_id)))
 
         sched_data = ScheduleData(class_list)
-        # print("schedule data")
-        # print("class course ids: {}".format([ c.course_id for c in class_list]))
-        # print("result count = {}".format(len(class_list)))
-        # print("\033[92m end------------------------------------\33[0m")
 
         return sched_data
 
@@ -116,16 +131,26 @@ class Scheduler():
         for i in range(50):
             start_time = time.time()
             collisions = []
+            
+            # get the list of possible class combinations
+            # class_solution_sets = sched_constraints.get_class_result_sets()
+            # for class_solution_set in class_solution_sets:
             for i in range(30):
-                # print('\033[92m Attempt {} -----------------------------------------------\033[0m'.format(i + 1))
-                self.set_constraints(sched_constraints.get_constraints())
-
-                if self.solver.check() != sat:
-                    # Test_Util.generate_teachers(10)
-                    # Test_Util.generate_classrooms(10)
-                    raise SchedulerNoSolution('Not satisfiable')
+                class_solution_set = sched_constraints.next_solution()
+                if not class_solution_set:
+                    print('\033[91m Constraint solutions exhausted, adding another class and trying again...\033[0m')
                 else:
-                    schedule = self.gen_sched_classes(self.solver.model(), sched_constraints)
+                    print('\033[93m Solution set: \n {} \033[0m'.format(class_solution_set))
+
+                # print('\033[92m Attempt {} -----------------------------------------------\033[0m'.format(i + 1))
+                # self.set_constraints(sched_constraints.get_constraints())
+
+                # if self.solver.check() != sat:
+                #     # Test_Util.generate_teachers(10)
+                #     # Test_Util.generate_classrooms(10)
+                #     raise SchedulerNoSolution('Not satisfiable')
+                # else:
+                schedule = self.gen_sched_classes(class_solution_set, sched_constraints)
                 # now start assigning students to classes and see if we can find
                 # a place for every student
                 collisions = self.place_students(schedule, sched_constraints.student_requirement_set)
