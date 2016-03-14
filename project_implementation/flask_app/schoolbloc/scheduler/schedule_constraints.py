@@ -4,6 +4,7 @@ from schoolbloc.scheduler.models import *
 from schoolbloc.config import config
 import math
 import time
+from sys import stdout
 
 # make the class z3 data type and define its constructor
 # a class represents a mapping of teacher, room, course, time, and students
@@ -73,27 +74,52 @@ class ScheduleConstraints:
         self.student_requirement_set = [] # list of StudentRequirement objects
 
         self.prep_class_constraints()
+        self.solutions_checked_count = 0
         # self.reset_constraints()
 
     def next_solution(self):
         print("Getting next solution")
-        solution = []
-        while len(solution) == 0:
-            for course_id, class_const_list in self.class_constraints.items():
-                for class_constraint in class_const_list:
-                    res = class_constraint.next_solution()
-                    if not res:
-                        return False
-                        print("ran out of solutions for course {}".format(course_id))
-                    else:
-                        solution.append(res)
-            # now make sure its a valid solution
-            if not self.check_solution(solution):
-                solution = []
-            else:
-                print("found valid solution")
+        # line up the list of class constraints
+        class_constraint_set = []
+        for course_id, class_const_list in self.class_constraints.items():
+            class_constraint_set += class_const_list
 
-        return solution
+        print("There are {} potential solutions".format(math.factorial(len(class_constraint_set))))
+        self.solutions_checked_count = 0
+        # now get the initial solution set
+        solution_set = []
+        for class_const in class_constraint_set:
+            solution_set.append(class_const.next_solution())
+
+        # now check it, if it works, return it. else adjust one solution at a time until we come up with a 
+        # valid solution
+        if self.check_solution(solution_set):
+            return solution_set
+
+        sol_index = 0
+        while True:
+            next_sol = class_constraint_set[sol_index].next_solution()
+            # figure out which solution we should replace, by starting at the beginning, then when
+            # it runs out of solutions, replace the second one and reset the first one
+            while not next_sol:
+                # reset the current position and move to the next position
+                class_constraint_set[sol_index].reset_solutions()
+                sol_index += 1
+                if sol_index >= len(class_constraint_set):
+                    return False
+                next_sol = class_constraint_set[sol_index].next_solution()
+
+            # replace the solution 
+            solution_set.pop(sol_index)
+            solution_set.insert(sol_index, next_sol)
+
+            # check the current set
+            if self.check_solution(solution_set):
+                print("Found valid solution set: {}".format(solution_set))
+                return solution_set
+
+        print("Exausted all possible solution sets")
+        return False
 
 
     # def get_class_result_sets(self):
@@ -127,6 +153,9 @@ class ScheduleConstraints:
         """
         Takes a list of ClassResult objects and checks for collisions 
         """
+        self.solutions_checked_count += 1
+        print("\rChecked {} solutions so far".format(self.solutions_checked_count))
+        stdout.flush()
         teacher_time_pairs = []
         classroom_time_pairs = []
         for c in class_list:
@@ -736,26 +765,25 @@ class TeacherConstraint:
 
     def reset_solutions(self):
         self.cur_classroom_index = 0
+        for classroom in self.get_classroom_constraints():
+            classroom.reset_solutions()
 
     def next_solution(self):
         classroom_constraints = self.get_classroom_constraints()
         classroom_constraint = None
         timeblock_id = 0
-        while not classroom_constraint and not timeblock_id:
+        while not classroom_constraint:
             if self.cur_classroom_index >= len(classroom_constraints):
                 return False
             
             classroom_constraint = classroom_constraints[self.cur_classroom_index]
-            while not timeblock_id:
-                timeblock_id = classroom_constraint.next_solution()
-                if not timeblock_id:
-                    self.cur_classroom_index += 1
-                    print("cur_classroom_index {}".format(self.cur_classroom_index))
-                    if self.cur_classroom_index >= len(classroom_constraints):
-                        return False
-                    else:
-                        classroom_constraint.reset_solutions()
-                        classroom_constraint = classroom_constraints[self.cur_classroom_index]
+            # if the current classroom constraint is out of timeblocks, then move to the next one
+            timeblock_id = classroom_constraint.next_solution()
+            if not timeblock_id:
+                classroom_constraint.reset_solutions()
+                self.cur_classroom_index += 1
+                classroom_constraint = None
+                timeblock_id = 0
 
         return classroom_constraint.classroom_id, timeblock_id
 
@@ -963,7 +991,6 @@ class ClassroomConstraint:
             return False
         next_id = timeblock_ids[self.cur_timeblock_index]
         self.cur_timeblock_index += 1
-        print("cur_timeblock_index {}".format(self.cur_timeblock_index))
         return next_id
 
     def reset_solutions(self):
@@ -1100,29 +1127,30 @@ class ClassConstraint:
         timeblock_id = 0
         classroom_id = 0
         solution = []
+        id_set = []
 
-        while not teacher_constraint and not timeblock_id and not classroom_id:
+        while not teacher_constraint:
             if self.cur_teacher_index >= len(teacher_constraints):
                 return False
-            
+
             teacher_constraint = teacher_constraints[self.cur_teacher_index]
-            while not timeblock_id and not classroom_id:
-                id_list = teacher_constraint.next_solution()
-                if not id_list:
-                    self.cur_teacher_index += 1
-                    print("cur_teacher_index {}".format(self.cur_teacher_index))
-                    if self.cur_teacher_index >= len(teacher_constraints):
-                        return False
-                    else:
-                        teacher_constraint.reset_solutions()
-                        teacher_constraint = teacher_constraints[self.cur_teacher_index]
-                else:
-                    classroom_id = id_list[0] 
-                    timeblock_id = id_list[1]
+            # if the current teacher constraint is out of classrooms, then move to the next one
+            id_set = teacher_constraint.next_solution()
+            if not id_set:
+                teacher_constraint.reset_solutions()
+                self.cur_teacher_index += 1
+                teacher_constraint = None
 
-        return ClassSolution(self.course_id, classroom_id, teacher_constraint.teacher_id, timeblock_id)
+        classroom_id = id_set[0] 
+        timeblock_id = id_set[1]
+        class_solution = ClassSolution(self.course_id, classroom_id, teacher_constraint.teacher_id, timeblock_id)
+        return class_solution
 
-
+    def reset_solutions(self):
+        self.cur_teacher_index = 0
+        for teacher in self.get_teacher_constraints():
+            teacher.reset_solutions()
+    
     def get_teacher_constraints(self):
         if len(self.mand_teacher_constraints) > 0:
             return self.mand_teacher_constraints
