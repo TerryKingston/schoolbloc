@@ -1,0 +1,18 @@
+POST /register
+
+payload: {
+	"username": null,
+	"password": null,
+	"fullName": null,
+	"person": "parent" | "student" | "teacher",
+	"user_id": null,
+	"access_token": null,
+	"email": null
+}
+
+return: 
+200: OK
+???: "Username already exists."
+???: "Failed to save submission: submission was a duplicate."
+???: "School id does not exist."
+???: "Bad school id - token access pair."

@@ -31,7 +31,7 @@ angular.module('sbAngularApp').factory('userAuthService', ['$q', '$http', '$wind
 		/**
 		 * Attempts to register the user with the given credentials
 		 */
-		registerUser: function(username, password, fullname) {
+		registerUser: function(username, password, fullname, person, id, token, email) {
 			var data;
 			var url = commonService.conformUrl(REGISTER_URL);
 			var deferred = $q.defer();
@@ -39,7 +39,11 @@ angular.module('sbAngularApp').factory('userAuthService', ['$q', '$http', '$wind
 			data = {
 				username: username,
 				password: password,
-				fullName: fullname
+				fullName: fullname,
+				person: person,
+				user_id: id,
+				access_token: token,
+				email: email
 			};
 
 			$http.post(url, data).then(function(data) {

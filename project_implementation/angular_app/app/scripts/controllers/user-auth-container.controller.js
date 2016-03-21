@@ -24,11 +24,17 @@ angular.module('sbAngularApp')
 			fullName: null,
 			password: null,
 			passwordRe: null,
+			person: null,
+			token: null,
+			email: null,
 			errors: {
 				usernameError: null,
 				fullNameError: null,
 				passwordError: null,
-				passwordReError: null
+				passwordReError: null,
+				personError: null,
+				tokenError: null,
+				emailError: null
 			},
 			text: {
 				title: null,
@@ -39,6 +45,67 @@ angular.module('sbAngularApp')
 		authenticationError: null
 	};
 
+
+	/**
+	 * Returns true if front-end validates person type, false otherwise
+	 */
+	$scope.isValidPerson = function() {
+		if ($scope.userAuthContainer.form.person && ($scope.userAuthContainer.form.person === 'parent' || $scope.userAuthContainer.form.person === 'teacher' || $scope.userAuthContainer.form.person === 'student')) {
+			$scope.userAuthContainer.form.errors.personError = null;
+			return true;
+		}
+		$translate("userAuthContainer.INVALID_PERSON").then(function (translation) {
+			$scope.userAuthContainer.form.errors.personError = translation;
+		});
+		return false;
+	};
+
+	/**
+	 * Returns true if front-end validates access taken, false otherwise
+	 */
+	$scope.isValidToken = function() {
+		// @TODO: determine exact requirements for token
+		if ($scope.userAuthContainer.form.token &&
+				$scope.userAuthContainer.form.token.length >= 2) {
+			$scope.userAuthContainer.form.errors.tokenError = null;
+			return true;
+		}
+		$translate("userAuthContainer.INVALID_TOKEN").then(function (translation) {
+			$scope.userAuthContainer.form.errors.tokenError = translation;
+		});
+		return false;
+	};
+
+	/**
+	 * Returns true if front-end validates email, false otherwise
+	 */
+	$scope.isValidEmail = function() {
+		var regex = /\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/;
+    	if (regex.test($scope.userAuthContainer.form.email.toUpperCase())) {
+			$scope.userAuthContainer.form.errors.emailError = null;
+    		return true;
+    	}
+		$translate("userAuthContainer.INVALID_EMAIL").then(function (translation) {
+			$scope.userAuthContainer.form.errors.emailError = translation;
+		});
+		return false;
+	};
+
+	/**
+	 * Returns true if front-end validates school id, false otherwise
+	 */
+	$scope.isValidId = function() {
+		// @TODO: determine exact requirements for id
+		if ($scope.userAuthContainer.form.id &&
+				$scope.userAuthContainer.form.id.length >= 2) {
+			$scope.userAuthContainer.form.errors.idError = null;
+			return true;
+		}
+		$translate("userAuthContainer.INVALID_ID").then(function (translation) {
+			$scope.userAuthContainer.form.errors.idError = translation;
+		});
+		return false;
+	};
 
 	/**
 	 * Returns true if front-end validates username, false otherwise
@@ -168,6 +235,18 @@ angular.module('sbAngularApp')
 				$scope.userAuthContainer.form.errors.passwordError = translation;
 			});
 		}
+		// 401 : "School id does not exist."
+		else if (data == "School id does not exist.") {
+			$translate("userAuthContainer.BAD_ID").then(function (translation) {
+				$scope.userAuthContainer.form.errors.idError = translation;
+			});
+		}
+		// 401 : "Bad school id - token access pair."
+		else if (data == "Bad school id - token access pair.") {
+			$translate("userAuthContainer.BAD_TOKEN").then(function (translation) {
+				$scope.userAuthContainer.form.errors.tokenError = translation;
+			});
+		}
 		// probably a 500 error
 		else {
 			$translate("userAuthContainer.SERVER_ERROR").then(function (translation) {
@@ -218,6 +297,18 @@ angular.module('sbAngularApp')
 			if (!$scope.isValidFullName()) {
 				validForm = false;
 			}
+			if (!$scope.isValidPerson()) {
+				validForm = false;
+			}
+			if (!$scope.isValidId()) {
+				validForm = false;
+			}
+			if (!$scope.isValidToken()) {
+				validForm = false;
+			}
+			if (!$scope.isValidEmail()) {
+				validForm = false;
+			}
 			if (!$scope.isValidPassword()) {
 				validForm = false;
 			}
@@ -227,7 +318,7 @@ angular.module('sbAngularApp')
 			if (validForm) {
 				$scope.userAuthContainer.authenticationError = null;
 
-				userAuthService.registerUser(form.username, form.password, form.fullName).then(function (data) {
+				userAuthService.registerUser(form.username, form.password, form.fullName, form.person, form.id, form.token, form.email).then(function (data) {
 					// at the end of a successful submit, we want to reset the form in case the user logs out
 					$scope.resetForm();
 					$scope.$emit("checkUserAuth");

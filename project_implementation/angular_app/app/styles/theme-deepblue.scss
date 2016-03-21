@@ -674,6 +674,12 @@ textarea {
     $main-view-content-padding;
 }
 
+.main-view-content p {
+	max-width: 500px;
+	margin-bottom: 15px;
+	line-height: 20px;
+}
+
 .main-view-content h3 {
   font-size: 24px;
   color: $text-gray;
@@ -1284,6 +1290,13 @@ textarea {
 }
 
 /* END table */
+
+/* user access */
+.user-access .user-access-group {
+	margin-bottom: 20px;
+}
+
+/* END user access */
 
 /* Scheduler */
 .error-box {
