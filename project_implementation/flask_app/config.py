@@ -20,3 +20,4 @@ JWT_EXPIRATION_DELTA = timedelta(hours=24)
 UPLOAD_FOLDER = '/tmp'
 ALLOWED_EXTENSIONS = set(['csv'])
 RESTFUL_JSON = {'sort_keys': False}
+PROPAGATE_EXCEPTIONS = True
