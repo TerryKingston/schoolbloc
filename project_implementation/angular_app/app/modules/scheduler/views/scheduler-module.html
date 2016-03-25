@@ -1,15 +1,20 @@
 <sb-view-header config="schedulerModule.viewHeaderConfig"></sb-view-header>
 <!-- scheduler -->
 <div class="scheduler-wrapper" ng-if="!config.subView">
-  <div ng-controller="SchedulerContainer">
+  <div ng-controller="SchedulerContainer" ng-if="userAccess.role === 'admin'">
     <sb-scheduler-container></sb-scheduler-container>
+  </div>
+  <div ng-controller="ScheduleContainer" ng-if="userAccess.role === 'parent' || userAccess.role === 'student'">
+    <sb-schedule-container></sb-schedule-container>
   </div>
 </div>
 
-
 <!-- facts and constraints -->
 <div class="facts-constraints-wrapper" ng-if="config.subView === 'facts and constraints'">
-  <div ng-controller="FactsConstraints">
+  <div ng-controller="FactsConstraints" ng-if="userAccess.role === 'admin'">
     <sb-facts-constraints config="schedulerModule"></sb-facts-constraints>
+  </div>
+  <div ng-controller="ManageClasses" ng-if="userAccess.role === 'parent' || userAccess.role === 'student'">
+    <sb-manage-classes></sb-manage-classes>
   </div>
 </div>

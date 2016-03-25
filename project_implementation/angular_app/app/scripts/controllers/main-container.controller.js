@@ -18,9 +18,9 @@ angular.module('sbAngularApp')
 	];
 
 	$scope.mainNavBar = null;
-
+	// $scope.userAccess = null;
 }])
-.directive('sbMainContainer', ['$translate', function($translate) {
+.directive('sbMainContainer', ['$translate', 'globalService', function($translate, globalService) {
 	/**
 	 * For manipulating the DOM
 	 * @param  scope   as configured in the controller
@@ -28,19 +28,44 @@ angular.module('sbAngularApp')
 	 * @param  attrs   hash object with key-value pairs of normalized attribute names and their corresponding attribute values.
 	 */
 	function link(scope, element, attrs) {
-		function getModuleTranslations() {
-			$translate("schedulerModule.SCHEDULER").then(function (translation) {
-				scope.mainContainer.navBarConfig.modules[0].name = translation;
-			});
-
-			$translate("schedulerModule.FACTS_CONSTRAINTS").then(function (translation) {
-				scope.mainContainer.navBarConfig.modules[0].submodules[0].name = translation;
-			});
-
+		scope.userAccess = {
+			role: null
 		};
 
+		function getModuleTranslations() {
+			if (scope.userAccess && scope.userAccess.role === 'admin') {
+				$translate("schedulerModule.SCHEDULER").then(function (translation) {
+					scope.mainContainer.navBarConfig.modules[0].name = translation;
+				});
+
+				$translate("schedulerModule.FACTS_CONSTRAINTS").then(function (translation) {
+					scope.mainContainer.navBarConfig.modules[0].submodules[0].name = translation;
+				});
+			}
+			else if (scope.userAccess && scope.userAccess.role === 'parent' || scope.userAccess.role === 'student') {
+				$translate("schedulerModule.SCHEDULE").then(function (translation) {
+					scope.mainContainer.navBarConfig.modules[0].name = translation;
+				});
+
+				$translate("schedulerModule.MANAGE_CLASSES").then(function (translation) {
+					scope.mainContainer.navBarConfig.modules[0].submodules[0].name = translation;
+				});
+			}
+		};
+
+		function getUserAccess() {
+			scope.userAccess = globalService.getUserAccess();
+			getModuleTranslations();
+		}
+
+		function roleChange() {
+			getModuleTranslations();
+		}
+
+		scope.$watch('userAccess.role', roleChange);
+
 		/**** initial setup ****/
-		getModuleTranslations();
+		getUserAccess();
 	}
 
 	/**

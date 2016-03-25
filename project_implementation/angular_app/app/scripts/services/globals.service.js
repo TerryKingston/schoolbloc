@@ -15,6 +15,12 @@ angular.module('sbAngularApp').factory('globalService', [ function() {
 		forbiddenState: false
 	}
 
+	var userAccess = {
+		role: null,
+		id: null,
+		username: null
+	}
+
 
 	return {
 
@@ -40,6 +46,10 @@ angular.module('sbAngularApp').factory('globalService', [ function() {
 		 */
 		getStateUpdates: function() {
 			return stateUpdates;
+		},
+
+		getUserAccess: function() {
+			return userAccess;
 		}
 	};
 }]);

@@ -429,6 +429,10 @@ angular.module('sbAngularApp')
 	}
 
 	function getTranslations() {
+		$translate("schedulerModule.ELECTIVE_COURSE").then(function (translation) {
+			$scope.translations.student_course = translation;
+		});
+
 		$translate("schedulerModule.SUBJECT").then(function (translation) {
 			$scope.translations.subject = translation;
 		});

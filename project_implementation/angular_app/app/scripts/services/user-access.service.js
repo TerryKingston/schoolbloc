@@ -69,18 +69,6 @@ angular.module('sbAngularApp').factory('userAccessService', ['$q', '$http', 'com
 			var deferred = $q.defer();
 			deferred.resolve(userAccess.tokens);
 			return deferred.promise;
-		},
-
-		getStudentTokens: function() {
-			var deferred = $q.defer();
-			deferred.resolve(userAccess.tokens.student);
-			return deferred.promise;
-		},
-
-		getTeacherTokens: function() {
-			var deferred = $q.defer();
-			deferred.resolve(userAccess.tokens.teacher);
-			return deferred.promise;
 		}
 	};
 }]);

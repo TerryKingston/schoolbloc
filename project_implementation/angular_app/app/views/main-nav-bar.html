@@ -16,7 +16,7 @@
     </section>
     <section class="main-nav-bar-main-controls">
       <a href="" ng-click="mainNavBar.changeView('main dashboard')"><div class="main-control" ng-class="{'main-control-active': config.view === 'main dashboard', 'dashboard-control': config.view !== 'main dashboard'}">{{"mainNavBar.MAIN_DASHBOARD" | translate}}</div></a>
-      <a href="" ng-click="mainNavBar.changeView('import export')"><div class="main-control" ng-class="{'main-control-active': config.view === 'import export'}">{{"mainNavBar.IMPORT_EXPORT" | translate}}</div></a>
+      <a href="" ng-click="mainNavBar.changeView('import export')" ng-if="userAccess.role === 'admin'"><div class="main-control" ng-class="{'main-control-active': config.view === 'import export'}">{{"mainNavBar.IMPORT_EXPORT" | translate}}</div></a>
     </section>
     <section class="main-nav-bar-module-controls">
       <h3>{{"mainNavBar.MODULES" | translate}}</h3>

@@ -38,6 +38,8 @@ angular.module('sbAngularApp')
 		profileIsOpen: false,
 	};
 
+	// $scope.userAccess = null;
+
 	$scope.mainNavBar.changeView = function(view) {
 		$scope.mainNavBar.config.view = view;
 		$scope.mainNavBar.config.subView = null
@@ -56,7 +58,7 @@ angular.module('sbAngularApp')
 
 
 }])
-.directive('sbMainNavBar', ['$window', '$translate', 'commonService', '$document', function($window, $translate, commonService, $document) {
+.directive('sbMainNavBar', ['$window', '$translate', 'commonService', 'globalService', '$document', function($window, $translate, commonService, globalService, $document) {
 	/**
 	 * For manipulating the DOM
 	 * @param  scope   as configured in the controller
@@ -112,9 +114,14 @@ angular.module('sbAngularApp')
 			});
 		};
 
+		function getUserAccess() {
+			scope.userAccess = globalService.getUserAccess();
+		}
+
 		/**** initial setup ****/
 		linkConfig();
 		getTranslations();
+		getUserAccess();
 
 		// check against the current window size when the browser loads.
 		updateWindowSize();

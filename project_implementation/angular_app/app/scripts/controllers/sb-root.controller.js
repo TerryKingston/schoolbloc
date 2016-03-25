@@ -79,9 +79,17 @@ angular.module('sbAngularApp')
 	 * Sets necessary variables to accept the state.
 	 */
 	function determineJwtState() {
+		var userAccess;
 		// only returns username if JWT exists and hasn't expired
 		$scope.sbRoot.user.username = userAuthService.getUsername();
-		$scope.sbRoot.user.role = userAuthService.getRole();
+		$scope.sbRoot.user.id = userAuthService.getUserId();
+		$scope.sbRoot.user.role = userAuthService.getUserRole();
+		// save to global
+		userAccess = globalService.getUserAccess();
+		userAccess.username = $scope.sbRoot.user.username;
+		userAccess.id = $scope.sbRoot.user.id;
+		userAccess.role = $scope.sbRoot.user.role;
+
 		// set navbar config
 		$scope.sbRoot.mainContainer.navBarConfig.profile.username = $scope.sbRoot.user.username;
 		$scope.sbRoot.mainContainer.navBarConfig.profile.role = $scope.sbRoot.user.role;

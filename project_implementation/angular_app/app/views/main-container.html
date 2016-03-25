@@ -4,8 +4,11 @@
   </div>
 
   <div class="main-views">
-    <div ng-controller="AdminHomeContainer" ng-if="mainContainer.navBarConfig.view === 'main dashboard'">
+    <div ng-controller="AdminHomeContainer" ng-if="mainContainer.navBarConfig.view === 'main dashboard' && userAccess.role === 'admin'">
       <sb-admin-home-container></sb-admin-home-container>
+    </div>
+    <div ng-controller="ParentHomeContainer" ng-if="mainContainer.navBarConfig.view === 'main dashboard' && userAccess.role === 'parent'">
+      <sb-parent-home-container></sb-parent-home-container>
     </div>
     <div ng-controller="ImportExportContainer" ng-if="mainContainer.navBarConfig.view === 'import export'">
       <sb-import-export-container></sb-import-export-container>

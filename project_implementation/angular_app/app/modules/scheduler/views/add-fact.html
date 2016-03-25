@@ -46,12 +46,12 @@
       <button class="circle-btn circle-btn-remove" ng-if="factInput.multipleValues && factInput.addedValue" ng-click="removeInput(factInput, $index)"></button>
       <div class="input-row-error" ng-if="factInput.error">{{factInput.error}}</div>
     </div>
-    <div class="icon-option-row">
+    <!-- <div class="icon-option-row">
       <a href="">
         <div class="calendar-icon"></div>
         <div>{{"schedulerModule.SET_REPEAT" | translate}}</div>
       </a>
-    </div>
+    </div> -->
     <div class="add-fact-error" ng-if="addFactConfig.addFactErrorText">
       {{addFactConfig.addFactErrorText}}
     </div>

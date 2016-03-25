@@ -1,0 +1,14 @@
+GET /user-tokens
+
+payload: none
+
+return: {
+	"student": [
+		{
+			"user_id": null,
+			"full_name": null,
+			"access_token": null
+		}
+	],
+	"teacher": [] // can just leave empty since we aren't planning on doing teacher access tokens
+}

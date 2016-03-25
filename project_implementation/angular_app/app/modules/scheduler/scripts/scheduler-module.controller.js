@@ -28,7 +28,7 @@ angular.module('sbAngularApp')
 		}
 	};
 }])
-.directive('sbSchedulerModule', ['schedulerService', function(schedulerService) {
+.directive('sbSchedulerModule', ['schedulerService', 'globalService', function(schedulerService, globalService) {
 	/**
 	 * For manipulating the DOM
 	 * @param  scope   as configured in the controller
@@ -36,6 +36,10 @@ angular.module('sbAngularApp')
 	 * @param  attrs   hash object with key-value pairs of normalized attribute names and their corresponding attribute values.
 	 */
 	function link(scope, element, attrs) {
+		scope.userAccess = {
+			role: null
+		};
+
 		scope.$watch('config.subView', viewChange);
 
 		function viewChange() {
@@ -43,6 +47,19 @@ angular.module('sbAngularApp')
 				schedulerService.updateScheduleList();
 			}
 		}
+
+		function getUserAccess() {
+			scope.userAccess = globalService.getUserAccess();
+		}
+
+		// function roleChange() {
+		// 	getModuleTranslations();
+		// }
+
+		// scope.$watch('userAccess.role', roleChange);
+
+		/**** initial setup ****/
+		getUserAccess();
 	}
 
 	/**

@@ -21,10 +21,22 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 	};
 
 	var tableTypes = {
-		"fact": ["classroom", "course", "student", "student_group", "subject", "teacher", "timeblock"]
+		"fact": ["classroom", "course", "student", "student_group", "subject", "teacher", "timeblock"],
+		"student": ["student_course"]
 	};
 
 	var factTypeConfig = {
+		"student_course": [
+			{
+				key: "course",
+				value: null,
+				error: null,
+				required: true,
+				type: "constraint",
+				multipleValues: false,
+				facts: null
+			}
+		],
 		"classroom": [
 			{
 				key: "room_number",
@@ -771,8 +783,13 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 			else if (factName === "student_group") {
 				url = STUDENT_GROUP_URL;
 			}
+			else if (factName === "student_course") {
+				// @TODO: change later
+				url = COURSE_URL;
+			}
 			else {
-				console.error("tableEntriesService.getTableFacts: unexpected state: invalid factName: " + constraintName);
+				debugger;
+				console.error("tableEntriesService.getTableFacts: unexpected state: invalid factName: " + factName);
 				deferred.reject("ERROR: Unexpected front-end input.");
 				return deferred.promise;
 			}
