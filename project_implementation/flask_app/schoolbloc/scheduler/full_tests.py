@@ -76,8 +76,8 @@ class FullScheduleTests(unittest.TestCase):
         # self.assertEqual(scheduler.calc_course_count(), {})
         # with timeout(seconds=30):
         scheduler.make_schedule()
-        scheduler.make_schedule()
-        scheduler.make_schedule()
+        # scheduler.make_schedule()
+        # scheduler.make_schedule()
 
     def build_vg_dataset(self):
 

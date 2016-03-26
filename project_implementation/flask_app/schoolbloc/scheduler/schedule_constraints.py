@@ -4,6 +4,7 @@ from schoolbloc.scheduler.models import *
 from schoolbloc.config import config
 import math
 import time
+import schoolbloc.scheduler.scheduler_util as SchedUtil
 
 # make the class z3 data type and define its constructor
 # a class represents a mapping of teacher, room, course, time, and students
@@ -90,7 +91,9 @@ class ScheduleConstraints:
 
     def prep_implied_constraints(self):
         self.db_constraints += self.set_courses()
-        print('\033[92m class count: {} \033[0m'.format( self.class_count))
+        SchedUtil.log_note("info", "Scheduler", "Attempting to solve using {} classes".format(self.class_count))
+        
+        # print('\033[92m class count: {} \033[0m'.format( self.class_count))
         self.check_fact_utilization()
         self.db_constraints += self.prevent_room_time_collision()
         self.db_constraints += self.prevent_teacher_time_collision()
@@ -113,7 +116,7 @@ class ScheduleConstraints:
         self.prep_z3_classes()
         self.prep_implied_constraints()
         #self.prep_db_constraints()
-        print("reset constraints ( {} min )".format(round((time.time() - start_time)/60)))
+        # print("reset constraints ( {} min )".format(round((time.time() - start_time)/60)))
 
     def prep_class_constraints(self):
         """
@@ -152,11 +155,13 @@ class ScheduleConstraints:
     def check_if_student_is_overscheduled(student, required_courses):
         timeblock_count = Timeblock.query.count()
         if len(required_courses) > timeblock_count:
-            msg = "Student {} course req ({}) is greater than time block count ({})".format(
+            msg = "Student {} course requirements ({}) are greater than the available number of timeblocks ({})".format(
                 student.id, len(required_courses), timeblock_count)
+            SchedUtil.log_note("error", "Scheduler", msg)
             raise SchedulerNoSolution(msg)
         elif len(required_courses) < timeblock_count:
-            print("\033[91m Warning: Student {} course requirements are less than full time \033[0m".format(student.id))
+            msg = "Student {} course requirements are less than the number of timeblocks"
+            SchedUtil.log_note("warning", "Scheduler", msg)
             
     def gen_constraints_from_collisions(self, collisions):
         # choose the student with the most collisions that doesn't already
@@ -216,7 +221,9 @@ class ScheduleConstraints:
         new_class = ClassConstraint(course_id, course.name)
         self.class_constraints[course_id].append(new_class)
         self.class_count += 1
-        print('\033[91m Added Class for course: {} {}\033[0m'.format(course.id, course.name))
+
+        msg = "Added another class for the course: {} {}".format(course.id, course.name)
+        SchedUtil.log_note("info", "Scheduler", msg)
         self.reset_constraints()
 
 
@@ -316,12 +323,14 @@ class ScheduleConstraints:
             classroom_max = timeblock_count * classroom_count
 
             if class_count > teacher_max:
-                print("\033[91m No solution, Not enough teachers for course: {} {}, teachers={}, classes={}\033[0m".format(
-                    course_id, class_list[0].course_name, teacher_count, class_count))
+                msg = "No solution, Not enough teachers for course: {} {}, teachers={}, classes={}".format(
+                    course_id, class_list[0].course_name, teacher_count, class_count)
+                SchedUtil.log_note("error", "Scheduler", msg)
                 raise SchedulerNoSolution("Not enough classrooms")  
             elif len(class_list) > classroom_max:
-                print("\033[91m No solution, Not enough classrooms for course: {} {}, classrooms={}, classes={}\033[0m".format(
-                    course_id, class_list[0].course_name, classroom_count, class_count))
+                msg = "No solution, Not enough classrooms for course: {} {}, classrooms={}, classes={}".format(
+                    course_id, class_list[0].course_name, classroom_count, class_count)
+                SchedUtil.log_note("error", "Scheduler", msg)
                 raise SchedulerNoSolution("Not enough classrooms")  
             # else:
             #     print('\033[92m Course      {} {} \033[0m'.format(course_id, class_list[0].course_name))
@@ -836,18 +845,21 @@ class ClassConstraint:
 
     def check_id_lists(self):
         if len(self.teacher_ids) <= 0:
-            print("\033[91m No solution, course {} {} has 0 available teachers".format(
-                    self.course_id, self.course_name))
+            msg = "No solution, course {} {} has 0 available teachers".format(
+                    self.course_id, self.course_name)
+            SchedUtil.log_note("error", "Scheduler", msg)
             raise SchedulerNoSolution("0 teachers for course {} {}".format(self.course_id, self.course_name))  
 
         elif len(self.classroom_ids) <= 0:
-            print("\033[91m No solution, course {} {} has 0 available classrooms".format(
-                    self.course_id, self.course_name))
+            msg = "No solution, course {} {} has 0 available classrooms".format(
+                    self.course_id, self.course_name)
+            SchedUtil.log_note("error", "Scheduler", msg)
             raise SchedulerNoSolution("0 classrooms for course {} {}".format(self.course_id, self.course_name))  
 
         elif len(self.timeblock_ids) <= 0:
-            print("\033[91m No solution, course {} {} has 0 available timeblocks".format(
-                    self.course_id, self.course_name))
+            msg = "No solution, course {} {} has 0 available timeblocks".format(
+                    self.course_id, self.course_name)
+            SchedUtil.log_note("error", "Scheduler", msg)
             raise SchedulerNoSolution("0 timeblocks for course {} {}".format(self.course_id, self.course_name))  
     
     

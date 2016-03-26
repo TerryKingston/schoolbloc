@@ -701,3 +701,18 @@ class ScheduledClassesStudent(db.Model, SqlalchemySerializer):
 
     def __str__(self):
         return "{} {}".format(self.scheduled_class, self.student)
+
+
+class Notification(db.Model, SqlalchemySerializer):
+    """
+    ORM object representing a single notifications. 
+
+    Notifications can be used to report info back to the user including warnings and errors
+    """
+    __tablename__ = 'notifications'
+    id = db.Column(db.Integer, primary_key=True)
+    created_at = db.Column(db.DateTime, nullable=False)
+    type = db.Column(db.String(40), nullable=False) # success, info, warning, error
+    subject = db.Column(db.String(80), nullable=False)
+    description = db.Column(db.String(255), nullable=False)
+    unread = db.Column(db.Boolean, nullable=False, default=True)

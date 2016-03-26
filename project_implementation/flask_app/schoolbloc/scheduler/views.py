@@ -78,7 +78,15 @@ register_rest_orm(StudentsTimeblock)
 register_rest_orm(SubjectsTimeblock)
 register_rest_orm(TeachersTimeblock)
 register_rest_orm(Timeblock)
+register_rest_orm(Notification)
 
+class UnreadNotifications(Resource):
+
+    def get(self):
+        notes = Notification.query.filter_by(unread=True)
+        return notes.serialize(expanded=False)
+
+api.add_resource(UnreadNotifications, '/api/notifications/unread')
 
 # Rest api for full schedules
 class ScheduleApi(Resource):
@@ -105,8 +113,14 @@ class ScheduleListApi(Resource):
         return [s.serialize(expanded=False) for s in schedules]
 
     def post(self):
-        # TODO this is what calls into terrys code
-        return {'success', True}
+        try:
+            scheduler = Scheduler()
+            scheduler.make_schedule()
+            return {'success', True}
+        except SchedulerNoSolution:
+            return {'error': e}, 400
+
+
 
 api.add_resource(ScheduleApi, '/api/schedules/<int:schedule_id>')
 api.add_resource(ScheduleListApi, '/api/schedules')

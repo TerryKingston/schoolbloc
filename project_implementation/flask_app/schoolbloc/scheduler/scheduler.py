@@ -5,8 +5,7 @@ from schoolbloc.config import config
 from schoolbloc.scheduler.schedule_data import ScheduleClass, ScheduleStudent, ScheduleData
 from schoolbloc.scheduler.schedule_constraints import ScheduleConstraints, ClassConstraint
 import time
-# TODO: remove this import when done testing
-from schoolbloc.scheduler.test_util import SchedulerTestUtilities as Test_Util
+import schoolbloc.scheduler.scheduler_util as SchedUtil
 
 class SchedulerNoSolution(Exception):
     pass
@@ -104,6 +103,7 @@ class Scheduler():
 
     def make_schedule(self):
         
+        SchedUtil.log_note("info", "Scheduler", "Scheduler started")
         # first step, decide how many classes of each course we need
         # this is decided based on the need of the students, and what 
         # teachers and rooms are available for each course.
@@ -123,6 +123,7 @@ class Scheduler():
                 if self.solver.check() != sat:
                     # Test_Util.generate_teachers(10)
                     # Test_Util.generate_classrooms(10)
+                    SchedUtil.log_note("error", "Scheduler", "Solver could not find a solution for the current constraint set")
                     raise SchedulerNoSolution('Not satisfiable')
                 else:
                     schedule = self.gen_sched_classes(self.solver.model(), sched_constraints)
@@ -134,8 +135,9 @@ class Scheduler():
                     # if not schedule.min_student_counts_satisfied():
                     #     raise SchedulerNoSolution('Min student count not met')
 
-                    print('\033[92m Satisfied! (attempt {})\033[0m'.format(i))
-                    print('\033[92m {} \033[0m'.format(schedule))
+                    SchedUtil.log_note("success", "Scheduler", "Solution found, saving schedule now")
+                    # print('\033[92m Satisfied! (attempt {})\033[0m'.format(i))
+                    # print('\033[92m {} \033[0m'.format(schedule))
                     # now save the schedule
                     schedule.save()
                     return
@@ -147,10 +149,12 @@ class Scheduler():
                     #     break
 
             end_time = time.time()
-            print('\033[91m Failed placing students, adding another class and trying again...\033[0m')
-            print('\033[91m Execution time: {} (min)\033[0m'.format( int((end_time - start_time)/60)) )
+            SchedUtil.log_note("warning", "Scheduler", "Failed placing students, adding another class and trying again")
+            # print('\033[91m Failed placing students, adding another class and trying again...\033[0m')
+            # print('\033[91m Execution time: {} (min)\033[0m'.format( int((end_time - start_time)/60)) )
             sched_constraints.add_class_from_collisions(collisions)
 
+        SchedUtil.log_note("error", "Scheduler", "Scheduler failed, max attempts reached")
         print('\033[91m Reached max attempts \033[0m')
         raise SchedulerNoSolution()
 
