@@ -1,0 +1,12 @@
+// PUT /api/notification/:id
+"payload": {
+	"key": "value",  // Updates this key to a new value
+}
+
+// example
+// PUT /api/notification/1
+"payload": {
+
+    "unread": false, 
+}
+
