@@ -142,6 +142,8 @@
 	"dynamicTable.ERROR_REQUIRED": "Input is required.",
 	"dynamicTable.ERROR_UNIQUE": "Input is not unique.",
 	"dynamicTable.EDITOR_ERROR": "Could not save changes.",
+	"dynamicTable.REQUIRED_COURSES": "Required courses",
+	"dynamicTable.ELECTIVE_COURSES": "Elective courses",
 
 	"schedulerModule.TITLE": "Schedule",
 	"schedulerModule.SUBTITLE": "View this term's schedule or manage scheduling facts.",

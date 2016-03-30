@@ -3,7 +3,7 @@
 /**
  * Helps with basic user authentication and registration.
  */
-angular.module('sbAngularApp').factory('userAuthService', ['$q', '$http', '$window', 'commonService', function($q, $http, $window, commonService) {
+angular.module('sbAngularApp').factory('userAuthService', ['$q', '$http', '$window', 'commonService', '$timeout', function($q, $http, $window, commonService, $timeout) {
   var SERVER_ROOT = "",
     REGISTER_URL = SERVER_ROOT + "/register",
     LOGIN_URL = SERVER_ROOT + "auth";
@@ -68,7 +68,15 @@ angular.module('sbAngularApp').factory('userAuthService', ['$q', '$http', '$wind
       };
 
       $http.post(url, data).then(function(data) {
-        deferred.resolve(data.data);
+        $window.localStorage.username = data.data.username;
+        $window.localStorage.role = data.data.role;
+        $window.localStorage.role_id = data.data.role_id;
+        $window.localStorage.user_id = data.data.user_id;
+
+        $timeout(function() {
+          deferred.resolve(data.data);
+        }, 1000);
+
       }, function(data) {
         deferred.reject(data.data);
       });
@@ -81,6 +89,10 @@ angular.module('sbAngularApp').factory('userAuthService', ['$q', '$http', '$wind
     logoutUser: function() {
       // delete the JWT token so that the user would need to reauthenticate
       $window.localStorage.removeItem('jwtToken');
+      $window.localStorage.removeItem('username');
+      $window.localStorage.removeItem('role');
+      $window.localStorage.removeItem('user_id');
+      $window.localStorage.removeItem('role_id');
     },
 
     /**
@@ -102,9 +114,10 @@ angular.module('sbAngularApp').factory('userAuthService', ['$q', '$http', '$wind
      */
     getUsername: function() {
       var self = this;
-      if (self.isUserAuthenticated()) {
+      if (self.isUserAuthenticated() && $window.localStorage.username) {
+        
         // @TODO: remove when jwt passes in username and role with it
-        return "parent";
+        return $window.localStorage.username;
         // flask-JWT is only returning the identity
         return parseJwtTokenClaim(self.getJwtToken()).username;
       }
@@ -113,9 +126,9 @@ angular.module('sbAngularApp').factory('userAuthService', ['$q', '$http', '$wind
 
     getUserId: function() {
       var self = this;
-      if (self.isUserAuthenticated()) {
+      if (self.isUserAuthenticated() && $window.localStorage.user_id) {
         // @TODO: remove when jwt passes in username and role with it
-        return "123456";
+        return $window.localStorage.user_id;
 
         // flask-JWT is only returning the identity
         return parseJwtTokenClaim(self.getJwtToken()).user_id;
@@ -125,9 +138,9 @@ angular.module('sbAngularApp').factory('userAuthService', ['$q', '$http', '$wind
 
     getUserRole: function() {
       var self = this;
-      if (self.isUserAuthenticated()) {
+      if (self.isUserAuthenticated() && $window.localStorage.role) {
         // @TODO: remove when jwt passes in username and role with it
-        return "parent";
+        return $window.localStorage.role;
 
         // flask-JWT is only returning the identity
         return parseJwtTokenClaim(self.getJwtToken()).role;
