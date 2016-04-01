@@ -187,7 +187,7 @@
           </div>
           <!-- disable btn and other btn-size options -->
           <div ng-if="rowEntry.type === 'disabled'">
-            <button class="table-row-disabled" ng-class="{'table-row-disabled-active': rowEntry.value, 'table-row-disabled-inactive': !rowEntry.value}" alt="{{'dynamicTable.DISABLE' | translate}}" ng-click="disableRow(rowIndex)"></button>
+            <!-- <button class="table-row-disabled" ng-class="{'table-row-disabled-active': rowEntry.value, 'table-row-disabled-inactive': !rowEntry.value}" alt="{{'dynamicTable.DISABLE' | translate}}" ng-click="disableRow(rowIndex)"></button> -->
             <button class="table-row-delete" alt="{{'dynamicTable.DELETE' | translate}}" ng-click="deleteRow(rowIndex)"></button>
           </div>
         </td>

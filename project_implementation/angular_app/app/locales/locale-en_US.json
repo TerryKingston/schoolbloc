@@ -130,7 +130,7 @@
 	"dynamicTable.MIN": "Min",
 	"dynamicTable.MAX": "Max",
 	"dynamicTable.CONFIRM_REMOVE": "Are you sure you want to remove",
-	"dynamicTable.CONFIRM_REMOVE_ROW": "Are you sure you want to remove the entire entry?",
+	"dynamicTable.CONFIRM_REMOVE_ROW": "Are you sure you want to remove the entry?",
 	"dynamicTable.REMOVE": "Remove",
 	"dynamicTable.ERROR_LIST_ITEM": "Must be item from list.",
 	"dynamicTable.ERROR_MUST_NUMBER": "Input must be a number.",

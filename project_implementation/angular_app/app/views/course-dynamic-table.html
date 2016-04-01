@@ -13,9 +13,7 @@
     </thead>
     <tbody>
       <tr ng-repeat="row in tableView.requiredCourses track by $index" ng-init="rowIndex = $index">
-        <!-- if property or constraint -->
         <td>
-          <!-- property (not a cluster) -->
           <div>{{row[0]}}</div>
         </td>
       </tr>
@@ -31,13 +29,27 @@
       </tr>
     </thead>
     <tbody ui-sortable ng-model="tableView.electiveCourses">
-      <tr class="sortable-row" ng-repeat="row in tableView.electiveCourses track by $index" ng-init="rowIndex = $index">
-        <!-- if property or constraint -->
-        <td>
-          <!-- property (not a cluster) -->
+      <tr class="sortable-row" ng-repeat="row in tableView.electiveCourses track by $index" ng-init="rowIndex = $index" ng-class="{'delete-warning-row': (rowIndex === selectedRow.index && selectedRow.delete)}">
+        <!-- EDITOR -->
+        <td class="table-editor" id="constraintEditor" colspan="2" ng-if="row.type === 'editor'">
+          <!-- DELETE row -->
+          <div class="table-editor-flex" ng-if="row.subType === 'delete-row'">
+            <div class="table-editor-left">
+              <section>
+                <div class="editor-prompt-text">{{'dynamicTable.CONFIRM_REMOVE_ROW' | translate}}</div>
+              </section>
+              <div class="editor-error" ng-if="row.error" ng-bind-html="row.error"></div>
+              <section class="flex-bottom-btn">
+                <button class="btn btn-danger" ng-click="confirmDeleteRow()">{{'dynamicTable.REMOVE' | translate}}</button>
+                <button class="btn btn-secondary" ng-click="cancelEditor()">{{"dynamicTable.CANCEL" | translate}}</button>
+              </section>
+            </div>
+          </div>
+        </td>
+        <td ng-if="!row.type">
           <div class="row-property">{{row[0]}}</div>
         </td>
-        <td>
+        <td ng-if="!row.type">
           <div>
             <button class="table-row-delete" alt="{{'dynamicTable.DELETE' | translate}}" ng-click="deleteRow(rowIndex)"></button>
           </div>
