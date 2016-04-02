@@ -3,7 +3,8 @@ from z3 import *
 from schoolbloc.scheduler.models import *
 from schoolbloc.config import config
 from schoolbloc.scheduler.schedule_data import ScheduleClass, ScheduleStudent, ScheduleData
-from schoolbloc.scheduler.schedule_constraints import ScheduleConstraints, ClassConstraint
+from schoolbloc.scheduler.schedule_constraints import ScheduleConstraints
+from schoolbloc.scheduler.class_constraint import ClassConstraint
 import time
 import schoolbloc.scheduler.scheduler_util as SchedUtil
 
@@ -124,7 +125,12 @@ class Scheduler():
                     # Test_Util.generate_teachers(10)
                     # Test_Util.generate_classrooms(10)
                     SchedUtil.log_note("error", "Scheduler", "Solver could not find a solution for the current constraint set")
-                    raise SchedulerNoSolution('Not satisfiable')
+                    
+                    if sched_constraints.can_relax_constraints():
+                        SchedUtil.log_note("info", "Scheduler", "Relaxing priorities and trying again.")
+                        sched_constraints.relax_constraints()
+                    else:
+                        raise SchedulerNoSolution('Not satisfiable')
                 else:
                     schedule = self.gen_sched_classes(self.solver.model(), sched_constraints)
                 # now start assigning students to classes and see if we can find
