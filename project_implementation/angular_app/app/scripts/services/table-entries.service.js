@@ -32,7 +32,7 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 				value: null,
 				error: null,
 				required: true,
-				type: "constraint",
+				type: "uniqueText",
 				multipleValues: false,
 				facts: null
 			}
@@ -786,9 +786,48 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 			else if (factName === "student_course") {
 				// @TODO: change later
 				url = COURSE_URL;
+				deferred.resolve([
+					{
+						course: "Math I",
+						id: 1,
+						required: true,
+						rank: null
+					},
+					{
+						course: "English I",
+						id: 2,
+						required: true,
+						rank: null
+					},
+					{
+						course: "History I",
+						id: 3,
+						required: true,
+						rank: null
+					},
+					{
+						course: "Band I",
+						id: 4,
+						required: false,
+						rank: 3
+					},
+					{
+						course: "Choir I",
+						id: 5,
+						required: false,
+						rank: 2
+					},
+					{
+						course: "Programming I",
+						id: 6,
+						required: false,
+						rank: 1
+					}
+				]);
+				
+				return deferred.promise;
 			}
 			else {
-				debugger;
 				console.error("tableEntriesService.getTableFacts: unexpected state: invalid factName: " + factName);
 				deferred.reject("ERROR: Unexpected front-end input.");
 				return deferred.promise;
@@ -863,7 +902,6 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 				!factTypeConfig[factType].length) {
 				return;
 			}
-
 			// for ease of coding
 			ftc = factTypeConfig[factType];
 

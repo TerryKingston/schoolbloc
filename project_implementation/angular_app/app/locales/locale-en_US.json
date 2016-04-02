@@ -130,7 +130,7 @@
 	"dynamicTable.MIN": "Min",
 	"dynamicTable.MAX": "Max",
 	"dynamicTable.CONFIRM_REMOVE": "Are you sure you want to remove",
-	"dynamicTable.CONFIRM_REMOVE_ROW": "Are you sure you want to remove the entire entry?",
+	"dynamicTable.CONFIRM_REMOVE_ROW": "Are you sure you want to remove the entry?",
 	"dynamicTable.REMOVE": "Remove",
 	"dynamicTable.ERROR_LIST_ITEM": "Must be item from list.",
 	"dynamicTable.ERROR_MUST_NUMBER": "Input must be a number.",
@@ -142,6 +142,8 @@
 	"dynamicTable.ERROR_REQUIRED": "Input is required.",
 	"dynamicTable.ERROR_UNIQUE": "Input is not unique.",
 	"dynamicTable.EDITOR_ERROR": "Could not save changes.",
+	"dynamicTable.REQUIRED_COURSES": "Required courses",
+	"dynamicTable.ELECTIVE_COURSES": "Elective courses",
 
 	"schedulerModule.TITLE": "Schedule",
 	"schedulerModule.SUBTITLE": "View this term's schedule or manage scheduling facts.",

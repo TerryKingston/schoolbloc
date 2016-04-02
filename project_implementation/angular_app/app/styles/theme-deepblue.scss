@@ -76,6 +76,7 @@ $pencil-icon: url("data:image/svg+xml;uft8,<svg xmlns='http://www.w3.org/2000/sv
 $circle-pencil-icon: url("data:image/svg+xml;uft8,<svg xmlns='http://www.w3.org/2000/svg' x='0px' y='0px' width='16' height='16' viewBox='-2 -2 22 22' xml:space='preserve' fill='#FFF'><g><polygon points='2 18 2.5 14.5 2.5 14.5 5.5 17.5 5.5 17.5 '/><polyline points='3.5 13.5 6.5 16.5 15.5 7.5 12.5 4.5 '/><path d='M16.5 6.5L17 6c0 0 1.25-1.25 0.5-2C17 3.5 16 2.5 16 2.5S15.25 1.75 14 3l-0.5 0.5'/></g></svg>");
 $circle-disable-icon: url("data:image/svg+xml;uft8,<svg xmlns='http://www.w3.org/2000/svg' x='0px' y='0px' width='18' height='18' viewBox='0 0 18 18' xml:space='preserve'><g><rect x='3.5' y='7.5' fill-rule='evenodd' clip-rule='evenodd' fill='#FFFFFF' width='11' height='3'/></g></svg>");
 $circle-delete-icon: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' version='1.1' x='0' y='0' width='16' height='16' viewBox='-3 -3 25 25' xml:space='preserve' fill='#FFF'><path d='M19 5'/><polygon points='19 5 17 3 11 9 5 3 3 5 9 11 3 17 5 19 11 13 17 19 19 17 13 11 '/></svg>");
+$move-icon: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' version='1.1' x='0' y='0' width='12' height='35' viewBox='0 0 12 35' enable-background='new 0 0 12 35' xml:space='preserve' fill='#000'><circle cx='8.5' cy='10.5' r='1.5'/><circle cx='8.5' cy='17.5' r='1.5'/><circle cx='8.5' cy='24.5' r='1.5'/><circle cx='2.5' cy='10.5' r='1.5'/><circle cx='2.5' cy='17.5' r='1.5'/><circle cx='2.5' cy='24.5' r='1.5'/></svg>");
 
 /* Meyere's CSS reset
   CITE: http://meyerweb.com/eric/tools/css/reset/ */
@@ -292,12 +293,12 @@ textarea {
 }
 
 .btn:disabled {
-	background-color: #ccc;
-	color: #999;
+  background-color: #ccc;
+  color: #999;
 }
 
 .btn:disabled:hover {
-	background-color: #bbb;
+  background-color: #bbb;
   color: #888;
 }
 
@@ -444,7 +445,7 @@ textarea {
 }
 
 .main-nav-bar .main-nav-bar-profile-active .down-arrow-icon {
-	transform: rotate(180deg);
+  transform: rotate(180deg);
 }
 
 .main-nav-bar .main-nav-bar-profile h4 {
@@ -675,9 +676,9 @@ textarea {
 }
 
 .main-view-content p {
-	max-width: 500px;
-	margin-bottom: 15px;
-	line-height: 20px;
+  max-width: 500px;
+  margin-bottom: 15px;
+  line-height: 20px;
 }
 
 .main-view-content h3 {
@@ -822,7 +823,7 @@ textarea {
 }
 
 .table-options-container {
-	margin: 10px 0;
+  margin: 10px 0;
 }
 
 .table-options-container {
@@ -876,9 +877,32 @@ textarea {
   text-transform: capitalize;
 }
 
+.dynamic-table .sortable-row {
+  cursor: move;
+}
+
+.dynamic-table .required-row {
+  background-color: #f5f5f5;
+}
+
+.dynamic-table .sortable-row td:first-child .row-property:before {
+  width: 12px;
+  height: 35px;
+  content: '';
+  display: inline-block;
+  float: left;
+  background-image: $move-icon;
+  opacity: 0.2;
+  margin-right: 5px;
+}
+
 .dynamic-table th {
   text-align: left;
   background-color: $table-background;
+}
+
+.dynamic-table thead tr {
+  border: 1px solid $table-border;
 }
 
 .dynamic-table .header-row {
@@ -898,7 +922,7 @@ textarea {
 }
 
 .dynamic-table td span {
-	font-size: 14px;
+  font-size: 14px;
 }
 
 .dynamic-table td div,
@@ -931,19 +955,19 @@ textarea {
 }
 
 .dynamic-table .table-editor .editor-prompt-text {
-	font-weight: 700;
-	font-size: 16px;
-	color: $text-gray;
+  font-weight: 700;
+  font-size: 16px;
+  color: $text-gray;
 }
 
 .dynamic-table .table-editor .editor-prompt-entry {
-	border: 1px solid $text-gray;
-	border-left-width: 10px;
-	padding: 0 10px;
+  border: 1px solid $text-gray;
+  border-left-width: 10px;
+  padding: 0 10px;
 }
 
 .dynamic-table .table-editor .prompt-entry-key {
-	font-weight: 700;
+  font-weight: 700;
 }
 
 .dynamic-table .table-editor div:hover {
@@ -963,12 +987,12 @@ textarea {
 
 .dynamic-table div,
 .dynamic-table a {
-	font-size: 14px;
-	line-height: 35px;
+  font-size: 14px;
+  line-height: 35px;
 }
 
 .dynamic-table .table-cluster-open {
-	//border-left: 5px solid $table-row-open;
+  //border-left: 5px solid $table-row-open;
   //border-top-left-radius: 10px;
   padding: 0;
   //transition: all 0s;
@@ -979,13 +1003,13 @@ textarea {
 }
 
 .dynamic-table .entry-editer-selection {
-	border: 3px solid $text-black;
+  border: 3px solid $text-black;
   background-color: $table-background-gray;
   padding: 0 5px;
 }
 
 .dynamic-table .entry span {
-	margin-left: 16px; // need this because the priority boxes are now absolutely positioned to avoid text-overflow: ellipse oddities
+  margin-left: 16px; // need this because the priority boxes are now absolutely positioned to avoid text-overflow: ellipse oddities
 }
 
 .dynamic-table .table-row-disabled,
@@ -998,21 +1022,21 @@ textarea {
 }
 
 .dynamic-table .table-row-delete {
-	opacity: 0;
+  opacity: 0;
   background-image: $delete-icon;
 }
 
 .dynamic-table .table-row-disabled:hover {
-	opacity: 1;
+  opacity: 1;
 }
 
 .dynamic-table .table-row-disabled-active {
-	background-image: $disable-icon;
+  background-image: $disable-icon;
 }
 
 .dynamic-table .table-row-disabled-inactive {
   opacity: 0;
-	background-image: $false-disable-icon;
+  background-image: $false-disable-icon;
 }
 
 .dynamic-table .entry:hover .entry-options {
@@ -1061,7 +1085,7 @@ textarea {
 }
 
 .dynamic-table .entry-disabled {
-	color: $alert-red;
+  color: $alert-red;
 }
 
 .dynamic-table .no-entry .no-entry-edit {
@@ -1147,13 +1171,13 @@ textarea {
 }
 
 .dynamic-table .table-editor label div {
-	display: inline;
-	margin-right: 20px;
+  display: inline;
+  margin-right: 20px;
 }
 
 .dynamic-table .table-editor .editor-min-max,
 .dynamic-table .table-editor .editor-min-max div {
-	margin-right: 0;
+  margin-right: 0;
 }
 
 .dynamic-table .table-editor label input {
@@ -1180,12 +1204,12 @@ textarea {
 }
 
 .dynamic-table .priority-label {
-	display: inline;
+  display: inline;
 }
 
 .dynamic-table .priority-label div {
-	font-family: 'Roboto Mono';
-	text-indent: -1px;
+  font-family: 'Roboto Mono';
+  text-indent: -1px;
   font-size: 12px;
   font-weight: 500;
   min-width: 12px; // have to override td div min-width property
@@ -1203,7 +1227,7 @@ textarea {
 }
 
 .dynamic-table .priority-label .priority-mandatory {
-	opacity: 0.2;
+  opacity: 0.2;
 }
 
 .dynamic-table .table-editor .table-editor-priority .priority-help {
@@ -1293,7 +1317,7 @@ textarea {
 
 /* user access */
 .user-access .user-access-group {
-	margin-bottom: 20px;
+  margin-bottom: 20px;
 }
 
 /* END user access */
@@ -1321,7 +1345,7 @@ textarea {
 }
 
 .editor-error {
-	background-color: $alert-red-background !important;
+  background-color: $alert-red-background !important;
 }
 
 .input-row .input-row-min-max,
@@ -1335,7 +1359,7 @@ textarea {
 }
 
 .editor-min-max .editor-min {
-	margin-right: 10px;
+  margin-right: 10px;
 }
 
 .input-row .input-row-min-max .input-row-min {
@@ -1343,20 +1367,20 @@ textarea {
 }
 
 .scheduler-container .schedule-list {
-	margin-top: 40px;
+  margin-top: 40px;
 }
 
 .scheduler-container .schedule-list div {
-	height: 35px;
-	line-height: 35px;
+  height: 35px;
+  line-height: 35px;
 }
 
 .scheduler-container .schedule-list div a {
-	font-size: 16px;
-	color: $primary-link;
-	font-weight: 700;
+  font-size: 16px;
+  color: $primary-link;
+  font-weight: 700;
 }
 
 .scheduler-container .schedule-list div a:hover {
-	text-decoration: underline;
+  text-decoration: underline;
 }

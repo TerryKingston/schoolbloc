@@ -1,0 +1,65 @@
+<section class="table-wrapper">
+  <section ng-if="!tableView.electiveCourses || !tableView.electiveCourses.length"> 
+    <h3>Adding Electives</h3>
+    <p>You have no chosen electives. Use the "Add Elective" button above to add a desired elective to the list of possible courses.</p>
+  </section>
+  <table class="dynamic-table schedule-table" ng-if="tableView.requiredCourses && tableView.requiredCourses.length">
+    <thead>
+      <tr>
+        <th>
+          <div>{{"dynamicTable.REQUIRED_COURSES" | translate}}</div>
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr ng-repeat="row in tableView.requiredCourses track by $index" ng-init="rowIndex = $index">
+        <td>
+          <div>{{row[0]}}</div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <br>
+  <table class="dynamic-table schedule-table" ng-if="tableView.electiveCourses && tableView.electiveCourses.length">
+    <thead>
+      <tr>
+        <th colspan="2">
+          <div>{{"dynamicTable.ELECTIVE_COURSES" | translate}}</div>
+        </th>
+      </tr>
+    </thead>
+    <tbody ui-sortable ng-model="tableView.electiveCourses">
+      <tr class="sortable-row" ng-repeat="row in tableView.electiveCourses track by $index" ng-init="rowIndex = $index" ng-class="{'delete-warning-row': (rowIndex === selectedRow.index && selectedRow.delete)}">
+        <!-- EDITOR -->
+        <td class="table-editor" id="constraintEditor" colspan="2" ng-if="row.type === 'editor'">
+          <!-- DELETE row -->
+          <div class="table-editor-flex" ng-if="row.subType === 'delete-row'">
+            <div class="table-editor-left">
+              <section>
+                <div class="editor-prompt-text">{{'dynamicTable.CONFIRM_REMOVE_ROW' | translate}}</div>
+              </section>
+              <div class="editor-error" ng-if="row.error" ng-bind-html="row.error"></div>
+              <section class="flex-bottom-btn">
+                <button class="btn btn-danger" ng-click="confirmDeleteRow()">{{'dynamicTable.REMOVE' | translate}}</button>
+                <button class="btn btn-secondary" ng-click="cancelEditor()">{{"dynamicTable.CANCEL" | translate}}</button>
+              </section>
+            </div>
+          </div>
+        </td>
+        <td ng-if="!row.type">
+          <div class="row-property">{{row[0]}}</div>
+        </td>
+        <td ng-if="!row.type">
+          <div>
+            <button class="table-row-delete" alt="{{'dynamicTable.DELETE' | translate}}" ng-click="deleteRow(rowIndex)"></button>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <br>
+  <section ng-if="tableView.electiveCourses && tableView.electiveCourses.length">
+    <h3>*Priority of Electives:</h3>
+    <p>Elective courses are ordered by the student's preference with the top course being highest priority.  Drag elective courses to reorganize preference.</p>
+  </section>
+</section>

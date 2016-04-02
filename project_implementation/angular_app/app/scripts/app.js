@@ -16,7 +16,8 @@ angular.module('sbAngularApp', [
 	    'ngSanitize',
 	    'ngTouch',
   		'pascalprecht.translate',
-        'angularFileUpload'
+        'angularFileUpload',
+        'ui.sortable'
 ]).constant('LOCALES', {
 	'locales': {
         'xx_XX': 'Jibberish',

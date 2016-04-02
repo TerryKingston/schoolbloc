@@ -1,8 +1,10 @@
 from flask import Blueprint
+from flask.ext.jwt import current_identity
 from flask.ext.restful import Api, Resource, abort
 from schoolbloc import auth_required
 from schoolbloc.scheduler.restexport import TestRest, TestRestList
 from schoolbloc.scheduler.models import *
+from schoolbloc.scheduler.scheduler import Scheduler, SchedulerNoSolution
 
 mod = Blueprint('api', __name__)
 api = Api(mod)
@@ -55,6 +57,17 @@ def register_rest_orm(orm, get='admin', put='admin', post='admin',
     return cls, cls_list
 
 
+def student_parent_get_or_abort(self, orm_id):
+    if current_identity.role.role_type in ('student', 'parent'):
+        if current_identity.id != orm_id:
+            return {'error': 'Denied'}, 403
+
+    orm_object = self.orm.query.get(orm_id)
+    if not orm_object:
+        abort(404, message="ID {} not found".format(orm_id))
+    return orm_object
+
+
 # Expose facts and constraints over rest api
 register_rest_orm(Course)
 register_rest_orm(CoursesStudent)
@@ -65,7 +78,6 @@ register_rest_orm(Classroom)
 register_rest_orm(ClassroomsTeacher)
 register_rest_orm(ClassroomsCourse)
 register_rest_orm(StudentGroup)
-register_rest_orm(Student)
 register_rest_orm(StudentsStudentGroup)
 register_rest_orm(StudentGroupsSubject)
 register_rest_orm(StudentsSubject)
@@ -80,15 +92,21 @@ register_rest_orm(TeachersTimeblock)
 register_rest_orm(Timeblock)
 register_rest_orm(Notification)
 
+# TODO probably don't want to let students modify everything of their own. Figure
+#      out the specs, and override something to studnets can only hvae limited perms
+s_cls, sl_cls = register_rest_orm(Student, get=None, put=['student', 'parent', 'admin'])
+s_cls._get_or_abort = student_parent_get_or_abort
+sl_cls._get_or_abort = student_parent_get_or_abort
+
+
+# Additional rest apis we are exposing
 class UnreadNotifications(Resource):
 
     def get(self):
         notes = Notification.query.filter_by(unread=True)
         return notes.serialize(expanded=False)
 
-api.add_resource(UnreadNotifications, '/api/notifications/unread')
 
-# Rest api for full schedules
 class ScheduleApi(Resource):
 
     def get(self, schedule_id):
@@ -117,10 +135,10 @@ class ScheduleListApi(Resource):
             scheduler = Scheduler()
             scheduler.make_schedule()
             return {'success', True}
-        except SchedulerNoSolution:
+        except SchedulerNoSolution as e:
             return {'error': e}, 400
 
 
-
+api.add_resource(UnreadNotifications, '/api/notifications/unread')
 api.add_resource(ScheduleApi, '/api/schedules/<int:schedule_id>')
 api.add_resource(ScheduleListApi, '/api/schedules')
