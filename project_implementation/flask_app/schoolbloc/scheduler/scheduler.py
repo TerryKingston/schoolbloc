@@ -9,7 +9,10 @@ import time
 import schoolbloc.scheduler.scheduler_util as SchedUtil
 
 class SchedulerNoSolution(Exception):
-    pass
+    def __init__(self, message):
+        self.message = message
+    def __str__(self):
+        return repr(self.value)
 
 class Scheduler():
 
@@ -117,51 +120,48 @@ class Scheduler():
         for i in range(50):
             start_time = time.time()
             collisions = []
-            for i in range(30):
-                # print('\033[92m Attempt {} -----------------------------------------------\033[0m'.format(i + 1))
-                self.set_constraints(sched_constraints.get_constraints())
-
-                if self.solver.check() != sat:
-                    # Test_Util.generate_teachers(10)
-                    # Test_Util.generate_classrooms(10)
-                    SchedUtil.log_note("error", "Scheduler", "Solver could not find a solution for the current constraint set")
+            
+            SchedUtil.log_note("info", "Scheduler", "Attempting to solve using {} classes".format(sched_constraints.class_count))
+            for i in range(20): # try 20 different z3 mappings
+            # find a valid z3 mapping, or quit because none exist
+                SchedUtil.log_note("info", "Scheduler", "Generating a mapping of teachers, courses, classrooms and timeblocks")
+                while True:
+                    self.set_constraints(sched_constraints.get_constraints())
+                    if self.solver.check() != sat:
+                        SchedUtil.log_note("warning", "Scheduler", "Solver could not find a solution for the current constraint set")
                     
-                    if sched_constraints.can_relax_constraints():
-                        SchedUtil.log_note("info", "Scheduler", "Relaxing priorities and trying again.")
-                        sched_constraints.relax_constraints()
+                        if sched_constraints.can_relax_constraints():
+                            sched_constraints.relax_constraints()
+                            sched_constraints.reset_constraints()
+                        else:
+                            SchedUtil.log_note("error", "Scheduler", "No valid mapping exists for current constraint set")
+                            raise SchedulerNoSolution('Not satisfiable')
                     else:
-                        raise SchedulerNoSolution('Not satisfiable')
-                else:
-                    schedule = self.gen_sched_classes(self.solver.model(), sched_constraints)
+                        SchedUtil.log_note("info", "Scheduler", "Valid mapping found, attempting to schedule students")
+                        break
+
+                schedule = self.gen_sched_classes(self.solver.model(), sched_constraints)
                 # now start assigning students to classes and see if we can find
                 # a place for every student
                 collisions = self.place_students(schedule, sched_constraints.student_requirement_set)
                 if len(collisions) == 0:
-                    # finally make sure we met all the min student counts
-                    # if not schedule.min_student_counts_satisfied():
-                    #     raise SchedulerNoSolution('Min student count not met')
-
                     SchedUtil.log_note("success", "Scheduler", "Solution found, saving schedule now")
-                    # print('\033[92m Satisfied! (attempt {})\033[0m'.format(i))
-                    # print('\033[92m {} \033[0m'.format(schedule))
-                    # now save the schedule
                     schedule.save()
                     return
-                # else:
-                #     sched_constraints.reset_constraints()
-                #     # if sched_constraints.gen_constraints_from_collisions(collisions):
-                    # print('\033[91m Failed placing students, trying again...\033[0m')
-                    # else:
-                    #     break
+                else:
+                    if i < 20:
+                        SchedUtil.log_note("warning", "Scheduler", "Failed placing students, attempting again with a new mapping")
 
-            end_time = time.time()
-            SchedUtil.log_note("warning", "Scheduler", "Failed placing students, adding another class and trying again")
-            # print('\033[91m Failed placing students, adding another class and trying again...\033[0m')
-            # print('\033[91m Execution time: {} (min)\033[0m'.format( int((end_time - start_time)/60)) )
-            sched_constraints.add_class_from_collisions(collisions)
+            # end_time = time.time()
+            if sched_constraints.can_relax_constraints():
+                SchedUtil.log_note("warning", "Scheduler", "Failed placing students, relaxing constraints and trying again")
+                sched_constraints.relax_constraints()
+                sched_constraints.reset_constraints()    
+            else:
+                SchedUtil.log_note("warning", "Scheduler", "Failed placing students, adding another class and trying again")
+                sched_constraints.add_class_from_collisions(collisions)
 
-        SchedUtil.log_note("error", "Scheduler", "Scheduler failed, max attempts reached")
-        print('\033[91m Reached max attempts \033[0m')
+        SchedUtil.log_note("error", "Scheduler", "Scheduler failed to place students")
         raise SchedulerNoSolution()
 
     def set_constraints(self, constraints):

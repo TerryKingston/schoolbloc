@@ -1,5 +1,6 @@
 from schoolbloc.scheduler.models import *
 from schoolbloc.scheduler.classroom_constraint import ClassroomConstraint
+import schoolbloc.scheduler.scheduler_util as SchedUtil
 
 class TeacherConstraint:
     def __init__(self, teacher_id):
@@ -30,10 +31,10 @@ class TeacherConstraint:
                         cc.relax_constraints(class_id)
                         return
 
-        if len(self.mand_timeblock_constraints) == 0 and len(self.high_timeblock_constraints) > 0:
+        if len(self.mand_timeblock_ids) == 0 and len(self.high_timeblock_ids) > 0:
                 SchedUtil.log_note("info", "Scheduler", "Relaxing the teacher->timeblock constraints for class {} (teacher: {})".format(
                     class_id, self.teacher_id))
-                self.high_timeblock_constraints = []
+                self.high_timeblock_ids = []
                 return 
 
         return False
@@ -51,8 +52,8 @@ class TeacherConstraint:
                     if cc.can_relax_constraints():
                         return True
 
-        if len(self.mand_timeblock_constraints) == 0:
-            if len(self.high_timeblock_constraints) > 0:
+        if len(self.mand_timeblock_ids) == 0:
+            if len(self.high_timeblock_ids) > 0:
                 return True
 
         return False
@@ -85,23 +86,29 @@ class TeacherConstraint:
         # first calculate the timeblock id lists
         self.mand_timeblock_ids = [ ct.timeblock_id for ct in 
                         TeachersTimeblock.query.filter_by(priority='mandatory', 
-                                                            teacher_id=self.teacher_id).all() ]
+                                                            teacher_id=self.teacher_id,
+                                                            active=True).all() ]
         self.high_timeblock_ids = [ ct.timeblock_id for ct in 
                         TeachersTimeblock.query.filter_by(priority='high', 
-                                                            teacher_id=self.teacher_id).all() ]
+                                                            teacher_id=self.teacher_id,
+                                                            active=True).all() ]
         self.low_timeblock_ids = [ ct.timeblock_id for ct in 
                         TeachersTimeblock.query.filter_by(priority='low', 
-                                                            teacher_id=self.teacher_id).all() ]
+                                                            teacher_id=self.teacher_id,
+                                                            active=True).all() ]
         for subject_id in self.subject_ids:
             self.mand_timeblock_ids += [ st.timeblock_id for st in 
                              SubjectsTimeblock.query.filter_by(priority='mandatory', 
-                                                               subject_id=subject_id).all() ]
+                                                               subject_id=subject_id,
+                                                               active=True).all() ]
             self.high_timeblock_ids += [ st.timeblock_id for st in 
                              SubjectsTimeblock.query.filter_by(priority='high', 
-                                                               subject_id=subject_id).all() ]
+                                                               subject_id=subject_id,
+                                                               active=True).all() ]
             self.low_timeblock_ids += [ st.timeblock_id for st in 
                              SubjectsTimeblock.query.filter_by(priority='low', 
-                                                               subject_id=subject_id).all() ]
+                                                               subject_id=subject_id,
+                                                               active=True).all() ]
 
         # if our low id set is empty. we assume all timeblocks are in the low set
         if len(self.low_timeblock_ids) == 0: 
@@ -111,23 +118,29 @@ class TeacherConstraint:
         # now calculate the classrooms
         mand_classroom_ids = [ ct.classroom_id for ct in 
                                ClassroomsTeacher.query.filter_by(priority='mandatory', 
-                                                                 teacher_id=self.teacher_id).all() ]
+                                                                 teacher_id=self.teacher_id,
+                                                                 active=True).all() ]
         high_classroom_ids = [ ct.classroom_id for ct in 
                                ClassroomsTeacher.query.filter_by(priority='high', 
-                                                                 teacher_id=self.teacher_id).all() ]
+                                                                 teacher_id=self.teacher_id,
+                                                                 active=True).all() ]
         low_classroom_ids = [ ct.classroom_id for ct in 
                                ClassroomsTeacher.query.filter_by(priority='low', 
-                                                                 teacher_id=self.teacher_id).all() ]
+                                                                 teacher_id=self.teacher_id,
+                                                                 active=True).all() ]
         for subject_id in self.subject_ids:
             mand_classroom_ids += [ cs.classroom_id for cs in 
                                     ClassroomsSubject.query.filter_by(priority='mandatory', 
-                                                                      subject_id=subject_id).all() ]
+                                                                      subject_id=subject_id,
+                                                                      active=True).all() ]
             high_classroom_ids += [ cs.classroom_id for cs in 
                                     ClassroomsSubject.query.filter_by(priority='high', 
-                                                                      subject_id=subject_id).all() ]
+                                                                      subject_id=subject_id,
+                                                                      active=True).all() ]
             low_classroom_ids += [ cs.classroom_id for cs in 
                                     ClassroomsSubject.query.filter_by(priority='low', 
-                                                                      subject_id=subject_id).all() ]
+                                                                      subject_id=subject_id,
+                                                                      active=True).all() ]
         
         # if our low id set is empty. we assume all timeblocks are in the low set
         if len(low_classroom_ids) == 0:

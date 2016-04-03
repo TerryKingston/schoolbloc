@@ -36,13 +36,13 @@ angular.module('sbAngularApp')
 	 */
 	$scope.generateSchedule = function() {
 		$scope.config.loadingGenerate = true;
-		// schedulerService.generateSchedule().then(function(data) {
-		// 	$scope.config.loadingGenerate = false;
-		// 	$scope.config.error = null;
-		// }, function(error) {
-		// 	$scope.config.loadingGenerate = false;
-		// 	$scope.config.error = "Error: could not generate a schedule."
-		// });
+		schedulerService.generateSchedule().then(function(data) {
+			$scope.config.loadingGenerate = false;
+			$scope.config.error = null;
+		}, function(error) {
+			$scope.config.loadingGenerate = false;
+			$scope.config.error = "Error: could not generate a schedule."
+		});
 	};
 
 	/**

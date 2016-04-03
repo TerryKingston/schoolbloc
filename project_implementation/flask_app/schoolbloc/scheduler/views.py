@@ -104,7 +104,17 @@ class UnreadNotifications(Resource):
 
     def get(self):
         notes = Notification.query.filter_by(unread=True)
-        return notes.serialize(expanded=False)
+        
+        if len(notes) > 0:
+            # mark the notes as read before sending them off to the view
+            for note in notes:
+                note.unread = False
+            db.session.commit()
+
+            return notes.serialize(expanded=False)
+        else:
+            last_note = Notification.query.order_by("created_at desc")[0]
+            return last_note.serialize(expanded=False)
 
 
 class ScheduleApi(Resource):
@@ -136,7 +146,7 @@ class ScheduleListApi(Resource):
             scheduler.make_schedule()
             return {'success', True}
         except SchedulerNoSolution as e:
-            return {'error': e}, 400
+            return {'error': e.message}, 400
 
 
 api.add_resource(UnreadNotifications, '/api/notifications/unread')

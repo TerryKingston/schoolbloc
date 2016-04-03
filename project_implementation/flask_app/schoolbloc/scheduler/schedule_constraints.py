@@ -113,7 +113,6 @@ class ScheduleConstraints:
 
     def prep_implied_constraints(self):
         self.db_constraints += self.set_courses()
-        SchedUtil.log_note("info", "Scheduler", "Attempting to solve using {} classes".format(self.class_count))
         
         # print('\033[92m class count: {} \033[0m'.format( self.class_count))
         self.check_fact_utilization()
