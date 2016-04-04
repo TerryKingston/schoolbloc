@@ -30,6 +30,10 @@
   <button class="btn btn-secondary" ng-click="toggleTableOptions(false)">{{'dynamicTable.CLOSE' | translate}}</button>
 </div>
 <section class="table-wrapper">
+  <div class="loading" ng-if="!tableView.rows.length">
+    <div>Loading... </div>
+    <div class="spinner" style="margin-left: 20px"></div>
+  </div>
   <table class="dynamic-table schedule-table" ng-if="tableView.rows && tableView.rows.length" ng-mouseleave="resetHeader()">
     <!-- <thead>
       <tr>

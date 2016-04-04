@@ -283,6 +283,34 @@ textarea {
 }
 /* END root */
 
+/* spinner */
+.loading div {
+	margin-top: 40px;
+	float: left;
+	font-size: 16px;
+	color: $note-gray;
+	line-height: 20px;
+}
+
+.spinner {
+    width: 20px;
+    height: 20px;
+    border-left: 3px solid $note-gray;
+    border-right: 3px solid #FFF;
+    border-top: 3px solid $note-gray;
+    border-bottom: 3px solid $note-gray;
+    border-radius: 20px;
+    animation-name: spinner;
+    animation-duration: 1s;
+    animation-iteration-count: infinite;
+}
+
+@keyframes spinner {
+    0%   {transform: rotate(0deg);}
+    100% {transform: rotate(360deg);}
+}
+/* END spinner */
+
 /* button */
 .btn {
   border: none;
