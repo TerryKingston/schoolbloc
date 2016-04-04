@@ -103,8 +103,12 @@ sl_cls._get_or_abort = student_parent_get_or_abort
 class UnreadNotifications(Resource):
 
     def get(self):
-        notes = Notification.query.filter_by(unread=True)
-        return notes.serialize(expanded=False)
+        notes = Notification.query.filter_by(unread=True).all()
+        for note in notes:
+            note.unread = False
+            db.session.add(note)
+        db.session.commit()
+        return [note.serialize() for note in notes]
 
 
 class ScheduleApi(Resource):
