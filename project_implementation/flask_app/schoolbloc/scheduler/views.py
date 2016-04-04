@@ -134,7 +134,7 @@ class ScheduleListApi(Resource):
         try:
             scheduler = Scheduler()
             scheduler.make_schedule()
-            return {'success', True}
+            return {'success': True}
         except SchedulerNoSolution as e:
             return {'error': e}, 400
 
