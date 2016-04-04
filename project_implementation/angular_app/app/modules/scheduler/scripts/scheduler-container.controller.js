@@ -24,7 +24,7 @@ angular.module('sbAngularApp')
 	};
 	$scope.schedule = [];
 	$scope.clusterList = [];
-
+	$scope.showExportOptions = false;
 	$scope.scheduleConfig = {};
 
 	$scope.selectSchedule = function(id) {
@@ -78,11 +78,15 @@ angular.module('sbAngularApp')
 		});		
 	};
 
+	$scope.showExportScheduleOptions = function() {
+		$scope.showExportOptions = !$scope.showExportOptions;
+	}
+
 	/**
 	 * Export the schedule to a .json file
 	 * @todo : allow for other file types in export
 	 */
-	$scope.exportSchedule = function() {	
+	$scope.exportAsJSON = function() {	
 		var filename, scheduleId = "", data, blob,
 			e, a;
 
@@ -103,6 +107,47 @@ angular.module('sbAngularApp')
 		a.download = filename;
 		a.href = window.URL.createObjectURL(blob);
 		a.dataset.downloadurl = ['text/json', a.download, a.href].join(':');
+		e.initMouseEvent('click', true, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
+		a.dispatchEvent(e);
+		// END CITE
+	};
+
+	/**
+	 * Export the schedule to a .json file
+	 * @todo : allow for other file types in export
+	 */
+	$scope.exportAsCSV = function() {	
+		var filename, scheduleId = "", data, blob,
+			e, a, i, j, s;
+
+		// generate file name
+		if ($scope.scheduleConfig.selectedSchedule.id) {
+			scheduleId = $scope.scheduleConfig.selectedSchedule.id;
+		}
+		filename = "schedule_" + scheduleId + ".csv";
+
+		// convert to csv file format
+		data = "\"classroom\",\"course\",\"time\",\"teacher\",\"student\"\n";
+		s = $scope.scheduleConfig.selectedSchedule.classes;
+		for (i = 0; i < s.length; i++) {
+			for (j = 0; j < s[i].students.length; j++) {
+				data = data + "\"" + s[i].classroom.value + "\",";
+				data = data + "\"" + s[i].course.value + "\",";
+				data = data + "\"" + s[i].time + "\",";
+				data = data + "\"" + s[i].teacher.value + "\",";
+				data = data + "\"" + s[i].students[j].value + "\"\n";
+			}
+		}
+
+		// create a fake a tag that has a url to the json file, then fake click it
+		// CITE: http://bgrins.github.io/devtools-snippets/#console-save
+		blob = new Blob([data], {type: 'text/json'});
+		e = document.createEvent('MouseEvents');
+		a = document.createElement('a');
+
+		a.download = filename;
+		a.href = window.URL.createObjectURL(blob);
+		a.dataset.downloadurl = ['text/csv', a.download, a.href].join(':');
 		e.initMouseEvent('click', true, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
 		a.dispatchEvent(e);
 		// END CITE

@@ -10,7 +10,14 @@
 
 
   <section ng-if="scheduleConfig.selectedSchedule">
-    <button class="btn btn-recommended" ng-click="exportSchedule()">{{"schedulerModule.EXPORT_SCHEDULE" | translate}}</button>
+    <button class="btn btn-recommended export-options" ng-click="showExportScheduleOptions()">{{"schedulerModule.EXPORT_SCHEDULE" | translate}}</button>
+    <div class="export-options-tooltip" ng-show="showExportOptions">
+      <ul>
+        <li ng-click="exportAsJSON()">JSON</li>
+        <li ng-click="exportAsCSV()">CSV</li>
+      </ul>
+      <div class="triangle-up"></div>
+    </div>
     <button class="btn btn-danger" ng-click="deleteSchedule()">{{"schedulerModule.DELETE_SCHEDULE" | translate}}</button>
 
     <section class="table-wrapper">
