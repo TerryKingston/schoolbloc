@@ -10,7 +10,7 @@
  * Controller of the sbAngularApp
  */
 angular.module('sbAngularApp')
-.controller('SchedulerContainer', ['$scope', 'schedulerService', function($scope, schedulerService) {
+.controller('SchedulerContainer', ['$scope', 'schedulerService', '$timeout', function($scope, schedulerService, $timeout) {
 	this.components = [
 		'HTML5 Boilerplate',
 		'AngularJS',
@@ -36,14 +36,36 @@ angular.module('sbAngularApp')
 	 */
 	$scope.generateSchedule = function() {
 		$scope.config.loadingGenerate = true;
-		// schedulerService.generateSchedule().then(function(data) {
-		// 	$scope.config.loadingGenerate = false;
-		// 	$scope.config.error = null;
-		// }, function(error) {
-		// 	$scope.config.loadingGenerate = false;
-		// 	$scope.config.error = "Error: could not generate a schedule."
-		// });
+
+		getGenerationUpdates();
+
+		schedulerService.generateSchedule().then(function(data) {
+			$scope.config.loadingGenerate = false;
+			$scope.config.error = null;
+		}, function(error) {
+			$scope.config.loadingGenerate = false;
+			$scope.config.error = "Error: could not generate a schedule."
+		});
 	};
+
+	function getGenerationUpdates() {
+		// stop requesting updates once the new schedule is generated
+		if (!$scope.config.loadingGenerate) {
+			return;
+		}
+
+		// every 5 seconds get new updates
+		$timeout(function() {
+			schedulerService.getScheduleUpdate().then(function(data) {
+				debugger;
+				getGenerationUpdates();
+			}, function(error) {
+				debugger;
+				//$scope.config.loadingGenerate = false;
+				$scope.config.error = "Error: could not get updates."
+			});
+		}, 5000);
+	}
 
 	/**
 	 * Remove the schedule from the front-end view

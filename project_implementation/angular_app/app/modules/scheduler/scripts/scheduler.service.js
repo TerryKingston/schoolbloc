@@ -5,6 +5,7 @@
  */
 angular.module('sbAngularApp').factory('schedulerService', ['$q', '$http', 'commonService', function($q, $http, commonService) {
 	var GET_SCHEDULES = "api/schedules";
+	var GET_SCHEDULE_UPDATES = "api/notifications/unread";
 	var scheduleConfig = {
 		scheduleList: null,
 		selectedSchedule: null
@@ -12,6 +13,19 @@ angular.module('sbAngularApp').factory('schedulerService', ['$q', '$http', 'comm
 
 	return {
 		
+		getScheduleUpdate: function() {
+			var deferred = $q.defer();
+			var url = commonService.conformUrl(GET_SCHEDULE_UPDATES);
+
+			$http.get(url).then(function(data) {
+				deferred.resolve(data.data);
+			}, function(data) {
+				deferred.reject(data);
+			});
+
+			return deferred.promise;
+		},
+
 		getScheduleConfig: function() {
 			return scheduleConfig;
 		},
