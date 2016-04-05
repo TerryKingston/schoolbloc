@@ -1,6 +1,6 @@
 import csv
 from schoolbloc import db
-from schoolbloc.scheduler.models import Student, Classroom, Teacher, Course
+from schoolbloc.scheduler.models import Student, Classroom, Teacher, Course, Timeblock, Subject, StudentGroup
 from schoolbloc.users.models import User
 
 
@@ -29,8 +29,47 @@ def classrooms_import(filepath):
             reader = csv.DictReader(csvfile)
             with db.session.no_autoflush:
                 for row in reader:
-                    classroom = Classroom(room_number=row['classroom_number'], max_student_count=row['max_student_count'])
+                    classroom = Classroom(room_number=row['classroom_number'])
                     db.session.add(classroom)
+                db.session.commit()
+    except:
+        db.session.rollback()
+        raise
+
+def student_groups_import(filepath):
+    try:
+        with open(filepath) as csvfile:
+            reader = csv.DictReader(csvfile)
+            with db.session.no_autoflush:
+                for row in reader:
+                    studentGroup = StudentGroup(name=row['name'])
+                    db.session.add(studentGroup)
+                db.session.commit()
+    except:
+        db.session.rollback()
+        raise
+
+def subjects_import(filepath):
+    try:
+        with open(filepath) as csvfile:
+            reader = csv.DictReader(csvfile)
+            with db.session.no_autoflush:
+                for row in reader:
+                    subject = Subject(name=row['name'])
+                    db.session.add(subject)
+                db.session.commit()
+    except:
+        db.session.rollback()
+        raise
+
+def timeblocks_import(filepath):
+    try:
+        with open(filepath) as csvfile:
+            reader = csv.DictReader(csvfile)
+            with db.session.no_autoflush:
+                for row in reader:
+                    timeblock = Timeblock(start_time=row['start_time'], end_time=row['end_time'])
+                    db.session.add(timeblock)
                 db.session.commit()
     except:
         db.session.rollback()
@@ -46,7 +85,8 @@ def teachers_import(filepath):
                     u = User(username=row['last_name'], password=row['first_name'], role_type='teacher')
                     db.session.add(u)
                     db.session.flush()
-                    teacher = Teacher(first_name=row['first_name'], last_name=row['last_name'], user_id=u.id)
+                    teacher = Teacher(first_name=row['first_name'], last_name=row['last_name'], user_id=u.id,
+                                      avail_start_time=row['start_time'], avail_end_time=row['end_time'])
                     db.session.add(teacher)
                 db.session.commit()
     except:
@@ -60,7 +100,8 @@ def courses_import(filepath):
             reader = csv.DictReader(csvfile)
             with db.session.no_autoflush:
                 for row in reader:
-                    course = Course(name=row['course_name'], duration=row['duration'],  max_student_count=row['max_student_count'], min_student_count=row['min_student_count'])
+                    course = Course(name=row['course_name'], duration=row['duration'],
+                                    max_student_count=row['max_student_count'], min_student_count=row['min_student_count'])
                     db.session.add(course)
                 db.session.commit()
     except:
