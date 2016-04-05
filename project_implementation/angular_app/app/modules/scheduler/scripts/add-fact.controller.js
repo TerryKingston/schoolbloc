@@ -227,7 +227,7 @@ angular.module('sbAngularApp')
 		var i,
 			duplicateMap,
 			ftc = $scope.addFactConfig.factTypeConfig,
-			fe;
+			fe, priority;
 
 		// no config object given
 		if (!$scope.addFactConfig.factTypeConfig || !$scope.addFactConfig.factTypeConfig.length) {
@@ -292,9 +292,15 @@ angular.module('sbAngularApp')
 					fe[ftc[i].key] = [];
 				}
 				if (fe[ftc[i].key] && (ftc[i].value !== null && ftc[i].value !== "")) {
+					if (ftc[i].elective) {
+						priority = "low";
+					}
+					else {
+						priority = "mandatory";
+					}
 					fe[ftc[i].key].push({
 						"id": ftc[i].facts.map[ftc[i].value],
-						"priority": "mandatory", // for now, it's always mandatory when we add
+						"priority": priority, // for now, it's always mandatory when we add
 						"active": true // for now, it's always true when we add
 					});
 				}
@@ -381,6 +387,10 @@ angular.module('sbAngularApp')
 		// mark it as an added input 
 		newFactInput.addedValue = true;
 
+		if (newFactInput.canBeElective) {
+			newFactInput.elective = false;
+		}
+
 		$scope.addFactConfig.factTypeConfig.splice(index + 1, 0, newFactInput);
 	};
 
@@ -431,6 +441,10 @@ angular.module('sbAngularApp')
 	function getTranslations() {
 		$translate("schedulerModule.ELECTIVE_COURSE").then(function (translation) {
 			$scope.translations.student_course = translation;
+		});
+
+		$translate("schedulerModule.DAYS").then(function (translation) {
+			$scope.translations.days = translation;
 		});
 
 		$translate("schedulerModule.SUBJECT").then(function (translation) {

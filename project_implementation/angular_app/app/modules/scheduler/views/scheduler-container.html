@@ -7,9 +7,17 @@
       <a href="" ng-click="selectSchedule(schedule.id)">{{schedule.name}} ({{schedule.created_at}})</a>
     </div>
   </section>
-
-
-  <section ng-if="scheduleConfig.selectedSchedule">
+  <div class="loading" ng-if="scheduleConfig.selectedSchedule && !scheduleConfig.selectedSchedule.id">
+    <div>Loading... </div>
+    <div class="spinner" style="margin-left: 20px"></div>
+  </div>
+  <section ng-if="scheduleConfig.selectedSchedule && scheduleConfig.selectedSchedule.id">
+    <div class="header-input-row">
+      <label>
+        <div>{{"schedulerModule.VIEW_AS" | translate}}</div>
+        <select ng-model="scheduleOptions.selectedValue" ng-options="option.value as option.text for option in scheduleOptions.values" ng-change="updateScheduleView()"></select>
+      </label>
+    </div>
     <button class="btn btn-recommended export-options" ng-click="showExportScheduleOptions()">{{"schedulerModule.EXPORT_SCHEDULE" | translate}}</button>
     <div class="export-options-tooltip" ng-show="showExportOptions">
       <ul>

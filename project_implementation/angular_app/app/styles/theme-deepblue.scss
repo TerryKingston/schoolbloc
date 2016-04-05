@@ -21,6 +21,8 @@ $secondary-gray: #666;
 $secondary-gray-hover: #555;
 $add-green: #7CD845;
 
+$low-yellow: #BFB88C;
+
 $primary-link: #36A5E7;
 $secondary-link: #105681;
 
@@ -731,6 +733,7 @@ textarea {
   color: $text-gray;
   width: 150px;
   display: inline-block;
+  vertical-align: top;
 }
 
 /* no required div class */
@@ -752,6 +755,41 @@ textarea {
   border-radius: 0;
   padding: 0 5px;
   width: 200px;
+}
+
+.main-view-content .input-row .input-row-days label {
+	display: block;
+	height: 22px;
+}
+
+.input-row .input-row-elective-course div {
+	display: inline;
+	height: 22px;
+	line-height: 22px;
+	text-transform: capitalize;
+}
+
+.input-row .input-row-elective-course input {
+	width: auto;
+	display: inline;
+	height: 22px;
+	padding: 0;
+	margin: 0;
+}
+
+.main-view-content .input-row .input-row-days div {
+	display: inline;
+	height: 22px;
+	line-height: 22px;
+	text-transform: capitalize;
+}
+
+.main-view-content .input-row .input-row-days input {
+	width: auto;
+	display: inline;
+	height: 22px;
+	padding: 0;
+	margin: 0;
 }
 
 .main-view-content .input-row .input-row-error {
@@ -1274,8 +1312,9 @@ textarea {
 }
 
 .dynamic-table .table-editor .table-editor-priority .priority-help-tooltip .triangle-up {
-  width: 0; 
-  height: 0; 
+  width: 0 !important; 
+  min-width: 0 !important;
+  height: 0 !important; 
   border-left: 8px solid transparent;
   border-right: 8px solid transparent;
   border-bottom: 8px solid $text-black;
@@ -1315,11 +1354,15 @@ textarea {
 }
 
 .dynamic-table .priority-high {
-  background-color: $alert-red;
+  background-color: $add-green;
 }
 
 .dynamic-table .priority-low {
-  background-color: $add-green;
+  background-color: $low-yellow;
+}
+
+.dynamic-table .priority-not {
+	background-color: $alert-red;
 }
 
 .dynamic-table .table-editor .table-editor-right a {
@@ -1439,8 +1482,9 @@ textarea {
 }
 
 .scheduler-container .export-options-tooltip .triangle-up {
-  width: 0; 
-  height: 0; 
+  width: 0 !important; 
+  height: 0 !important; 
+  min-width: 0 !important;
   border-left: 8px solid transparent;
   border-right: 8px solid transparent;
   border-bottom: 8px solid $text-black;

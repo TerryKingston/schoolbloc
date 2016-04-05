@@ -26,10 +26,20 @@ angular.module('sbAngularApp')
 	$scope.clusterList = [];
 	$scope.showExportOptions = false;
 	$scope.scheduleConfig = {};
+	$scope.scheduleOptions = {
+		values: [{value: "class", "text": "Class"}, {value: "student", "text": "Student"}],
+		selectedValue: 'class'
+	};
+
 
 	$scope.selectSchedule = function(id) {
 		schedulerService.getSchedule(id);
 	};
+
+	$scope.updateScheduleView = function() {
+		console.log($scope.scheduleOptions.selectedValue)
+		schedulerService.getSchedule($scope.scheduleConfig.selectedSchedule.id, $scope.scheduleOptions.selectedValue);
+	}
 
 	/**
 	 * Request the generated schedule from the back-end
@@ -47,6 +57,7 @@ angular.module('sbAngularApp')
 			$scope.config.error = "Error: could not generate a schedule."
 		});
 	};
+
 
 	function getGenerationUpdates() {
 		// stop requesting updates once the new schedule is generated

@@ -229,6 +229,7 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 				value: null,
 				error: null,
 				required: false,
+				canBeElective: true,
 				type: "constraint",
 				multipleValues: true,
 				facts: null
@@ -276,6 +277,7 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 				value: null,
 				error: null,
 				required: false,
+				canBeElective: true,
 				type: "constraint",
 				multipleValues: true,
 				facts: null
@@ -403,6 +405,14 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 				multipleValues: false
 			},
 			{
+				key: "days",
+				value: [{"text": "monday", "value": true}, {"text": "tuesday", "value": true}, {"text": "wednesday", "value": true}, {"text": "thursday", "value": true}, {"text": "friday", "value": true}],
+				error: null,
+				required: true,
+				type: "checkboxes",
+				multipleValues: false
+			},
+			{
 				key: "course",
 				value: null,
 				error: null,
@@ -454,15 +464,14 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 				type: "startEnd",
 				multipleValues: false
 			},
-			// {
-			// 	key: "days",
-			// 	value: null,
-			// 	error: null,
-			// 	required: true,
-			// 	type: "dropdown",
-			// 	multipleValues: true,
-			// 	possibleAnswers: ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday", "weekdays"]
-			// },
+			{
+				key: "days",
+				value: [{"text": "monday", "value": false}, {"text": "tuesday", "value": false}, {"text": "wednesday", "value": false}, {"text": "thursday", "value": false}, {"text": "friday", "value": false}],
+				error: null,
+				required: true,
+				type: "checkboxes",
+				multipleValues: false
+			},
 			{
 				key: "teacher",
 				value: null,

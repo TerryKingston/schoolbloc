@@ -28,7 +28,12 @@
         <!-- <select ng-if="factInput.type === 'dropdown'" ng-model="factInput.value" ng-blur="checkInput(factInput)">
           <option ng-repeat="option in factInput.possibleAnswers track by $index" value="{{option}}">{{option}}</option>
         </select> -->
-
+        <div ng-if="factInput.type === 'checkboxes'" class="input-row-days">
+          <label ng-repeat="day in factInput.value">
+            <input type="checkbox" ng-model="day.value">
+            <div>{{day.text}}</div>
+          </label>
+        </div>
         <div class="input-row-constraint" ng-if="factInput.type === 'dropdown'">
           <input list="{{factInput.key}}" ng-disabled="!factInput.possibleAnswers.length" ng-model="factInput.value" ng-blur="checkInput(factInput)">
           <datalist id="{{factInput.key}}">
@@ -40,6 +45,10 @@
           <datalist id="{{factInput.key}}">
             <option ng-repeat="factValue in factInput.facts.values" value="{{factValue}}">{{factValue}}</option>
           </datalist>
+          <label ng-if="factInput.canBeElective" class="input-row-elective-course">
+            <input type="checkbox" ng-model="factInput.elective">
+            <div>Elective</div>
+          </label>
         </div>
       </label>
       <button class="circle-btn circle-btn-add" ng-if="factInput.multipleValues && !factInput.addedValue" ng-click="addInput(factInput, $index)"></button>

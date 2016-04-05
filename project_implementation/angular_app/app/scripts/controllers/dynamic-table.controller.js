@@ -714,6 +714,8 @@ angular.module('sbAngularApp')
       if ($scope.editor.factType === 'constraint') {
         $scope.editor.facts = $scope.factTypeConfigMap[$scope.editor.key].facts;
       }
+
+      $scope.editor.canBeElective = $scope.factTypeConfigMap[$scope.editor.key].canBeElective;
     }
 
     // set value/id as needed
@@ -785,6 +787,8 @@ angular.module('sbAngularApp')
 
     $scope.selectedRow.index = null;
     $scope.selectedRow.delete = false;
+
+    $scope.editor.canBeElective = false;
 
     $scope.editor.error = null;
     $scope.editor.selectedEntry = null;

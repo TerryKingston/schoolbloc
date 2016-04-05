@@ -41,7 +41,7 @@ angular.module('sbAngularApp').factory('schedulerService', ['$q', '$http', 'comm
 			});
 		},
 
-		getSchedule: function(id) {
+		getSchedule: function(id, viewType) {
 			var deferred = $q.defer();
 			var url;
 
@@ -50,7 +50,17 @@ angular.module('sbAngularApp').factory('schedulerService', ['$q', '$http', 'comm
 				return deferred.promise;
 			}
 
-			url = commonService.conformUrl(GET_SCHEDULES + "/" + id);
+			if (!viewType) {
+				viewType = "";
+			}
+			else {
+				viewType = "/" + viewType;
+			}
+
+			// some way to signify that the schedule is loading
+			scheduleConfig.selectedSchedule = {id: null};
+
+			url = commonService.conformUrl(GET_SCHEDULES + "/" + id + viewType);
 
 			$http.get(url).then(function(data) {
 				var i;

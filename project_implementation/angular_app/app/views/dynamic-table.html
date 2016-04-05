@@ -117,10 +117,17 @@
                 <div class="table-editor-priority" ng-if="(row.subType === 'edit-constraint' || row.subType === 'add-constraint') && row.priority !== 'forced'">
                   <button class="priority-help">?</button>
                   <section class="priority-help-tooltip">
-                    <div class="tooltip-text">
+                    <div ng-if="!row.canBeElective" class="tooltip-text">
                       <p>{{'dynamicTable.MANDATORY_TOOLTIP' | translate}}</p>
                       <p>{{'dynamicTable.HIGH_TOOLTIP' | translate}}</p>
                       <p>{{'dynamicTable.LOW_TOOLTIP' | translate}}</p>
+                      <p>{{'dynamicTable.NOT_TOOLTIP' | translate}}</p>
+                    </div>
+                    <div ng-if="row.canBeElective" class="tooltip-text">
+                      <p>{{'dynamicTable.ELECTIVE_MANDATORY_TOOLTIP' | translate}}</p>
+                      <p>{{'dynamicTable.ELECTIVE_HIGH_TOOLTIP' | translate}}</p>
+                      <p>{{'dynamicTable.ELECTIVE_LOW_TOOLTIP' | translate}}</p>
+                      <p>{{'dynamicTable.NOT_TOOLTIP' | translate}}</p>
                     </div>
                     <div class="triangle-up"></div>
                   </section>
@@ -128,6 +135,7 @@
                   <button class="priority-mandatory" ng-class="{'priority-active': row.priority === 'mandatory'}" placeholder="{{'dynamicTable.MANDATORY' | translate}}" ng-click="changePriority(row, 'mandatory')">{{'dynamicTable.ABBR_MANDATORY' | translate}}</button>
                   <button class="priority-high" ng-class="{'priority-active': row.priority === 'high'}" placeholder="{{'dynamicTable.HIGH' | translate}}" ng-click="changePriority(row, 'high')">{{'dynamicTable.ABBR_HIGH' | translate}}</button>
                   <button class="priority-low" ng-class="{'priority-active': row.priority === 'low'}" placeholder="{{'dynamicTable.LOW' | translate}}" ng-click="changePriority(row, 'low')">{{'dynamicTable.ABBR_LOW' | translate}}</button>
+                  <button class="priority-not" ng-class="{'priority-active': row.priority === 'not'}" placeholder="{{'dynamicTable.NOT' | translate}}" ng-click="changePriority(row, 'not')">{{'dynamicTable.ABBR_NOT' | translate}}</button>
                 </div>
               </section>
               <div class="editor-error" ng-if="row.error" ng-bind-html="row.error"></div>
@@ -163,6 +171,7 @@
                   <div class="priority-mandatory" placeholder="{{'dynamicTable.MANDATORY' | translate}}" ng-if="element.priority === 'mandatory'">{{'dynamicTable.ABBR_MANDATORY' | translate}}</div>
                   <div class="priority-high" placeholder="{{'dynamicTable.HIGH' | translate}}" ng-if="element.priority === 'high'">{{'dynamicTable.ABBR_HIGH' | translate}}</div>
                   <div class="priority-low" placeholder="{{'dynamicTable.LOW' | translate}}" ng-if="element.priority === 'low'">{{'dynamicTable.ABBR_LOW' | translate}}</div>
+                  <div class="priority-not" placeholder="{{'dynamicTable.NOT' | translate}}" ng-if="element.priority === 'not'">{{'dynamicTable.ABBR_NOT' | translate}}</div>
                 </div>
                 <div class="entry-options">
                   <button class="entry-edit" alt="{{'dynamicTable.EDIT' | translate}}" ng-click="editConstraint(rowIndex, rowEntryIndex, element)"></button>
