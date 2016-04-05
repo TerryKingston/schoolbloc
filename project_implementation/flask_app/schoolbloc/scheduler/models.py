@@ -631,6 +631,41 @@ class Schedule(db.Model, SqlalchemySerializer):
             ret['classes'] = [s.serialize() for s in self.scheduled_classes]
         return ret
 
+    def student_serialize(self):
+        ret = OrderedDict()
+        ret['id'] = self.id
+        ret['name'] = self.name
+        ret['created_at'] = str(self.created_at)
+
+        # This is a dict just for the sake of adding new classes for students
+        # efficiently. When we return this, we will convert it back into a list
+        # with just the values of the students in there (having an int as the
+        # key is invalid json)
+        students = {}
+        for sch_class in self.scheduled_classes:
+            for student in sch_class.students:
+                if student.id not in students:
+                    students[student.id] = OrderedDict()
+                    students[student.id]['id'] = student.id
+                    students[student.id]['first_name'] = student.first_name
+                    students[student.id]['last_name'] = student.last_name
+                    students[student.id]['classes'] = []
+
+                students[student.id]['classes'].append({
+                    'classroom': str(sch_class.classroom),
+                    'classroom_id': sch_class.classroom.id,
+                    'course': str(sch_class.course),
+                    'course_id': sch_class.course_id,
+                    'teacher': str(sch_class.teacher),
+                    'teacher_id': sch_class.teacher_id,
+                    'start_time': sch_class.start_time,
+                    'end_time': sch_class.end_time,
+                })
+
+        # Where we convert it back into a list, for reasons mentioned above
+        ret['students'] = [s for s in students.values()]
+        return ret
+
 
 class ScheduledClass(db.Model, SqlalchemySerializer):
     """
@@ -705,7 +740,7 @@ class ScheduledClassesStudent(db.Model, SqlalchemySerializer):
 
 class Notification(db.Model, SqlalchemySerializer):
     """
-    ORM object representing a single notifications. 
+    ORM object representing a single notifications.
 
     Notifications can be used to report info back to the user including warnings and errors
     """

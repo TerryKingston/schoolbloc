@@ -128,6 +128,23 @@ class ScheduleApi(Resource):
         return {'success': True}
 
 
+class ScheduleStudentApi(Resource):
+
+    def get(self, schedule_id):
+        schedule = Schedule.query.get(schedule_id)
+        if not schedule:
+            abort(404, message="Schedule {} not found".format(schedule_id))
+        return schedule.student_serialize()
+
+    def delete(self, schedule_id):
+        schedule = Schedule.query.get(schedule_id)
+        if not schedule:
+            abort(404, message="Schedule {} not found".format(schedule_id))
+        db.session.delete(schedule)
+        db.session.commit()
+        return {'success': True}
+
+
 class ScheduleListApi(Resource):
 
     def get(self):
@@ -144,5 +161,6 @@ class ScheduleListApi(Resource):
 
 
 api.add_resource(UnreadNotifications, '/api/notifications/unread')
-api.add_resource(ScheduleApi, '/api/schedules/<int:schedule_id>')
+api.add_resource(ScheduleApi, '/api/schedules/<int:schedule_id>/class')
+api.add_resource(ScheduleStudentApi, '/api/schedules/<int:schedule_id>/student')
 api.add_resource(ScheduleListApi, '/api/schedules')
