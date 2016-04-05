@@ -1,0 +1,3 @@
+// DELETE /api/<fact>/id
+// DELETE /api/student_course/<course_id>?user_id=<student_id>
+// note that this should NOT delete the course.  It should instead change its priority form "high" to "low"

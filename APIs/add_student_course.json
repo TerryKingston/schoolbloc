@@ -1,0 +1,7 @@
+// POST /api/student_course?user_id=<student_id>
+// there should already be a mapping between the student_id and course_id, but the course would be "low" priority.  This should set that course priority to "high" as well as setting rank to the given integer.
+"payload": {
+	"id": <course_id>,
+	"priority": "high", // will always be set to "high"
+	"rank": <integer> // cannot be blank
+}

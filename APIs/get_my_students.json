@@ -1,0 +1,22 @@
+// GET /api/my_students
+// example
+// 
+// returns a list of all the students under a parent's control
+[
+    {
+        "full name": "Bob Dylan",
+        "id": "123432"
+    },
+    {
+        "full name": "Bonnie Tyler",
+        "id": "258953"
+    },
+    {
+        "full name": "Phil Collins",
+        "id": "3573223"
+    },
+    {
+        "full name": "Neil Diamond",
+        "id": "1256783"
+    }
+]

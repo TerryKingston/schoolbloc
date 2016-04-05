@@ -51,7 +51,7 @@ angular.module('sbAngularApp').factory('schedulerService', ['$q', '$http', 'comm
 			}
 
 			if (!viewType) {
-				viewType = "";
+				viewType = "/class";
 			}
 			else {
 				viewType = "/" + viewType;

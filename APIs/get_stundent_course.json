@@ -1,0 +1,75 @@
+// GET /api/student_course?user_id=<student_id>
+// example
+// 
+// send back a list of all courses that are marked as "mandatory"/"high" priority for a given student.
+// rank is entirely determined by front-end.
+[
+    {
+        "course": "Math I",
+        "id": 1,
+        "priority": "mandatory",
+        "rank": null
+    },
+    {
+        "course": "English I",
+        "id": 2,
+        "priority": "mandatory",
+        "rank": null
+    },
+    {
+        "course": "History I",
+        "id": 3,
+        "priority": "mandatory",
+        "rank": null
+    },
+    {
+        "course": "Band I",
+        "id": 4,
+        "priority": "high",
+        "rank": 2
+    },
+    {
+        "course": "Choir I",
+        "id": 5,
+        "priority": "high",
+        "rank": 3
+    },
+    {
+        "course": "Programming I",
+        "id": 6,
+        "priority": "high",
+        "rank": 1
+    }
+]
+
+// GET /api/student_course/electives?user_id=<student_id>
+// example
+// 
+// send back a list of all courses that are marked as "low" priority for a given student.
+// rank is entirely determined by front-end.
+[
+    {
+        "course": "Math I",
+        "id": 1
+    },
+    {
+        "course": "English I",
+        "id": 2
+    },
+    {
+        "course": "History I",
+        "id": 3
+    },
+    {
+        "course": "Band I",
+        "id": 4
+    },
+    {
+        "course": "Choir I",
+        "id": 5
+    },
+    {
+        "course": "Programming I",
+        "id": 6
+    }
+]
