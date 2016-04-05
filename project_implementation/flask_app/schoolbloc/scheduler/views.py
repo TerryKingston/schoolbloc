@@ -1,3 +1,5 @@
+from threading import Thread
+
 from flask import Blueprint
 from flask.ext.jwt import current_identity
 from flask.ext.restful import Api, Resource, abort
@@ -145,6 +147,13 @@ class ScheduleStudentApi(Resource):
         return {'success': True}
 
 
+class CreateSchedule(Thread):
+
+    def run(self):
+        scheduler = Scheduler()
+        scheduler.make_schedule()
+
+
 class ScheduleListApi(Resource):
 
     def get(self):
@@ -152,12 +161,10 @@ class ScheduleListApi(Resource):
         return [s.serialize(expanded=False) for s in schedules]
 
     def post(self):
-        try:
-            scheduler = Scheduler()
-            scheduler.make_schedule()
-            return {'success': True}
-        except SchedulerNoSolution as e:
-            return {'error': e}, 400
+        worker_thread = CreateSchedule()
+        worker_thread.daemon = True
+        worker_thread.start()
+        return {'success': 'Started generating schedule'}
 
 
 api.add_resource(UnreadNotifications, '/api/notifications/unread')
