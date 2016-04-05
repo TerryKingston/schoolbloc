@@ -35,6 +35,42 @@ class SqlalchemySerializer:
         return results
 
 
+#####################
+# Parent Information
+#####################
+
+class Parent(db.Model, SqlalchemySerializer):
+    # Name and rest constraints for API generation
+    __tablename__ = 'parents'
+
+    # Columns
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    first_name = db.Column(db.String(128), nullable=False)
+    last_name = db.Column(db.String(128), nullable=False)
+
+    # Relationships
+    parent_student_mapper = db.relationship("ParentStudentMapper",
+                                            back_populates="parent",
+                                            passive_deletes=True)
+
+    # Helper
+    students = association_proxy('parent_student_mapper', 'student')
+
+
+class ParentStudentMapper(db.Model):
+    __tablename__ = 'parent_student_mapper'
+
+    # Columns
+    id = db.Column(db.Integer, primary_key=True)
+    parent_id = db.Column(db.Integer, db.ForeignKey('parents.id', ondelete='CASCADE'), nullable=False)
+    student_id = db.Column(db.Integer, db.ForeignKey('students.id', ondelete='CASCADE'), nullable=False)
+
+    # Relationships
+    parent = db.relationship("Parent", back_populates="parent_student_mapper")
+    student = db.relationship("Student", back_populates="parent_student_mapper")
+
+
 ########
 # Facts
 ########
@@ -158,6 +194,9 @@ class Student(db.Model, SqlalchemySerializer):
     scheduled_classes_student = db.relationship("ScheduledClassesStudent",
                                                 back_populates="student",
                                                 passive_deletes=True)
+    parent_student_mapper = db.relationship("ParentStudentMapper",
+                                            back_populates="student",
+                                            passive_deletes=True)
 
     def __str__(self):
         return "{} {}".format(self.first_name, self.last_name)
