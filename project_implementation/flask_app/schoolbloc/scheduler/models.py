@@ -40,7 +40,6 @@ class SqlalchemySerializer:
 #####################
 
 class Parent(db.Model, SqlalchemySerializer):
-    # Name and rest constraints for API generation
     __tablename__ = 'parents'
 
     # Columns
@@ -173,7 +172,8 @@ class Student(db.Model, SqlalchemySerializer):
 
     # Columns
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    uid = db.Column(db.String(64), nullable=False, unique=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
     first_name = db.Column(db.String(128), nullable=False)
     last_name = db.Column(db.String(128), nullable=False)
 
@@ -290,7 +290,8 @@ class Teacher(db.Model, SqlalchemySerializer):
 
     # Columns
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    uid = db.Column(db.String(64), nullable=False, unique=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
     first_name = db.Column(db.String(128), nullable=False)
     last_name = db.Column(db.String(128), nullable=False)
     avail_start_time = db.Column(db.Integer)
