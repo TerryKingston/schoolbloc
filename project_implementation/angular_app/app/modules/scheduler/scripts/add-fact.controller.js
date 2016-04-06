@@ -524,7 +524,7 @@ angular.module('sbAngularApp')
 		});
 
 		$translate("schedulerModule.USER_ID").then(function (translation) {
-			$scope.translations.user_id = translation;
+			$scope.translations.uid = translation;
 		});
 
 		$translate("schedulerModule.ERROR_LIST_ITEM").then(function (translation) {

@@ -912,7 +912,7 @@ angular.module('sbAngularApp')
     });
 
     $translate("dynamicTable.USER_ID").then(function (translation) {
-      $scope.translations.user_id = translation;
+      $scope.translations.uid = translation;
     });
 
     $translate("dynamicTable.ERROR_LIST_ITEM").then(function (translation) {

@@ -175,7 +175,7 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 		],
 		"student": [
 			{
-				key: "user_id",
+				key: "uid",
 				value: null,
 				error: null,
 				required: true,
@@ -367,7 +367,7 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 		],
 		"teacher": [
 			{
-				key: "user_id",
+				key: "uid",
 				value: null,
 				error: null,
 				required: true,
