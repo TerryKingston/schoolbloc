@@ -791,3 +791,15 @@ class Notification(db.Model, SqlalchemySerializer):
     subject = db.Column(db.String(80), nullable=False)
     description = db.Column(db.String(255), nullable=False)
     unread = db.Column(db.Boolean, nullable=False, default=True)
+
+class TeachersWeekDay(db.Model, SqlalchemySerializer):
+    __tablename__ = 'teachers_week_days'
+    id = db.Column(db.Integer, primary_key=True)
+    teacher_id = db.Column(db.Integer, nullable=False)
+    weekday = db.Column(db.String(20), nullable=False)
+
+class TimeblocksWeekDay(db.Model, SqlalchemySerializer):
+    __tablename__ = 'timeblocks_week_days'
+    id = db.Column(db.Integer, primary_key=True)
+    timeblock_id = db.Column(db.Integer, nullable=False)
+    weekday = db.Column(db.String(20), nullable=False)
