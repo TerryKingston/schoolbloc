@@ -835,6 +835,10 @@ angular.module('sbAngularApp')
 
 
   function getTranslations() {
+    $translate("dynamicTable.DAY").then(function (translation) {
+      $scope.translations.day = translation;
+    });
+
     $translate("dynamicTable.SUBJECT").then(function (translation) {
       $scope.translations.subject = translation;
     });

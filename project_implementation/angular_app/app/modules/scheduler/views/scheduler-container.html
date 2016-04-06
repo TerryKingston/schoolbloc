@@ -1,6 +1,17 @@
 <section class="scheduler-container main-view-content">
   <div class="error-box" ng-if="config.error">{{config.error}}</div>
   <button class="btn btn-recommended" ng-click="generateSchedule()" ng-show="!config.showSchedule" ng-disabled="config.loadingGenerate">{{"schedulerModule.GENERATE_SCHEDULE" | translate}}</button>
+  <br>
+  <br>
+  <section ng-if="scheduleLog.data.length">
+    <h4>Schedule log:</h4>
+    <section class="schedule-log">
+      <div ng-repeat="log in scheduleLog.data">
+        <div class="schedule-log-date">{{log.created_at}}:</div>
+        <div class="schedule-log-description">{{log.description}}</div>
+      </div>
+    </section>
+  </section>
   <section class="schedule-list" ng-if="scheduleConfig.scheduleList && scheduleConfig.scheduleList.length">
     <h3>{{"schedulerModule.VIEW_SCHEDULES" | translate}}</h3>
     <div ng-repeat="schedule in scheduleConfig.scheduleList track by $index">
@@ -29,14 +40,16 @@
     <button class="btn btn-danger" ng-click="deleteSchedule()">{{"schedulerModule.DELETE_SCHEDULE" | translate}}</button>
 
     <section class="table-wrapper">
-      <table class="dynamic-table schedule-table">
-        <tr>
-          <th>{{"schedulerModule.COURSE" | translate}}</th>
-          <th>{{"schedulerModule.TEACHER" | translate}}</th>
-          <th>{{"schedulerModule.CLASSROOM" | translate}}</th>
-          <th>{{"schedulerModule.TIME" | translate}}</th>
-          <th>{{"schedulerModule.STUDENTS" | translate}}</th>
-        </tr>
+      <table class="dynamic-table schedule-table" ng-if="scheduleConfig.selectedSchedule.classes">
+        <thead>
+          <tr>
+            <th>{{"schedulerModule.COURSE" | translate}}</th>
+            <th>{{"schedulerModule.TEACHER" | translate}}</th>
+            <th>{{"schedulerModule.CLASSROOM" | translate}}</th>
+            <th>{{"schedulerModule.TIME" | translate}}</th>
+            <th>{{"schedulerModule.STUDENTS" | translate}}</th>
+          </tr>
+        </thead>
         <tr ng-repeat="row in scheduleConfig.selectedSchedule.classes track by $index">
           <td>{{row.course.value}}</td>
           <td>{{row.teacher.value}}</td>
@@ -48,6 +61,40 @@
             </div>
             <div class="table-cluster-open" ng-show="row.show_students">
               <div ng-repeat="student in row.students">{{student.value}}</div>
+            </div>
+          </td>
+        </tr>
+      </table>
+      <table class="dynamic-table schedule-table" ng-if="scheduleConfig.selectedSchedule.students">
+        <thead>
+          <tr>
+            <th>{{"schedulerModule.STUDENT" | translate}}</th>
+            <th>{{"schedulerModule.CLASSES" | translate}}</th>
+          </tr>
+        </thead>
+        <tr ng-repeat="row in scheduleConfig.selectedSchedule.students track by $index">
+          <td>{{row.first_name}} {{row.last_name}}</td>
+          <td class="table-cluster table-within-table" ng-click="toggleCluster(row, 'classes')">
+            <div class="table-cluster-closed" ng-show="!row.show_classes">
+              <a href="">Show {{row.classes.length}}</a>
+            </div>
+            <div class="table-cluster-open" ng-show="row.show_classes">
+              <table class="dynamic-table class-table">
+                <thead>
+                  <tr>
+                    <th>{{"schedulerModule.COURSE" | translate}}</th>
+                    <th>{{"schedulerModule.TEACHER" | translate}}</th>
+                    <th>{{"schedulerModule.CLASSROOM" | translate}}</th>
+                    <th>{{"schedulerModule.TIME" | translate}}</th>
+                  </tr>
+                </thead>
+                <tr ng-repeat="class in row.classes">
+                  <td>{{class.course}}</td>
+                  <td>{{class.teacher}}</td>
+                  <td>{{class.classroom}}</td>
+                  <td>{{class.time}}</td>
+                </tr>
+              </table>
             </div>
           </td>
         </tr>

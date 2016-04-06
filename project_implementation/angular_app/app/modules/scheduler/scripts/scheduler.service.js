@@ -63,13 +63,22 @@ angular.module('sbAngularApp').factory('schedulerService', ['$q', '$http', 'comm
 			url = commonService.conformUrl(GET_SCHEDULES + "/" + id + viewType);
 
 			$http.get(url).then(function(data) {
-				var i;
+				var i, j;
 				var ss;
 				scheduleConfig.selectedSchedule = data.data;
 				ss = scheduleConfig.selectedSchedule;
 				// update the schedule's time to match standard time
-				for (i = 0; i < ss.classes.length; i++) {
-					ss.classes[i].time = commonService.formatTimeM2S(ss.classes[i].start_time, ss.classes[i].end_time);
+				if (ss.classes) {
+					for (i = 0; i < ss.classes.length; i++) {
+						ss.classes[i].time = commonService.formatTimeM2S(ss.classes[i].start_time, ss.classes[i].end_time);
+					}
+				}
+				if (ss.students) {
+					for (i = 0; i < ss.students.length; i++) {
+						for (j = 0; j < ss.students[i].classes.length; j++) {
+							ss.students[i].classes[j].time = commonService.formatTimeM2S(ss.students[i].classes[j].start_time, ss.students[i].classes[j].end_time);
+						}
+					}
 				}
 
 				deferred.resolve(scheduleConfig.selectedSchedule);

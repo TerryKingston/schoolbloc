@@ -443,6 +443,10 @@ angular.module('sbAngularApp')
 			$scope.translations.student_course = translation;
 		});
 
+		$translate("schedulerModule.DAY").then(function (translation) {
+			$scope.translations.day = translation;
+		});
+
 		$translate("schedulerModule.DAYS").then(function (translation) {
 			$scope.translations.days = translation;
 		});

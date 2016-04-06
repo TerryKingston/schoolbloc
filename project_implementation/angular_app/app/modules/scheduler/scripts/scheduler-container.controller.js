@@ -31,13 +31,32 @@ angular.module('sbAngularApp')
 		selectedValue: 'class'
 	};
 
+	$scope.scheduleLog = {
+		data: [
+			// {
+			// 	"created_at": "2015-16-14 13:45.34567",
+			// 	"description": "Schedule has started, but a bunny jumped into the main system and is crashing all the servers.  Oh no! He just ate the internet!"
+			// },
+			// {
+			// 	"created_at": "2015-16-14 13:45.34567",
+			// 	"description": "Schedule has started, but a bunny jumped into the main system and is crashing all the servers.  Oh no! He just ate the internet!"
+			// },
+			// {
+			// 	"created_at": "2015-16-14 13:45.34567",
+			// 	"description": "Schedule has started, but a bunny jumped into the main system and is crashing all the servers.  Oh no! He just ate the internet!"
+			// },
+			// {
+			// 	"created_at": "2015-16-14 13:45.34567",
+			// 	"description": "Schedule has started, but a bunny jumped into the main system and is crashing all the servers.  Oh no! He just ate the internet!"
+			// }
+		]
+	};
 
 	$scope.selectSchedule = function(id) {
 		schedulerService.getSchedule(id);
 	};
 
 	$scope.updateScheduleView = function() {
-		console.log($scope.scheduleOptions.selectedValue)
 		schedulerService.getSchedule($scope.scheduleConfig.selectedSchedule.id, $scope.scheduleOptions.selectedValue);
 	}
 
@@ -50,7 +69,7 @@ angular.module('sbAngularApp')
 		getGenerationUpdates();
 
 		schedulerService.generateSchedule().then(function(data) {
-			$scope.config.loadingGenerate = false;
+			//$scope.config.loadingGenerate = false;
 			$scope.config.error = null;
 		}, function(error) {
 			$scope.config.loadingGenerate = false;
@@ -68,10 +87,14 @@ angular.module('sbAngularApp')
 		// every 5 seconds get new updates
 		$timeout(function() {
 			schedulerService.getScheduleUpdate().then(function(data) {
-				debugger;
+				var i;
+				if (data) {
+					for (i = 0; i < data.length; i++) {
+						$scope.scheduleLog.data.push(data[i]);
+					}
+				}
 				getGenerationUpdates();
 			}, function(error) {
-				debugger;
 				//$scope.config.loadingGenerate = false;
 				$scope.config.error = "Error: could not get updates."
 			});

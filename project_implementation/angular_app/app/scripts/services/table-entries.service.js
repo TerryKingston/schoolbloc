@@ -9,6 +9,7 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 		COURSE_URL = SERVER_ROOT + "courses",
 		STUDENT_URL = SERVER_ROOT + "students",
 		STUDENT_GROUP_URL = SERVER_ROOT + "student_groups",
+		DAY_URL = SERVER_ROOT + "days",
 		SUBJECT_URL = SERVER_ROOT + "subjects",
 		TEACHER_URL = SERVER_ROOT + "teachers",
 		TIME_URL = SERVER_ROOT + "timeblocks";
@@ -405,12 +406,53 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 				multipleValues: false
 			},
 			{
-				key: "days",
-				value: [{"text": "monday", "value": true}, {"text": "tuesday", "value": true}, {"text": "wednesday", "value": true}, {"text": "thursday", "value": true}, {"text": "friday", "value": true}],
+				key: "day",
+				value: "Monday",
 				error: null,
 				required: true,
-				type: "checkboxes",
-				multipleValues: false
+				type: "constraint",
+				multipleValues: true,
+				facts: null
+			},
+			{
+				addedValue: true,
+				key: "day",
+				value: "Tuesday",
+				error: null,
+				required: true,
+				type: "constraint",
+				multipleValues: true,
+				facts: null
+			},
+			{
+				addedValue: true,
+				key: "day",
+				value: "Wednesday",
+				error: null,
+				required: true,
+				type: "constraint",
+				multipleValues: true,
+				facts: null
+			},
+			{
+				addedValue: true,
+				key: "day",
+				value: "Thursday",
+				error: null,
+				required: true,
+				type: "constraint",
+				multipleValues: true,
+				facts: null
+			},
+			{
+				addedValue: true,
+				key: "day",
+				value: "Friday",
+				error: null,
+				required: true,
+				type: "constraint",
+				multipleValues: true,
+				facts: null
 			},
 			{
 				key: "course",
@@ -465,12 +507,13 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 				multipleValues: false
 			},
 			{
-				key: "days",
-				value: [{"text": "monday", "value": false}, {"text": "tuesday", "value": false}, {"text": "wednesday", "value": false}, {"text": "thursday", "value": false}, {"text": "friday", "value": false}],
+				key: "day",
+				value: null,
 				error: null,
 				required: true,
-				type: "checkboxes",
-				multipleValues: false
+				type: "constraint",
+				multipleValues: true,
+				facts: null
 			},
 			{
 				key: "teacher",
@@ -639,6 +682,9 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 			else if (factType === "student_group") {
 				url = STUDENT_GROUP_URL;
 			}
+			else if (factType === "day") {
+				url = DAY_URL;
+			}
 			else {
 				console.error("tableEntriesService.addFact: unexpected state: invalid factType: " + factType);
 				deferred.reject("ERROR: Unexpected front-end input.");
@@ -686,6 +732,9 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 			else if (factType === "student_group") {
 				url = STUDENT_GROUP_URL;
 			}
+			else if (factType === "day") {
+				url = DAY_URL;
+			}
 			else {
 				console.error("tableEntriesService.addFact: unexpected state: invalid factType: " + factType);
 				deferred.reject("ERROR: Unexpected front-end input.");
@@ -732,6 +781,9 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 			}
 			else if (factType === "student_group") {
 				url = STUDENT_GROUP_URL;
+			}
+			else if (factType === "day") {
+				url = DAY_URL;
 			}
 			else {
 				console.error("tableEntriesService.addFact: unexpected state: invalid factType: " + factType);
@@ -791,6 +843,9 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 			}
 			else if (factName === "student_group") {
 				url = STUDENT_GROUP_URL;
+			}
+			else if (factName === "day") {
+				url = DAY_URL;
 			}
 			else if (factName === "student_course") {
 				// @TODO: change later
@@ -959,6 +1014,9 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 			}
 			else if (constraintName === "student_group") {
 				url = STUDENT_GROUP_URL;
+			}
+			else if (constraintName === "day") {
+				url = DAY_URL;
 			}
 			else {
 				console.error("tableEntriesService.getConstraintFacts: unexpected state: invalid constraintName: " + constraintName);
