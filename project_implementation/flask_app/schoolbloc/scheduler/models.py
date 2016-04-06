@@ -157,6 +157,23 @@ class Course(db.Model, SqlalchemySerializer):
         return "{}".format(self.name)
 
 
+class Day(db.Model, SqlalchemySerializer):
+    # Name and rest constraints for API generation
+    __tablename__ = 'days'
+
+    # Columns
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.Integer, nullable=False)
+
+    # Relationships
+    teachers_days = db.relationship("TeachersDays",
+                                    back_populates="day",
+                                    passive_deletes=True)
+    timeblocks_days = db.relationship("TimeblocksDay",
+                                      back_populates="day",
+                                      passive_deletes=True)
+
+
 class Student(db.Model, SqlalchemySerializer):
     """
     ORM object for students stored in the database
@@ -312,9 +329,12 @@ class Teacher(db.Model, SqlalchemySerializer):
     teachers_timeblocks = db.relationship("TeachersTimeblock",
                                           back_populates="teacher",
                                           passive_deletes=True)
+    teachers_days = db.relationship("TeachersDays",
+                                    back_populates="teacher",
+                                    passive_deletes=True)
     scheduled_class = db.relationship("ScheduledClass",
-                                        back_populates="teacher",
-                                        passive_deletes=True)
+                                      back_populates="teacher",
+                                      passive_deletes=True)
 
     def __str__(self):
         return "{} {}".format(self.first_name, self.last_name)
@@ -359,6 +379,9 @@ class Timeblock(db.Model, SqlalchemySerializer):
     teachers_timeblocks = db.relationship("TeachersTimeblock",
                                           back_populates="timeblock",
                                           passive_deletes=True)
+    timeblocks_days = db.relationship("TimeblocksDay",
+                                      back_populates="timeblock",
+                                      passive_deletes=True)
 
     def __str__(self):
         return "{} {}".format(self.start_time, self.end_time)
@@ -631,6 +654,21 @@ class TeachersSubject(db.Model, SqlalchemySerializer):
     subject = db.relationship("Subject", back_populates="teachers_subjects")
 
 
+class TeachersDays(db.Model, SqlalchemySerializer):
+    __tablename__ = 'teachers_days'
+
+    # Columns
+    id = db.Column(db.Integer, primary_key=True)
+    active = db.Column(db.Boolean, nullable=False, default=True)
+    priority = db.Column(db.String(128), nullable=False, default='mandatory')
+    teacher_id = db.Column(db.Integer, db.ForeignKey('teachers.id', ondelete="CASCADE"), nullable=False)
+    day_id = db.Column(db.Integer, db.ForeignKey('days.id', ondelete="CASCADE"), nullable=False)
+
+    # Relationships
+    teacher = db.relationship("Teacher", back_populates='teachers_days')
+    day = db.relationship("Day", back_populates='teachers_days')
+
+
 class TeachersTimeblock(db.Model, SqlalchemySerializer):
     """
     ORM Object for linking table between teachers and timeblocks
@@ -647,6 +685,21 @@ class TeachersTimeblock(db.Model, SqlalchemySerializer):
     # Relationships
     teacher = db.relationship("Teacher", back_populates='teachers_timeblocks')
     timeblock = db.relationship("Timeblock", back_populates='teachers_timeblocks')
+
+
+class TimeblocksDay(db.Model, SqlalchemySerializer):
+    __tablename__ = 'timeblocks_days'
+
+    # Columns
+    id = db.Column(db.Integer, primary_key=True)
+    active = db.Column(db.Boolean, nullable=False, default=True)
+    priority = db.Column(db.String(128), nullable=False, default='low')
+    timeblock_id = db.Column(db.Integer, db.ForeignKey('timeblocks.id', ondelete="CASCADE"), nullable=False)
+    day_id = db.Column(db.Integer, db.ForeignKey('days.id', ondelete="CASCADE"), nullable=False)
+
+    # Relationships
+    timeblock = db.relationship("Timeblock", back_populates='timeblocks_days')
+    day = db.relationship("Day", back_populates='timeblocks_days')
 
 
 ############
@@ -794,19 +847,4 @@ class Notification(db.Model, SqlalchemySerializer):
     description = db.Column(db.String(255), nullable=False)
     unread = db.Column(db.Boolean, nullable=False, default=True)
 
-class Day(db.Model, SqlalchemySerializer):
-    __tablename__ = 'days'
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.Integer, nullable=False)
 
-class TeachersDays(db.Model, SqlalchemySerializer):
-    __tablename__ = 'teachers_days'
-    id = db.Column(db.Integer, primary_key=True)
-    teacher_id = db.Column(db.Integer, nullable=False)
-    day_id = db.Column(db.Integer, nullable=False)
-
-class TimeblocksDay(db.Model, SqlalchemySerializer):
-    __tablename__ = 'timeblocks_days'
-    id = db.Column(db.Integer, primary_key=True)
-    timeblock_id = db.Column(db.Integer, nullable=False)
-    day_id = db.Column(db.Integer, nullable=False)
