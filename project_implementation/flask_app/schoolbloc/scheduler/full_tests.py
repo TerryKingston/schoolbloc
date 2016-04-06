@@ -34,6 +34,13 @@ class FullScheduleTests(unittest.TestCase):
         db.session.add(User(username='student', password='student', role_type='student'))
         db.session.add(User(username='student2', password='student2', role_type='student'))
         db.session.add(User(username='student3', password='student3', role_type='student'))
+        db.session.add(Day(name='monday'))
+        db.session.add(Day(name='tuesday'))
+        db.session.add(Day(name='wednesday'))
+        db.session.add(Day(name='thursday'))
+        db.session.add(Day(name='friday'))
+        db.session.add(Day(name='saturday'))
+        db.session.add(Day(name='sunday'))
         db.session.commit()
 
     # def setUp(self):

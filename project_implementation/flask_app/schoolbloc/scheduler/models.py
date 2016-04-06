@@ -286,7 +286,8 @@ class Teacher(db.Model, SqlalchemySerializer):
     # Name and rest constraints for API generation
     __tablename__ = 'teachers'
     __restconstraints__ = ['courses_teachers', 'teachers_subjects',
-                           'classrooms_teachers', 'teachers_timeblocks']
+                           'classrooms_teachers', 'teachers_timeblocks',
+                           'teachers_days']
 
     # Columns
     id = db.Column(db.Integer, primary_key=True)
@@ -331,7 +332,8 @@ class Timeblock(db.Model, SqlalchemySerializer):
     __tablename__ = 'timeblocks'
     __restconstraints__ = ['teachers_timeblocks','students_timeblocks',
                            'student_groups_timeblocks', 'courses_timeblocks',
-                           'subjects_timeblocks', 'classrooms_timeblocks']
+                           'subjects_timeblocks', 'classrooms_timeblocks',
+                           'timeblocks_days']
 
     # Columns
     id = db.Column(db.Integer, primary_key=True)
@@ -792,14 +794,19 @@ class Notification(db.Model, SqlalchemySerializer):
     description = db.Column(db.String(255), nullable=False)
     unread = db.Column(db.Boolean, nullable=False, default=True)
 
-class TeachersWeekDay(db.Model, SqlalchemySerializer):
-    __tablename__ = 'teachers_week_days'
+class Day(db.Model, SqlalchemySerializer):
+    __tablename__ = 'days'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.Integer, nullable=False)
+
+class TeachersDays(db.Model, SqlalchemySerializer):
+    __tablename__ = 'teachers_days'
     id = db.Column(db.Integer, primary_key=True)
     teacher_id = db.Column(db.Integer, nullable=False)
-    weekday = db.Column(db.String(20), nullable=False)
+    day_id = db.Column(db.Integer, nullable=False)
 
-class TimeblocksWeekDay(db.Model, SqlalchemySerializer):
-    __tablename__ = 'timeblocks_week_days'
+class TimeblocksDay(db.Model, SqlalchemySerializer):
+    __tablename__ = 'timeblocks_days'
     id = db.Column(db.Integer, primary_key=True)
     timeblock_id = db.Column(db.Integer, nullable=False)
-    weekday = db.Column(db.String(20), nullable=False)
+    day_id = db.Column(db.Integer, nullable=False)
