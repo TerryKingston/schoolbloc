@@ -14,7 +14,7 @@
           <th>Access token</th>
         </tr>
         <tr ng-repeat="token in userAccess.tokens.student track by $index">
-          <td>{{token.user_id}}</td>
+          <td>{{token.uid}}</td>
           <td>{{token.name}}</td>
           <td>{{token.token}}</td>
         </tr>
@@ -34,7 +34,7 @@
         <th>Access token</th>
       </tr>
       <tr ng-repeat="token in userAccess.tokens.teacher track by $index">
-        <td>{{token.user_id}}</td>
+        <td>{{token.uid}}</td>
         <td>{{token.name}}</td>
         <td>{{token.token}}</td>
       </tr>

@@ -41,7 +41,7 @@ angular.module('sbAngularApp').factory('userAuthService', ['$q', '$http', '$wind
         password: password,
         fullName: fullname,
         person: person,
-        user_id: id,
+        uid: id,
         access_token: token,
         email: email
       };
@@ -71,7 +71,7 @@ angular.module('sbAngularApp').factory('userAuthService', ['$q', '$http', '$wind
         $window.localStorage.username = data.data.username;
         $window.localStorage.role = data.data.role;
         $window.localStorage.role_id = data.data.role_id;
-        $window.localStorage.user_id = data.data.user_id;
+        $window.localStorage.uid = data.data.uid;
 
         $timeout(function() {
           deferred.resolve(data.data);
@@ -91,7 +91,7 @@ angular.module('sbAngularApp').factory('userAuthService', ['$q', '$http', '$wind
       $window.localStorage.removeItem('jwtToken');
       $window.localStorage.removeItem('username');
       $window.localStorage.removeItem('role');
-      $window.localStorage.removeItem('user_id');
+      $window.localStorage.removeItem('uid');
       $window.localStorage.removeItem('role_id');
     },
 
@@ -126,12 +126,12 @@ angular.module('sbAngularApp').factory('userAuthService', ['$q', '$http', '$wind
 
     getUserId: function() {
       var self = this;
-      if (self.isUserAuthenticated() && $window.localStorage.user_id) {
+      if (self.isUserAuthenticated() && $window.localStorage.uid) {
         // @TODO: remove when jwt passes in username and role with it
-        return $window.localStorage.user_id;
+        return $window.localStorage.uid;
 
         // flask-JWT is only returning the identity
-        return parseJwtTokenClaim(self.getJwtToken()).user_id;
+        return parseJwtTokenClaim(self.getJwtToken()).uid;
       }
       // @TODO: what do we do if the token has expired or there is no token?
     },
