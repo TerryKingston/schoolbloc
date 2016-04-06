@@ -845,9 +845,17 @@ class Notification(db.Model, SqlalchemySerializer):
     __tablename__ = 'notifications'
     id = db.Column(db.Integer, primary_key=True)
     created_at = db.Column(db.DateTime, nullable=False)
-    type = db.Column(db.String(40), nullable=False) # success, info, warning, error
+    type = db.Column(db.String(40), nullable=False)  # success, info, warning, error
     subject = db.Column(db.String(80), nullable=False)
     description = db.Column(db.String(255), nullable=False)
     unread = db.Column(db.Boolean, nullable=False, default=True)
 
-
+    def serialize(self):
+        ret = OrderedDict()
+        ret['id'] = self.id
+        ret['created_at'] = str(self.created_at)
+        ret['type'] = self.type
+        ret['subject'] = self.subject
+        ret['description'] = self.description
+        ret['unread'] = self.unread
+        return ret
