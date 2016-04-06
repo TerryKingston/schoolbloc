@@ -172,6 +172,8 @@ class Day(db.Model, SqlalchemySerializer):
     timeblocks_days = db.relationship("TimeblocksDay",
                                       back_populates="day",
                                       passive_deletes=True)
+    def __str__(self):
+        return "{}".format(name)
 
 
 class Student(db.Model, SqlalchemySerializer):
