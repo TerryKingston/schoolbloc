@@ -59,14 +59,14 @@ def register_rest_orm(orm, get='admin', put='admin', post='admin',
     return cls, cls_list
 
 
+# TODO incorporate parents into this
 def student_parent_get_or_abort(self, orm_id):
-    if current_identity.role.role_type in ('student', 'parent'):
-        if current_identity.id != orm_id:
-            return {'error': 'Denied'}, 403
-
     orm_object = self.orm.query.get(orm_id)
     if not orm_object:
         abort(404, message="ID {} not found".format(orm_id))
+    if current_identity.role.role_type in ('student', 'parent'):
+        if current_identity.id != orm_object.user_id:
+            abort(404, message='Denied')
     return orm_object
 
 
