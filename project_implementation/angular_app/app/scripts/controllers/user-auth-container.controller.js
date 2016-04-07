@@ -173,6 +173,7 @@ angular.module('sbAngularApp')
 	 * Switches view between login and registration
 	 */
 	$scope.switchForm = function() {
+		$scope.resetForm();
 		$scope.userAuthContainer.form.isLoginForm = !$scope.userAuthContainer.form.isLoginForm;
 		$scope.getFormTypeText();
 	};
@@ -332,7 +333,7 @@ angular.module('sbAngularApp')
 
 	$scope.resetForm = function() {
 		$scope.userAuthContainer.form = {
-			isLoginForm: true,
+			isLoginForm: $scope.userAuthContainer.form.isLoginForm,
 			username: null,
 			fullName: null,
 			password: null,

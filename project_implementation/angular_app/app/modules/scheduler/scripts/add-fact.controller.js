@@ -336,6 +336,7 @@ angular.module('sbAngularApp')
 
 	$scope.resetForm = function (factInput, index) {
 		var i,
+			weekDayFacts,
 			ftc = $scope.addFactConfig.factTypeConfig;
 
 		// remove all added input fields
@@ -359,6 +360,62 @@ angular.module('sbAngularApp')
 			else {
 				ftc[i].value = null;
 			}
+			ftc[i].error = null;
+		}
+
+		// special case for teacher day values
+		if ($scope.factSelection === 'teacher') {
+			weekDayFacts = ftc[5].facts;
+			// remove the day that is set to null, and add the all weekdays as checked
+			ftc.splice(5, 1, {
+				key: "day",
+				value: "Monday",
+				error: null,
+				required: true,
+				type: "constraint",
+				multipleValues: true,
+				facts: weekDayFacts
+			},
+			{
+				addedValue: true,
+				key: "day",
+				value: "Tuesday",
+				error: null,
+				required: true,
+				type: "constraint",
+				multipleValues: true,
+				facts: weekDayFacts
+			},
+			{
+				addedValue: true,
+				key: "day",
+				value: "Wednesday",
+				error: null,
+				required: true,
+				type: "constraint",
+				multipleValues: true,
+				facts: weekDayFacts
+			},
+			{
+				addedValue: true,
+				key: "day",
+				value: "Thursday",
+				error: null,
+				required: true,
+				type: "constraint",
+				multipleValues: true,
+				facts: weekDayFacts
+			},
+			{
+				addedValue: true,
+				key: "day",
+				value: "Friday",
+				error: null,
+				required: true,
+				type: "constraint",
+				multipleValues: true,
+				facts: weekDayFacts
+			});
 		}
 	};
 
@@ -426,6 +483,8 @@ angular.module('sbAngularApp')
 		$scope.addFactConfig.factTypeConfig = tableEntriesService.getFactTypeConfig($scope.tableConfig.tableSelection);
 		// make sure to grab the array of constraints for this fact type
 		tableEntriesService.updateFactTypeFacts($scope.tableConfig.tableSelection);
+
+		$scope.resetForm();
 	}
 
 	function getDynamicTranslations() {
