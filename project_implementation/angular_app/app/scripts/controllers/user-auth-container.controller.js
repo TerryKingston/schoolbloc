@@ -301,10 +301,10 @@ angular.module('sbAngularApp')
 			if (!$scope.isValidPerson()) {
 				validForm = false;
 			}
-			if (!$scope.isValidId()) {
+			if ($scope.userAuthContainer.form.person === 'student' && !$scope.isValidId()) {
 				validForm = false;
 			}
-			if (!$scope.isValidToken()) {
+			if ($scope.userAuthContainer.form.person === 'student' && !$scope.isValidToken()) {
 				validForm = false;
 			}
 			if (!$scope.isValidEmail()) {

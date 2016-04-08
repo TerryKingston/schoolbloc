@@ -37,7 +37,7 @@
       <label for="userAuthPerson">{{"userAuthContainer.I_AM_A" | translate}}</label>
       <select id="userAuthPerson" ng-model="userAuthContainer.form.person" ng-blur="isValidPerson()">
         <option value="student">{{"userAuthContainer.STUDENT" | translate}}</option>
-        <option value="teacher">{{"userAuthContainer.TEACHER" | translate}}</option>
+        <!-- <option value="teacher">{{"userAuthContainer.TEACHER" | translate}}</option> -->
         <option value="parent">{{"userAuthContainer.PARENT" | translate}}</option>
       </select>
       <p class="user-auth-input-error-text" ng-if="userAuthContainer.form.errors.personError">{{userAuthContainer.form.errors.personError}}</p>
@@ -53,13 +53,13 @@
       <p class="user-auth-input-error-text" ng-if="userAuthContainer.form.errors.genderError">{{userAuthContainer.form.errors.genderError}}</p>
     </section> -->
     <!-- SCHOOL ID -->
-    <section class="user-auth-input" ng-class="{'user-auth-input-error': userAuthContainer.form.errors.idError}" ng-show="!userAuthContainer.form.isLoginForm">
+    <section class="user-auth-input" ng-class="{'user-auth-input-error': userAuthContainer.form.errors.idError}" ng-show="!userAuthContainer.form.isLoginForm && userAuthContainer.form.person === 'student'">
       <label for="userAuthId">{{"userAuthContainer.ID" | translate}}</label>
       <input type="text" id="userAuthId" ng-model="userAuthContainer.form.id" ng-blur="isValidId()">
       <p class="user-auth-input-error-text" ng-if="userAuthContainer.form.errors.idError">{{userAuthContainer.form.errors.idError}}</p>
     </section>
     <!-- ACCESS TOKEN -->
-    <section class="user-auth-input" ng-class="{'user-auth-input-error': userAuthContainer.form.errors.tokenError}" ng-show="!userAuthContainer.form.isLoginForm">
+    <section class="user-auth-input" ng-class="{'user-auth-input-error': userAuthContainer.form.errors.tokenError}" ng-show="!userAuthContainer.form.isLoginForm && userAuthContainer.form.person === 'student'">
       <label for="userAuthToken">{{"userAuthContainer.ACCESS_TOKEN" | translate}}</label>
       <input type="text" id="userAuthToken" ng-model="userAuthContainer.form.token" ng-blur="isValidToken()">
       <p class="user-auth-input-error-text" ng-if="userAuthContainer.form.errors.tokenError">{{userAuthContainer.form.errors.tokenError}}</p>

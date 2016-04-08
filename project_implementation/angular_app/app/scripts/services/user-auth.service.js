@@ -140,6 +140,8 @@ angular.module('sbAngularApp').factory('userAuthService', ['$q', '$http', '$wind
       var self = this;
       if (self.isUserAuthenticated() && $window.localStorage.role) {
         // @TODO: remove when jwt passes in username and role with it
+        return 'parent';
+
         return $window.localStorage.role;
 
         // flask-JWT is only returning the identity

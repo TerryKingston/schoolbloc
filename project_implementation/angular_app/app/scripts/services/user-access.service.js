@@ -7,7 +7,8 @@ angular.module('sbAngularApp').factory('userAccessService', ['$q', '$http', 'com
 	var SERVER_ROOT = "api/",
 		TOKENS = SERVER_ROOT + "tokens/",
 		STUDENT_TOKENS = TOKENS + "student",
-		TEACHER_TOKENS = TOKENS + "teacher";
+		TEACHER_TOKENS = TOKENS + "teacher",
+		MY_STUDENTS = SERVER_ROOT + "my_students";
 
 	var userAccess = {
 		tokens: {
@@ -68,6 +69,41 @@ angular.module('sbAngularApp').factory('userAccessService', ['$q', '$http', 'com
 		getUserTokens: function() {
 			var deferred = $q.defer();
 			deferred.resolve(userAccess.tokens);
+			return deferred.promise;
+		},
+
+		getUsersStudents: function() {
+			var url;
+			var deferred = $q.defer();
+
+			// conform the url to change the port
+			url = commonService.conformUrl(MY_STUDENTS);
+
+			$http.get(url).then(function(data) {
+				deferred.resolve(data.data);
+			}, function(data) {
+				deferred.reject(data.data);
+			});
+			return deferred.promise;
+		},
+
+		saveStudent: function(id, access_token) {
+			var url, data;
+			var deferred = $q.defer();
+
+			// conform the url to change the port
+			url = commonService.conformUrl(MY_STUDENTS);
+
+			data = {
+				id: id,
+				access_token: access_token
+			};
+
+			$http.post(url, data).then(function(data) {
+				deferred.resolve(data.data);
+			}, function(data) {
+				deferred.reject(data.data);
+			});
 			return deferred.promise;
 		}
 	};

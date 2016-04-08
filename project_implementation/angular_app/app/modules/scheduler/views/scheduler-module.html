@@ -4,8 +4,11 @@
   <div ng-controller="SchedulerContainer" ng-if="userAccess.role === 'admin'">
     <sb-scheduler-container></sb-scheduler-container>
   </div>
-  <div ng-controller="ScheduleContainer" ng-if="userAccess.role === 'parent' || userAccess.role === 'student'">
+  <!-- <div ng-controller="ScheduleContainer" ng-if="userAccess.role === 'parent' || userAccess.role === 'student'">
     <sb-schedule-container></sb-schedule-container>
+  </div> -->
+  <div ng-controller="ManageClasses" ng-if="userAccess.role === 'parent' || userAccess.role === 'student'">
+    <sb-manage-classes></sb-manage-classes>
   </div>
 </div>
 

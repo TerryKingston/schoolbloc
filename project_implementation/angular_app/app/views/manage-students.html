@@ -1,0 +1,49 @@
+<section class="manage-students main-view-content">
+  <section class="manage-students-title">
+  	<h3>Welcome to Schoolbloc!</h3>
+    <p>Add students by providing their school id and access token provided to you via email.</p>
+    <p>Once provided, you may manage each of your students' courses by selecting a student.</p>
+    <p>Choose <b>'Manage classes'</b> from the menu to view the selected student's required coures, as well as adding and prioritizing the student's elective courses.</p>
+    <p>To log out, click on your username, and <b>'Logout'</b>.</p>
+    <p>Please note, you will be unable to view your students' schedule from this website.  The school will provide you with your students' schedule at a later time.</p>
+  </section>
+  <section class="add-students">
+    <h3>Students</h3>
+    <button class="btn btn-recommended" ng-if="!addStudent.showAddStudent" ng-click="addStudentToggle(true)">Add student</button>
+    <section ng-if="addStudent.showAddStudent">
+      <div class="input-row">
+        <label>
+          <div>Student id<div class="required">*</div></div>
+          <input type="text" ng-model="addStudent.form.id" ng-blur="checkInput('id')">
+        </label>
+        <div class="input-row-error" ng-if="addStudent.form.id_error">{{addStudent.form.id_error}}</div>
+      </div>
+      <div>
+        <label>
+          <div>Access token<div class="required">*</div></div>
+          <input type="text" ng-model="addStudent.form.access_token" ng-blur="checkInput('access_token')">
+        </label>
+        <div class="input-row-error" ng-if="addStudent.form.access_token_error">{{addStudent.form.access_token_error}}</div>
+      </div>
+      <!-- <div class="icon-option-row">
+        <a href="">
+          <div class="calendar-icon"></div>
+          <div>{{"schedulerModule.SET_REPEAT" | translate}}</div>
+        </a>
+      </div> -->
+      <div class="add-fact-error" ng-if="addStudent.form.error">
+        {{addStudent.form.error}}
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-recommended" ng-click="saveStudent(false)">{{"schedulerModule.SAVE" | translate}}</button>
+        <button class="btn btn-recommended" ng-click="saveStudent(true)" ng-bind-html="'schedulerModule.SAVE_ANOTHER' | translate"></button>
+        <button class="btn btn-secondary" ng-click="addStudentToggle(false)">{{"schedulerModule.CANCEL" | translate}}</button>
+      </div>
+    </section>
+  </section>
+  <section class="manage-students-group"  ng-if="manageStudents.students.length">
+    <div class="student-selection" ng-class="{'student-selection-active': student.id === manageStudents.selectedStudent.id}" ng-repeat="student in manageStudents.students track by $index" ng-click="selectStudent(student)">
+      <div>{{student['full name']}} ({{student.id}})</div>
+    </div>
+  </section>
+</section>

@@ -10,6 +10,9 @@
     <div ng-controller="ParentHomeContainer" ng-if="mainContainer.navBarConfig.view === 'main dashboard' && userAccess.role === 'parent'">
       <sb-parent-home-container></sb-parent-home-container>
     </div>
+    <div ng-controller="StudentHomeContainer" ng-if="mainContainer.navBarConfig.view === 'main dashboard' && userAccess.role === 'student'">
+      <sb-student-home-container></sb-student-home-container>
+    </div>
     <div ng-controller="ImportExportContainer" ng-if="mainContainer.navBarConfig.view === 'import export'">
       <sb-import-export-container></sb-import-export-container>
     </div>
