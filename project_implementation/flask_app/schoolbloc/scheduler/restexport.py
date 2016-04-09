@@ -136,13 +136,17 @@ class TestRest(Resource):
             foreign_name = _get_constraint_foreign_name(self.orm, constraint)
             foreign_serialized = []
             for mapper_orm in getattr(orm_object, constraint):
+                # Data from foreign orm
                 foreign_orm = getattr(mapper_orm, foreign_name)
                 serialized = {
                     'id': foreign_orm.id,
                     'value': str(foreign_orm),
-                    'active': mapper_orm.active,
-                    'priority': mapper_orm.priority
                 }
+
+                # Constraint orm data
+                for column in mapper_orm.__table__.columns.values():
+                    if not column.foreign_keys and not column.primary_key:
+                        serialized[column.name] = getattr(mapper_orm, column.name)
                 foreign_serialized.append(serialized)
             ret[foreign_name] = foreign_serialized
         return ret
@@ -161,6 +165,7 @@ class TestRest(Resource):
                 to_remove.append(key)
         for key in to_remove:
             del request_json[key]
+        print(orm_obj.room_number)
         db.session.add(orm_obj)
 
         # only stuff left in json_request should be the constraint data. If there
@@ -177,15 +182,24 @@ class TestRest(Resource):
                 this_id, foreign_id = _get_constraint_key_column_names(self.orm, orm_class)
 
                 if data['method'] == 'add':
-                    try:
-                        tmp_kwargs = {}
-                        tmp_kwargs['active'] = data['active']
-                        tmp_kwargs['priority'] = data['priority']
-                        tmp_kwargs[this_id] = orm_obj.id
-                        tmp_kwargs[foreign_id] = data['id']
-                        db.session.add(orm_class(**tmp_kwargs))
-                    except KeyError as e:
-                        abort(400, message="missing key {} in constraint {}".format(str(e), constraint))
+                    # These are the ids for the constraint
+                    tmp_kwargs = {
+                        this_id: orm_obj.id,
+                        foreign_id: data['id']
+                    }
+
+                    # These are the additional data for the constraints (active,
+                    # priority, etc). Don't error out here if the key doesn't
+                    # exist in the request json. If it is a nullable column, or
+                    # if the column has a default value, they don't have to pass
+                    # it in here for the api to work
+                    for column in orm_class.__table__.columns.values():
+                        if not column.foreign_keys and not column.primary_key:
+                            try:
+                                tmp_kwargs[column.name] = data[column.name]
+                            except KeyError:
+                                pass
+                    db.session.add(orm_class(**tmp_kwargs))
 
                 elif data['method'] == 'delete':
                     try:
@@ -210,15 +224,21 @@ class TestRest(Resource):
                                                              foreign_col == data['id']).one()
 
                         for key, value in data.items():
+                            # Special keys we want to handle or ignore
                             if key == 'id':
                                 setattr(tmp_orm_obj, foreign_id, value)
-                            elif key == 'active':
-                                setattr(tmp_orm_obj, 'active', value)
-                            elif key == 'priority':
-                                setattr(tmp_orm_obj, 'priority', value)
+                                continue
                             elif key == 'method':
                                 continue
-                            else:
+
+                            # Columns of the constraint orm
+                            found = False
+                            for column in orm_class.__table__.columns.values():
+                                if key == column.name:
+                                    setattr(tmp_orm_obj, key, value)
+                                    found = True
+                                    break
+                            if not found:
                                 abort(400, message='Bad key found in constraint json: {}'.format(key))
                         db.session.add(tmp_orm_obj)
                     except NoResultFound:
@@ -270,9 +290,10 @@ class TestRestList(Resource):
                     serialized = {
                         'id': foreign_orm.id,
                         'value': str(foreign_orm),
-                        'active': mapper_orm.active,
-                        'priority': mapper_orm.priority
                     }
+                    for column in mapper_orm.__table__.columns.values():
+                        if not column.foreign_keys and not column.primary_key:
+                            serialized[column.name] = getattr(mapper_orm, column.name)
                     foreign_serialized.append(serialized)
                 tmp_ret[foreign_name] = foreign_serialized
             ret.append(tmp_ret)
@@ -302,26 +323,36 @@ class TestRestList(Resource):
         # only stuff left in json_request should be the constraint data. If there
         # is additional keys here, go ahead and error out instead of ignoring them
         # (nothing has been commited to the db yet)
+        from pprint import pprint
+        pprint(request_json)
         for constraint, data_list in request_json.items():
             for data in data_list:
-                try:
-                    orm_class = _find_constraint_mapping_table(self.orm, constraint)
-                    this_id, foreign_id = _get_constraint_key_column_names(self.orm, orm_class)
+                constraint_orm_class = _find_constraint_mapping_table(self.orm, constraint)
+                this_id, foreign_id = _get_constraint_key_column_names(self.orm, constraint_orm_class)
 
-                    print(constraint, data)
-                    tmp_kwargs = {}
-                    tmp_kwargs['active'] = data['active']
-                    tmp_kwargs['priority'] = data['priority']
-                    tmp_kwargs[this_id] = orm_obj.id
-                    tmp_kwargs[foreign_id] = data['id']
-                    db.session.add(orm_class(**tmp_kwargs))
-                except KeyError as e:
-                    abort(400, message="missing key {} in constraint {}".format(str(e), constraint))
+                # These are the ids for the constraint
+                tmp_kwargs = {
+                    this_id: orm_obj.id,
+                    foreign_id: data['id']
+                }
+
+                # These are the additional data for the constraints (active,
+                # priority, etc). Don't error out here if the key doesn't
+                # exist in the request json. If it is a nullable column, or
+                # if the column has a default value, they don't have to pass
+                # it in here for the api to work
+                for column in constraint_orm_class.__table__.columns.values():
+                    if not column.foreign_keys and not column.primary_key:
+                        try:
+                            tmp_kwargs[column.name] = data[column.name]
+                        except KeyError:
+                            pass
+                db.session.add(constraint_orm_class(**tmp_kwargs))
 
         # Save all new objects to db
         try:
             db.session.commit()
-        except IntegrityError as e:
+        except Exception as e:
             db.session.rollback()
-            return {'error': 'SQL integrity error: {}'.format(e)}, 409
+            return {'error': 'Error committing SQL: {}'.format(e)}, 409
         return {'success': 'Added successfully'}, 200
