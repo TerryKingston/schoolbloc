@@ -3,6 +3,8 @@ from threading import Thread
 from flask import Blueprint
 from flask.ext.jwt import current_identity
 from flask.ext.restful import Api, Resource, abort
+from sqlalchemy.orm.exc import NoResultFound
+
 from schoolbloc import auth_required
 from schoolbloc.scheduler.restexport import TestRest, TestRestList
 from schoolbloc.scheduler.models import *
@@ -168,7 +170,20 @@ class ScheduleListApi(Resource):
         return {'success': 'Started generating schedule'}
 
 
+class ParentsStudents(Resource):
+
+    @auth_required(roles='parent')
+    def get(self):
+        try:
+            parent = Parent.query.filter_by(user_id=current_identity.id).one()
+        except NoResultFound:
+            return []
+        print(parent.students)
+        return [s.serialize() for s in parent.students]
+
+
 api.add_resource(UnreadNotifications, '/api/notifications/unread')
 api.add_resource(ScheduleApi, '/api/schedules/<int:schedule_id>/class')
 api.add_resource(ScheduleStudentApi, '/api/schedules/<int:schedule_id>/student')
 api.add_resource(ScheduleListApi, '/api/schedules')
+api.add_resource(ParentsStudents, '/api/get_my_students')
