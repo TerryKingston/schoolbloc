@@ -1,4 +1,7 @@
 import logging
+import random
+import string
+
 from collections import OrderedDict
 
 from schoolbloc import db, app
@@ -196,6 +199,7 @@ class Student(db.Model, SqlalchemySerializer):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
     first_name = db.Column(db.String(128), nullable=False)
     last_name = db.Column(db.String(128), nullable=False)
+    access_token = db.Column(db.String(16), nullable=False, unique=True)
 
     # Relationships
     user = db.relationship("User", backref="student")
@@ -217,6 +221,22 @@ class Student(db.Model, SqlalchemySerializer):
     parent_student_mapper = db.relationship("ParentStudentMapper",
                                             back_populates="student",
                                             passive_deletes=True)
+
+    def __init__(self, uid=None, user_id=None, first_name=None, last_name=None,
+                 access_token=None):
+        """
+        WE have an explicit init method so we can create the access token when a
+        student is created
+        """
+        self.uid = uid
+        self.user_id = user_id
+        self.first_name = first_name
+        self.last_name = last_name
+        if access_token:
+            self.access_token = access_token
+        else:
+            choices = string.ascii_letters + string.digits
+            self.access_token = ''.join(random.SystemRandom().choice(choices) for _ in range(16))
 
     def __str__(self):
         return "{} {}".format(self.first_name, self.last_name)
