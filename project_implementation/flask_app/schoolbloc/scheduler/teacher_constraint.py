@@ -96,6 +96,11 @@ class TeacherConstraint:
                         TeachersTimeblock.query.filter_by(priority='low', 
                                                             teacher_id=self.teacher_id,
                                                             active=True).all() ]
+
+        not_timeblock_ids = [ ct.timeblock_id for ct in 
+                        TeachersTimeblock.query.filter_by(priority='not', 
+                                                            teacher_id=self.teacher_id,
+                                                            active=True).all() ]
         for subject_id in self.subject_ids:
             self.mand_timeblock_ids += [ st.timeblock_id for st in 
                              SubjectsTimeblock.query.filter_by(priority='mandatory', 
@@ -109,11 +114,18 @@ class TeacherConstraint:
                              SubjectsTimeblock.query.filter_by(priority='low', 
                                                                subject_id=subject_id,
                                                                active=True).all() ]
-
+            not_timeblock_ids += [ st.timeblock_id for st in 
+                             SubjectsTimeblock.query.filter_by(priority='not', 
+                                                               subject_id=subject_id,
+                                                               active=True).all() ]
         # if our low id set is empty. we assume all timeblocks are in the low set
         if len(self.low_timeblock_ids) == 0: 
             self.low_timeblock_ids = [ t.id for t in Timeblock.query.all() ]
 
+
+        self.mand_timeblock_ids = set(self.mand_timeblock_ids) - set(not_timeblock_ids)
+        self.high_timeblock_ids = set(self.high_timeblock_ids) - set(not_timeblock_ids)
+        self.low_timeblock_ids = set(self.low_timeblock_ids) - set(not_timeblock_ids)
 
         # now calculate the classrooms
         mand_classroom_ids = [ ct.classroom_id for ct in 
@@ -126,6 +138,10 @@ class TeacherConstraint:
                                                                  active=True).all() ]
         low_classroom_ids = [ ct.classroom_id for ct in 
                                ClassroomsTeacher.query.filter_by(priority='low', 
+                                                                 teacher_id=self.teacher_id,
+                                                                 active=True).all() ]
+        not_classroom_ids = [ ct.classroom_id for ct in 
+                               ClassroomsTeacher.query.filter_by(priority='not', 
                                                                  teacher_id=self.teacher_id,
                                                                  active=True).all() ]
         for subject_id in self.subject_ids:
@@ -141,10 +157,18 @@ class TeacherConstraint:
                                     ClassroomsSubject.query.filter_by(priority='low', 
                                                                       subject_id=subject_id,
                                                                       active=True).all() ]
+            not_classroom_ids += [ cs.classroom_id for cs in 
+                                    ClassroomsSubject.query.filter_by(priority='not', 
+                                                                      subject_id=subject_id,
+                                                                      active=True).all() ]
         
         # if our low id set is empty. we assume all timeblocks are in the low set
         if len(low_classroom_ids) == 0:
             low_classroom_ids = [ c.id for c in Classroom.query.all() ]
+
+        mand_classroom_ids = set(mand_classroom_ids) - set(not_classroom_ids)
+        high_classroom_ids = set(high_classroom_ids) - set(not_classroom_ids)
+        low_classroom_ids = set(low_classroom_ids) - set(not_classroom_ids)
 
         # now make a set of ClassroomConstraints from each list
         self.mand_classroom_constraints = [ ClassroomConstraint(c_id) for c_id in mand_classroom_ids ]
