@@ -151,7 +151,7 @@ class FullScheduleTests(unittest.TestCase):
         # Add courses and subjects
         sub_music = Subject(name="Music")
         db.session.add(sub_music)
-        cl_music = [ Course(name=c_name, duration=82, 
+        cl_music = [ Course(name=c_name, 
                             min_student_count=0,
                             max_student_count=30) 
                       for c_name in ["Beg Band", "Int Band",  "Beg Orch", "Int Orchestra",
@@ -169,7 +169,7 @@ class FullScheduleTests(unittest.TestCase):
 
         sub_7th_math = Subject(name="7th Math")
         db.session.add(sub_7th_math)
-        cl_7th_math = [Course(name=c_name, duration=82, 
+        cl_7th_math = [Course(name=c_name, 
                             min_student_count=10,
                             max_student_count=30) 
                        for c_name in ["7th Grade Math", "Secondary Math I", "Secondary Math II"] ]
@@ -185,7 +185,7 @@ class FullScheduleTests(unittest.TestCase):
 
         sub_8th_math = Subject(name="8th Math")
         db.session.add(sub_8th_math)
-        cl_8th_math = [Course(name=c_name, duration=82, 
+        cl_8th_math = [Course(name=c_name, 
                             min_student_count=10,
                             max_student_count=30)
                         for c_name in ["8th Grade Math",  
@@ -203,7 +203,7 @@ class FullScheduleTests(unittest.TestCase):
 
         sub_9th_math = Subject(name="9th Math")                               
         db.session.add(sub_9th_math)
-        cl_9th_math = [ Course(name=c_name, duration=82, 
+        cl_9th_math = [ Course(name=c_name, 
                             min_student_count=10,
                             max_student_count=30)  
                         for c_name in ["9th Grade Math", "Secondary Math I", "Secondary Math II", "Secondary Math III"] ]
@@ -218,7 +218,7 @@ class FullScheduleTests(unittest.TestCase):
         csubs = [ CoursesSubject(course_id=c.id, subject_id=sub_9th_math.id) for c in cl_9th_math ]
         for cs in csubs: db.session.add(cs)
 
-        course_7th_sci = Course(name="Int Science (7)", duration=82, 
+        course_7th_sci = Course(name="Int Science (7)", 
                             min_student_count=10,
                             max_student_count=25)
         db.session.add(course_7th_sci)
@@ -227,7 +227,7 @@ class FullScheduleTests(unittest.TestCase):
         # add a teacher for this course
         db.session.add(CoursesTeacher(teacher_id=math_teacher_4.id, course_id=course_7th_sci.id))
 
-        course_8th_sci = Course(name="Int Science (8)", duration=82, 
+        course_8th_sci = Course(name="Int Science (8)", 
                             min_student_count=10,
                             max_student_count=25)
         db.session.add(course_8th_sci)
@@ -236,17 +236,17 @@ class FullScheduleTests(unittest.TestCase):
         # add a teacher for this course
         db.session.add(CoursesTeacher(teacher_id=sci_teacher_1.id, course_id=course_7th_sci.id))
 
-        course_9th_sci = Course(name="Int Science (9)", duration=82, 
+        course_9th_sci = Course(name="Int Science (9)", 
                             min_student_count=10,
                             max_student_count=25)
         db.session.add(course_9th_sci)
 
-        course_7th_la = Course(name="Language Arts (7)", duration=82, 
+        course_7th_la = Course(name="Language Arts (7)", 
                             min_student_count=10,
                             max_student_count=25)
         db.session.add(course_7th_la)
 
-        course_8th_la = Course(name="Language Arts (8)", duration=82, 
+        course_8th_la = Course(name="Language Arts (8)", 
                             min_student_count=10,
                             max_student_count=25)
         db.session.add(course_8th_la)
@@ -256,7 +256,7 @@ class FullScheduleTests(unittest.TestCase):
         db.session.add(CoursesTeacher(teacher_id=lang_teacher_1.id, course_id=course_8th_la.id))
         db.session.add(CoursesTeacher(teacher_id=lang_teacher_2.id, course_id=course_8th_la.id))
 
-        course_9th_la = Course(name="Language Arts (9)", duration=82, 
+        course_9th_la = Course(name="Language Arts (9)", 
                             min_student_count=10,
                             max_student_count=35)
         db.session.add(course_9th_la)
@@ -266,7 +266,7 @@ class FullScheduleTests(unittest.TestCase):
         db.session.add(CoursesTeacher(teacher_id=lang_teacher_1.id, course_id=course_9th_la.id))
         db.session.add(CoursesTeacher(teacher_id=lang_teacher_2.id, course_id=course_9th_la.id))
 
-        course_7th_pe = Course(name="PE/Health (7)", duration=82, 
+        course_7th_pe = Course(name="PE/Health (7)", 
                             min_student_count=20,
                             max_student_count=50)
         db.session.add(course_7th_pe)
@@ -275,7 +275,7 @@ class FullScheduleTests(unittest.TestCase):
         # add a teacher for this course
         db.session.add(CoursesTeacher(teacher_id=pe_teacher_1.id, course_id=course_7th_pe.id))
 
-        course_8th_pe = Course(name="PE/Health (8)", duration=82, 
+        course_8th_pe = Course(name="PE/Health (8)", 
                             min_student_count=20,
                             max_student_count=50)
         db.session.add(course_8th_pe)
@@ -285,7 +285,7 @@ class FullScheduleTests(unittest.TestCase):
         db.session.add(CoursesTeacher(teacher_id=pe_teacher_2.id, course_id=course_8th_pe.id))
         db.session.add(CoursesTeacher(teacher_id=pe_teacher_3.id, course_id=course_8th_pe.id))
 
-        course_9th_pe = Course(name="PE/Health (9)", duration=82, 
+        course_9th_pe = Course(name="PE/Health (9)", 
                             min_student_count=20,
                             max_student_count=50)
         db.session.add(course_9th_pe)
@@ -295,14 +295,14 @@ class FullScheduleTests(unittest.TestCase):
         db.session.add(CoursesTeacher(teacher_id=pe_teacher_2.id, course_id=course_9th_pe.id))
         db.session.add(CoursesTeacher(teacher_id=pe_teacher_3.id, course_id=course_9th_pe.id))
 
-        course_leadership = Course(name="Leadership", duration=82, 
+        course_leadership = Course(name="Leadership", 
                             min_student_count=10,
                             max_student_count=25)
         db.session.add(course_leadership)
 
         sub_soc_stud = Subject(name="Social Studies")                               
         db.session.add(sub_soc_stud)
-        cl_soc_stud = [ Course(name=c_name, duration=82, 
+        cl_soc_stud = [ Course(name=c_name, 
                             min_student_count=10,
                             max_student_count=30)  
                         for c_name in ["Student Govt", "Utah Studies", "US History I", "World Geog"] ]
@@ -318,7 +318,7 @@ class FullScheduleTests(unittest.TestCase):
 
         sub_tech = Subject(name="Technology")                               
         db.session.add(sub_tech)
-        cl_tech = [ Course(name=c_name, duration=82, 
+        cl_tech = [ Course(name=c_name, 
                             min_student_count=10,
                             max_student_count=15)  
                         for c_name in ["Technology", "Computer Essentials", "Robotics" "Computer Tech", "Pre Engineering", "Auto"] ]
@@ -332,7 +332,7 @@ class FullScheduleTests(unittest.TestCase):
 
         sub_learning = Subject(name="Learning")                               
         db.session.add(sub_learning)
-        cl_learning = [ Course(name=c_name, duration=82, 
+        cl_learning = [ Course(name=c_name, 
                             min_student_count=10,
                             max_student_count=35)  
                         for c_name in ["Learning Strategies", "College & Career Awareness"] ]
