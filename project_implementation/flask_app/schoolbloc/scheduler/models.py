@@ -503,6 +503,7 @@ class CoursesStudent(db.Model, SqlalchemySerializer):
     id = db.Column(db.Integer, primary_key=True)
     active = db.Column(db.Boolean, nullable=False, default=True)
     priority = db.Column(db.String(128), nullable=False, default='low')
+    rank = db.Column(db.Integer, nullable=False, default='0')
     course_id = db.Column(db.Integer, db.ForeignKey('courses.id', ondelete="CASCADE"), nullable=False)
     student_id = db.Column(db.Integer, db.ForeignKey('students.id', ondelete="CASCADE"), nullable=False)
 
