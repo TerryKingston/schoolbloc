@@ -134,7 +134,6 @@ class Course(db.Model, SqlalchemySerializer):
     name = db.Column(db.String(128), nullable=False)
     min_student_count = db.Column(db.Integer)
     max_student_count = db.Column(db.Integer)
-    duration = db.Column(db.Integer)  # optional duration, will use global default if not specified
 
     # Relationships
     classrooms_courses = db.relationship("ClassroomsCourse",
