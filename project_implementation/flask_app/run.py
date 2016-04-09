@@ -6,7 +6,7 @@ using redis instead of an in memory dictionary for session
 storage
 """
 from schoolbloc import app, db
-from datetime import timedelta
+from schoolbloc.scheduler.models import Day
 from schoolbloc.users.models import Role, User
 
 if __name__ == '__main__':
