@@ -432,6 +432,9 @@ class ClassroomsCourse(db.Model, SqlalchemySerializer):
     classroom = db.relationship("Classroom", back_populates="classrooms_courses")
     course = db.relationship("Course", back_populates="classrooms_courses")
 
+    # Unique constraints
+    __table_args__ = (UniqueConstraint('classroom_id', 'course_id', name='_classroom_course_uc'),)
+
 
 class ClassroomsSubject(db.Model, SqlalchemySerializer):
     """ ORM object for linking table between classrooms and subjects tables """
@@ -448,6 +451,9 @@ class ClassroomsSubject(db.Model, SqlalchemySerializer):
     classroom = db.relationship("Classroom", back_populates="classrooms_subjects")
     subject = db.relationship("Subject", back_populates="classrooms_subjects")
 
+    # Unique constraints
+    __table_args__ = (UniqueConstraint('classroom_id', 'subject_id', name='_classroom_subject_uc'),)
+
 
 class ClassroomsTeacher(db.Model, SqlalchemySerializer):
     """ ORM object for linking table between classrooms and teachers tables """
@@ -463,6 +469,9 @@ class ClassroomsTeacher(db.Model, SqlalchemySerializer):
     # Relationships
     classroom = db.relationship("Classroom", back_populates="classrooms_teachers")
     teacher = db.relationship("Teacher", back_populates="classrooms_teachers")
+
+    # Unique constraints
+    __table_args__ = (UniqueConstraint('classroom_id', 'teacher_id', name='_classroom_teacher_uc'),)
 
 
 class ClassroomsTimeblock(db.Model, SqlalchemySerializer):
@@ -482,6 +491,9 @@ class ClassroomsTimeblock(db.Model, SqlalchemySerializer):
     classroom = db.relationship("Classroom", back_populates='classrooms_timeblocks')
     timeblock = db.relationship("Timeblock", back_populates='classrooms_timeblocks')
 
+    # Unique constraints
+    __table_args__ = (UniqueConstraint('classroom_id', 'timeblock_id', name='_classroom_timeblock_uc'),)
+
 
 class CoursesStudent(db.Model, SqlalchemySerializer):
     """ ORM object for linking table between courses and students tables """
@@ -497,6 +509,9 @@ class CoursesStudent(db.Model, SqlalchemySerializer):
     # Relationships
     student = db.relationship("Student", back_populates="courses_students")
     course = db.relationship("Course", back_populates="courses_students")
+
+    # Unique constraints
+    __table_args__ = (UniqueConstraint('course_id', 'student_id', name='_course_student_uc'),)
 
 
 class CoursesStudentGroup(db.Model, SqlalchemySerializer):
@@ -514,6 +529,9 @@ class CoursesStudentGroup(db.Model, SqlalchemySerializer):
     student_group = db.relationship("StudentGroup", back_populates="courses_student_groups")
     course = db.relationship("Course", back_populates="courses_student_groups")
 
+    # Unique constraints
+    __table_args__ = (UniqueConstraint('course_id', 'student_group_id', name='_course_studentgroup_uc'),)
+
 
 class CoursesSubject(db.Model, SqlalchemySerializer):
     """ ORM object for linking table between courses and subjects tables """
@@ -529,6 +547,9 @@ class CoursesSubject(db.Model, SqlalchemySerializer):
     # Relationships
     subject = db.relationship("Subject", back_populates="courses_subjects")
     course = db.relationship("Course", back_populates="courses_subjects")
+
+    # Unique constraints
+    __table_args__ = (UniqueConstraint('course_id', 'subject_id', name='_course_subject_uc'),)
 
 
 class CoursesTimeblock(db.Model, SqlalchemySerializer):
@@ -546,6 +567,9 @@ class CoursesTimeblock(db.Model, SqlalchemySerializer):
     course = db.relationship("Course", back_populates='courses_timeblocks')
     timeblock = db.relationship("Timeblock", back_populates='courses_timeblocks')
 
+    # Unique constraints
+    __table_args__ = (UniqueConstraint('course_id', 'timeblock_id', name='_course_timeblock_uc'),)
+
 
 class CoursesTeacher(db.Model, SqlalchemySerializer):
     """ ORM object for linking table between courses and teachers tables """
@@ -562,6 +586,9 @@ class CoursesTeacher(db.Model, SqlalchemySerializer):
     teacher = db.relationship("Teacher", back_populates="courses_teachers")
     course = db.relationship("Course", back_populates="courses_teachers")
 
+    # Unique constraints
+    __table_args__ = (UniqueConstraint('course_id', 'teacher_id', name='_course_teacher_uc'),)
+
 
 class StudentGroupsSubject(db.Model, SqlalchemySerializer):
     """ ORM object for linking table between student_groups and subjects """
@@ -577,6 +604,9 @@ class StudentGroupsSubject(db.Model, SqlalchemySerializer):
     # Relationships
     student_group = db.relationship("StudentGroup", back_populates="student_groups_subjects")
     subject = db.relationship("Subject", back_populates="student_groups_subjects")
+
+    # Unique constraints
+    __table_args__ = (UniqueConstraint('student_group_id', 'subject_id', name='_studentgroup_subject_uc'),)
 
 
 class StudentGroupsTimeblock(db.Model, SqlalchemySerializer):
@@ -596,6 +626,9 @@ class StudentGroupsTimeblock(db.Model, SqlalchemySerializer):
     student_group = db.relationship("StudentGroup", back_populates='student_groups_timeblocks')
     timeblock = db.relationship("Timeblock", back_populates='student_groups_timeblocks')
 
+    # Unique constraints
+    __table_args__ = (UniqueConstraint('student_group_id', 'timeblock_id', name='_studentgroup_timeblock_uc'),)
+
 
 class StudentsStudentGroup(db.Model, SqlalchemySerializer):
     """ ORM object for linking table between students and student_groups tables """
@@ -612,6 +645,9 @@ class StudentsStudentGroup(db.Model, SqlalchemySerializer):
     student = db.relationship("Student", back_populates="students_student_groups")
     student_group = db.relationship("StudentGroup", back_populates="students_student_groups")
 
+    # Unique constraints
+    __table_args__ = (UniqueConstraint('student_group_id', 'student_id', name='_studentgroup_student_uc'),)
+
 
 class StudentsSubject(db.Model, SqlalchemySerializer):
     """ ORM Object for linking table between students and subjects """
@@ -627,6 +663,9 @@ class StudentsSubject(db.Model, SqlalchemySerializer):
     # Relationships
     student = db.relationship("Student", back_populates="students_subjects")
     subject = db.relationship("Subject", back_populates="students_subjects")
+
+    # Unique constraints
+    __table_args__ = (UniqueConstraint('student_id', 'subject_id', name='_student_subject_uc'),)
 
 
 class StudentsTimeblock(db.Model, SqlalchemySerializer):
@@ -646,6 +685,9 @@ class StudentsTimeblock(db.Model, SqlalchemySerializer):
     student = db.relationship("Student", back_populates='students_timeblocks')
     timeblock = db.relationship("Timeblock", back_populates='students_timeblocks')
 
+    # Unique constraints
+    __table_args__ = (UniqueConstraint('student_id', 'timeblock_id', name='_student_timeblock_uc'),)
+
 
 class SubjectsTimeblock(db.Model, SqlalchemySerializer):
     """
@@ -664,6 +706,9 @@ class SubjectsTimeblock(db.Model, SqlalchemySerializer):
     subject = db.relationship("Subject", back_populates='subjects_timeblocks')
     timeblock = db.relationship("Timeblock", back_populates='subjects_timeblocks')
 
+    # Unique constraints
+    __table_args__ = (UniqueConstraint('subject_id', 'timeblock_id', name='_subject_timeblock_uc'),)
+
 
 class TeachersSubject(db.Model, SqlalchemySerializer):
     __tablename__ = 'teachers_subjects'
@@ -679,6 +724,9 @@ class TeachersSubject(db.Model, SqlalchemySerializer):
     teacher = db.relationship("Teacher", back_populates="teachers_subjects")
     subject = db.relationship("Subject", back_populates="teachers_subjects")
 
+    # Unique constraints
+    __table_args__ = (UniqueConstraint('teacher_id', 'subject_id', name='_teacher_subject_uc'),)
+
 
 class TeachersDays(db.Model, SqlalchemySerializer):
     __tablename__ = 'teachers_days'
@@ -693,6 +741,9 @@ class TeachersDays(db.Model, SqlalchemySerializer):
     # Relationships
     teacher = db.relationship("Teacher", back_populates='teachers_days')
     day = db.relationship("Day", back_populates='teachers_days')
+
+    # Unique constraints
+    __table_args__ = (UniqueConstraint('teacher_id', 'day_id', name='_teacher_day_uc'),)
 
 
 class TeachersTimeblock(db.Model, SqlalchemySerializer):
@@ -712,6 +763,9 @@ class TeachersTimeblock(db.Model, SqlalchemySerializer):
     teacher = db.relationship("Teacher", back_populates='teachers_timeblocks')
     timeblock = db.relationship("Timeblock", back_populates='teachers_timeblocks')
 
+    # Unique constraints
+    __table_args__ = (UniqueConstraint('teacher_id', 'timeblock_id', name='_teacher_timeblock_uc'),)
+
 
 class TimeblocksDay(db.Model, SqlalchemySerializer):
     __tablename__ = 'timeblocks_days'
@@ -726,6 +780,9 @@ class TimeblocksDay(db.Model, SqlalchemySerializer):
     # Relationships
     timeblock = db.relationship("Timeblock", back_populates='timeblocks_days')
     day = db.relationship("Day", back_populates='timeblocks_days')
+
+    # Unique constraints
+    __table_args__ = (UniqueConstraint('timeblock_id', 'day_id', name='_timeblock_day_uc'),)
 
 
 ############
