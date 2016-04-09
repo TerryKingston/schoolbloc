@@ -165,7 +165,6 @@ class TestRest(Resource):
                 to_remove.append(key)
         for key in to_remove:
             del request_json[key]
-        print(orm_obj.room_number)
         db.session.add(orm_obj)
 
         # only stuff left in json_request should be the constraint data. If there
@@ -323,8 +322,6 @@ class TestRestList(Resource):
         # only stuff left in json_request should be the constraint data. If there
         # is additional keys here, go ahead and error out instead of ignoring them
         # (nothing has been commited to the db yet)
-        from pprint import pprint
-        pprint(request_json)
         for constraint, data_list in request_json.items():
             for data in data_list:
                 constraint_orm_class = _find_constraint_mapping_table(self.orm, constraint)
