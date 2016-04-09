@@ -1,6 +1,6 @@
 from threading import Thread
 
-from flask import Blueprint
+from flask import Blueprint, request
 from flask.ext.jwt import current_identity
 from flask.ext.restful import Api, Resource, abort
 from sqlalchemy.orm.exc import NoResultFound
@@ -178,12 +178,27 @@ class ParentsStudents(Resource):
             parent = Parent.query.filter_by(user_id=current_identity.id).one()
         except NoResultFound:
             return []
-        print(parent.students)
         return [s.serialize() for s in parent.students]
+
+    @auth_required(roles='parent')
+    def post(self):
+        request_json = request.get_json(force=True)
+        if 'access_token' not in request_json:
+            abort(400, message='missing access token in request')
+
+        try:
+            student = Student.query.filter_by(access_token=request_json['access_token']).one()
+        except NoResultFound:
+            abort(400, message='Student with requested access token not found')
+
+        parent = Parent.query.filter_by(user_id=current_identity.id).one()
+        db.session.add(ParentStudentMapper(parent_id=parent.id, student_id=student.id))
+        db.session.commit()
+        return student.serialize()
 
 
 api.add_resource(UnreadNotifications, '/api/notifications/unread')
 api.add_resource(ScheduleApi, '/api/schedules/<int:schedule_id>/class')
 api.add_resource(ScheduleStudentApi, '/api/schedules/<int:schedule_id>/student')
 api.add_resource(ScheduleListApi, '/api/schedules')
-api.add_resource(ParentsStudents, '/api/get_my_students')
+api.add_resource(ParentsStudents, '/api/my_students')
