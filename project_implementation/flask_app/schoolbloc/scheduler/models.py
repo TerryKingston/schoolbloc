@@ -5,7 +5,7 @@ import string
 from collections import OrderedDict
 
 from schoolbloc import db, app
-from sqlalchemy import event
+from sqlalchemy import event, UniqueConstraint
 from sqlalchemy.engine import Engine
 from sqlalchemy.ext.associationproxy import association_proxy
 
@@ -71,6 +71,9 @@ class ParentStudentMapper(db.Model):
     # Relationships
     parent = db.relationship("Parent", back_populates="parent_student_mapper")
     student = db.relationship("Student", back_populates="parent_student_mapper")
+
+    # Unique constraints
+    __table_args__ = (UniqueConstraint('parent_id', 'student_id', name='_parent_student_uc'),)
 
 
 ########
