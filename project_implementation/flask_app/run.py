@@ -40,16 +40,6 @@ if __name__ == '__main__':
     except:
         db.session.rollback()
 
-    # LANDON TODO -- clean this crap up
-    try:
-        db.session.add(Role(role_type='parent'))
-        db.session.commit()
-    except:
-        db.session.rollback()
-    try:
-        db.session.add(User(username='parent1', password='parent1', role_type='parent'))
-    except:
-        db.session.rollback()
     try:
         db.session.add(Student(uid='u026xxx', first_name='Landon', last_name='Bland'))
         db.session.add(Student(uid='u027xxx', first_name='Daelon', last_name='Bland'))
