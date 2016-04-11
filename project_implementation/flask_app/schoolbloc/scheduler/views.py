@@ -183,11 +183,11 @@ class ParentsStudents(Resource):
     @auth_required(roles='parent')
     def post(self):
         request_json = request.get_json(force=True)
-        if 'access_token' not in request_json:
+        if 'user_token' not in request_json:
             abort(400, message='missing access token in request')
 
         try:
-            student = Student.query.filter_by(access_token=request_json['access_token']).one()
+            student = Student.query.filter_by(user_token=request_json['user_token']).one()
         except NoResultFound:
             abort(400, message='Student with requested access token not found')
 
