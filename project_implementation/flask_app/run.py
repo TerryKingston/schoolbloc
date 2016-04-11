@@ -6,7 +6,8 @@ using redis instead of an in memory dictionary for session
 storage
 """
 from schoolbloc import app, db
-from schoolbloc.scheduler.models import Day
+from schoolbloc.scheduler.models import Day, Student, Parent, \
+    ParentStudentMapper
 from schoolbloc.users.models import Role, User
 
 if __name__ == '__main__':
@@ -35,6 +36,18 @@ if __name__ == '__main__':
         db.session.add(Day(name='Friday'))
         db.session.add(Day(name='Saturday'))
         db.session.add(Day(name='Sunday'))
+        db.session.commit()
+    except:
+        db.session.rollback()
+
+    # Some example parent/student stuff
+    try:
+        db.session.add(Student(uid='u026xxx', first_name='Landon', last_name='Bland'))
+        db.session.add(Student(uid='u027xxx', first_name='Daelon', last_name='Bland'))
+        db.session.commit()
+
+        parent_user = User.query.filter_by(username='parent1').one()
+        db.session.add(Parent(user_id=parent_user.id, first_name='Bob', last_name='Bland'))
         db.session.commit()
     except:
         db.session.rollback()
