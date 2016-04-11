@@ -5,70 +5,26 @@
  */
 angular.module('sbAngularApp').factory('userAccessService', ['$q', '$http', 'commonService', function($q, $http, commonService) {
 	var SERVER_ROOT = "api/",
+		ALL_TOKENS = "api/students?constraints=false",
 		TOKENS = SERVER_ROOT + "tokens/",
 		STUDENT_TOKENS = TOKENS + "student",
 		TEACHER_TOKENS = TOKENS + "teacher",
 		MY_STUDENTS = SERVER_ROOT + "my_students";
 
-	var userAccess = {
-		tokens: {
-			student: [
-				{
-					"name": "Alfred Alloy",
-					"uid": "0123643",
-					"token": "vjkalh382ho"
-				},
-				{
-					"name": "Barbs Bucket",
-					"uid": "2565434",
-					"token": "fsbjrpsob3"
-				},
-				{
-					"name": "Callen Coy",
-					"uid": "2345675",
-					"token": "352pogj0bj"
-				},
-				{
-					"name": "Dartanian Decker",
-					"uid": "2554466",
-					"token": "3pt8gjwjj09"
-				},
-				{
-					"name": "Eli Ellen",
-					"uid": "5787653",
-					"token": "dvbe324556"
-				}
-			],
-			teacher: [
-				{
-					"name": "Mrs. Buttersworth",
-					"uid": "97654355",
-					"token": "gsnserbdrn"
-				},
-				{
-					"name": "Mr. America",
-					"uid": "97654775",
-					"token": "35btgrd"
-				},
-				{
-					"name": "Dr. Who",
-					"uid": "980876578",
-					"token": "3htyjt5etf"
-				},
-				{
-					"name": "Dr. Mario",
-					"uid": "96543455",
-					"token": "2365ygfhf"
-				}
-			]
-		}
-	}
-
 	return {
 
 		getUserTokens: function() {
+			var url;
 			var deferred = $q.defer();
-			deferred.resolve(userAccess.tokens);
+			//deferred.resolve(userAccess.tokens);
+			// conform the url to change the port
+			url = commonService.conformUrl(ALL_TOKENS);
+
+			$http.get(url).then(function(data) {
+				deferred.resolve(data.data);
+			}, function(data) {
+				deferred.reject(data.data);
+			});
 			return deferred.promise;
 		},
 
@@ -87,7 +43,7 @@ angular.module('sbAngularApp').factory('userAccessService', ['$q', '$http', 'com
 			return deferred.promise;
 		},
 
-		saveStudent: function(id, access_token) {
+		saveStudent: function(id, user_token) {
 			var url, data;
 			var deferred = $q.defer();
 
@@ -95,8 +51,8 @@ angular.module('sbAngularApp').factory('userAccessService', ['$q', '$http', 'com
 			url = commonService.conformUrl(MY_STUDENTS);
 
 			data = {
-				id: id,
-				access_token: access_token
+				// id: id, don't need
+				user_token: user_token
 			};
 
 			$http.post(url, data).then(function(data) {

@@ -2,6 +2,5 @@
 
 payload:
 {
-    "id": <student_id>,
     "access_token": <access_token associated with that id>
 }

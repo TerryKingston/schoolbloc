@@ -1,4 +1,4 @@
-GET /user-tokens
+// GET api/user-tokens
 
 payload: none
 

@@ -21,9 +21,9 @@ angular.module('sbAngularApp')
 		showAddStudent: false,
 		form: {
 			id: null,
-			access_token: null,
+			user_token: null,
 			id_error: null,
-			access_token_error: null,
+			user_token_error: null,
 			error: null
 		},
 		addAnother: false
@@ -55,7 +55,7 @@ angular.module('sbAngularApp')
 		if (inputType === 'id') {
 			return checkId();
 		}
-		if (inputType === 'access_token') {
+		if (inputType === 'user_token') {
 			return checkAccessToken();
 		}
 	}
@@ -70,22 +70,26 @@ angular.module('sbAngularApp')
 	}
 
 	function checkAccessToken() {
-		if (!$scope.addStudent.form.access_token) {
-			$scope.addStudent.form.access_token_error = "Input is required.";
+		if (!$scope.addStudent.form.user_token) {
+			$scope.addStudent.form.user_token_error = "Input is required.";
 			return false;
 		}
-		$scope.addStudent.form.access_token_error = null;
+		$scope.addStudent.form.user_token_error = null;
 		return true;
 	}
 
 	$scope.saveStudent = function(addAnother) {
-		if (!checkInput('id') || !checkInput('access_token')) {
+		// if (!$scope.checkInput('id')) {
+		// 	return;
+		// }
+
+		if (!$scope.checkInput('user_token')) {
 			return;
 		}
 
 		$scope.addStudent.addAnother = addAnother;
 
-		userAccessService.saveStudent($scope.addStudent.form.id, $scope.addStudent.form.access_token).then(function(data) {
+		userAccessService.saveStudent($scope.addStudent.form.id, $scope.addStudent.form.user_token).then(function(data) {
 			if ($scope.addStudent.addAnother) {
 				$scope.addStudent.addAnother = false;
 			}
@@ -93,13 +97,28 @@ angular.module('sbAngularApp')
 				$scope.addStudent.showAddStudent = false;
 			}
 			$scope.addStudent.form.error = null;
-
+			resetForm();
 			// update the student's table with the newly added student
 			getUsersStudents();
 
 		}, function(error) {
-			$scope.addStudent.form.error = error;
+			if (error.message === 'Student with requested access token not found') {
+				$scope.addStudent.form.error = "Invalid access token.";
+			}
+			else {
+				$scope.addStudent.form.error = error.message;
+			}
 		});
+	}
+
+	function resetForm() {
+		$scope.addStudent.form = {
+			id: null,
+			user_token: null,
+			id_error: null,
+			user_token_error: null,
+			error: null
+		};
 	}
 
 	/**** initial setup ****/
