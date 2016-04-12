@@ -42,7 +42,7 @@
     }
 ]
 
-// GET /api/student_course/electives?user_id=<student_id>
+// GET /api/student_course?user_id=<student_id>&electives=true
 // example
 // 
 // send back a list of all courses that are marked as "low" priority for a given student.
