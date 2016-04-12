@@ -20,14 +20,6 @@ angular.module('sbAngularApp').factory('userAuthService', ['$q', '$http', '$wind
     // we are only interested in the <base64-encoded claims> as the other components are only necessary for the server
     // NOTE: this may not be true as we may need to verify the token is correct.  See https://developer.atlassian.com/static/connect/docs/latest/concepts/understanding-jwt.html
     var base64Url = token.split('.')[1];
-    if (!base64Url) {
-      return {
-        exp: 0,
-        role: null,
-        uid: null,
-        username: null
-      };
-    }
     var base64 = base64Url.replace('-', '+').replace('_', '/');
     // atob = a to b: decodes string using base64 encoding
     return JSON.parse($window.atob(base64));
@@ -50,7 +42,7 @@ angular.module('sbAngularApp').factory('userAuthService', ['$q', '$http', '$wind
         fullName: fullname,
         person: person,
         uid: id,
-        user_token: token,
+        access_token: token,
         email: email
       };
 
@@ -148,7 +140,7 @@ angular.module('sbAngularApp').factory('userAuthService', ['$q', '$http', '$wind
       var self = this;
       if (self.isUserAuthenticated() && $window.localStorage.role) {
         // @TODO: remove when jwt passes in username and role with it
-        //return 'parent';
+        return 'parent';
 
         return $window.localStorage.role;
 
