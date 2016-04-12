@@ -247,7 +247,7 @@ class StudentCourseSelector(Resource):
         if priority == 'mandatory':
             abort(400, message='cannot set priority to mandatory')
 
-        student_id = request.args.get('constraints')
+        student_id = request.args.get('user_id')
         if not student_id:
             abort(400, message="Missing user_id in url params")
 
