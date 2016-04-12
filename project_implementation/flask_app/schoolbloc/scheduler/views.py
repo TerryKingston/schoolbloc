@@ -189,7 +189,7 @@ class ParentsStudents(Resource):
         try:
             student = Student.query.filter_by(user_token=request_json['user_token']).one()
         except NoResultFound:
-            abort(400, message='Student with requested access token not found')
+            abort(400, message='Student with requested user token not found')
 
         parent = Parent.query.filter_by(user_id=current_identity.id).one()
         db.session.add(ParentStudentMapper(parent_id=parent.id, student_id=student.id))
@@ -197,8 +197,92 @@ class ParentsStudents(Resource):
         return student.serialize()
 
 
+class StudentCourseSelector(Resource):
+
+    @staticmethod
+    def _course_student_mapper_exists(course_id, student_id):
+        for ssg in StudentsStudentGroup.query.filter_by(student_id=student_id).all():
+            for csg in CoursesStudentGroup.query.filter_by(student_group_id=ssg.student_group_id).all():
+                if course_id == csg.course_id:
+                    return True
+        return False
+
+    @staticmethod
+    def _verify_access_or_abort(student_id):
+        """ Don't let students or parents access other students data """
+        role = current_identity.role.role_type
+        current_user_id = current_identity.id
+
+        # admins can access anyone
+        if role == 'admin':
+            return
+
+        # students can only access themselves
+        elif role == 'student':
+            student = Student.query.filter_by(id=student_id).one()
+            if student.user_id != current_user_id:
+                abort(404, message='Access denied')
+
+        # parents can access any of their students
+        elif role == 'parent':
+            parent = Parent.query.filter_by(user_id=current_identity.id).one()
+            for student in parent.students:
+                if student.id == student_id:
+                    return
+            abort(404, message='Access denied')
+
+        else:
+            abort(404, message='Expect role of admin, student or teacher')
+
+    @auth_required(roles=['student', 'parent', 'admin'])
+    def post(self):
+        request_json = request.get_json(force=True)
+        try:
+            course_id = request_json['id']
+            priority = request_json['priority']
+            rank = request_json['rank']
+        except KeyError:
+            abort(400, message='missing id, rank, or priority in request')
+
+        student_id = request.args.get('constraints')
+        if not student_id:
+            abort(400, message="Missing user_id in url params")
+
+        try:
+            student = Student.query.filter_by(id=student_id).one()
+        except NoResultFound:
+            abort(400, message="Student ID {} not found".format(student_id))
+
+        self._verify_access_or_abort(student.id)
+
+        # If we already have an existing CourseStudnet constraint for this, just
+        # update this
+        cs = CoursesStudent.query.filter_by(course_id=course_id,
+                                            student_id=student.id).first()
+        if cs:
+            if cs.priority == "mandatory":
+                abort(400, message="Cannot lower priority of a mandatory course")
+            cs.priority = priority
+            cs.rank = rank
+            db.session.add(cs)
+            db.session.commit()
+            return {'success': True}
+
+        # Otherwise, verify that this student has this course in one of this
+        # studnet groups, and add the constraint to the
+        if not self._course_student_mapper_exists(request_json['id'], student.id):
+            abort(400, message="No mapping exists between this student and course")
+
+        cs = CoursesStudent(active=True, priority=priority, rank=rank,
+                            course_id=course_id, student_id=student.id)
+        db.session.add(cs)
+        db.session.commit()
+        return {'success': True}
+
+
 api.add_resource(UnreadNotifications, '/api/notifications/unread')
 api.add_resource(ScheduleApi, '/api/schedules/<int:schedule_id>/class')
 api.add_resource(ScheduleStudentApi, '/api/schedules/<int:schedule_id>/student')
 api.add_resource(ScheduleListApi, '/api/schedules')
 api.add_resource(ParentsStudents, '/api/my_students')
+api.add_resource(StudentCourseSelector, '/api/student_course')
