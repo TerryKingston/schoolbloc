@@ -202,11 +202,10 @@ class StudentCourseSelector(Resource):
     @staticmethod
     def _greater_priority(p1, p2):
         """ Compares if p1 > p2 """
-        if p1 == 'low':
-            if p2 in ('high', 'mandatory'):
-                return True
-        elif p1 == 'high':
-            if p2 == 'mandatory':
+        # Cannot be lower then low or higher then mandatory, so we only have
+        # to check the 'high' case
+        if p1 == 'high':
+            if p2 == 'low':
                 return True
         return False
 
@@ -281,13 +280,17 @@ class StudentCourseSelector(Resource):
         student_id = request.args.get('user_id')
         if not student_id:
             abort(400, message="Missing user_id in url params")
+        try:
+            student_id = int(student_id)
+        except ValueError:
+            abort(400, message="user_id must be an integer")
         self._verify_access_or_abort(student_id)
 
         courses = self._get_all_student_courses(student_id)
 
         ret = []
-        if electives:
-            for course_id, course_dict in courses:
+        if electives and electives.lower() == 'true':
+            for course_id, course_dict in courses.items():
                 if course_dict['priority'] == 'low':
                     c = Course.query.filter_by(id=course_id).one()
                     ret.append({
@@ -295,7 +298,7 @@ class StudentCourseSelector(Resource):
                         'course': str(c),
                     })
         else:
-            for course_id, course_dict in courses:
+            for course_id, course_dict in courses.items():
                 if course_dict['priority'] != 'low':
                     c = Course.query.filter_by(id=course_id).one()
                     ret.append({
@@ -322,6 +325,10 @@ class StudentCourseSelector(Resource):
         student_id = request.args.get('user_id')
         if not student_id:
             abort(400, message="Missing user_id in url params")
+        try:
+            student_id = int(student_id)
+        except ValueError:
+            abort(400, message="user_id must be an integer")
 
         try:
             student = Student.query.filter_by(id=student_id).one()
@@ -359,7 +366,13 @@ class StudentCourseSelector(Resource):
         student_id = request.args.get('user_id')
         course_id = request.args.get('course_id')
         if not student_id or not course_id:
-            abort(400, message="missing user_id or course_id from url args")
+            abort(400, message="Missing user_id in url params")
+        try:
+            student_id = int(student_id)
+            course_id = int(course_id)
+        except ValueError:
+            abort(400, message="user_id and course_id must be an integers")
+
         self._verify_access_or_abort(student_id)
         cs = CoursesStudent.query.filter_by(course_id=course_id,
                                             student_id=student_id).first()
