@@ -244,6 +244,9 @@ class StudentCourseSelector(Resource):
         except KeyError:
             abort(400, message='missing id, rank, or priority in request')
 
+        if priority == 'mandatory':
+            abort(400, message='cannot set priority to mandatory')
+
         student_id = request.args.get('constraints')
         if not student_id:
             abort(400, message="Missing user_id in url params")
