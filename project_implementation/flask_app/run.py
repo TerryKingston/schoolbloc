@@ -41,13 +41,17 @@ if __name__ == '__main__':
         db.session.rollback()
 
     try:
-        db.session.add(Student(uid='u026xxx', first_name='Landon', last_name='Bland'))
-        db.session.add(Student(uid='u027xxx', first_name='Daelon', last_name='Bland'))
-        db.session.commit()
+        #db.session.add(Role(role_type='parent'))
+        #db.session.add(User(username='parent1', password='parent1', role_type='parent'))
+        #db.session.commit()
+        #db.session.add(Student(uid='u026xxx', first_name='Landon', last_name='Bland'))
+        #db.session.add(Student(uid='u027xxx', first_name='Daelon', last_name='Bland'))
+        #db.session.commit()
 
-        parent_user = User.query.filter_by(username='parent1').one()
-        db.session.add(Parent(user_id=parent_user.id, first_name='Bob', last_name='Bland'))
-        db.session.commit()
+        #parent_user = User.query.filter_by(username='parent1').one()
+        #db.session.add(Parent(user_id=parent_user.id, first_name='Bob', last_name='Bland'))
+        #db.session.commit()
+        pass
     except:
         db.session.rollback()
 
