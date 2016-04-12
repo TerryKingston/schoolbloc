@@ -11,19 +11,19 @@
     <h3>Students</h3>
     <button class="btn btn-recommended" ng-if="!addStudent.showAddStudent" ng-click="addStudentToggle(true)">Add student</button>
     <section ng-if="addStudent.showAddStudent">
-      <div class="input-row">
+      <!-- <div class="input-row">
         <label>
           <div>Student id<div class="required">*</div></div>
           <input type="text" ng-model="addStudent.form.id" ng-blur="checkInput('id')">
         </label>
         <div class="input-row-error" ng-if="addStudent.form.id_error">{{addStudent.form.id_error}}</div>
-      </div>
-      <div>
+      </div> -->
+      <div class="input-row">
         <label>
           <div>Access token<div class="required">*</div></div>
-          <input type="text" ng-model="addStudent.form.access_token" ng-blur="checkInput('access_token')">
+          <input type="text" ng-model="addStudent.form.user_token" ng-blur="checkInput('user_token')">
         </label>
-        <div class="input-row-error" ng-if="addStudent.form.access_token_error">{{addStudent.form.access_token_error}}</div>
+        <div class="input-row-error" ng-if="addStudent.form.user_token_error">{{addStudent.form.user_token_error}}</div>
       </div>
       <!-- <div class="icon-option-row">
         <a href="">
@@ -43,7 +43,8 @@
   </section>
   <section class="manage-students-group"  ng-if="manageStudents.students.length">
     <div class="student-selection" ng-class="{'student-selection-active': student.id === manageStudents.selectedStudent.id}" ng-repeat="student in manageStudents.students track by $index" ng-click="selectStudent(student)">
-      <div>{{student['full name']}} ({{student.id}})</div>
+      <div class="students-group-name">{{student.first_name}} {{student.last_name}}</div>
+      <div class="students-group-school-id">{{student.uid}}</div>
     </div>
   </section>
 </section>

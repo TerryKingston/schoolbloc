@@ -1522,3 +1522,46 @@ textarea {
 	margin-bottom: 0px;
 	font-size: 10px;
 }
+
+.manage-students-group {
+	margin-top: 20px;
+}
+
+.manage-students-group div {
+	clear: both;
+}
+
+.manage-students-group .student-selection-active div {
+	border-color: $add-green;
+	font-weight: 700;
+}
+
+.manage-students-group .student-selection-active .students-group-name {
+	border-left-width: 10px;
+	padding-left: 11px;
+}
+
+.manage-students-group .student-selection-active .students-group-school-id {
+	background-color: $add-green;
+}
+
+.manage-students-group div div {
+	height: 35px;
+	line-height: 35px;
+	font-size: 14px;
+	border: 1px solid $note-gray;
+	margin: 0 0 5px 0;
+	width: 200px;
+	padding: 0 0 0 20px;
+	overflow: hidden;
+	white-space: nowrap;
+	display: inline-block;
+	float: left;
+	clear: none;
+}
+
+.manage-students-group div .students-group-school-id {
+	background-color: $note-gray;
+	color: #FFF;
+	width: 100px;
+}

@@ -3,7 +3,7 @@
   	<h3>User access tokens</h3>
     <p>By providing these access tokens coupled with the user's school id, a user can create an account bound to that id.</p>
   </section>
-  <section class="user-access-group" ng-if="userAccess.tokens.student.length">
+  <section class="user-access-group" ng-if="userAccess.tokens.length">
     <h4>Student access tokens</h4>
     <p>A student or parents of students can use these tokens to sign up for elective classes and view the student's schedule.</p>
     <table class="dynamic-table">
@@ -13,18 +13,18 @@
           <th>Name</th>
           <th>Access token</th>
         </tr>
-        <tr ng-repeat="token in userAccess.tokens.student track by $index">
+        <tr ng-repeat="token in userAccess.tokens track by $index">
           <td>{{token.uid}}</td>
-          <td>{{token.name}}</td>
-          <td>{{token.token}}</td>
+          <td>{{token.first_name}} {{token.last_name}}</td>
+          <td>{{token.user_token}}</td>
         </tr>
       <tbody>
     </table>
   </section>
-  <section class="user-access-group"  ng-if="!userAccess.tokens.student.length">
+  <section class="user-access-group"  ng-if="!userAccess.tokens.length">
     <h4>There are no student access tokens</h4>
   </section>
-  <section class="user-access-group"  ng-if="userAccess.tokens.teacher.length">
+  <!-- <section class="user-access-group"  ng-if="userAccess.tokens.teacher.length">
     <h4>Teacher access tokens</h4>
     <p>A teacher can use these tokens to modify his or her courses, classroom, and time blocks.</p>
     <table class="dynamic-table">
@@ -42,5 +42,5 @@
   </section>
   <section class="user-access-group" ng-if="!userAccess.tokens.teacher.length">
     <h4>There are no teacher access tokens</h4>
-  </section>
+  </section> -->
 </section>
