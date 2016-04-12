@@ -200,12 +200,53 @@ class ParentsStudents(Resource):
 class StudentCourseSelector(Resource):
 
     @staticmethod
+    def _greater_priority(p1, p2):
+        """ Compares if p1 > p2 """
+        if p1 == 'low':
+            if p2 in ('high', 'mandatory'):
+                return True
+        elif p1 == 'high':
+            if p2 == 'mandatory':
+                return True
+        return False
+
+    @staticmethod
     def _course_student_mapper_exists(course_id, student_id):
         for ssg in StudentsStudentGroup.query.filter_by(student_id=student_id).all():
             for csg in CoursesStudentGroup.query.filter_by(student_group_id=ssg.student_group_id).all():
                 if course_id == csg.course_id:
                     return True
         return False
+
+    def _get_all_student_courses(self, student_id):
+        # Get the student groups ones first, as they may be overwritten by
+        # student courses.
+        courses = {}
+        for ssg in StudentsStudentGroup.query.filter_by(student_id=student_id).all():
+            for csg in CoursesStudentGroup.query.filter_by(student_group_id=ssg.student_group_id).all():
+                if csg.course_id not in courses:
+                    courses[csg.course_id] = {
+                        'priority': csg.priority,
+                        'rank': 0,
+                    }
+                else:
+                    current_priority = courses[csg.course_id]['priority']
+                    if self._greater_priority(csg.priority, current_priority):
+                        courses[csg.course_id]['priority'] = csg.priority
+
+        # Now handle the individual overrides that can happen in CoursesStudent
+        for cs in CoursesStudent.query.filter_by(student_id=student_id).all():
+            if cs.course_id not in courses:
+                courses[cs.course_id] = {
+                    'priority': cs.priority,
+                    'rank': cs.rank,
+                }
+            else:
+                courses[csg.course_id]['rank'] = cs.rank  # guaranteed to be >=
+                current_priority = courses[cs.course_id]['priority']
+                if self._greater_priority(cs.priority, current_priority):
+                    courses[csg.course_id]['priority'] = cs.priority
+        return courses
 
     @staticmethod
     def _verify_access_or_abort(student_id):
@@ -233,6 +274,37 @@ class StudentCourseSelector(Resource):
 
         else:
             abort(404, message='Expect role of admin, student or teacher')
+
+    @auth_required(roles=['student', 'parent', 'admin'])
+    def get(self):
+        electives = request.args.get('electives')
+        student_id = request.args.get('user_id')
+        if not student_id:
+            abort(400, message="Missing user_id in url params")
+        self._verify_access_or_abort(student_id)
+
+        courses = self._get_all_student_courses(student_id)
+
+        ret = []
+        if electives:
+            for course_id, course_dict in courses:
+                if course_dict['priority'] == 'low':
+                    c = Course.query.filter_by(id=course_id).one()
+                    ret.append({
+                        'id': c.id,
+                        'course': str(c),
+                    })
+        else:
+            for course_id, course_dict in courses:
+                if course_dict['priority'] != 'low':
+                    c = Course.query.filter_by(id=course_id).one()
+                    ret.append({
+                        'id': c.id,
+                        'course': str(c),
+                        'priority': course_dict['priority'],
+                        'rank': course_dict['rank'],
+                    })
+        return ret
 
     @auth_required(roles=['student', 'parent', 'admin'])
     def post(self):
@@ -282,6 +354,7 @@ class StudentCourseSelector(Resource):
         db.session.commit()
         return {'success': True}
 
+    @auth_required(roles=['student', 'parent', 'admin'])
     def delete(self):
         student_id = request.args.get('user_id')
         course_id = request.args.get('course_id')
