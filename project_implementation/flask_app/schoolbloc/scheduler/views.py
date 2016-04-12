@@ -282,6 +282,20 @@ class StudentCourseSelector(Resource):
         db.session.commit()
         return {'success': True}
 
+    def delete(self):
+        student_id = request.args.get('user_id')
+        course_id = request.args.get('course_id')
+        if not student_id or not course_id:
+            abort(400, message="missing user_id or course_id from url args")
+        self._verify_access_or_abort(student_id)
+        cs = CoursesStudent.query.filter_by(course_id=course_id,
+                                            student_id=student_id).first()
+        cs.rank = 0
+        cs.priority = 'low'
+        db.session.add(cs)
+        db.session.commit()
+        return {'success': True}
+
 
 api.add_resource(UnreadNotifications, '/api/notifications/unread')
 api.add_resource(ScheduleApi, '/api/schedules/<int:schedule_id>/class')
