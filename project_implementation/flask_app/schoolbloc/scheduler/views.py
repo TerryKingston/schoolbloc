@@ -380,6 +380,8 @@ class StudentCourseSelector(Resource):
             try:
                 cs = CoursesStudent.query.filter_by(course_id=data['id'],
                                                     student_id=student_id).one()
+                if cs.priority == "mandatory":
+                    abort(400, message="Cannot change rank of a mandatory course")
                 cs.rank = data['rank']
                 db.session.add(cs)
             except NoResultFound:
