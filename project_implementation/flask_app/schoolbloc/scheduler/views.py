@@ -241,10 +241,11 @@ class StudentCourseSelector(Resource):
                     'rank': cs.rank,
                 }
             else:
-                courses[csg.course_id]['rank'] = cs.rank  # guaranteed to be >=
+                courses[cs.course_id]['rank'] = cs.rank  # guaranteed to be >=
                 current_priority = courses[cs.course_id]['priority']
                 if self._greater_priority(cs.priority, current_priority):
-                    courses[csg.course_id]['priority'] = cs.priority
+                    courses[cs.course_id]['priority'] = cs.priority
+
         return courses
 
     @staticmethod
