@@ -1,0 +1,10 @@
+// PUT /api/student_course?user_id=<student_id>
+// 
+// this is esentially the way to change the rankings of all the electives.
+// Expect back a list of electives that all needs their ranks changed.
+"payload": [
+	{
+		"id": <course_id>,
+		"rank": <integer>
+	}
+]
