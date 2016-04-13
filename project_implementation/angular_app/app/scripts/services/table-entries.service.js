@@ -754,8 +754,11 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 				return deferred.promise;
 			}
 
+			url = STUDENT_COURSE_URL;
 			manageStudents = userAccessService.getUsersManagedStudents();
-			url = STUDENT_COURSE_URL + "?user_id=" + manageStudents.selectedStudent.id;
+			if (manageStudents && manageStudents.selectedStudent) {
+				url = url + "?user_id=" + manageStudents.selectedStudent.id;
+			}
 			url = commonService.conformUrl(url);
 
 			$http.put(url, newRankArr).then(function(data) {
@@ -863,7 +866,10 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 
 			if (factType === "student_course") {
 				manageStudents = userAccessService.getUsersManagedStudents();
-				url = STUDENT_COURSE_URL + "?course_id=" + factId + "&user_id=" + manageStudents.selectedStudent.id;
+				url = STUDENT_COURSE_URL + "?course_id=" + factId;
+				if (manageStudents && manageStudents.selectedStudent) {
+					url = url + "&user_id=" + manageStudents.selectedStudent.id;
+				}
 				url = commonService.conformUrl(url);
 			}
 
@@ -936,7 +942,10 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 
 			if (factName === "student_course") {
 				manageStudents = userAccessService.getUsersManagedStudents();
-				url = STUDENT_COURSE_URL + "?user_id=" + manageStudents.selectedStudent.id;
+				url = STUDENT_COURSE_URL;
+				if (manageStudents && manageStudents.selectedStudent) {
+					url = url + "?user_id=" + manageStudents.selectedStudent.id;
+				}
 				url = commonService.conformUrl(url);
 			}
 
@@ -1072,7 +1081,11 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 
 			if (constraintName === "student_course") {
 				manageStudents = userAccessService.getUsersManagedStudents();
-				url = commonService.conformUrl(STUDENT_COURSE_URL + "?user_id=" + manageStudents.selectedStudent.id + "&electives=true")
+				url = STUDENT_COURSE_URL + "?electives=true";
+				if (manageStudents && manageStudents.selectedStudent) {
+					url = url + "&user_id=" + manageStudents.selectedStudent.id;
+				}
+				url = commonService.conformUrl(url);
 			}
 
 			$http.get(url).then(function(data) {

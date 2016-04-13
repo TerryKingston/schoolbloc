@@ -253,31 +253,35 @@ angular.module('sbAngularApp')
 	 */
 	$scope.checkForErrors = function(data) {
 		// 401 : "Username already exists."
-		if (data === "Username already exists." || data === "Failed to save submission: submission was a duplicate.") {
+		if (data.message === "Username already exists" || data.message === "Failed to save submission: submission was a duplicate.") {
 			$translate("userAuthContainer.DUPLICATE_USERNAME").then(function (translation) {
 				$scope.userAuthContainer.form.errors.usernameError = translation;
 			});
 		}
 		// 401 : "Username does not exist."
-		else if (data === "Username does not exist.") {
-			$translate("userAuthContainer.NO_USERNAME").then(function (translation) {
-				$scope.userAuthContainer.form.errors.usernameError = translation;
-			});
+		else if (data.description === "Invalid credentials") {
+			// $translate("userAuthContainer.NO_USERNAME").then(function (translation) {
+			// 	$scope.userAuthContainer.form.errors.usernameError = translation;
+			// });
+			$scope.userAuthContainer.form.errors.usernameError = "Invalid credentials";
+			$scope.userAuthContainer.form.errors.passwordError = "Invalid credentials";
 		}
 		// 401 : "Username password combination was invalid."
-		else if (data == "Username password combination was invalid.") {
+		else if (data.message == "Username password combination was invalid.") {
 			$translate("userAuthContainer.BAD_PASSWORD").then(function (translation) {
 				$scope.userAuthContainer.form.errors.passwordError = translation;
 			});
 		}
 		// 401 : "School id does not exist."
-		else if (data == "School id does not exist.") {
-			$translate("userAuthContainer.BAD_ID").then(function (translation) {
-				$scope.userAuthContainer.form.errors.idError = translation;
-			});
+		else if (data.message == "student user token not found") {
+			$scope.userAuthContainer.form.errors.tokenError = "Access token was invalid.";
+		}
+		// 401 : "School id does not exist."
+		else if (data.message == "This student already belongs to a user") {
+			$scope.userAuthContainer.form.errors.tokenError = "Token belongs to another user.";
 		}
 		// 401 : "Bad school id - token access pair."
-		else if (data == "Bad school id - token access pair.") {
+		else if (data.message == "Bad school id - token access pair.") {
 			$translate("userAuthContainer.BAD_TOKEN").then(function (translation) {
 				$scope.userAuthContainer.form.errors.tokenError = translation;
 			});

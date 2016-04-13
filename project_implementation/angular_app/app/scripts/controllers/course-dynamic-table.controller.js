@@ -157,7 +157,7 @@ angular.module('sbAngularApp')
 
 	function setupTableView() {
 		var i, row, j, k, entry, keys, headerObj;
-    debugger;
+
     $scope.tableView = {
       requiredCourses: [],
       electiveCourses: []

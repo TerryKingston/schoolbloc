@@ -66,7 +66,14 @@ angular.module('sbAngularApp').factory('userAuthService', ['$q', '$http', '$wind
       
 
       $http.post(url, data).then(function(data) {
-        deferred.resolve(data.data);
+        $window.localStorage.username = data.data.username;
+        $window.localStorage.role = data.data.role;
+        $window.localStorage.role_id = data.data.role_id;
+        $window.localStorage.uid = data.data.uid;
+
+        $timeout(function() {
+          deferred.resolve(data.data);
+        }, 1000);
       }, function(data) {
         deferred.reject(data.data);
       });
