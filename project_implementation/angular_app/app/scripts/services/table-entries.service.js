@@ -690,7 +690,11 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 			// special case because of POST student_course requirement (such as rank)
 			else if (factType === "student_course") {
 				manageStudents = userAccessService.getUsersManagedStudents();
-				url = STUDENT_COURSE_URL + "?user_id=" + manageStudents.selectedStudent.id;
+
+				url = STUDENT_COURSE_URL;
+				if (manageStudents && manageStudents.selectedStudent) {
+					url = url + "?user_id=" + manageStudents.selectedStudent.id;
+				}
 				url = commonService.conformUrl(url);
 				
 				factEntry = {

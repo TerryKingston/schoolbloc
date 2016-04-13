@@ -110,7 +110,7 @@ angular.module('sbAngularApp')
 
 		function getTranslations() {
 			$translate("mainNavBar.SIGNED_IN").then(function (translation) {
-				scope.translations.signed_in = commonService.format(translation, [scope.config.profile.username]);
+				scope.translations.signed_in = commonService.format(translation, [scope.config.profile.role]);
 			});
 		};
 

@@ -10,7 +10,7 @@
  * Controller of the sbAngularApp
  */
 angular.module('sbAngularApp')
-.controller('ManageClasses', ['$scope', '$translate', 'tableEntriesService', 'userAccessService', function($scope, $translate, tableEntriesService, userAccessService) {
+.controller('ManageClasses', ['$scope', '$window', '$translate', 'tableEntriesService', 'userAccessService', function($scope, $window, $translate, tableEntriesService, userAccessService) {
 	this.components = [
 		'HTML5 Boilerplate',
 		'AngularJS',
@@ -19,6 +19,7 @@ angular.module('sbAngularApp')
 
 	$scope.factSelection = null;
 	$scope.manageStudents = null;
+	$scope.isStudent = false;
 
 	function setupTableEntries() {
 		$scope.factSelection = tableEntriesService.getTableSelections("student");
@@ -30,9 +31,16 @@ angular.module('sbAngularApp')
 		$scope.manageStudents = userAccessService.getUsersManagedStudents();
 	}
 
+	function getRole() {
+		if ($window.localStorage.role === 'student') {
+			$scope.isStudent = true;
+		}
+	}
+
 	/**** initial setup ****/
 	setupTableEntries();
 	getManagedStudents();
+	getRole();
 }])
 .directive('sbManageClasses', [function() {
 	/**
