@@ -5,7 +5,7 @@
  */
 angular.module('sbAngularApp').factory('userAuthService', ['$q', '$http', '$window', 'commonService', '$timeout', function($q, $http, $window, commonService, $timeout) {
   var SERVER_ROOT = "",
-    REGISTER_URL = SERVER_ROOT + "/register",
+    REGISTER_URL = SERVER_ROOT + "api/register",
     LOGIN_URL = SERVER_ROOT + "auth";
 
   /**
@@ -39,20 +39,31 @@ angular.module('sbAngularApp').factory('userAuthService', ['$q', '$http', '$wind
     /**
      * Attempts to register the user with the given credentials
      */
-    registerUser: function(username, password, fullname, person, id, token, email) {
+    registerUser: function(user) {
       var data;
       var url = commonService.conformUrl(REGISTER_URL);
       var deferred = $q.defer();
 
-      data = {
-        username: username,
-        password: password,
-        fullName: fullname,
-        person: person,
-        uid: id,
-        user_token: token,
-        email: email
-      };
+      if (user.role_type === 'parent') {
+        data = {
+          username: user.username,
+          password: user.password,
+          role_type: user.role_type,
+          first_name: user.first_name,
+          last_name: user.last_name,
+          email: user.email
+        };
+      }
+      // student
+      else {
+        data = {
+          username: user.username,
+          password: user.password,
+          role_type: user.role_type,
+          user_token: user.user_token
+        };
+      }
+      
 
       $http.post(url, data).then(function(data) {
         deferred.resolve(data.data);

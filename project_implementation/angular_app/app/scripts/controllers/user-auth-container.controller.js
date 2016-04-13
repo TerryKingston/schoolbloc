@@ -21,7 +21,8 @@ angular.module('sbAngularApp')
 		form: {
 			isLoginForm: true,
 			username: null,
-			fullName: null,
+			firstName: null,
+			lastName: null,
 			password: null,
 			passwordRe: null,
 			person: null,
@@ -29,7 +30,8 @@ angular.module('sbAngularApp')
 			email: null,
 			errors: {
 				usernameError: null,
-				fullNameError: null,
+				firstNameError: null,
+				lastNameError: null,
 				passwordError: null,
 				passwordReError: null,
 				personError: null,
@@ -156,6 +158,38 @@ angular.module('sbAngularApp')
 	};
 
 	/**
+	 * Returns true if front-end validates full name, false otherwise
+	 */
+	$scope.isValidFirstName = function() {
+		// @TODO: determine exact requirements for fullName
+		if ($scope.userAuthContainer.form.firstName &&
+				$scope.userAuthContainer.form.firstName.length >= 2) {
+			$scope.userAuthContainer.form.errors.firstNameError = null;
+			return true;
+		}
+		$translate("userAuthContainer.INVALID_FULLNAME").then(function (translation) {
+			$scope.userAuthContainer.form.errors.firstNameError = translation;
+		});
+		return false;
+	};
+
+	/**
+	 * Returns true if front-end validates full name, false otherwise
+	 */
+	$scope.isValidLastName = function() {
+		// @TODO: determine exact requirements for fullName
+		if ($scope.userAuthContainer.form.lastName &&
+				$scope.userAuthContainer.form.lastName.length >= 2) {
+			$scope.userAuthContainer.form.errors.lastNameError = null;
+			return true;
+		}
+		$translate("userAuthContainer.INVALID_FULLNAME").then(function (translation) {
+			$scope.userAuthContainer.form.errors.lastNameError = translation;
+		});
+		return false;
+	};
+
+	/**
 	 * Returns true if front-end validates retyping of password, false otherwise
 	 */
 	$scope.isValidPasswordRe = function() {
@@ -261,6 +295,7 @@ angular.module('sbAngularApp')
 	 */
 	$scope.submitForm = function() {
 		var validForm = true,
+			user,
 			form = $scope.userAuthContainer.form; // shortcut
 
 
@@ -292,22 +327,10 @@ angular.module('sbAngularApp')
 		else {
 			// perform checks
 			// since we want to check each field, we have a variable keep track of whether or not it was valid
-			if (!$scope.isValidUsername()) {
-				validForm = false;
-			}
-			if (!$scope.isValidFullName()) {
-				validForm = false;
-			}
 			if (!$scope.isValidPerson()) {
 				validForm = false;
 			}
-			if ($scope.userAuthContainer.form.person === 'student' && !$scope.isValidId()) {
-				validForm = false;
-			}
-			if ($scope.userAuthContainer.form.person === 'student' && !$scope.isValidToken()) {
-				validForm = false;
-			}
-			if (!$scope.isValidEmail()) {
+			if (!$scope.isValidUsername()) {
 				validForm = false;
 			}
 			if (!$scope.isValidPassword()) {
@@ -316,10 +339,38 @@ angular.module('sbAngularApp')
 			if (!$scope.isValidPasswordRe()) {
 				validForm = false;
 			}
+			if (form.person === 'student') {
+				if (!$scope.isValidToken()) {
+					validForm = false;
+				}
+			}
+			else if (form.person === 'parent') {
+				if (!$scope.isValidEmail()) {
+					validForm = false;
+				}
+				if (!$scope.isValidFirstName()) {
+					validForm = false;
+				}
+				if (!$scope.isValidLastName()) {
+					validForm = false;
+				}
+			}			
 			if (validForm) {
 				$scope.userAuthContainer.authenticationError = null;
-
-				userAuthService.registerUser(form.username, form.password, form.fullName, form.person, form.id, form.token, form.email).then(function (data) {
+				user = {
+					username: form.username,
+					password: form.password,
+					role_type: form.person,
+					first_name: form.firstName,
+					last_name: form.lastName,
+					email: form.email,
+					user_token: form.token
+				}
+				userAuthService.registerUser(user).then(function (data) {
+					// NOTE: b.e. fixed this
+					// // after a register, the b.e. has a hard time giving what we need to login, so just login
+					// $scope.userAuthContainer.form.isLoginForm = true;
+					// $scope.submitForm();
 					// at the end of a successful submit, we want to reset the form in case the user logs out
 					$scope.resetForm();
 					$scope.$emit("checkUserAuth");
@@ -335,14 +386,22 @@ angular.module('sbAngularApp')
 		$scope.userAuthContainer.form = {
 			isLoginForm: $scope.userAuthContainer.form.isLoginForm,
 			username: null,
-			fullName: null,
+			firstName: null,
+			lastName: null,
 			password: null,
 			passwordRe: null,
+			person: null,
+			token: null,
+			email: null,
 			errors: {
 				usernameError: null,
-				fullNameError: null,
+				firstNameError: null,
+				lastNameError: null,
 				passwordError: null,
-				passwordReError: null
+				passwordReError: null,
+				personError: null,
+				tokenError: null,
+				emailError: null
 			},
 			text: {
 				title: null,
@@ -350,6 +409,8 @@ angular.module('sbAngularApp')
 				submitButton: null
 			}
 		};
+
+
 		$scope.getFormTypeText();
 		$scope.getAuthenticationError();
 	};

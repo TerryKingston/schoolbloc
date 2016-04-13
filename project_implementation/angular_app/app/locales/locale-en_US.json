@@ -16,6 +16,8 @@
 	"userAuthContainer.PASSWORD": "Password",
 	"userAuthContainer.PASSWORD_RE": "Re-enter Password",
 	"userAuthContainer.FULL_NAME": "Full Name",
+	"userAuthContainer.FIRST_NAME": "First Name",
+	"userAuthContainer.LAST_NAME": "Last Name",
 	"userAuthContainer.BIRTH_DATE": "Date of Birth",
 	"userAuthContainer.ID": "School Id (Student Id)",
 	"userAuthContainer.EMAIL": "Email",

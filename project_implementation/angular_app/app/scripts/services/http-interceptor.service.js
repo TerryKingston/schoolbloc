@@ -77,9 +77,10 @@ angular.module('sbAngularApp').factory('httpInterceptorService', ['$q', '$window
 		 * @param  {object} response object that was sent from server
 		 */
 		response: function(response) {
+
 			// NOTE: see request() for more information:
 			//if (response.config.url.indexOf("/auth") !== -1 || response.config.url.indexOf("/app-data") !== -1)
-			if (response.data.access_token) {
+			if (response.data && response.data.access_token) {
 				saveJwtToken(response.data.access_token);
 			}
 
