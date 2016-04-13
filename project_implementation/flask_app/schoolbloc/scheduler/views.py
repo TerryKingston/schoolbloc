@@ -249,44 +249,56 @@ class StudentCourseSelector(Resource):
         return courses
 
     @staticmethod
-    def _verify_access_or_abort(student_id):
-        """ Don't let students or parents access other students data """
+    def _get_student_id_or_abort():
+        """
+        Return the student id, assuming it exists and that this user has
+        access to do stuff on this student id
+        """
         role = current_identity.role.role_type
         current_user_id = current_identity.id
 
-        # admins can access anyone
+        # First, make sure the student id exists, either in the request, or
+        # as it is a student who logged on
+        student_id = request.args.get('user_id')
+        if student_id:
+            try:
+                student_id = int(student_id)
+            except ValueError:
+                abort(400, message="user_id must be an integer")
+        else:
+            if role == 'student':
+                student = Student.query.filter_by(user_id=current_user_id).one()
+                student_id = student.id
+            else:
+                abort(400, message="Missing parameter 'user_id'")
+
+        # Next, see if this user has permission to access this student id. Admins
+        # can access any student ids, parents can access their students, and
+        # students can only access themselves
         if role == 'admin':
             return
-
-        # students can only access themselves
         elif role == 'student':
             student = Student.query.filter_by(id=student_id).one()
             if student.user_id != current_user_id:
                 abort(404, message='Access denied')
-
-        # parents can access any of their students
         elif role == 'parent':
             parent = Parent.query.filter_by(user_id=current_identity.id).one()
+            found = False
             for student in parent.students:
                 if student.id == student_id:
-                    return
-            abort(404, message='Access denied')
-
+                    found = True
+                    break
+            if not found:
+                abort(404, message='Access denied')
         else:
             abort(404, message='Expect role of admin, student or teacher')
+
+        return student_id
 
     @auth_required(roles=['student', 'parent', 'admin'])
     def get(self):
         electives = request.args.get('electives')
-        student_id = request.args.get('user_id')
-        if not student_id:
-            abort(400, message="Missing user_id in url params")
-        try:
-            student_id = int(student_id)
-        except ValueError:
-            abort(400, message="user_id must be an integer")
-        self._verify_access_or_abort(student_id)
-
+        student_id = self._get_student_id_or_abort()
         courses = self._get_all_student_courses(student_id)
 
         ret = []
@@ -317,31 +329,16 @@ class StudentCourseSelector(Resource):
             course_id = request_json['id']
             priority = request_json['priority']
             rank = request_json['rank']
+            if priority == 'mandatory':
+                abort(400, message='cannot set priority to mandatory')
         except KeyError:
             abort(400, message='missing id, rank, or priority in request')
-
-        if priority == 'mandatory':
-            abort(400, message='cannot set priority to mandatory')
-
-        student_id = request.args.get('user_id')
-        if not student_id:
-            abort(400, message="Missing user_id in url params")
-        try:
-            student_id = int(student_id)
-        except ValueError:
-            abort(400, message="user_id must be an integer")
-
-        try:
-            student = Student.query.filter_by(id=student_id).one()
-        except NoResultFound:
-            abort(400, message="Student ID {} not found".format(student_id))
-
-        self._verify_access_or_abort(student.id)
+        student_id = self._get_student_id_or_abort()
 
         # If we already have an existing CourseStudnet constraint for this, just
         # update this
         cs = CoursesStudent.query.filter_by(course_id=course_id,
-                                            student_id=student.id).first()
+                                            student_id=student_id).first()
         if cs:
             if cs.priority == "mandatory":
                 abort(400, message="Cannot lower priority of a mandatory course")
@@ -353,26 +350,18 @@ class StudentCourseSelector(Resource):
 
         # Otherwise, verify that this student has this course in one of this
         # studnet groups, and add the constraint to the
-        if not self._course_student_mapper_exists(request_json['id'], student.id):
+        if not self._course_student_mapper_exists(request_json['id'], student_id):
             abort(400, message="No mapping exists between this student and course")
 
         cs = CoursesStudent(active=True, priority=priority, rank=rank,
-                            course_id=course_id, student_id=student.id)
+                            course_id=course_id, student_id=student_id)
         db.session.add(cs)
         db.session.commit()
         return {'success': True}
 
     @auth_required(roles=['student', 'parent', 'admin'])
     def put(self):
-        student_id = request.args.get('user_id')
-        if not student_id:
-            abort(400, message="Missing user_id in url params")
-        try:
-            student_id = int(student_id)
-        except ValueError:
-            abort(400, message="user_id must be an integer")
-        self._verify_access_or_abort(student_id)
-
+        student_id = self._get_student_id_or_abort()
         request_json = request.get_json(force=True)
         for data in request_json:
             if "id" not in data or "rank" not in data:
@@ -393,17 +382,15 @@ class StudentCourseSelector(Resource):
 
     @auth_required(roles=['student', 'parent', 'admin'])
     def delete(self):
-        student_id = request.args.get('user_id')
+        student_id = self._get_student_id_or_abort()
         course_id = request.args.get('course_id')
-        if not student_id or not course_id:
-            abort(400, message="Missing user_id in url params")
+        if not course_id:
+            abort(400, message="Missing course_id in url params")
         try:
-            student_id = int(student_id)
             course_id = int(course_id)
         except ValueError:
-            abort(400, message="user_id and course_id must be an integers")
+            abort(400, message="course_id must be an integers")
 
-        self._verify_access_or_abort(student_id)
         cs = CoursesStudent.query.filter_by(course_id=course_id,
                                             student_id=student_id).first()
         cs.rank = 0
