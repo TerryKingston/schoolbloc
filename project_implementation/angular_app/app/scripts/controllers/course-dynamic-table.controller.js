@@ -34,24 +34,24 @@ angular.module('sbAngularApp')
     "error": null
   };
 
-  $scope.deleteRow = function(rowIndex) {
-    // determine if row index is affected by an already in place editor, and reconfigure if needed
-    if ($scope.editor.rowIndex !== null && rowIndex > $scope.editor.rowIndex) {
-      rowIndex--;
-    }
+  // $scope.deleteRow = function(rowIndex) {
+  //   // determine if row index is affected by an already in place editor, and reconfigure if needed
+  //   if ($scope.editor.rowIndex !== null && rowIndex > $scope.editor.rowIndex) {
+  //     rowIndex--;
+  //   }
 
-    resetEditor();
+  //   resetEditor();
 
-    // because now the rowIndex is the editor
-    $scope.selectedRow.index = rowIndex + 1;
-    $scope.selectedRow.delete = true;
+  //   // because now the rowIndex is the editor
+  //   $scope.selectedRow.index = rowIndex + 1;
+  //   $scope.selectedRow.delete = true;
 
-    $scope.editor.subType = 'delete-row';
+  //   $scope.editor.subType = 'delete-row';
 
-    // add editor into rows
-    $scope.editor.rowIndex = rowIndex;
-    $scope.tableView.electiveCourses.splice(rowIndex, 0, $scope.editor);
-  };
+  //   // add editor into rows
+  //   $scope.editor.rowIndex = rowIndex;
+  //   $scope.tableView.electiveCourses.splice(rowIndex, 0, $scope.editor);
+  // };
 
   $scope.cancelEditor = function() {
     resetEditor();
@@ -75,15 +75,21 @@ angular.module('sbAngularApp')
     $scope.editor.rowIndex = null;
     $scope.editor.subType = null;
     $scope.editor.key = null;
+    $scope.skipCourseOfId = null;
   }
 
-  $scope.confirmDeleteRow = function() {
+  /**
+   * We use this instead of the constraint editor $scope.deleteRow --> $scope.confirmDeleteRow typical method
+   * because the constraint editor is part of the rows 
+   * and is therefore ui:sortable (moveable), which causes all sorts of headaches
+   */
+  $scope.forceDeleteRow = function(rowIndex) {
     var i, courseId, method;
 
     // rowIndex is one off because of header being in the row
-    courseId = $scope.tableView.electiveCourses[$scope.editor.rowIndex + 1][2];
+    courseId = $scope.tableView.electiveCourses[rowIndex][2];
 
-    tableEntriesService.deleteFact(courseId, $scope.tableConfig.tableSelection).then(function (data) {
+    tableEntriesService.deleteFact(courseId, 'student_course').then(function (data) {
       // reset the form
       $scope.cancelEditor();
 
@@ -96,6 +102,25 @@ angular.module('sbAngularApp')
     });
   };
 
+  // $scope.confirmDeleteRow = function() {
+  //   var i, courseId, method;
+
+  //   // rowIndex is one off because of header being in the row
+  //   courseId = $scope.tableView.electiveCourses[$scope.editor.rowIndex + 1][2];
+
+  //   tableEntriesService.deleteFact(courseId, 'student_course').then(function (data) {
+  //     // reset the form
+  //     $scope.cancelEditor();
+
+  //     // update the table to contain the new information
+  //     tableEntriesService.updateTableConfig("fact", $scope.tableConfig.tableSelection);
+  //   }, function(error) {
+  //     $translate("dynamicTable.EDITOR_ERROR").then(function (translation) {
+  //       $scope.editor.error = translation;
+  //     });
+  //   });
+  // };
+
 
 	function getTableEntries() {
 		$scope.tableConfig = tableEntriesService.getTableConfiguration();
@@ -103,6 +128,8 @@ angular.module('sbAngularApp')
 	}
 
   function updateElectiveCourses() {
+    var i, ec, newRankArr = [];
+
     if (!$scope.tableView.electiveCourses || !$scope.tableView.electiveCourses.length) {
       return;
     }
@@ -111,13 +138,26 @@ angular.module('sbAngularApp')
       return;
     }
 
-    // @TODO: send changes to back-end
-    console.log("First elective: " + $scope.tableView.electiveCourses[0][0]);
+    // send rank changes to back-end
+    //console.log("First elective: " + $scope.tableView.electiveCourses[0][0]);
+    ec = $scope.tableView.electiveCourses;
+    for (i = 0; i < ec.length; i++) {
+      newRankArr.push({
+        id: ec[i][2],
+        rank: i + 1
+      });
+    }
+
+    tableEntriesService.editStudentCourse(newRankArr).then(function(data) {
+      // don't think I have to do anything
+    }, function(error) {
+      // @TODO: not sure what to do on a failure
+    });
   }
 
 	function setupTableView() {
 		var i, row, j, k, entry, keys, headerObj;
-
+    debugger;
     $scope.tableView = {
       requiredCourses: [],
       electiveCourses: []
@@ -132,9 +172,13 @@ angular.module('sbAngularApp')
 
     keys = Object.keys($scope.tableConfig.entries[0]);
     for (i = 0; i < $scope.tableConfig.entries.length; i++) {
+      // ignore disabled entries
+      if ($scope.tableConfig.entries[i].disabled) {
+        continue;
+      }
       row = [];
       row.push($scope.tableConfig.entries[i].course);
-      if ($scope.tableConfig.entries[i].required) {
+      if ($scope.tableConfig.entries[i].priority === "mandatory") {
         $scope.tableView.requiredCourses.push(row);
       }
       else {
@@ -151,20 +195,44 @@ angular.module('sbAngularApp')
   }
 
   function sortElectivesArrayByRank() {
-    var i, j, newRankArr = [], ec;
-
+    var i, j, newRankArr = [], ec, foundRank, lowestRank, curRank;
     ec = $scope.tableView.electiveCourses;
-
     if (!ec.length) {
       return;
     }
 
     for (i = 0; i < ec.length; i++) {
+      foundRank = false;
       for (j = 0; j < ec.length; j++) {
         // rank is @ index 1
         if (ec[j][1] - 1 === i) {
           newRankArr.push(ec[j]);
+          foundRank = true;
         }
+      }
+      // rank is out of sync, instead sort by lowest to highest rank, then update rank with proper numbers, then send that to the b.e.
+      if (!foundRank) {
+        curRank = 0;
+        newRankArr = [];
+        //                                        some extreme limit, and extreme problem in ranking sync has occured
+        while (newRankArr.length !== ec.length || curRank > ec.length * 10) {
+          for (i = 0; i < ec.length; i++) {
+            // rank is @ index 1
+            if (ec[i][1] === curRank) {
+              newRankArr.push(ec[i]);
+            }
+          }
+          curRank++;
+        }
+
+        // update the b.e. with this sync'd rank
+        $scope.tableView.electiveCourses = newRankArr;
+        // make it ready for sortable, even if it thinks it isn't
+        $scope.readyForSortable = true;
+        updateElectiveCourses();
+
+        // don't continue with the out-of-sync ranked arr
+        return;
       }
     }
 

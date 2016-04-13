@@ -102,7 +102,7 @@
 	"dynamicTable.MANDATORY_TOOLTIP": "(M)andatory: schedule will fail if it cannot be fulfilled.",
 	"dynamicTable.HIGH_TOOLTIP": "(H)igh: schedule is highly recommended to fulfill.",
 	"dynamicTable.LOW_TOOLTIP": "(L)ow: schedule is suggested to fulfill.",
-	"dynamicTabxle.NOT_TOOLTIP": "(N)ot: schedule will not allow this constraint.",
+	"dynamicTable.NOT_TOOLTIP": "(N)ot: schedule will not allow this constraint.",
 	"dynamicTable.ELECTIVE_MANDATORY_TOOLTIP": "M: Required course for student.",
 	"dynamicTable.ELECTIVE_HIGH_TOOLTIP": "H: Assigns this elective to the student.",
 	"dynamicTable.ELECTIVE_LOW_TOOLTIP": "L: Allows elective for the student to pick.",

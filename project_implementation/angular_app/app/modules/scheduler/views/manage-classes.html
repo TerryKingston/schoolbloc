@@ -1,5 +1,8 @@
-<section class="scheduler-container main-view-content">
+<section class="scheduler-container main-view-content" ng-if="manageStudents.selectedStudent">
   <!-- <sb-suggestion-list config="config.suggestionListConfig"></sb-suggestion-list> -->
+  <div>
+    <h3>Viewing courses for {{manageStudents.selectedStudent.first_name}} {{manageStudents.selectedStudent.last_name}}</h3>
+  </div>
   <div ng-controller="AddFact">
     <sb-add-fact></sb-add-fact>
   </div>
@@ -7,5 +10,11 @@
   <!-- @TODO: figure out angular way to deal with tables -->
   <div ng-controller="CourseDynamicTable">
     <sb-course-dynamic-table></sb-course-dynamic-table>
+  </div>
+</section>
+<section class="scheduler-container main-view-content" ng-if="!manageStudents.selectedStudent">
+  <div>
+    <h3>You have no added students</h3>
+    <p>Go back to the Main Dashboard to add the access token for one of your students to continue.</p>
   </div>
 </section>

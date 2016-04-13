@@ -3,11 +3,12 @@
 /**
  * Provides data objects for large tables
  */
-angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'commonService', function($q, $http, commonService) {
+angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'commonService', 'userAccessService', function($q, $http, commonService, userAccessService) {
 	var SERVER_ROOT = "api/",
 		CLASSROOM_URL = SERVER_ROOT + "classrooms",
 		COURSE_URL = SERVER_ROOT + "courses",
 		STUDENT_URL = SERVER_ROOT + "students",
+		STUDENT_COURSE_URL = SERVER_ROOT + "student_course",
 		STUDENT_GROUP_URL = SERVER_ROOT + "student_groups",
 		DAY_URL = SERVER_ROOT + "days",
 		SUBJECT_URL = SERVER_ROOT + "subjects",
@@ -29,11 +30,11 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 	var factTypeConfig = {
 		"student_course": [
 			{
-				key: "course",
+				key: "student_course",
 				value: null,
 				error: null,
 				required: true,
-				type: "uniqueText",
+				type: "constraint",
 				multipleValues: false,
 				facts: null
 			}
@@ -614,6 +615,9 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 			if ((constraintArr[i].start_time || constraintArr[i].start_time === 0) && (constraintArr[i].end_time || constraintArr[i].end_time === 0)) {
 				value = value + commonService.formatTimeM2S(constraintArr[i].start_time, constraintArr[i].end_time);
 			}
+			if (constraintArr[i].course) {
+				value = value + constraintArr[i].course;
+			}
 			value = value.trim();
 
 			// if factValues[x] is equal to any factsMap key, we have a duplicate and we should alter all duplicates to contain factValues[x] + " (id)"
@@ -653,7 +657,8 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 		},
 
 		addFact: function(factEntry, factType) {
-			var url;
+			var url, rank, i, self = this;
+			var manageStudents;
 			var deferred = $q.defer();
 			if (!factEntry) {
 				deferred.reject("ERROR: needed parameter not provided.")
@@ -682,6 +687,44 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 			else if (factType === "student_group") {
 				url = STUDENT_GROUP_URL;
 			}
+			// special case because of POST student_course requirement (such as rank)
+			else if (factType === "student_course") {
+				manageStudents = userAccessService.getUsersManagedStudents();
+				url = STUDENT_COURSE_URL + "?user_id=" + manageStudents.selectedStudent.id;
+				url = commonService.conformUrl(url);
+				
+				factEntry = {
+					"id": factEntry.student_course[0].id,
+					"priority": "high",
+					"rank": null // @TODO
+				};
+
+				if (tableConfig.entries) {
+					// set it to highest rank among all electives
+					rank = 1;
+					for (i = 0; i < tableConfig.entries.length; i++) {
+						if (tableConfig.entries[i].priority === "high") {
+							rank++;
+						}
+					}
+					factEntry.rank = rank;
+				}
+				else {
+					console.error("tableEntriesService.addFact: unexpected state");
+					deferred.reject("ERROR: Not entries given.");
+				}
+
+				$http.post(url, factEntry).then(function(data) {
+					// update the list since this fact should now be removed
+					self.updateFactTypeFacts('student_course');
+					deferred.resolve(data.data);
+
+				}, function(data) {
+					deferred.reject(data.data);
+				});
+
+				return deferred.promise;
+			}
 			else if (factType === "day") {
 				url = DAY_URL;
 			}
@@ -695,6 +738,27 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 			url = commonService.conformUrl(url);
 
 			$http.post(url, factEntry).then(function(data) {
+				deferred.resolve(data.data);
+			}, function(data) {
+				deferred.reject(data.data);
+			});
+			return deferred.promise;
+		},
+
+		editStudentCourse: function(newRankArr) {
+			var url, manageStudents;
+			var deferred = $q.defer();
+
+			if (!newRankArr || !newRankArr.length) {
+				deferred.reject("ERROR: needed parameter not provided.")
+				return deferred.promise;
+			}
+
+			manageStudents = userAccessService.getUsersManagedStudents();
+			url = STUDENT_COURSE_URL + "?user_id=" + manageStudents.selectedStudent.id;
+			url = commonService.conformUrl(url);
+
+			$http.put(url, newRankArr).then(function(data) {
 				deferred.resolve(data.data);
 			}, function(data) {
 				deferred.reject(data.data);
@@ -753,7 +817,7 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 		},
 
 		deleteFact: function(factId, factType) {
-			var url;
+			var url, manageStudents, self = this;
 			var deferred = $q.defer();
 			if (!factId) {
 				deferred.reject("ERROR: needed parameter not provided.")
@@ -785,6 +849,9 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 			else if (factType === "day") {
 				url = DAY_URL;
 			}
+			else if (factType === "student_course") {
+				// done later as constrains=true is added
+			}
 			else {
 				console.error("tableEntriesService.addFact: unexpected state: invalid factType: " + factType);
 				deferred.reject("ERROR: Unexpected front-end input.");
@@ -794,7 +861,15 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 			// conform the url to change the port
 			url = commonService.conformUrl(url + "/" + factId);
 
+			if (factType === "student_course") {
+				manageStudents = userAccessService.getUsersManagedStudents();
+				url = STUDENT_COURSE_URL + "?course_id=" + factId + "&user_id=" + manageStudents.selectedStudent.id;
+				url = commonService.conformUrl(url);
+			}
+
 			$http.delete(url).then(function(data) {
+				// update the list since this fact should now be removed
+				self.updateFactTypeFacts('student_course');
 				deferred.resolve(data.data);
 			}, function(data) {
 				deferred.reject(data.data);
@@ -815,7 +890,7 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 		},
 
 		getTableFacts: function(factName) {
-			var url;
+			var url, manageStudents;
 			var deferred = $q.defer();
 
 			if (!factName) {
@@ -848,48 +923,7 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 				url = DAY_URL;
 			}
 			else if (factName === "student_course") {
-				// @TODO: change later
-				url = COURSE_URL;
-				deferred.resolve([
-					{
-						course: "Math I",
-						id: 1,
-						required: true,
-						rank: null
-					},
-					{
-						course: "English I",
-						id: 2,
-						required: true,
-						rank: null
-					},
-					{
-						course: "History I",
-						id: 3,
-						required: true,
-						rank: null
-					},
-					{
-						course: "Band I",
-						id: 4,
-						required: false,
-						rank: 3
-					},
-					{
-						course: "Choir I",
-						id: 5,
-						required: false,
-						rank: 2
-					},
-					{
-						course: "Programming I",
-						id: 6,
-						required: false,
-						rank: 1
-					}
-				]);
-				
-				return deferred.promise;
+				// done later as constrains=true is added
 			}
 			else {
 				console.error("tableEntriesService.getTableFacts: unexpected state: invalid factName: " + factName);
@@ -899,6 +933,12 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 
 			// conform the url to change the port
 			url = commonService.conformUrl(url) + '?constraints=true';
+
+			if (factName === "student_course") {
+				manageStudents = userAccessService.getUsersManagedStudents();
+				url = STUDENT_COURSE_URL + "?user_id=" + manageStudents.selectedStudent.id;
+				url = commonService.conformUrl(url);
+			}
 
 			$http.get(url).then(function(data) {
 				deferred.resolve(data.data);
@@ -941,10 +981,10 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 						}
 					}
 					tableConfig.entries = data;
-					// DEBUG: go ahead and add disabled for show casing
-					for (i = 0; i < tableConfig.entries.length; i++) {
-						tableConfig.entries[i].disabled = Math.random() < 0.2;
-					}
+					// // DEBUG: go ahead and add disabled for show casing
+					// for (i = 0; i < tableConfig.entries.length; i++) {
+					// 	tableConfig.entries[i].disabled = Math.random() < 0.2;
+					// }
 				}, function (data) {
 					// @TODO: display error message
 				});
@@ -986,7 +1026,7 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 		 * index is simply based back through return deferrment as a way to keep track of an index in a for loop
 		 */
 		getConstraintFacts: function(constraintName, index) {
-			var url;
+			var url, manageStudents;
 			var deferred = $q.defer();
 
 			if (!constraintName) {
@@ -1018,6 +1058,9 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 			else if (constraintName === "day") {
 				url = DAY_URL;
 			}
+			else if (constraintName === "student_course") {
+				// performed later since constraints=false is added
+			}
 			else {
 				console.error("tableEntriesService.getConstraintFacts: unexpected state: invalid constraintName: " + constraintName);
 				deferred.reject({data: "ERROR: Unexpected front-end input.", index: index});
@@ -1026,6 +1069,11 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 
 			// conform the url to change the port
 			url = commonService.conformUrl(url) + '?constraints=false';;
+
+			if (constraintName === "student_course") {
+				manageStudents = userAccessService.getUsersManagedStudents();
+				url = commonService.conformUrl(STUDENT_COURSE_URL + "?user_id=" + manageStudents.selectedStudent.id + "&electives=true")
+			}
 
 			$http.get(url).then(function(data) {
 				deferred.resolve({data: data.data, index: index});

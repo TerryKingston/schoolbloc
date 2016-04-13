@@ -35,10 +35,11 @@ angular.module('sbAngularApp')
 	}
 
 	function getUsersStudents() {
+		$scope.manageStudents = userAccessService.getUsersManagedStudents();
 		userAccessService.getUsersStudents().then(function(data) {
-			$scope.manageStudents.students = data;
+			//$scope.manageStudents.students = data;
 		}, function(error) {
-			$scope.manageStudents.students = null;
+			//$scope.manageStudents.students = null;
 		});
 	}
 

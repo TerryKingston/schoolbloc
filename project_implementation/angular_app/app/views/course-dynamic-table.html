@@ -31,9 +31,9 @@
     <tbody ui-sortable ng-model="tableView.electiveCourses">
       <tr class="sortable-row" ng-repeat="row in tableView.electiveCourses track by $index" ng-init="rowIndex = $index" ng-class="{'delete-warning-row': (rowIndex === selectedRow.index && selectedRow.delete)}">
         <!-- EDITOR -->
-        <td class="table-editor" id="constraintEditor" colspan="2" ng-if="row.type === 'editor'">
+        <!-- <td class="table-editor" id="constraintEditor" colspan="2" ng-if="row.type === 'editor'"> -->
           <!-- DELETE row -->
-          <div class="table-editor-flex" ng-if="row.subType === 'delete-row'">
+          <!-- <div class="table-editor-flex" ng-if="row.subType === 'delete-row'">
             <div class="table-editor-left">
               <section>
                 <div class="editor-prompt-text">{{'dynamicTable.CONFIRM_REMOVE_ROW' | translate}}</div>
@@ -45,13 +45,15 @@
               </section>
             </div>
           </div>
-        </td>
+        </td> -->
         <td ng-if="!row.type">
           <div class="row-property">{{row[0]}}</div>
         </td>
         <td ng-if="!row.type">
           <div>
-            <button class="table-row-delete" alt="{{'dynamicTable.DELETE' | translate}}" ng-click="deleteRow(rowIndex)"></button>
+            <!-- old method with EDITOR -->
+            <!-- <button class="table-row-delete" alt="{{'dynamicTable.DELETE' | translate}}" ng-click="deleteRow(rowIndex)"></button> -->
+            <button class="table-row-delete" alt="{{'dynamicTable.DELETE' | translate}}" ng-click="forceDeleteRow(rowIndex)"></button>
           </div>
         </td>
       </tr>

@@ -100,6 +100,9 @@ angular.module('sbAngularApp')
 		}
 		else {
 			$scope.sbRoot.user.authenticated = false;
+			// reset to always have a newly logged in user go to the main dashboard
+			$scope.sbRoot.mainContainer.navBarConfig.view = "main dashboard";
+			$scope.sbRoot.mainContainer.navBarConfig.subView = null;
 		}
 
 		$scope.sbRoot.initialLoading = false;
