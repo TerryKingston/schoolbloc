@@ -107,6 +107,7 @@ sl_cls._get_or_abort = student_parent_get_or_abort
 # Additional rest apis we are exposing
 class UnreadNotifications(Resource):
 
+    @auth_required(roles='admin')
     def get(self):
         notes = Notification.query.filter_by(unread=True).all()
         for note in notes:
@@ -118,12 +119,14 @@ class UnreadNotifications(Resource):
 
 class ScheduleApi(Resource):
 
+    @auth_required(roles='admin')
     def get(self, schedule_id):
         schedule = Schedule.query.get(schedule_id)
         if not schedule:
             abort(404, message="Schedule {} not found".format(schedule_id))
         return schedule.serialize(expanded=True)
 
+    @auth_required(roles='admin')
     def delete(self, schedule_id):
         schedule = Schedule.query.get(schedule_id)
         if not schedule:
@@ -135,12 +138,14 @@ class ScheduleApi(Resource):
 
 class ScheduleStudentApi(Resource):
 
+    @auth_required(roles='admin')
     def get(self, schedule_id):
         schedule = Schedule.query.get(schedule_id)
         if not schedule:
             abort(404, message="Schedule {} not found".format(schedule_id))
         return schedule.student_serialize()
 
+    @auth_required(roles='admin')
     def delete(self, schedule_id):
         schedule = Schedule.query.get(schedule_id)
         if not schedule:
@@ -159,10 +164,12 @@ class CreateSchedule(Thread):
 
 class ScheduleListApi(Resource):
 
+    @auth_required(roles='admin')
     def get(self):
         schedules = Schedule.query.all()
         return [s.serialize(expanded=False) for s in schedules]
 
+    @auth_required(roles='admin')
     def post(self):
         worker_thread = CreateSchedule()
         worker_thread.daemon = True
