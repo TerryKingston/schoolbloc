@@ -1,8 +1,9 @@
 import logging
-from flask import Blueprint, request
+from flask import Blueprint, request, current_app
 from flask.ext.jwt import current_identity
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm.exc import NoResultFound
+from werkzeug.local import LocalProxy
 
 from schoolbloc import auth_required, db
 from schoolbloc.scheduler.models import Student, Parent
@@ -130,7 +131,12 @@ class UserRegister(Resource):
                 student.user_id = user.id
                 db.session.add(student)
                 db.session.commit()
-                return {"success": True}
+
+                # Log the user in
+                _jwt = LocalProxy(lambda: current_app.extensions['jwt'])
+                identity = _jwt.authentication_callback(username, password)
+                access_token = _jwt.jwt_encode_callback(identity)
+                return _jwt.auth_response_callback(access_token, identity)
             except NoResultFound:
                 abort(400, message="student user token not found")
             except IntegrityError:
@@ -154,6 +160,12 @@ class UserRegister(Resource):
                                 last_name=last_name, email=email)
                 db.session.add(parent)
                 db.session.commit()
+
+                # Log the user in
+                _jwt = LocalProxy(lambda: current_app.extensions['jwt'])
+                identity = _jwt.authentication_callback(username, password)
+                access_token = _jwt.jwt_encode_callback(identity)
+                return _jwt.auth_response_callback(access_token, identity)
             except IntegrityError:
                 db.session.rollback()
                 abort(400, message="Username already exists")
