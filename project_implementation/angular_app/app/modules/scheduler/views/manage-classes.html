@@ -1,7 +1,8 @@
 <section class="scheduler-container main-view-content" ng-if="manageStudents.selectedStudent || isStudent">
   <!-- <sb-suggestion-list config="config.suggestionListConfig"></sb-suggestion-list> -->
   <div>
-    <h3>Viewing courses for {{manageStudents.selectedStudent.first_name}} {{manageStudents.selectedStudent.last_name}}</h3>
+    <h3 ng-if="manageStudents.selectedStudent">Viewing courses for {{manageStudents.selectedStudent.first_name}} {{manageStudents.selectedStudent.last_name}}</h3>
+    <h3 ng-if="!manageStudents.selectedStudent">Viewing your courses</h3>
   </div>
   <div ng-controller="AddFact">
     <sb-add-fact></sb-add-fact>

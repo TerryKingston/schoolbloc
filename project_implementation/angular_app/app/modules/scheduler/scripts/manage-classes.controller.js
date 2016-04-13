@@ -34,6 +34,7 @@ angular.module('sbAngularApp')
 	function getRole() {
 		if ($window.localStorage.role === 'student') {
 			$scope.isStudent = true;
+			userAccessService.resetManagedStudents();
 		}
 	}
 

@@ -37,6 +37,11 @@ angular.module('sbAngularApp').factory('userAccessService', ['$q', '$http', 'com
 			return manageStudents;
 		},
 
+		resetManagedStudents: function() {
+			manageStudents.students = null;
+			manageStudents.selectedStudent = null;
+		},
+
 		getUsersStudents: function() {
 			var url;
 			var deferred = $q.defer();

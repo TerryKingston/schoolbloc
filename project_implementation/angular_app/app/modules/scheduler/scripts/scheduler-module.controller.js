@@ -43,7 +43,7 @@ angular.module('sbAngularApp')
 		scope.$watch('config.subView', viewChange);
 
 		function viewChange() {
-			if (scope.config.subView === null && scope.config.view === 'scheduler') {
+			if (scope.config.subView === null && scope.config.view === 'scheduler' && scope.userAccess.role === 'admin') {
 				schedulerService.updateScheduleList();
 			}
 		}
