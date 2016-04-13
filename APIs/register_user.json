@@ -1,18 +1,25 @@
-POST /register
+POST /api/register
 
+# Students
 payload: {
-	"username": null,
-	"password": null,
-	"fullName": null,
-	"person": "parent" | "student" | "teacher",
-	"user_id": null,
-	"access_token": null,
-	"email": null
+	"username": <username>,
+	"password": <password>,
+	"role_type": "student"
+	"user_token": <student_user_token>,
 }
 
-return: 
+# Parents
+payload: {
+	"username": <username>,
+	"password": <password>,
+	"role_type": "parent",
+	"first_name": <first_name>,
+	"last_name": <last_name>,
+	"email": <email>
+}
+
+return:
 200: OK
-???: "Username already exists."
-???: "Failed to save submission: submission was a duplicate."
-???: "School id does not exist."
-???: "Bad school id - token access pair."
+400: "Username already exists."
+400: "Student user token not found"
+400: "Student already belongs to an existing user"

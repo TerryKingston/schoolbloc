@@ -50,6 +50,7 @@ class Parent(db.Model, SqlalchemySerializer):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False, unique=True)
     first_name = db.Column(db.String(128), nullable=False)
     last_name = db.Column(db.String(128), nullable=False)
+    email = db.Column(db.String(128), nullable=False)
 
     # Relationships
     parent_student_mapper = db.relationship("ParentStudentMapper",

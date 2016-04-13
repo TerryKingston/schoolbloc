@@ -1,9 +1,11 @@
 import logging
-from flask import Blueprint
+from flask import Blueprint, request
 from flask.ext.jwt import current_identity
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm.exc import NoResultFound
 
 from schoolbloc import auth_required, db
+from schoolbloc.scheduler.models import Student, Parent
 from schoolbloc.users.models import User
 from flask.ext.restful import Api, Resource, abort, reqparse
 
@@ -90,29 +92,76 @@ class UserApi(Resource):
 class UserListApi(Resource):
     """ Get all users or create new user """
 
-    @auth_required(roles=['teacher', 'admin'])
+    @auth_required(roles='admin')
     def get(self):
         """ Get a list of users """
         return [user.serialize() for user in User.query.all()]
 
-    @auth_required(roles='admin')
+
+class UserRegister(Resource):
+
     def post(self):
         """ Create a new user """
-        parser = reqparse.RequestParser()
-        parser.add_argument('username', required=True)
-        parser.add_argument('password', required=True)
-        parser.add_argument('role', required=True)
-        args = parser.parse_args()
-        try:
-            u = User(username=args['username'], password=args['password'], role_type=args['role'])
-            db.session.add(u)
-            db.session.commit()
-        except IntegrityError:
-            db.session.rollback()
-            return {'error': 'username already exists'}, 409
+        request_json = request.get_json(force=True)
 
-        return {'success': 'user created successfully'}, 200
+        # Required args for all users
+        try:
+            username = request_json['username']
+            password = request_json['password']
+            role_type = request_json['role_type']
+        except KeyError as e:
+            abort(400, message="Missing required key: {}".format(e))
+
+        # If it's a student
+        if role_type == 'student':
+            try:
+                user_token = request_json['user_token']
+            except KeyError as e:
+                abort(400, message="Student missing required key: {}".format(e))
+
+            try:
+                student = Student.query.filter_by(user_token=user_token).one()
+                existing_user = User.query.filter_by(id=student.user_id).first()
+                if existing_user:
+                    abort(400, message="This student already belongs to a user")
+                user = User(username, password, role_type)
+                db.session.add(user)
+                db.session.flush()
+                student.user_id = user.id
+                db.session.add(student)
+                db.session.commit()
+                return {"success": True}
+            except NoResultFound:
+                abort(400, message="student user token not found")
+            except IntegrityError:
+                db.session.rollback()
+                abort(400, message="Username already exists")
+
+        # Add if it's a parent
+        elif role_type == 'parent':
+            try:
+                first_name = request_json['first_name']
+                last_name = request_json['last_name']
+                email = request_json['email']
+            except KeyError as e:
+                abort(400, message="Parent missing required key: {}".format(e))
+
+            try:
+                user = User(username, password, role_type)
+                db.session.add(user)
+                db.session.flush()
+                parent = Parent(user_id=user.id, first_name=first_name,
+                                last_name=last_name, email=email)
+                db.session.add(parent)
+                db.session.commit()
+            except IntegrityError:
+                db.session.rollback()
+                abort(400, message="Username already exists")
+
+        else:
+            abort(400, message="Role type must be parent or student")
 
 
 api.add_resource(UserApi, '/api/users/<int:user_id>')
 api.add_resource(UserListApi, '/api/users')
+api.add_resource(UserRegister, '/api/register')
