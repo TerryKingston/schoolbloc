@@ -362,6 +362,33 @@ class StudentCourseSelector(Resource):
         return {'success': True}
 
     @auth_required(roles=['student', 'parent', 'admin'])
+    def put(self):
+        student_id = request.args.get('user_id')
+        if not student_id:
+            abort(400, message="Missing user_id in url params")
+        try:
+            student_id = int(student_id)
+        except ValueError:
+            abort(400, message="user_id must be an integer")
+        self._verify_access_or_abort(student_id)
+
+        request_json = request.get_json(force=True)
+        for data in request_json:
+            if "id" not in data or "rank" not in data:
+                db.session.rollback()
+                abort(400, message="Missing id or rank in json dict")
+            try:
+                cs = CoursesStudent.query.filter_by(course_id=data['id'],
+                                                    student_id=student_id).one()
+                cs.rank = data['rank']
+                db.session.add(cs)
+            except NoResultFound:
+                db.session.rollback()
+                abort(400, message="CourseStudent mapper not found")
+        db.session.commit()
+        return {'success': True}
+
+    @auth_required(roles=['student', 'parent', 'admin'])
     def delete(self):
         student_id = request.args.get('user_id')
         course_id = request.args.get('course_id')
