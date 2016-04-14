@@ -126,7 +126,89 @@ class DataImportClassroom(Resource):
             log.exception(e)
             return {'error': 'something went wrong'}, 409
 
+class DataImportStudentGroup(Resource):
+    """ Get all users or create new user """
+
+    #@auth_required(roles='admin')
+    def post(self):
+        csv = request.files['file']
+
+        if not csv:
+            abort(400, message="Missing import file")
+
+        # Verify the file extension is .csv
+        extension = csv.filename.rsplit('.', 1)[1].lower()
+        if '.' in csv.filename and not extension in app.config['ALLOWED_EXTENSIONS']:
+            abort(400, message="File extension is not one of our supported types.")
+
+        filename = secure_filename(csv.filename) # scrub file path
+        tmp_filepath = os.path.join(app.config['TMP_FOLDER'], filename)
+        csv.save(tmp_filepath)
+
+        try:
+            csv_import.student_groups_import(tmp_filepath)
+            return {'success': 'Classroom data imported successfully'}, 200
+        except Exception as e:
+            log.exception(e)
+            return {'error': 'something went wrong'}, 409
+
+class DataImportSubject(Resource):
+    """ Get all users or create new user """
+
+    #@auth_required(roles='admin')
+    def post(self):
+        csv = request.files['file']
+
+        if not csv:
+            abort(400, message="Missing import file")
+
+        # Verify the file extension is .csv
+        extension = csv.filename.rsplit('.', 1)[1].lower()
+        if '.' in csv.filename and not extension in app.config['ALLOWED_EXTENSIONS']:
+            abort(400, message="File extension is not one of our supported types.")
+
+        filename = secure_filename(csv.filename) # scrub file path
+        tmp_filepath = os.path.join(app.config['TMP_FOLDER'], filename)
+        csv.save(tmp_filepath)
+
+        try:
+            csv_import.subjects_import(tmp_filepath)
+            return {'success': 'Classroom data imported successfully'}, 200
+        except Exception as e:
+            log.exception(e)
+            return {'error': 'something went wrong'}, 409
+
+class DataImportTimeblock(Resource):
+    """ Get all users or create new user """
+
+    #@auth_required(roles='admin')
+    def post(self):
+        csv = request.files['file']
+
+        if not csv:
+            abort(400, message="Missing import file")
+
+        # Verify the file extension is .csv
+        extension = csv.filename.rsplit('.', 1)[1].lower()
+        if '.' in csv.filename and not extension in app.config['ALLOWED_EXTENSIONS']:
+            abort(400, message="File extension is not one of our supported types.")
+
+        filename = secure_filename(csv.filename) # scrub file path
+        tmp_filepath = os.path.join(app.config['TMP_FOLDER'], filename)
+        csv.save(tmp_filepath)
+
+        try:
+            csv_import.timeblocks_import(tmp_filepath)
+            return {'success': 'Classroom data imported successfully'}, 200
+        except Exception as e:
+            log.exception(e)
+            return {'error': 'something went wrong'}, 409
+
+
 api.add_resource(DataImportStudent, '/api/import/student')
 api.add_resource(DataImportTeacher, '/api/import/teacher')
 api.add_resource(DataImportCourse, '/api/import/course')
 api.add_resource(DataImportClassroom, '/api/import/classroom')
+api.add_resource(DataImportStudentGroup, '/api/import/student_group')
+api.add_resource(DataImportSubject, '/api/import/subject')
+api.add_resource(DataImportTimeblock, '/api/import/timeblock')

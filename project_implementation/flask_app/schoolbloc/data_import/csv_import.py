@@ -10,12 +10,8 @@ def students_import(filepath):
             reader = csv.DictReader(csvfile)
             with db.session.no_autoflush:
                 for row in reader:
-                    u = User(username='{}_{}'.format(row['first_name'], row['last_name']), password=row['last_name'],
-                             role_type='student')
-                    db.session.add(u)
-                    db.session.flush()
                     student = Student(first_name=row['first_name'],
-                                      last_name=row['last_name'], user_id=u.id)
+                                      last_name=row['last_name'], uid=row['uid'])
                     db.session.add(student)
                 db.session.commit()
     except:
@@ -82,11 +78,8 @@ def teachers_import(filepath):
             reader = csv.DictReader(csvfile)
             with db.session.no_autoflush:
                 for row in reader:
-                    u = User(username=row['last_name'], password=row['first_name'], role_type='teacher')
-                    db.session.add(u)
-                    db.session.flush()
-                    teacher = Teacher(first_name=row['first_name'], last_name=row['last_name'], user_id=u.id,
-                                      avail_start_time=row['start_time'], avail_end_time=row['end_time'])
+                    teacher = Teacher(first_name=row['first_name'], last_name=row['last_name'],
+                                      avail_start_time=row['avail_start_time'], avail_end_time=row['avail_end_time'], uid=row['uid'])
                     db.session.add(teacher)
                 db.session.commit()
     except:
@@ -100,7 +93,7 @@ def courses_import(filepath):
             reader = csv.DictReader(csvfile)
             with db.session.no_autoflush:
                 for row in reader:
-                    course = Course(name=row['course_name'], duration=row['duration'],
+                    course = Course(name=row['course_name'],
                                     max_student_count=row['max_student_count'], min_student_count=row['min_student_count'])
                     db.session.add(course)
                 db.session.commit()
