@@ -34,8 +34,6 @@ if __name__ == '__main__':
         db.session.add(Day(name='Wednesday'))
         db.session.add(Day(name='Thursday'))
         db.session.add(Day(name='Friday'))
-        db.session.add(Day(name='Saturday'))
-        db.session.add(Day(name='Sunday'))
         db.session.commit()
     except:
         db.session.rollback()
