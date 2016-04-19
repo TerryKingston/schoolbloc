@@ -8,7 +8,8 @@ angular.module('sbAngularApp').factory('schedulerService', ['$q', '$http', 'comm
 	var GET_SCHEDULE_UPDATES = "api/notifications/unread";
 	var scheduleConfig = {
 		scheduleList: null,
-		selectedSchedule: null
+		selectedSchedule: null,
+		scheduleConfig: 0
 	};
 
 	return {
@@ -92,17 +93,18 @@ angular.module('sbAngularApp').factory('schedulerService', ['$q', '$http', 'comm
 
 		deleteSchedule: function(id) {
 			var deferred = $q.defer();
-			var url;
+			var url, self = this;
 
 			if (id === null) {
 				deferred.reject("No id given.");
 				return deferred.promise;
 			}
 
-			url = commonService.conformUrl(GET_SCHEDULES + "/" + id);
+			url = commonService.conformUrl(GET_SCHEDULES + "/" + id + "/class");
 
 			$http.delete(url).then(function(data) {
-				scheduleConfig.scheduleList = data.data;
+				//scheduleConfig.scheduleList = data.data;
+				self.updateScheduleList();
 				scheduleConfig.selectedSchedule = null;
 				deferred.resolve(data.data);
 			}, function(data) {

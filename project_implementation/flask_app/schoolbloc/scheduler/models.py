@@ -132,7 +132,7 @@ class Course(db.Model, SqlalchemySerializer):
 
     # Columns
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(128), nullable=False)
+    name = db.Column(db.String(128), nullable=False, unique=True)
     min_student_count = db.Column(db.Integer)
     max_student_count = db.Column(db.Integer)
 
@@ -258,7 +258,7 @@ class StudentGroup(db.Model, SqlalchemySerializer):
 
     # Columns
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(128), nullable=False)
+    name = db.Column(db.String(128), nullable=False, unique=True)
     students = association_proxy('students_student_groups', 'student')
 
     # Relationships
@@ -293,7 +293,7 @@ class Subject(db.Model, SqlalchemySerializer):
 
     # Columns
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(255), nullable=False)
+    name = db.Column(db.String(255), nullable=False, unique=True)
 
     # Relationships
     classrooms_subjects = db.relationship("ClassroomsSubject",

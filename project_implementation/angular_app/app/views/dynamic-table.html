@@ -18,11 +18,11 @@
           <span>{{'dynamicTable.DISPLAY_COLUMN' | translate}}</span>
         </label>
       </td>
-      <td>{{'dynamicTable.ENTRIES' | translate}}:</td>
-      <td>
+      <td ng-if="header.isConstraint">{{'dynamicTable.ENTRIES' | translate}}:</td>
+      <td ng-if="header.isConstraint">
         <button class="btn btn-link" ng-click="toggleAllEntries($index, true)">{{'dynamicTable.SHOW_ALL' | translate}}</button>
       </td>
-      <td>
+      <td ng-if="header.isConstraint">
         <button class="btn btn-link" ng-click="toggleAllEntries($index, false)">{{'dynamicTable.HIDE_ALL' | translate}}</button>
       </td>
     </tr>
@@ -30,9 +30,12 @@
   <button class="btn btn-secondary" ng-click="toggleTableOptions(false)">{{'dynamicTable.CLOSE' | translate}}</button>
 </div>
 <section class="table-wrapper">
-  <div class="loading" ng-if="!tableView.rows.length">
+  <div class="loading" ng-if="!tableView.rows.length && !isEmptyTable">
     <div>Loading... </div>
     <div class="spinner" style="margin-left: 20px"></div>
+  </div>
+  <div class="loading" ng-if="isEmptyTable">
+    <div>There are no entries</div>
   </div>
   <table class="dynamic-table schedule-table" ng-if="tableView.rows && tableView.rows.length" ng-mouseleave="resetHeader()">
     <!-- <thead>

@@ -1054,6 +1054,7 @@ textarea {
 
 .dynamic-table .delete-table-entry div {
   background-image: $delete-icon;
+  min-width: 22px;
   width: 22px;
   height: 22px;
 }
