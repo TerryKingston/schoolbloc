@@ -100,9 +100,9 @@ class FullScheduleTests(unittest.TestCase):
         # get a list of sample names
         names = TestUtil.get_names(320)
         
-        stud_7th_list = TestUtil.generate_students(100, names=names[0:100])
-        stud_8th_list = TestUtil.generate_students(100, names=names[100:200])
-        stud_9th_list = TestUtil.generate_students(100, names=names[200:300])
+        stud_7th_list = TestUtil.generate_students(66, names=names[0:66])
+        stud_8th_list = TestUtil.generate_students(66, names=names[66:132])
+        stud_9th_list = TestUtil.generate_students(66, names=names[132:198])
 
         # Add the teachers
         # teacher_name_list = [("S", "Owen"),("M", "Evans"), ("S", "Evans"), ("J", "Green"),
@@ -113,23 +113,63 @@ class FullScheduleTests(unittest.TestCase):
         #                 ("D", "Thomas")]
 
         # teach_list = TestUtil.generate_teachers(20, names[300:320])
+        teachers = []
         music_teacher_1 = TestUtil.generate_teachers(1, names[300:301])[0]
+        teachers.append(music_teacher_1)
+
         music_teacher_2 = TestUtil.generate_teachers(1, names[301:302])[0]
+        teachers.append(music_teacher_2)
+        
         math_teacher_1 = TestUtil.generate_teachers(1, names[302:303])[0]
+        teachers.append(math_teacher_1)
+        
         math_teacher_2 = TestUtil.generate_teachers(1, names[303:304])[0]
+        teachers.append(math_teacher_2)
+        
         math_teacher_3 = TestUtil.generate_teachers(1, names[304:305])[0]
+        teachers.append(math_teacher_3)
+        
         math_teacher_4 = TestUtil.generate_teachers(1, names[305:306])[0]
+        teachers.append(math_teacher_4)
+        
         sci_teacher_1 = TestUtil.generate_teachers(1, names[306:307])[0]
+        teachers.append(sci_teacher_1)
+        
         lang_teacher_1 = TestUtil.generate_teachers(1, names[307:308])[0]
+        teachers.append(lang_teacher_1)
+        
         lang_teacher_2 = TestUtil.generate_teachers(1, names[308:309])[0]
+        teachers.append(lang_teacher_2)
+        
         pe_teacher_1 = TestUtil.generate_teachers(1, names[309:310])[0]
+        teachers.append(pe_teacher_1)
+        
         soc_teacher_1 = TestUtil.generate_teachers(1, names[310:311])[0]
+        teachers.append(soc_teacher_1)
+        
         soc_teacher_2 = TestUtil.generate_teachers(1, names[311:312])[0]
+        teachers.append(soc_teacher_2)
+        
         tech_teacher_1 = TestUtil.generate_teachers(1, names[312:313])[0]
+        teachers.append(tech_teacher_1)
+        
         learn_teacher_1 = TestUtil.generate_teachers(1, names[313:314])[0]
+        teachers.append(learn_teacher_1)
+        
         pe_teacher_2 = TestUtil.generate_teachers(1, names[314:315])[0]
+        teachers.append(pe_teacher_2)
+        
         pe_teacher_3 = TestUtil.generate_teachers(1, names[315:316])[0]
+        teachers.append(pe_teacher_3)
+
         extra_teachers = TestUtil.generate_teachers(4, names[316:320])
+        teachers += extra_teachers
+
+        # Add teachers to weekdays
+        for day in Day.query.all():
+            for teacher in teachers:
+                db.session.add(TeachersDays(day_id=day.id, teacher_id=teacher.id))
+        db.session.flush()
 
         # Add the rooms
         room_numbers = [203, 215, 220, 216, 109, 207, 201, 205, 210, 214, 
@@ -380,40 +420,48 @@ class FullScheduleTests(unittest.TestCase):
 
         # add course assignments to each student group
         # NOTE: This set pushes the student booking over the number of time blocks
-        # for sg in sg_list: db.session.add(StudentGroupsSubject(subject_id=sub_music.id, student_group_id=sg.id))
-        # for sg in sg_list: db.session.add(StudentGroupsSubject(subject_id=sub_soc_stud.id, student_group_id=sg.id))
-        # for sg in sg_list: db.session.add(StudentGroupsSubject(subject_id=sub_tech.id, student_group_id=sg.id))
-        # for sg in sg_list: db.session.add(StudentGroupsSubject(subject_id=sub_learning.id, student_group_id=sg.id))
+        for sg in sg_list: db.session.add(StudentGroupsSubject(subject_id=sub_music.id, 
+                                                               student_group_id=sg.id,
+                                                               priority="low"))
+        for sg in sg_list: db.session.add(StudentGroupsSubject(subject_id=sub_soc_stud.id, 
+                                                               student_group_id=sg.id,
+                                                               priority="low"))
+        for sg in sg_list: db.session.add(StudentGroupsSubject(subject_id=sub_tech.id, 
+                                                               student_group_id=sg.id,
+                                                               priority="low"))
+        for sg in sg_list: db.session.add(StudentGroupsSubject(subject_id=sub_learning.id, 
+                                                               student_group_id=sg.id,
+                                                               priority="low"))
 
         db.session.add(StudentGroupsSubject(subject_id=sub_7th_math.id, 
                                             student_group_id=sg_7th_grade.id, 
-                                            priority="low"))
+                                            priority="high"))
         db.session.add(StudentGroupsSubject(subject_id=sub_8th_math.id, 
                                             student_group_id=sg_8th_grade.id,
-                                            priority="low"))
+                                            priority="high"))
         db.session.add(StudentGroupsSubject(subject_id=sub_9th_math.id, 
                                             student_group_id=sg_9th_grade.id,
-                                            priority="low"))
+                                            priority="high"))
 
         db.session.add(CoursesStudentGroup(course_id=course_7th_sci.id, 
                                            student_group_id=sg_7th_grade.id,
-                                           priority="low"))
+                                           priority="high"))
         db.session.add(CoursesStudentGroup(course_id=course_8th_sci.id, 
                                            student_group_id=sg_8th_grade.id,
-                                           priority="low"))
+                                           priority="high"))
         db.session.add(CoursesStudentGroup(course_id=course_9th_sci.id, 
                                            student_group_id=sg_9th_grade.id,
-                                           priority="low"))
+                                           priority="high"))
 
         db.session.add(CoursesStudentGroup(course_id=course_7th_la.id, 
                                            student_group_id=sg_7th_grade.id,
-                                           priority="low"))
+                                           priority="high"))
         db.session.add(CoursesStudentGroup(course_id=course_8th_la.id, 
                                            student_group_id=sg_8th_grade.id,
-                                           priority="low"))
+                                           priority="high"))
         db.session.add(CoursesStudentGroup(course_id=course_9th_la.id, 
                                            student_group_id=sg_9th_grade.id,
-                                           priority="low"))
+                                           priority="high"))
 
         db.session.add(CoursesStudentGroup(course_id=course_7th_pe.id, 
                                            student_group_id=sg_7th_grade.id,

@@ -32,23 +32,41 @@ class SchedulerTestUtilities():
         lunch_start_mins = SchedulerTestUtilities.convert_time_to_minutes(lunch_start)
         lunch_end_mins = SchedulerTestUtilities.convert_time_to_minutes(lunch_end)
 
-        time_blocks = []
+        time_blocks = [] # tuples as (start_time, end_time)
         cur_time = day_start_mins
         while cur_time < lunch_start_mins:
             start_time = SchedulerTestUtilities.convert_minutes_to_time(cur_time)
             end_time = SchedulerTestUtilities.convert_minutes_to_time(cur_time + class_duration)
-            time_blocks.append(Timeblock(start_time=start_time, end_time=end_time))
+            time_blocks.append((start_time, end_time))
             cur_time += class_duration + break_length
 
         cur_time = lunch_end_mins
         while cur_time < day_end_mins:
             start_time = SchedulerTestUtilities.convert_minutes_to_time(cur_time)
             end_time = SchedulerTestUtilities.convert_minutes_to_time(cur_time + class_duration)
-            time_blocks.append(Timeblock(start_time=start_time, 
-                                         end_time=end_time))
+            time_blocks.append((start_time, end_time))
             cur_time += class_duration + break_length
         
-        for t in time_blocks: db.session.add(t)
+        # Right now, we just support the MW, TT, F timeblock sets
+        monday = Day.query.filter_by(name="Monday")[0]
+        tuesday = Day.query.filter_by(name="Tuesday")[0]
+        wednesday = Day.query.filter_by(name="Wednesday")[0]
+        thursday = Day.query.filter_by(name="Thursday")[0]
+        friday = Day.query.filter_by(name="Friday")[0]
+        for t in time_blocks: 
+            mwTimeblock = Timeblock(start_time=t[0], end_time=t[1])
+            ttTimeblock = Timeblock(start_time=t[0], end_time=t[1])
+            fTimeblock = Timeblock(start_time=t[0], end_time=t[1])
+            db.session.add(mwTimeblock)
+            db.session.add(ttTimeblock)
+            db.session.add(fTimeblock)
+            db.session.flush()
+            db.session.add(TimeblocksDay(day_id=monday.id, timeblock_id=mwTimeblock.id))
+            db.session.add(TimeblocksDay(day_id=wednesday.id, timeblock_id=mwTimeblock.id))
+            db.session.add(TimeblocksDay(day_id=tuesday.id, timeblock_id=ttTimeblock.id))
+            db.session.add(TimeblocksDay(day_id=thursday.id, timeblock_id=ttTimeblock.id))
+            db.session.add(TimeblocksDay(day_id=friday.id, timeblock_id=fTimeblock.id))
+
         db.session.commit()
 
         return time_blocks

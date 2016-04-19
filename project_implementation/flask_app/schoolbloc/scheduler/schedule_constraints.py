@@ -3,6 +3,7 @@ from z3 import *
 from schoolbloc.scheduler.models import *
 from schoolbloc.config import config
 from schoolbloc.scheduler.class_constraint import ClassConstraint
+#from schoolbloc.scheduler.scheduler import SchedulerNoSolution
 import math
 import time
 import schoolbloc.scheduler.scheduler_util as SchedUtil
