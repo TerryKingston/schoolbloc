@@ -111,7 +111,7 @@ class SchedulerTestUtilities():
 
         stud_list = [ Student(first_name=names[i][0], 
                               last_name=names[i][1],
-                              uid="{}{}".format(names[i][0], names[i][1]))
+                              uid="{}".format(randint(0, 1000000)))
                       for i in range(n) ]
 
         for s in stud_list: db.session.add(s)
@@ -132,7 +132,7 @@ class SchedulerTestUtilities():
 
         teach_list = [ Teacher(first_name=names[i][0], 
                                last_name=names[i][1],
-                               uid="{}{}".format(names[i][0], names[i][1]),
+                               uid="{}".format(randint(0, 1000000)),
                                avail_start_time=avail_start_time,
                                avail_end_time=avail_end_time) 
                        for i in range(n) ]

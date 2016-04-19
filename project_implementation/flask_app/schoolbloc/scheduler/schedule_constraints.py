@@ -157,7 +157,8 @@ class ScheduleConstraints:
             ScheduleConstraints.check_if_student_is_overscheduled(student, req_courses)
             # now go through the list and create courses when needed
             for course_id in req_courses:
-                max_stud_count = int(ScheduleConstraints.max_student_count(course_id) * .9)
+                # max_stud_count = int(ScheduleConstraints.max_student_count(course_id) * .9)
+                max_stud_count = int(ScheduleConstraints.max_student_count(course_id))
                 course = Course.query.get(course_id)
 
                 if course_id not in self.class_constraints:
