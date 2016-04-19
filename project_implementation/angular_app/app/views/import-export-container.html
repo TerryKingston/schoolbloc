@@ -34,7 +34,9 @@
           <th>{{"importExport.STATUS" | translate}}</th>
         </tr>
         <tr ng-repeat="f in fileUploader.queue track by $index">
-          <td class="table-capitalize">{{f.formData.table_name}}</td>
+          <!-- it looks weird if student_groups -->
+          <td class="table-capitalize" ng-if="f.formData.table_name !== 'student_groups'">{{f.formData.table_name}}</td>
+          <td class="table-capitalize" ng-if="f.formData.table_name === 'student_groups'">Student groups</td>
           <td>{{f.file.name}}</td>
           <td class="delete-table-entry table-icon" ng-click="deleteTableEntry($index, f.isUploading)">
             <div ng-show="!f.isSuccess"></div>
