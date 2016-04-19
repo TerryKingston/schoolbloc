@@ -435,33 +435,33 @@ class FullScheduleTests(unittest.TestCase):
 
         db.session.add(StudentGroupsSubject(subject_id=sub_7th_math.id, 
                                             student_group_id=sg_7th_grade.id, 
-                                            priority="high"))
+                                            priority="mandatory"))
         db.session.add(StudentGroupsSubject(subject_id=sub_8th_math.id, 
                                             student_group_id=sg_8th_grade.id,
-                                            priority="high"))
+                                            priority="mandatory"))
         db.session.add(StudentGroupsSubject(subject_id=sub_9th_math.id, 
                                             student_group_id=sg_9th_grade.id,
-                                            priority="high"))
+                                            priority="mandatory"))
 
         db.session.add(CoursesStudentGroup(course_id=course_7th_sci.id, 
                                            student_group_id=sg_7th_grade.id,
-                                           priority="high"))
+                                           priority="mandatory"))
         db.session.add(CoursesStudentGroup(course_id=course_8th_sci.id, 
                                            student_group_id=sg_8th_grade.id,
-                                           priority="high"))
+                                           priority="mandatory"))
         db.session.add(CoursesStudentGroup(course_id=course_9th_sci.id, 
                                            student_group_id=sg_9th_grade.id,
-                                           priority="high"))
+                                           priority="mandatory"))
 
         db.session.add(CoursesStudentGroup(course_id=course_7th_la.id, 
                                            student_group_id=sg_7th_grade.id,
-                                           priority="high"))
+                                           priority="mandatory"))
         db.session.add(CoursesStudentGroup(course_id=course_8th_la.id, 
                                            student_group_id=sg_8th_grade.id,
-                                           priority="high"))
+                                           priority="mandatory"))
         db.session.add(CoursesStudentGroup(course_id=course_9th_la.id, 
                                            student_group_id=sg_9th_grade.id,
-                                           priority="high"))
+                                           priority="mandatory"))
 
         db.session.add(CoursesStudentGroup(course_id=course_7th_pe.id, 
                                            student_group_id=sg_7th_grade.id,
