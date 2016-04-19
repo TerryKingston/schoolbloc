@@ -100,9 +100,9 @@ class FullScheduleTests(unittest.TestCase):
         # get a list of sample names
         names = TestUtil.get_names(320)
         
-        stud_7th_list = TestUtil.generate_students(66, names=names[0:66])
-        stud_8th_list = TestUtil.generate_students(66, names=names[66:132])
-        stud_9th_list = TestUtil.generate_students(66, names=names[132:198])
+        stud_7th_list = TestUtil.generate_students(30, names=names[0:30])
+        stud_8th_list = TestUtil.generate_students(30, names=names[30:60])
+        stud_9th_list = TestUtil.generate_students(30, names=names[60:90])
 
         # Add the teachers
         # teacher_name_list = [("S", "Owen"),("M", "Evans"), ("S", "Evans"), ("J", "Green"),
@@ -212,7 +212,7 @@ class FullScheduleTests(unittest.TestCase):
         cl_7th_math = [Course(name=c_name, 
                             min_student_count=10,
                             max_student_count=30) 
-                       for c_name in ["7th Grade Math", "Secondary Math I", "Secondary Math II"] ]
+                       for c_name in ["7th Grade Math", "Secondary Math I"] ]
         for c in cl_7th_math: db.session.add(c)
         db.session.flush()
 
@@ -229,7 +229,7 @@ class FullScheduleTests(unittest.TestCase):
                             min_student_count=10,
                             max_student_count=30)
                         for c_name in ["8th Grade Math",  
-                                       "Secondary Math I", "Secondary Math II", "Secondary Math III"] ]
+                                       "Secondary Math II"] ]
         for c in cl_8th_math: db.session.add(c)
         db.session.flush()
 
@@ -246,7 +246,7 @@ class FullScheduleTests(unittest.TestCase):
         cl_9th_math = [ Course(name=c_name, 
                             min_student_count=10,
                             max_student_count=30)  
-                        for c_name in ["9th Grade Math", "Secondary Math I", "Secondary Math II", "Secondary Math III"] ]
+                        for c_name in ["9th Grade Math", "Secondary Math III"] ]
         
         for c in cl_9th_math: db.session.add(c)
         db.session.flush()

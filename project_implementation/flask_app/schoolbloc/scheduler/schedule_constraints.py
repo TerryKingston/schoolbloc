@@ -182,7 +182,7 @@ class ScheduleConstraints:
             SchedUtil.log_note("error", "Scheduler", msg)
             raise SchedulerNoSolution(msg)
         elif len(required_courses) < timeblock_count:
-            msg = "Student {} course requirements are less than the number of timeblocks"
+            msg = "Student {} course requirements are less than the number of timeblocks".format(student.id)
             SchedUtil.log_note("warning", "Scheduler", msg)
             
     def gen_constraints_from_collisions(self, collisions):

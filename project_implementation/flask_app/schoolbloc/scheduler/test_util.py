@@ -103,16 +103,15 @@ class SchedulerTestUtilities():
         else:
             names = [ ['student_f_%s' % random(), 'student_l_%s' % random()] for i in range(n) ]
 
-        s_user_list = [ User("{} {}".format(names[i][0], names[i][1]), 'password', 'student') 
-                        for i in range(n) ]
+        # s_user_list = [ User("{} {}".format(names[i][0], names[i][1]), 'password', 'student') 
+        #                 for i in range(n) ]
         
-        for u in s_user_list: db.session.add(u)
-        db.session.flush()
+        # for u in s_user_list: db.session.add(u)
+        # db.session.flush()
 
         stud_list = [ Student(first_name=names[i][0], 
                               last_name=names[i][1],
-                              uid="{}".format(s_user_list[i].id), 
-                              user_id=s_user_list[i].id) 
+                              uid="{}{}".format(names[i][0], names[i][1]))
                       for i in range(n) ]
 
         for s in stud_list: db.session.add(s)
@@ -127,14 +126,13 @@ class SchedulerTestUtilities():
         else:
             names = [ ['teacher_f_%s' % random(), 'teacher_l_%s' % random()] for i in range(n) ]
 
-        t_user_list = [ User("{} {}".format(names[i][0], names[i][1]), 'password', 'teacher') for i in range(n) ]
-        for u in t_user_list: db.session.add(u)
-        db.session.flush()
+        # t_user_list = [ User("{} {}".format(names[i][0], names[i][1]), 'password', 'teacher') for i in range(n) ]
+        # for u in t_user_list: db.session.add(u)
+        # db.session.flush()
 
         teach_list = [ Teacher(first_name=names[i][0], 
                                last_name=names[i][1],
-                               user_id=t_user_list[i].id,
-                               uid="{}".format(t_user_list[i].id),
+                               uid="{}{}".format(names[i][0], names[i][1]),
                                avail_start_time=avail_start_time,
                                avail_end_time=avail_end_time) 
                        for i in range(n) ]
