@@ -216,14 +216,6 @@ class StudentCourseSelector(Resource):
                 return True
         return False
 
-    @staticmethod
-    def _course_student_mapper_exists(course_id, student_id):
-        for ssg in StudentsStudentGroup.query.filter_by(student_id=student_id).all():
-            for csg in CoursesStudentGroup.query.filter_by(student_group_id=ssg.student_group_id).all():
-                if course_id == csg.course_id:
-                    return True
-        return False
-
     def _get_all_student_courses(self, student_id):
         courses = {}
 
@@ -384,8 +376,9 @@ class StudentCourseSelector(Resource):
             return {'success': True}
 
         # Otherwise, verify that this student has this course in one of this
-        # studnet groups, and add the constraint to the
-        if not self._course_student_mapper_exists(request_json['id'], student_id):
+        # student groups, and add the constraint to the
+        avail_student_courses = self._get_all_student_courses(student_id)
+        if request_json['id'] not in avail_student_courses:
             abort(400, message="No mapping exists between this student and course")
 
         cs = CoursesStudent(active=True, priority=priority, rank=rank,
