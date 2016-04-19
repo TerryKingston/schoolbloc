@@ -878,8 +878,10 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 			}
 
 			$http.delete(url).then(function(data) {
-				// update the list since this fact should now be removed
-				self.updateFactTypeFacts('student_course');
+				if (factType === 'student_course') {
+					// update the list since this fact should now be removed
+					self.updateFactTypeFacts('student_course');
+				}
 				deferred.resolve(data.data);
 			}, function(data) {
 				deferred.reject(data.data);
@@ -995,9 +997,9 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 					}
 					tableConfig.entries = data;
 					// // DEBUG: go ahead and add disabled for show casing
-					// for (i = 0; i < tableConfig.entries.length; i++) {
-					// 	tableConfig.entries[i].disabled = Math.random() < 0.2;
-					// }
+					for (i = 0; i < tableConfig.entries.length; i++) {
+						tableConfig.entries[i].disabled = false;
+					}
 				}, function (data) {
 					// @TODO: display error message
 				});
@@ -1021,7 +1023,6 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 			}
 			// for ease of coding
 			ftc = factTypeConfig[factType];
-
 			for (i = 0; i < ftc.length; i++) {
 				if (ftc[i].type === "constraint") {
 					self.getConstraintFacts(ftc[i].key, i).then(function (data) {

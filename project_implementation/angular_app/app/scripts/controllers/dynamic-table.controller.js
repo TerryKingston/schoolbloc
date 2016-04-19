@@ -21,6 +21,7 @@ angular.module('sbAngularApp')
   $scope.factTypeConfig = null;
   $scope.factTypeConfigMap = null;
 	$scope.tableView = null;
+  $scope.isEmptyTable = false;
   $scope.tableText = {
     closedArrayEntry: null,
     openedArrayEntry: null
@@ -118,9 +119,14 @@ angular.module('sbAngularApp')
     resetEditor();
 
     // no entries
-    if (!$scope.tableConfig.entries || !$scope.tableConfig.entries.length) {
+    if (!$scope.tableConfig.entries) {
       return;
     }
+    else if (!$scope.tableConfig.entries.length) {
+      $scope.isEmptyTable = true;
+      return;
+    }
+    $scope.isEmptyTable = false;
 
     // get the newest factTypeConfig object
     $scope.factTypeConfig = tableEntriesService.getFactTypeConfig($scope.tableConfig.tableSelection);
@@ -136,12 +142,13 @@ angular.module('sbAngularApp')
     keys = Object.keys($scope.tableConfig.entries[0])
     for (i = 0; i < keys.length; i++) {
       // ignore ids
-      if (keys[i] === "id") {
+      if (keys[i] === "id" || keys[i] === "user_token") {
         continue;
       }
       $scope.tableView.headers.push({
         value: keys[i],
         text: $scope.translations[keys[i]],
+        isConstraint: keys[i] === 'teacher' || keys[i] === 'course' || keys[i] === 'subject' || keys[i] === 'timeblock' || keys[i] === 'student' || keys[i] === 'student_group' || keys[i] === 'classroom',
         show: true
       });
     }
@@ -201,6 +208,7 @@ angular.module('sbAngularApp')
     headerObj = {
       type: "header"
     };
+
     $scope.tableView.rows.splice($scope.tableView.headerIndex, 0, headerObj);
   }
 

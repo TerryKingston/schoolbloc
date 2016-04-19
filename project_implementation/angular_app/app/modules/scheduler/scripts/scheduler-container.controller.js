@@ -53,7 +53,7 @@ angular.module('sbAngularApp')
 	};
 
 	$scope.selectSchedule = function(id) {
-		schedulerService.getSchedule(id);
+		schedulerService.getSchedule(id, $scope.scheduleOptions.selectedValue);
 	};
 
 	$scope.updateScheduleView = function() {
@@ -77,6 +77,15 @@ angular.module('sbAngularApp')
 		});
 	};
 
+	function startGenerationUpdates() {
+		$scope.config.loadingGenerate = true;
+		// only set if we've never been to this page before
+		if ($scope.scheduleConfig.checkIfRunningSchedule === 0) {
+			$scope.scheduleConfig.checkIfRunningSchedule = 1;
+		}
+		getGenerationUpdates();
+	}
+
 
 	function getGenerationUpdates() {
 		// stop requesting updates once the new schedule is generated
@@ -93,6 +102,16 @@ angular.module('sbAngularApp')
 						$scope.scheduleLog.data.push(data[i]);
 					}
 				}
+				// if we return back with no data, and this is the first time visiting this page,
+				// the odds of a schedule running is low so we can allow for generating of a schedule
+				if (data && !data.length && $scope.scheduleConfig.checkIfRunningSchedule !== 2) {
+					$scope.scheduleConfig.checkIfRunningSchedule = 2;
+					$scope.config.loadingGenerate = false;
+					return;
+				}
+				else if (data && data.length && $scope.scheduleConfig.checkIfRunningSchedule !== 2) {
+					$scope.scheduleConfig.checkIfRunningSchedule = 2;
+				}
 				getGenerationUpdates();
 			}, function(error) {
 				//$scope.config.loadingGenerate = false;
@@ -105,10 +124,10 @@ angular.module('sbAngularApp')
 	 * Remove the schedule from the front-end view
 	 */
 	$scope.deleteSchedule = function() {
-		schedulerService.deleteSchedule().then(function(data) {
+		schedulerService.deleteSchedule($scope.scheduleConfig.selectedSchedule.id).then(function(data) {
 			$scope.config.error = null;
 		}, function(error) {
-			$scope.config.error = "Error: could not generate a schedule.";
+			$scope.config.error = "Error: could not delete the schedule.";
 		});		
 	};
 
@@ -162,16 +181,37 @@ angular.module('sbAngularApp')
 
 		// convert to csv file format
 		data = "\"classroom\",\"course\",\"time\",\"teacher\",\"student\"\n";
-		s = $scope.scheduleConfig.selectedSchedule.classes;
-		for (i = 0; i < s.length; i++) {
-			for (j = 0; j < s[i].students.length; j++) {
-				data = data + "\"" + s[i].classroom.value + "\",";
-				data = data + "\"" + s[i].course.value + "\",";
-				data = data + "\"" + s[i].time + "\",";
-				data = data + "\"" + s[i].teacher.value + "\",";
-				data = data + "\"" + s[i].students[j].value + "\"\n";
+
+		if ($scope.scheduleOptions.selectedValue === 'class') {
+			s = $scope.scheduleConfig.selectedSchedule.classes;
+			for (i = 0; i < s.length; i++) {
+				for (j = 0; j < s[i].students.length; j++) {
+					data = data + "\"" + s[i].classroom.value + "\",";
+					data = data + "\"" + s[i].course.value + "\",";
+					data = data + "\"" + s[i].time + "\",";
+					data = data + "\"" + s[i].teacher.value + "\",";
+					data = data + "\"" + s[i].students[j].value + "\"\n";
+				}
 			}
 		}
+		else if ($scope.scheduleOptions.selectedValue === 'student') {
+			
+			s = $scope.scheduleConfig.selectedSchedule.students;
+			for (i = 0; i < s.length; i++) {
+				for (j = 0; j < s[i].classes.length; j++) {
+					data = data + "\"" + s[i].classes[j].classroom + "\",";
+					data = data + "\"" + s[i].classes[j].course + "\",";
+					data = data + "\"" + s[i].classes[j].time + "\",";
+					data = data + "\"" + s[i].classes[j].teacher + "\",";
+					data = data + "\"" + s[i].first_name + " " + s[i].last_name + "\"\n";
+				}
+			}
+		}
+		else {
+			console.error("Incorrect table type: cannot export.");
+			return;
+		}
+		
 
 		// create a fake a tag that has a url to the json file, then fake click it
 		// CITE: http://bgrins.github.io/devtools-snippets/#console-save
@@ -217,6 +257,8 @@ angular.module('sbAngularApp')
 
 	/**** initial setup ****/
 	getScheduleConfig();
+	startGenerationUpdates();
+
 }])
 .directive('sbSchedulerContainer', [ function() {
 	/**
