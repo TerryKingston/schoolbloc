@@ -1,6 +1,6 @@
 <section class="scheduler-container main-view-content">
   <div class="error-box" ng-if="config.error">{{config.error}}</div>
-  <button class="btn btn-recommended" ng-click="generateSchedule()" ng-show="!config.showSchedule" ng-disabled="config.loadingGenerate">{{"schedulerModule.GENERATE_SCHEDULE" | translate}}</button>
+  <button class="btn btn-recommended" ng-click="generateSchedule()" ng-show="!config.showSchedule" ng-disabled="scheduleConfig.loadingGenerate">{{"schedulerModule.GENERATE_SCHEDULE" | translate}}</button>
   <br>
   <br>
   <section ng-if="scheduleLog.data.length">

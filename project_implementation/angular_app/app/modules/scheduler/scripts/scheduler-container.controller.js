@@ -19,7 +19,6 @@ angular.module('sbAngularApp')
 
 	$scope.config = {
 		showSchedule: false,
-		loadingGenerate: false,
 		error: null
 	};
 	$scope.schedule = [];
@@ -64,32 +63,39 @@ angular.module('sbAngularApp')
 	 * Request the generated schedule from the back-end
 	 */
 	$scope.generateSchedule = function() {
-		$scope.config.loadingGenerate = true;
+		$scope.scheduleConfig.loadingGenerate = true;
 
 		getGenerationUpdates();
 
 		schedulerService.generateSchedule().then(function(data) {
-			//$scope.config.loadingGenerate = false;
+			//$scope.scheduleConfig.loadingGenerate = false;
 			$scope.config.error = null;
 		}, function(error) {
-			$scope.config.loadingGenerate = false;
+			$scope.scheduleConfig.loadingGenerate = false;
 			$scope.config.error = "Error: could not generate a schedule."
 		});
 	};
 
 	function startGenerationUpdates() {
-		$scope.config.loadingGenerate = true;
 		// only set if we've never been to this page before
 		if ($scope.scheduleConfig.checkIfRunningSchedule === 0) {
 			$scope.scheduleConfig.checkIfRunningSchedule = 1;
+		}
+		if ($scope.scheduleConfig.checkIfRunningSchedule !== 2) {
+			$scope.scheduleConfig.loadingGenerate = true;
 		}
 		getGenerationUpdates();
 	}
 
 
 	function getGenerationUpdates() {
+		var time = 5000;
+		if ($scope.scheduleConfig.checkIfRunningSchedule !== 2) {
+			time = 100;
+		}
+
 		// stop requesting updates once the new schedule is generated
-		if (!$scope.config.loadingGenerate) {
+		if (!$scope.scheduleConfig.loadingGenerate) {
 			return;
 		}
 
@@ -106,18 +112,24 @@ angular.module('sbAngularApp')
 				// the odds of a schedule running is low so we can allow for generating of a schedule
 				if (data && !data.length && $scope.scheduleConfig.checkIfRunningSchedule !== 2) {
 					$scope.scheduleConfig.checkIfRunningSchedule = 2;
-					$scope.config.loadingGenerate = false;
+					$scope.scheduleConfig.loadingGenerate = false;
 					return;
 				}
 				else if (data && data.length && $scope.scheduleConfig.checkIfRunningSchedule !== 2) {
 					$scope.scheduleConfig.checkIfRunningSchedule = 2;
 				}
+
+				// schedule may be finished, check for new schedule
+				if (data && !data.length) {
+					schedulerService.updateScheduleList();
+				}
+
 				getGenerationUpdates();
 			}, function(error) {
-				//$scope.config.loadingGenerate = false;
+				//$scope.scheduleConfig.loadingGenerate = false;
 				$scope.config.error = "Error: could not get updates."
 			});
-		}, 5000);
+		}, time);
 	}
 
 	/**

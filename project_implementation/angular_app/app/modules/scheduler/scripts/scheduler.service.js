@@ -9,7 +9,8 @@ angular.module('sbAngularApp').factory('schedulerService', ['$q', '$http', 'comm
 	var scheduleConfig = {
 		scheduleList: null,
 		selectedSchedule: null,
-		scheduleConfig: 0
+		checkIfRunningSchedule: 0,
+		loadingGenerate: false
 	};
 
 	return {
