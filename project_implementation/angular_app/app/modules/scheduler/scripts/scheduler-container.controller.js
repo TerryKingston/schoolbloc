@@ -22,6 +22,7 @@ angular.module('sbAngularApp')
 		error: null
 	};
 	$scope.schedule = [];
+	$scope.requestScheduleList = false;
 	$scope.clusterList = [];
 	$scope.showExportOptions = false;
 	$scope.scheduleConfig = {};
@@ -106,6 +107,13 @@ angular.module('sbAngularApp')
 				if (data) {
 					for (i = 0; i < data.length; i++) {
 						$scope.scheduleLog.data.push(data[i]);
+						// schedule done, allow for another to be generated
+						if (data[i].description === "Solution found, saving schedule now") {
+							$scope.scheduleConfig.loadingGenerate = false;
+							// schedule may be finished, check for new schedule
+							$scope.requestScheduleList = true;
+							updateScheduleList();
+						}
 					}
 				}
 				// if we return back with no data, and this is the first time visiting this page,
@@ -119,17 +127,30 @@ angular.module('sbAngularApp')
 					$scope.scheduleConfig.checkIfRunningSchedule = 2;
 				}
 
-				// schedule may be finished, check for new schedule
-				if (data && !data.length) {
-					schedulerService.updateScheduleList();
-				}
-
 				getGenerationUpdates();
 			}, function(error) {
 				//$scope.scheduleConfig.loadingGenerate = false;
 				$scope.config.error = "Error: could not get updates."
 			});
 		}, time);
+	}
+
+	function updateScheduleList() {
+
+		schedulerService.updateScheduleList();
+
+		$timeout(function() {
+			console.log("prev: " + $scope.scheduleConfig.previousScheduleAmount + " cur: " + $scope.scheduleConfig.currentScheduleAmount);
+			if ($scope.scheduleConfig.previousScheduleAmount !== $scope.scheduleConfig.currentScheduleAmount) {
+				console.log("not same");
+				$scope.requestScheduleList = false;
+			}
+
+			if ($scope.requestScheduleList) {
+				console.log("hit");
+				updateScheduleList();
+			}
+		}, 5000);
 	}
 
 	/**
