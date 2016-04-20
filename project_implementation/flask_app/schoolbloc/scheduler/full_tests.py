@@ -100,9 +100,9 @@ class FullScheduleTests(unittest.TestCase):
         # get a list of sample names
         names = TestUtil.get_names(320)
         
-        stud_7th_list = TestUtil.generate_students(66, names=names[0:66])
-        stud_8th_list = TestUtil.generate_students(66, names=names[66:132])
-        stud_9th_list = TestUtil.generate_students(66, names=names[132:198])
+        stud_7th_list = TestUtil.generate_students(30, names=names[0:30])
+        stud_8th_list = TestUtil.generate_students(30, names=names[30:60])
+        stud_9th_list = TestUtil.generate_students(30, names=names[60:90])
 
         # Add the teachers
         # teacher_name_list = [("S", "Owen"),("M", "Evans"), ("S", "Evans"), ("J", "Green"),
@@ -212,7 +212,7 @@ class FullScheduleTests(unittest.TestCase):
         cl_7th_math = [Course(name=c_name, 
                             min_student_count=10,
                             max_student_count=30) 
-                       for c_name in ["7th Grade Math", "Secondary Math I", "Secondary Math II"] ]
+                       for c_name in ["7th Grade Math", "Secondary Math I"] ]
         for c in cl_7th_math: db.session.add(c)
         db.session.flush()
 
@@ -229,7 +229,7 @@ class FullScheduleTests(unittest.TestCase):
                             min_student_count=10,
                             max_student_count=30)
                         for c_name in ["8th Grade Math",  
-                                       "Secondary Math I", "Secondary Math II", "Secondary Math III"] ]
+                                       "Secondary Math II"] ]
         for c in cl_8th_math: db.session.add(c)
         db.session.flush()
 
@@ -246,7 +246,7 @@ class FullScheduleTests(unittest.TestCase):
         cl_9th_math = [ Course(name=c_name, 
                             min_student_count=10,
                             max_student_count=30)  
-                        for c_name in ["9th Grade Math", "Secondary Math I", "Secondary Math II", "Secondary Math III"] ]
+                        for c_name in ["9th Grade Math", "Secondary Math III"] ]
         
         for c in cl_9th_math: db.session.add(c)
         db.session.flush()
@@ -435,33 +435,33 @@ class FullScheduleTests(unittest.TestCase):
 
         db.session.add(StudentGroupsSubject(subject_id=sub_7th_math.id, 
                                             student_group_id=sg_7th_grade.id, 
-                                            priority="high"))
+                                            priority="mandatory"))
         db.session.add(StudentGroupsSubject(subject_id=sub_8th_math.id, 
                                             student_group_id=sg_8th_grade.id,
-                                            priority="high"))
+                                            priority="mandatory"))
         db.session.add(StudentGroupsSubject(subject_id=sub_9th_math.id, 
                                             student_group_id=sg_9th_grade.id,
-                                            priority="high"))
+                                            priority="mandatory"))
 
         db.session.add(CoursesStudentGroup(course_id=course_7th_sci.id, 
                                            student_group_id=sg_7th_grade.id,
-                                           priority="high"))
+                                           priority="mandatory"))
         db.session.add(CoursesStudentGroup(course_id=course_8th_sci.id, 
                                            student_group_id=sg_8th_grade.id,
-                                           priority="high"))
+                                           priority="mandatory"))
         db.session.add(CoursesStudentGroup(course_id=course_9th_sci.id, 
                                            student_group_id=sg_9th_grade.id,
-                                           priority="high"))
+                                           priority="mandatory"))
 
         db.session.add(CoursesStudentGroup(course_id=course_7th_la.id, 
                                            student_group_id=sg_7th_grade.id,
-                                           priority="high"))
+                                           priority="mandatory"))
         db.session.add(CoursesStudentGroup(course_id=course_8th_la.id, 
                                            student_group_id=sg_8th_grade.id,
-                                           priority="high"))
+                                           priority="mandatory"))
         db.session.add(CoursesStudentGroup(course_id=course_9th_la.id, 
                                            student_group_id=sg_9th_grade.id,
-                                           priority="high"))
+                                           priority="mandatory"))
 
         db.session.add(CoursesStudentGroup(course_id=course_7th_pe.id, 
                                            student_group_id=sg_7th_grade.id,

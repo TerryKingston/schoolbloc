@@ -19,10 +19,10 @@ angular.module('sbAngularApp')
 
 	$scope.config = {
 		showSchedule: false,
-		loadingGenerate: false,
 		error: null
 	};
 	$scope.schedule = [];
+	$scope.requestScheduleList = false;
 	$scope.clusterList = [];
 	$scope.showExportOptions = false;
 	$scope.scheduleConfig = {};
@@ -64,32 +64,39 @@ angular.module('sbAngularApp')
 	 * Request the generated schedule from the back-end
 	 */
 	$scope.generateSchedule = function() {
-		$scope.config.loadingGenerate = true;
+		$scope.scheduleConfig.loadingGenerate = true;
 
 		getGenerationUpdates();
 
 		schedulerService.generateSchedule().then(function(data) {
-			//$scope.config.loadingGenerate = false;
+			//$scope.scheduleConfig.loadingGenerate = false;
 			$scope.config.error = null;
 		}, function(error) {
-			$scope.config.loadingGenerate = false;
+			$scope.scheduleConfig.loadingGenerate = false;
 			$scope.config.error = "Error: could not generate a schedule."
 		});
 	};
 
 	function startGenerationUpdates() {
-		$scope.config.loadingGenerate = true;
 		// only set if we've never been to this page before
 		if ($scope.scheduleConfig.checkIfRunningSchedule === 0) {
 			$scope.scheduleConfig.checkIfRunningSchedule = 1;
+		}
+		if ($scope.scheduleConfig.checkIfRunningSchedule !== 2) {
+			$scope.scheduleConfig.loadingGenerate = true;
 		}
 		getGenerationUpdates();
 	}
 
 
 	function getGenerationUpdates() {
+		var time = 5000;
+		if ($scope.scheduleConfig.checkIfRunningSchedule !== 2) {
+			time = 100;
+		}
+
 		// stop requesting updates once the new schedule is generated
-		if (!$scope.config.loadingGenerate) {
+		if (!$scope.scheduleConfig.loadingGenerate) {
 			return;
 		}
 
@@ -100,23 +107,49 @@ angular.module('sbAngularApp')
 				if (data) {
 					for (i = 0; i < data.length; i++) {
 						$scope.scheduleLog.data.push(data[i]);
+						// schedule done, allow for another to be generated
+						if (data[i].description === "Solution found, saving schedule now") {
+							$scope.scheduleConfig.loadingGenerate = false;
+							// schedule may be finished, check for new schedule
+							$scope.requestScheduleList = true;
+							updateScheduleList();
+						}
 					}
 				}
 				// if we return back with no data, and this is the first time visiting this page,
 				// the odds of a schedule running is low so we can allow for generating of a schedule
 				if (data && !data.length && $scope.scheduleConfig.checkIfRunningSchedule !== 2) {
 					$scope.scheduleConfig.checkIfRunningSchedule = 2;
-					$scope.config.loadingGenerate = false;
+					$scope.scheduleConfig.loadingGenerate = false;
 					return;
 				}
 				else if (data && data.length && $scope.scheduleConfig.checkIfRunningSchedule !== 2) {
 					$scope.scheduleConfig.checkIfRunningSchedule = 2;
 				}
+
 				getGenerationUpdates();
 			}, function(error) {
-				//$scope.config.loadingGenerate = false;
+				//$scope.scheduleConfig.loadingGenerate = false;
 				$scope.config.error = "Error: could not get updates."
 			});
+		}, time);
+	}
+
+	function updateScheduleList() {
+
+		schedulerService.updateScheduleList();
+
+		$timeout(function() {
+			console.log("prev: " + $scope.scheduleConfig.previousScheduleAmount + " cur: " + $scope.scheduleConfig.currentScheduleAmount);
+			if ($scope.scheduleConfig.previousScheduleAmount !== $scope.scheduleConfig.currentScheduleAmount) {
+				console.log("not same");
+				$scope.requestScheduleList = false;
+			}
+
+			if ($scope.requestScheduleList) {
+				console.log("hit");
+				updateScheduleList();
+			}
 		}, 5000);
 	}
 

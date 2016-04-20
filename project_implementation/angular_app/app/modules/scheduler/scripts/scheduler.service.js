@@ -9,7 +9,10 @@ angular.module('sbAngularApp').factory('schedulerService', ['$q', '$http', 'comm
 	var scheduleConfig = {
 		scheduleList: null,
 		selectedSchedule: null,
-		scheduleConfig: 0
+		checkIfRunningSchedule: 0,
+		loadingGenerate: false,
+		previousScheduleAmount: 0,
+		currentScheduleAmount: 0 
 	};
 
 	return {
@@ -36,6 +39,10 @@ angular.module('sbAngularApp').factory('schedulerService', ['$q', '$http', 'comm
 
 			$http.get(url).then(function(data) {
 				scheduleConfig.scheduleList = data.data;
+
+				// update the historical amount of schedule list length
+				scheduleConfig.previousScheduleAmount = scheduleConfig.currentScheduleAmount;
+				scheduleConfig.currentScheduleAmount = data.data.length;
 			}, function(data) {
 				// @TODO: how should we deal with this error?
 				scheduleConfig.scheduleList = [];

@@ -157,7 +157,8 @@ class ScheduleConstraints:
             ScheduleConstraints.check_if_student_is_overscheduled(student, req_courses)
             # now go through the list and create courses when needed
             for course_id in req_courses:
-                max_stud_count = int(ScheduleConstraints.max_student_count(course_id) * .9)
+                # max_stud_count = int(ScheduleConstraints.max_student_count(course_id) * .9)
+                max_stud_count = int(ScheduleConstraints.max_student_count(course_id))
                 course = Course.query.get(course_id)
 
                 if course_id not in self.class_constraints:
@@ -182,7 +183,7 @@ class ScheduleConstraints:
             SchedUtil.log_note("error", "Scheduler", msg)
             raise SchedulerNoSolution(msg)
         elif len(required_courses) < timeblock_count:
-            msg = "Student {} course requirements are less than the number of timeblocks"
+            msg = "Student {} course requirements are less than the number of timeblocks".format(student.id)
             SchedUtil.log_note("warning", "Scheduler", msg)
             
     def gen_constraints_from_collisions(self, collisions):

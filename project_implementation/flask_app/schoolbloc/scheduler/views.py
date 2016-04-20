@@ -216,19 +216,39 @@ class StudentCourseSelector(Resource):
                 return True
         return False
 
-    @staticmethod
-    def _course_student_mapper_exists(course_id, student_id):
-        for ssg in StudentsStudentGroup.query.filter_by(student_id=student_id).all():
-            for csg in CoursesStudentGroup.query.filter_by(student_group_id=ssg.student_group_id).all():
-                if course_id == csg.course_id:
-                    return True
-        return False
-
     def _get_all_student_courses(self, student_id):
-        # Get the student groups ones first, as they may be overwritten by
-        # student courses.
         courses = {}
+
+        # Get courses from subjects that this student belongs to
+        for ss in StudentsSubject.query.filter_by(student_id=student_id).all():
+            for course_sub in CoursesSubject.query.filter_by(subject_id=ss.subject_id).all():
+                if course_sub.course_id not in courses:
+                    courses[course_sub.course_id] = {
+                        'priority': course_sub.priority,
+                        'rank': 0,
+                    }
+                else:
+                    current_priority = courses[course_sub.course_id]['priority']
+                    if self._greater_priority(course_sub.priority, current_priority):
+                        courses[course_sub.course_id]['priority'] = course_sub.priority
+
+        # Get courses from student groups that this student belongs to
         for ssg in StudentsStudentGroup.query.filter_by(student_id=student_id).all():
+
+            # Get via subjects
+            for sgs in StudentGroupsSubject.query.filter_by(student_group_id=ssg.student_group_id).all():
+                for course_sub in CoursesSubject.query.filter_by(subject_id=sgs.subject_id).all():
+                    if course_sub.course_id not in courses:
+                        courses[course_sub.course_id] = {
+                            'priority': course_sub.priority,
+                            'rank': 0,
+                        }
+                    else:
+                        current_priority = courses[course_sub.course_id]['priority']
+                        if self._greater_priority(course_sub.priority, current_priority):
+                            courses[course_sub.course_id]['priority'] = course_sub.priority
+
+            # Get via courses
             for csg in CoursesStudentGroup.query.filter_by(student_group_id=ssg.student_group_id).all():
                 if csg.course_id not in courses:
                     courses[csg.course_id] = {
@@ -356,8 +376,9 @@ class StudentCourseSelector(Resource):
             return {'success': True}
 
         # Otherwise, verify that this student has this course in one of this
-        # studnet groups, and add the constraint to the
-        if not self._course_student_mapper_exists(request_json['id'], student_id):
+        # student groups, and add the constraint to the
+        avail_student_courses = self._get_all_student_courses(student_id)
+        if request_json['id'] not in avail_student_courses:
             abort(400, message="No mapping exists between this student and course")
 
         cs = CoursesStudent(active=True, priority=priority, rank=rank,
