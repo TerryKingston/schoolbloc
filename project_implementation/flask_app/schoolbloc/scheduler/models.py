@@ -839,7 +839,7 @@ class Schedule(db.Model, SqlalchemySerializer):
                     'teacher_id': sch_class.teacher_id,
                     'start_time': sch_class.start_time,
                     'end_time': sch_class.end_time,
-                    #'days':
+                    'days': [day.strip() for day in sch_class.days.split(',')]
                 })
 
         # Where we convert it back into a list, for reasons mentioned above
@@ -899,7 +899,7 @@ class ScheduledClass(db.Model, SqlalchemySerializer):
         ret['students'] = [{'value': str(s), 'id': s.id} for s in self.students]
         ret['start_time'] = self.start_time
         ret['end_time'] = self.end_time
-        ret['days'] = self.days
+        ret['days'] = [day.strip() for day in self.days.split(',')]
         return ret
 
 
