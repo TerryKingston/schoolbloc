@@ -1,0 +1,1713 @@
+@import url(http://fonts.googleapis.com/css?family=Open+Sans:400italic,400,700|Roboto+Mono:500);
+/* Meyere's CSS reset
+  CITE: http://meyerweb.com/eric/tools/css/reset/ */
+/* line 85, ../../app/styles/theme-deepblue.scss */
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center, dl, dt, dd, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed,
+figure, figcaption, footer, header, hgroup,
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  vertical-align: baseline;
+  font-family: "Open Sans", sans-serif;
+  color: #333;
+  font-size: 12px;
+}
+
+/* HTML5 display-role reset for older browsers */
+/* line 106, ../../app/styles/theme-deepblue.scss */
+article, aside, details, figcaption, figure,
+footer, header, hgroup, menu, nav, section {
+  display: block;
+}
+
+/* line 110, ../../app/styles/theme-deepblue.scss */
+body {
+  line-height: 1;
+}
+
+/* line 113, ../../app/styles/theme-deepblue.scss */
+ul {
+  /* list-style:none; */
+}
+
+/* line 116, ../../app/styles/theme-deepblue.scss */
+blockquote, q {
+  quotes: none;
+}
+
+/* line 119, ../../app/styles/theme-deepblue.scss */
+blockquote:before, blockquote:after,
+q:before, q:after {
+  content: '';
+  content: none;
+}
+
+/* line 124, ../../app/styles/theme-deepblue.scss */
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+/* line 128, ../../app/styles/theme-deepblue.scss */
+a {
+  outline: none;
+}
+
+/* line 131, ../../app/styles/theme-deepblue.scss */
+a:link {
+  text-decoration: none;
+}
+
+/* line 132, ../../app/styles/theme-deepblue.scss */
+a:visited {
+  text-decoration: none;
+}
+
+/* line 133, ../../app/styles/theme-deepblue.scss */
+a:active {
+  text-decoration: none;
+}
+
+/* line 134, ../../app/styles/theme-deepblue.scss */
+a:hover {
+  text-decoration: none;
+}
+
+/* END: Meyere's CSS reset */
+/* Personal preferences for defaults */
+/* line 138, ../../app/styles/theme-deepblue.scss */
+button {
+  outline: none;
+  cursor: pointer;
+}
+
+/* line 143, ../../app/styles/theme-deepblue.scss */
+button:disabled {
+  cursor: not-allowed;
+}
+
+/* line 147, ../../app/styles/theme-deepblue.scss */
+textarea {
+  font-family: "Open Sans", sans-serif;
+  color: #333;
+  font-size: 12px;
+  padding: 5px;
+  outline: none;
+}
+
+/* END: Personal preferences for defaults */
+/* User Authorization */
+/* line 161, ../../app/styles/theme-deepblue.scss */
+.user-auth-error-bar {
+  width: 100%;
+  background-color: #F13E01;
+}
+
+/* line 166, ../../app/styles/theme-deepblue.scss */
+.user-auth-error-bar p {
+  text-align: center;
+  padding: 15px;
+  font-size: 16px;
+  color: #FFF;
+}
+
+/* line 173, ../../app/styles/theme-deepblue.scss */
+.user-auth-container {
+  width: 240px;
+  margin: 20px auto 0px auto;
+  padding: 20px;
+}
+
+/* line 179, ../../app/styles/theme-deepblue.scss */
+.user-auth-header {
+  text-align: center;
+}
+
+/* line 183, ../../app/styles/theme-deepblue.scss */
+.user-auth-header .logo {
+  width: 290px;
+  height: 45px;
+  background-size: cover;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' version='1.1' x='0' y='0' width='385px' height='60px' viewBox='0 0 385 60' enable-background='new 0 0 385 60' xml:space='preserve'><g><path fill-rule='evenodd' clip-rule='evenodd' fill='#339ECC' d='M359.801 20.3c2.398-0.833 4.883-1.25 7.449-1.25 1.334 0 2.783 0.133 4.35 0.4 1.566 0.3 3.1 0.7 4.6 1.2l-2.5 6.9c-1.199-0.3-2.365-0.517-3.5-0.65 -1.133-0.167-2.115-0.25-2.949-0.25 -2.666 0-4.816 1.117-6.449 3.35 -1.635 2.2-2.451 5.233-2.451 9.1 0 3.9 0.816 6.967 2.451 9.2 1.633 2.2 3.783 3.3 6.449 3.3 0.334 0 0.684-0.017 1.051-0.05 0.666-0.066 1.365-0.167 2.1-0.3 0.066-0.033 0.117-0.05 0.15-0.05 0.666-0.167 1.25-0.35 1.75-0.55 0.467-0.233 0.883-0.45 1.25-0.65 0.365-0.233 0.865-0.533 1.5-0.9l-0.4 0.15c0.6-0.3 1.217-0.467 1.85-0.5 0.867-0.067 1.699 0.033 2.5 0.3 0.834 0.233 1.617 0.55 2.35 0.95 0.768 0.433 1.451 0.85 2.051 1.25 -0.801 0.733-1.5 1.4-2.1 2 -0.566 0.5-1.102 0.95-1.602 1.35 -0.533 0.434-1.049 0.801-1.549 1.101l-0.9 0.55c-1.367 0.733-2.367 1.25-3 1.55 -0.666 0.267-1.25 0.467-1.75 0.601 -0.232 0.066-0.467 0.133-0.699 0.199 -1.701 0.434-3.217 0.65-4.551 0.65 -2.566 0-5.051-0.4-7.449-1.2 -2.367-0.733-4.467-1.916-6.301-3.55s-3.316-3.717-4.45-6.25c-1.101-2.567-1.65-5.617-1.65-9.15 0-3.333 0.55-6.267 1.65-8.8 1.133-2.5 2.616-4.583 4.45-6.25C355.334 22.417 357.434 21.167 359.801 20.3zM336.85 24.7c1.767 1.733 3.116 3.833 4.05 6.3 0.967 2.433 1.45 5.133 1.45 8.1 0 3.167-0.566 5.983-1.7 8.45 -1.166 2.5-2.684 4.617-4.55 6.351 -1.833 1.733-3.95 3.05-6.35 3.949 -2.367 0.934-4.767 1.4-7.2 1.4 -2.601 0-5.101-0.45-7.5-1.35 -2.4-0.9-4.5-2.2-6.3-3.9 -1.834-1.7-3.301-3.8-4.4-6.3 -1.066-2.534-1.6-5.4-1.6-8.6 0-3.434 0.616-6.434 1.85-9 1.267-2.533 2.866-4.617 4.8-6.25 1.967-1.6 4.117-2.8 6.45-3.6 2.366-0.8 4.6-1.2 6.7-1.2 2.934 0 5.616 0.5 8.05 1.5C333.034 21.517 335.117 22.9 336.85 24.7zM329.15 30.3c-0.767-1.133-1.7-2.033-2.8-2.7 -1.1-0.667-2.366-1-3.8-1s-2.7 0.333-3.8 1c-1.134 0.667-2.067 1.566-2.801 2.7s-1.3 2.45-1.699 3.95c-0.367 1.5-0.551 3.117-0.551 4.85 0 1.867 0.2 3.566 0.601 5.1 0.434 1.533 1.017 2.85 1.75 3.95 0.767 1.133 1.717 2 2.85 2.6 1.101 0.6 2.316 0.9 3.65 0.9 1.434 0 2.7-0.333 3.8-1 1.1-0.633 2.033-1.517 2.8-2.65 0.733-1.133 1.283-2.467 1.65-4 0.366-1.533 0.55-3.167 0.55-4.9s-0.184-3.35-0.55-4.85C330.433 32.75 329.883 31.433 329.15 30.3zM240.5 4.4c1.533-0.233 2.933-0.417 4.199-0.55 1.301-0.167 2.551-0.267 3.75-0.3 1.233-0.066 2.5-0.1 3.801-0.1 3.3 0 6.25 0.367 8.85 1.1 2.533 0.7 4.667 1.733 6.4 3.1 1.666 1.3 2.949 2.9 3.85 4.8 0.9 1.867 1.35 3.933 1.35 6.2 0 1.833-0.566 3.65-1.699 5.45 -1.134 1.8-2.617 3.267-4.45 4.4l-2.15 1 2.05 0.55c1.334 0.5 2.584 1.2 3.75 2.1 1.134 0.934 2.134 1.983 3 3.15 0.834 1.2 1.483 2.467 1.95 3.8 0.467 1.333 0.7 2.65 0.7 3.95 0 1.934-0.434 3.85-1.3 5.75 -0.867 1.9-2.101 3.617-3.7 5.15 -1.634 1.5-3.616 2.733-5.95 3.7 -1.066 0.433-2.2 0.783-3.399 1.05 -0.634 0.1-1.301 0.2-2 0.3 -0.801 0.066-1.617 0.1-2.45 0.1 -0.7 0-1.316-0.017-1.851-0.05 -0.566-0.033-1.183-0.1-1.85-0.2 -0.634-0.1-1.333-0.233-2.1-0.399 -0.767-0.167-1.7-0.384-2.801-0.65 0.334-0.633 0.717-1.316 1.15-2.05s0.95-1.417 1.55-2.05c0.601-0.601 1.283-1.101 2.05-1.5 0.801-0.4 1.7-0.6 2.7-0.6 1.334 0 2.533-0.184 3.601-0.55 0.733-0.233 1.399-0.55 2-0.95 0.3-0.2 0.6-0.434 0.899-0.7C264.133 47.9 265 45.767 265 43c0-1.467-0.334-2.783-1-3.95 -0.634-1.133-1.517-2.117-2.65-2.95 -1.134-0.833-2.467-1.467-4-1.9 -1.566-0.434-3.267-0.65-5.1-0.65h-6.65v24.7h-10.35v-53C237.216 4.917 238.966 4.633 240.5 4.4zM245.6 26.55h6.65c1.3 0 2.533-0.183 3.699-0.55 1.167-0.367 2.2-0.883 3.101-1.55 0.899-0.7 1.633-1.534 2.2-2.5 0.5-0.967 0.75-2.05 0.75-3.25 0-0.867-0.167-1.767-0.5-2.7 -0.4-0.9-0.967-1.717-1.7-2.45 -0.767-0.733-1.767-1.367-3-1.9 -1.233-0.467-2.75-0.7-4.55-0.7 -1.301 0-2.4 0.033-3.301 0.1 -0.899 0.067-2.017 0.2-3.35 0.4V26.55zM295.2 2.15v56.1h-10.3V2.15H295.2z'/><path fill-rule='evenodd' clip-rule='evenodd' fill='#424240' d='M199.9 24.7c1.767 1.733 3.117 3.833 4.05 6.3 0.967 2.433 1.45 5.133 1.45 8.1 0 3.167-0.566 5.983-1.7 8.45 -1.166 2.5-2.683 4.617-4.55 6.351 -1.833 1.733-3.95 3.05-6.35 3.949 -2.367 0.934-4.767 1.4-7.2 1.4 -0.933 0-1.867-0.05-2.8-0.15v-0.05l-0.05 0.05c-1.6-0.233-3.15-0.633-4.65-1.199 -2.4-0.9-4.5-2.2-6.3-3.9 -1.833-1.7-3.3-3.8-4.4-6.3 -1.066-2.534-1.6-5.4-1.6-8.6 0-3.434 0.617-6.434 1.85-9 1.267-2.533 2.867-4.617 4.8-6.25 1.967-1.6 4.117-2.8 6.45-3.6 2.367-0.8 4.6-1.2 6.7-1.2 2.933 0 5.617 0.5 8.05 1.5C196.083 21.517 198.167 22.9 199.9 24.7zM177.35 44.2c0.433 1.533 1.017 2.85 1.75 3.95 0.767 1.133 1.717 2 2.85 2.6 1.1 0.6 2.316 0.9 3.65 0.9 1.433 0 2.7-0.333 3.8-1 1.1-0.633 2.034-1.517 2.8-2.65 0.733-1.133 1.284-2.467 1.65-4s0.55-3.167 0.55-4.9 -0.184-3.35-0.55-4.85 -0.917-2.817-1.65-3.95c-0.767-1.133-1.7-2.033-2.8-2.7 -1.1-0.667-2.367-1-3.8-1s-2.7 0.333-3.8 1c-1.133 0.667-2.067 1.566-2.8 2.7s-1.3 2.45-1.7 3.95c-0.367 1.5-0.55 3.117-0.55 4.85C176.75 40.967 176.95 42.667 177.35 44.2zM224.25 2.15v56.1H213.95V2.15H224.25zM33.85 5.95l-2.75 6.7c-2.233-0.633-4.233-1.083-6-1.35 -1.8-0.267-3.5-0.4-5.1-0.4 -2.233 0-4.017 0.533-5.35 1.6 -1.333 1.1-2 2.483-2 4.15 0 1.667 0.633 3.133 1.9 4.4 1.233 1.233 2.783 2.383 4.65 3.45 1.867 1.1 3.883 2.217 6.05 3.35 2.2 1.1 4.233 2.4 6.1 3.9 1.833 1.467 3.383 3.217 4.65 5.25s1.9 4.483 1.9 7.35c0 2.367-0.466 4.467-1.4 6.3 -0.9 1.867-2.183 3.417-3.85 4.65 -1.633 1.3-3.617 2.267-5.95 2.9 -2.3 0.7-4.867 1.05-7.7 1.05 -2.1 0-4.55-0.3-7.35-0.9 -2.767-0.533-5.867-1.6-9.3-3.199L5.2 48.3c2.667 1.267 5.167 2.133 7.5 2.6 2.333 0.467 4.433 0.7 6.3 0.7 1.333 0 2.55-0.184 3.65-0.55 1.133-0.367 2.1-0.867 2.9-1.5 0.833-0.667 1.466-1.417 1.9-2.25 0.433-0.833 0.65-1.75 0.65-2.75 0-1.767-0.6-3.3-1.8-4.6 -1.233-1.267-2.8-2.45-4.7-3.55 -1.867-1.1-3.867-2.2-6-3.3 -2.167-1.067-4.183-2.317-6.05-3.75 -1.867-1.4-3.417-3.05-4.65-4.95 -1.233-1.9-1.85-4.183-1.85-6.85 0-2.433 0.433-4.533 1.3-6.3 0.867-1.8 2.033-3.267 3.5-4.4s3.183-1.967 5.15-2.5c2-0.6 4.1-0.9 6.3-0.9 1.133 0 2.233 0.05 3.3 0.15 1.067 0.066 2.183 0.183 3.35 0.35 1.167 0.2 2.367 0.45 3.6 0.75C30.817 5 32.25 5.417 33.85 5.95zM72.15 20.65l-2.5 6.9c-1.2-0.3-2.367-0.517-3.5-0.65 -1.133-0.167-2.117-0.25-2.95-0.25 -2.667 0-4.817 1.117-6.45 3.35 -1.633 2.2-2.45 5.233-2.45 9.1 0 3.9 0.816 6.967 2.45 9.2 1.633 2.2 3.783 3.3 6.45 3.3 1.033 0 2.133-0.133 3.3-0.4 1.2-0.3 2.6-0.75 4.2-1.35l2.45 6.75c-1.9 0.9-3.7 1.567-5.4 2 -1.7 0.434-3.217 0.65-4.55 0.65 -2.567 0-5.05-0.4-7.45-1.2 -2.367-0.733-4.467-1.916-6.3-3.55 -1.833-1.634-3.317-3.717-4.45-6.25 -1.1-2.567-1.65-5.617-1.65-9.15 0-3.333 0.55-6.267 1.65-8.8 1.133-2.5 2.617-4.583 4.45-6.25 1.833-1.633 3.933-2.883 6.3-3.75 2.4-0.833 4.883-1.25 7.45-1.25 1.333 0 2.783 0.133 4.35 0.4C69.117 19.75 70.65 20.15 72.15 20.65zM109.5 22c0.967 1 1.733 2.233 2.3 3.7 0.6 1.5 0.9 3.25 0.9 5.25v27.3h-10.3V31.1c0-1.233-0.267-2.233-0.8-3 -0.5-0.8-1.317-1.2-2.45-1.2 -0.466 0-0.833 0.05-1.1 0.15 -0.3 0.1-0.784 0.167-1.45 0.2 -0.5 0.033-1.017-0.083-1.55-0.35 -0.467-0.233-0.917-0.6-1.35-1.1 -0.4-0.466-0.783-1-1.15-1.6 -0.4-0.567-0.767-1.2-1.1-1.9 2.4-1.367 4.483-2.267 6.25-2.7 1.767-0.367 3.333-0.55 4.7-0.55 1.267 0 2.534 0.233 3.8 0.7C107.434 20.283 108.533 21.033 109.5 22zM120.65 39.1c0-3.434 0.617-6.434 1.85-9 1.267-2.533 2.867-4.617 4.8-6.25 1.966-1.6 4.117-2.8 6.45-3.6 2.367-0.8 4.6-1.2 6.7-1.2 2.933 0 5.617 0.5 8.05 1.5 2.434 0.967 4.517 2.35 6.25 4.15 1.767 1.733 3.117 3.833 4.05 6.3 0.966 2.433 1.45 5.133 1.45 8.1 0 3.167-0.566 5.983-1.7 8.45 -1.167 2.5-2.684 4.617-4.55 6.351 -1.833 1.733-3.95 3.05-6.35 3.949 -2.367 0.934-4.767 1.4-7.2 1.4 -2.6 0-5.1-0.45-7.5-1.35 -2.4-0.9-4.5-2.2-6.3-3.9 -1.833-1.7-3.3-3.8-4.4-6.3C121.184 45.167 120.65 42.3 120.65 39.1zM136.65 27.6c-1.133 0.667-2.066 1.566-2.8 2.7s-1.3 2.45-1.7 3.95c-0.367 1.5-0.55 3.117-0.55 4.85 0 1.867 0.2 3.566 0.6 5.1 0.433 1.533 1.017 2.85 1.75 3.95 0.767 1.133 1.717 2 2.85 2.6 1.1 0.6 2.316 0.9 3.65 0.9 1.433 0 2.7-0.333 3.8-1 1.1-0.633 2.033-1.517 2.8-2.65 0.733-1.133 1.283-2.467 1.65-4s0.55-3.167 0.55-4.9 -0.183-3.35-0.55-4.85 -0.917-2.817-1.65-3.95c-0.767-1.133-1.7-2.033-2.8-2.7 -1.1-0.667-2.367-1-3.8-1C139.017 26.6 137.75 26.933 136.65 27.6zM88.8 2.15v56.1H78.5V2.15H88.8z'/></g></svg>");
+  margin: 0 auto;
+  margin-top: 80px;
+}
+
+/* line 192, ../../app/styles/theme-deepblue.scss */
+.user-auth-header .user-auth-sub-header {
+  margin-top: 40px;
+  background-color: #F7F7F7;
+  border: 1px dotted #ccc;
+  padding: 10px 0 7px 0;
+  width: 100%;
+}
+
+/* line 205, ../../app/styles/theme-deepblue.scss */
+.user-auth-header h2 {
+  font-size: 18px;
+  line-height: 18px;
+  margin-bottom: 10px;
+}
+
+/* line 211, ../../app/styles/theme-deepblue.scss */
+.user-auth-header h4 {
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 400;
+}
+
+/* line 217, ../../app/styles/theme-deepblue.scss */
+.user-auth-header h4 .user-auth-switch {
+  font-weight: 700;
+}
+
+/* line 221, ../../app/styles/theme-deepblue.scss */
+.user-auth-form-header {
+  font-size: 24px;
+  margin-bottom: 20px;
+  line-height: 36px;
+}
+
+/* line 227, ../../app/styles/theme-deepblue.scss */
+.user-auth-form label {
+  display: block;
+  margin-bottom: 7px;
+  font-size: 16px;
+}
+
+/* line 233, ../../app/styles/theme-deepblue.scss */
+.user-auth-form input, .user-auth-form select {
+  width: 100%;
+  font-size: 16px;
+  height: 30px;
+  box-sizing: border-box;
+  border: solid #999 1px;
+  padding: 0 5px;
+}
+
+/* line 242, ../../app/styles/theme-deepblue.scss */
+.user-auth-input {
+  margin-bottom: 20px;
+}
+
+/* line 246, ../../app/styles/theme-deepblue.scss */
+.user-auth-input-error input {
+  border: solid #F13E01 2px;
+}
+
+/* line 250, ../../app/styles/theme-deepblue.scss */
+.user-auth-input-error .user-auth-input-error-text {
+  line-height: 28px;
+  font-size: 14px;
+  padding-left: 10px;
+  background-color: #F13E01;
+  color: #FFF;
+}
+
+/* line 258, ../../app/styles/theme-deepblue.scss */
+.user-auth-switch {
+  margin-top: 10px;
+  text-align: right;
+}
+
+/* line 263, ../../app/styles/theme-deepblue.scss */
+.user-auth-switch a {
+  color: #36A5E7;
+  font-size: 14px;
+}
+
+/* line 268, ../../app/styles/theme-deepblue.scss */
+.user-auth-switch a:hover {
+  text-decoration: underline;
+}
+
+/* line 272, ../../app/styles/theme-deepblue.scss */
+.user-auth-note {
+  line-height: 20px;
+  margin-top: 20px;
+  text-align: justify;
+}
+
+/* END: User Authorization */
+/* root */
+/* line 280, ../../app/styles/theme-deepblue.scss */
+.root-page-loading {
+  font-size: 24px;
+  text-align: center;
+  margin-top: 100px;
+  color: #36A5E7;
+}
+
+/* END root */
+/* spinner */
+/* line 289, ../../app/styles/theme-deepblue.scss */
+.loading div {
+  margin-top: 40px;
+  float: left;
+  font-size: 16px;
+  color: #999;
+  line-height: 20px;
+}
+
+/* line 297, ../../app/styles/theme-deepblue.scss */
+.spinner {
+  width: 20px;
+  height: 20px;
+  border-left: 3px solid #999;
+  border-right: 3px solid #FFF;
+  border-top: 3px solid #999;
+  border-bottom: 3px solid #999;
+  border-radius: 20px;
+  animation-name: spinner;
+  animation-duration: 1s;
+  animation-iteration-count: infinite;
+}
+
+@keyframes spinner {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+/* END spinner */
+/* button */
+/* line 317, ../../app/styles/theme-deepblue.scss */
+.btn {
+  border: none;
+  padding: 8px;
+  border-radius: 4px;
+  min-width: 70px;
+  font-size: 14px;
+}
+
+/* line 325, ../../app/styles/theme-deepblue.scss */
+.btn:disabled {
+  background-color: #ccc;
+  color: #999;
+}
+
+/* line 330, ../../app/styles/theme-deepblue.scss */
+.btn:disabled:hover {
+  background-color: #bbb;
+  color: #888;
+}
+
+/* line 335, ../../app/styles/theme-deepblue.scss */
+.btn-recommended {
+  background-color: #36A5E7;
+  color: #FFF;
+}
+
+/* line 340, ../../app/styles/theme-deepblue.scss */
+.btn-recommended:hover {
+  background-color: #1D8ACB;
+}
+
+/* line 344, ../../app/styles/theme-deepblue.scss */
+.btn-secondary {
+  background-color: #666;
+  color: #FFF;
+}
+
+/* line 349, ../../app/styles/theme-deepblue.scss */
+.btn-secondary:hover {
+  background-color: #555;
+}
+
+/* line 353, ../../app/styles/theme-deepblue.scss */
+.btn-link {
+  background-color: transparent;
+  color: #105681;
+  font-weight: 700;
+}
+
+/* line 359, ../../app/styles/theme-deepblue.scss */
+.btn-link:hover {
+  text-decoration: underline;
+}
+
+/* line 363, ../../app/styles/theme-deepblue.scss */
+.btn-danger {
+  background-color: #F13E01;
+  color: #FFF;
+}
+
+/* line 368, ../../app/styles/theme-deepblue.scss */
+.btn-danger:hover {
+  background-color: #d43700;
+}
+
+/* line 372, ../../app/styles/theme-deepblue.scss */
+.circle-btn {
+  vertical-align: middle;
+  margin-left: 5px;
+  width: 18px;
+  height: 18px;
+  border-radius: 18px;
+  border: none;
+}
+
+/* line 381, ../../app/styles/theme-deepblue.scss */
+.circle-btn-add {
+  background-image: url("data:image/svg+xml;uft8,<svg xmlns='http://www.w3.org/2000/svg' version='1.1' x='0px' y='0px' width='18' height='18' viewBox='0 0 18 18' enable-background='new 0 0 18 18' xml:space='preserve' fill='#FFF'><polygon points='8 3 10 3 10 8 15 8 15 10 10 10 10 15 8 15 8 10 3 10 3 8 8 8 '/></svg>");
+  background-color: #7CD845;
+}
+
+/* line 386, ../../app/styles/theme-deepblue.scss */
+.circle-btn-remove {
+  background-image: url("data:image/svg+xml;uft8,<svg xmlns='http://www.w3.org/2000/svg' version='1.1' x='0px' y='0px' width='18' height='18' viewBox='0 0 18 18' enable-background='new 0 0 18 18' xml:space='preserve' fill='#FFF'><polygon points='8 3 10 3 10 8 15 8 15 10 10 10 10 15 8 15 8 10 3 10 3 8 8 8 '/></svg>");
+  background-color: #F13E01;
+  transform: rotate(45deg);
+}
+
+/* END button */
+/* Main Nav Bar */
+/* line 394, ../../app/styles/theme-deepblue.scss */
+.main-nav-bar {
+  position: fixed;
+  background-color: #333;
+  padding-top: 10px;
+}
+
+/* line 401, ../../app/styles/theme-deepblue.scss */
+.main-nav-bar h4,
+.main-nav-bar div {
+  color: #FFF;
+}
+
+/* line 406, ../../app/styles/theme-deepblue.scss */
+.main-nav-bar .main-nav-bar-header,
+.main-nav-bar .main-nav-bar-profile,
+.main-nav-bar .main-nav-bar-main-controls,
+.main-nav-bar .main-nav-bar-module-controls {
+  background-color: #333;
+}
+
+/* line 413, ../../app/styles/theme-deepblue.scss */
+.main-nav-bar-closed .hamburger-icon {
+  margin: 0 auto;
+  width: 22px;
+  height: 22px;
+  cursor: pointer;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' version='1.1' x='0' y='0' width='22' height='22' viewBox='0 0 22 22' enable-background='new 0 0 22 22' xml:space='preserve' fill='#FFFFFF'><rect x='1' y='17' width='20' height='4'/><rect x='1' y='9' width='20' height='4'/><rect x='1' y='1' width='20' height='4'/></svg>");
+}
+
+/* line 421, ../../app/styles/theme-deepblue.scss */
+.main-nav-bar .main-nav-bar-open {
+  height: inherit;
+  width: 230px;
+}
+
+/* line 426, ../../app/styles/theme-deepblue.scss */
+.main-nav-bar-width-box .main-nav-bar-open {
+  width: 230px;
+}
+
+/* line 430, ../../app/styles/theme-deepblue.scss */
+.main-nav-bar-width-box .main-nav-bar-closed {
+  width: 40px;
+}
+
+/* line 434, ../../app/styles/theme-deepblue.scss */
+.main-nav-bar-open .close-icon {
+  position: absolute;
+  left: 200px;
+  width: 22px;
+  height: 22px;
+  cursor: pointer;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' version='1.1' x='0' y='0' width='22' height='22' viewBox='0 0 22 22' enable-background='new 0 0 22 22' xml:space='preserve' fill='#FFFFFF'><path d='M19 5'/><polygon points='19 5 17 3 11 9 5 3 3 5 9 11 3 17 5 19 11 13 17 19 19 17 13 11 '/></svg>");
+}
+
+/* line 443, ../../app/styles/theme-deepblue.scss */
+.main-nav-bar-open .sb-logo {
+  width: 135px;
+  height: 21px;
+  background-size: cover;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' version='1.1' x='0' y='0' width='385px' height='60px' viewBox='0 0 385 60' enable-background='new 0 0 385 60' xml:space='preserve'><g><path fill-rule='evenodd' clip-rule='evenodd' fill='#339ECC' d='M359.801 20.3c2.398-0.833 4.883-1.25 7.449-1.25 1.334 0 2.783 0.133 4.35 0.4 1.566 0.3 3.1 0.7 4.6 1.2l-2.5 6.9c-1.199-0.3-2.365-0.517-3.5-0.65 -1.133-0.167-2.115-0.25-2.949-0.25 -2.666 0-4.816 1.117-6.449 3.35 -1.635 2.2-2.451 5.233-2.451 9.1 0 3.9 0.816 6.967 2.451 9.2 1.633 2.2 3.783 3.3 6.449 3.3 0.334 0 0.684-0.017 1.051-0.05 0.666-0.066 1.365-0.167 2.1-0.3 0.066-0.033 0.117-0.05 0.15-0.05 0.666-0.167 1.25-0.35 1.75-0.55 0.467-0.233 0.883-0.45 1.25-0.65 0.365-0.233 0.865-0.533 1.5-0.9l-0.4 0.15c0.6-0.3 1.217-0.467 1.85-0.5 0.867-0.067 1.699 0.033 2.5 0.3 0.834 0.233 1.617 0.55 2.35 0.95 0.768 0.433 1.451 0.85 2.051 1.25 -0.801 0.733-1.5 1.4-2.1 2 -0.566 0.5-1.102 0.95-1.602 1.35 -0.533 0.434-1.049 0.801-1.549 1.101l-0.9 0.55c-1.367 0.733-2.367 1.25-3 1.55 -0.666 0.267-1.25 0.467-1.75 0.601 -0.232 0.066-0.467 0.133-0.699 0.199 -1.701 0.434-3.217 0.65-4.551 0.65 -2.566 0-5.051-0.4-7.449-1.2 -2.367-0.733-4.467-1.916-6.301-3.55s-3.316-3.717-4.45-6.25c-1.101-2.567-1.65-5.617-1.65-9.15 0-3.333 0.55-6.267 1.65-8.8 1.133-2.5 2.616-4.583 4.45-6.25C355.334 22.417 357.434 21.167 359.801 20.3zM336.85 24.7c1.767 1.733 3.116 3.833 4.05 6.3 0.967 2.433 1.45 5.133 1.45 8.1 0 3.167-0.566 5.983-1.7 8.45 -1.166 2.5-2.684 4.617-4.55 6.351 -1.833 1.733-3.95 3.05-6.35 3.949 -2.367 0.934-4.767 1.4-7.2 1.4 -2.601 0-5.101-0.45-7.5-1.35 -2.4-0.9-4.5-2.2-6.3-3.9 -1.834-1.7-3.301-3.8-4.4-6.3 -1.066-2.534-1.6-5.4-1.6-8.6 0-3.434 0.616-6.434 1.85-9 1.267-2.533 2.866-4.617 4.8-6.25 1.967-1.6 4.117-2.8 6.45-3.6 2.366-0.8 4.6-1.2 6.7-1.2 2.934 0 5.616 0.5 8.05 1.5C333.034 21.517 335.117 22.9 336.85 24.7zM329.15 30.3c-0.767-1.133-1.7-2.033-2.8-2.7 -1.1-0.667-2.366-1-3.8-1s-2.7 0.333-3.8 1c-1.134 0.667-2.067 1.566-2.801 2.7s-1.3 2.45-1.699 3.95c-0.367 1.5-0.551 3.117-0.551 4.85 0 1.867 0.2 3.566 0.601 5.1 0.434 1.533 1.017 2.85 1.75 3.95 0.767 1.133 1.717 2 2.85 2.6 1.101 0.6 2.316 0.9 3.65 0.9 1.434 0 2.7-0.333 3.8-1 1.1-0.633 2.033-1.517 2.8-2.65 0.733-1.133 1.283-2.467 1.65-4 0.366-1.533 0.55-3.167 0.55-4.9s-0.184-3.35-0.55-4.85C330.433 32.75 329.883 31.433 329.15 30.3zM240.5 4.4c1.533-0.233 2.933-0.417 4.199-0.55 1.301-0.167 2.551-0.267 3.75-0.3 1.233-0.066 2.5-0.1 3.801-0.1 3.3 0 6.25 0.367 8.85 1.1 2.533 0.7 4.667 1.733 6.4 3.1 1.666 1.3 2.949 2.9 3.85 4.8 0.9 1.867 1.35 3.933 1.35 6.2 0 1.833-0.566 3.65-1.699 5.45 -1.134 1.8-2.617 3.267-4.45 4.4l-2.15 1 2.05 0.55c1.334 0.5 2.584 1.2 3.75 2.1 1.134 0.934 2.134 1.983 3 3.15 0.834 1.2 1.483 2.467 1.95 3.8 0.467 1.333 0.7 2.65 0.7 3.95 0 1.934-0.434 3.85-1.3 5.75 -0.867 1.9-2.101 3.617-3.7 5.15 -1.634 1.5-3.616 2.733-5.95 3.7 -1.066 0.433-2.2 0.783-3.399 1.05 -0.634 0.1-1.301 0.2-2 0.3 -0.801 0.066-1.617 0.1-2.45 0.1 -0.7 0-1.316-0.017-1.851-0.05 -0.566-0.033-1.183-0.1-1.85-0.2 -0.634-0.1-1.333-0.233-2.1-0.399 -0.767-0.167-1.7-0.384-2.801-0.65 0.334-0.633 0.717-1.316 1.15-2.05s0.95-1.417 1.55-2.05c0.601-0.601 1.283-1.101 2.05-1.5 0.801-0.4 1.7-0.6 2.7-0.6 1.334 0 2.533-0.184 3.601-0.55 0.733-0.233 1.399-0.55 2-0.95 0.3-0.2 0.6-0.434 0.899-0.7C264.133 47.9 265 45.767 265 43c0-1.467-0.334-2.783-1-3.95 -0.634-1.133-1.517-2.117-2.65-2.95 -1.134-0.833-2.467-1.467-4-1.9 -1.566-0.434-3.267-0.65-5.1-0.65h-6.65v24.7h-10.35v-53C237.216 4.917 238.966 4.633 240.5 4.4zM245.6 26.55h6.65c1.3 0 2.533-0.183 3.699-0.55 1.167-0.367 2.2-0.883 3.101-1.55 0.899-0.7 1.633-1.534 2.2-2.5 0.5-0.967 0.75-2.05 0.75-3.25 0-0.867-0.167-1.767-0.5-2.7 -0.4-0.9-0.967-1.717-1.7-2.45 -0.767-0.733-1.767-1.367-3-1.9 -1.233-0.467-2.75-0.7-4.55-0.7 -1.301 0-2.4 0.033-3.301 0.1 -0.899 0.067-2.017 0.2-3.35 0.4V26.55zM295.2 2.15v56.1h-10.3V2.15H295.2z'/><path fill-rule='evenodd' clip-rule='evenodd' fill='#FFF' d='M199.9 24.7c1.767 1.733 3.117 3.833 4.05 6.3 0.967 2.433 1.45 5.133 1.45 8.1 0 3.167-0.566 5.983-1.7 8.45 -1.166 2.5-2.683 4.617-4.55 6.351 -1.833 1.733-3.95 3.05-6.35 3.949 -2.367 0.934-4.767 1.4-7.2 1.4 -0.933 0-1.867-0.05-2.8-0.15v-0.05l-0.05 0.05c-1.6-0.233-3.15-0.633-4.65-1.199 -2.4-0.9-4.5-2.2-6.3-3.9 -1.833-1.7-3.3-3.8-4.4-6.3 -1.066-2.534-1.6-5.4-1.6-8.6 0-3.434 0.617-6.434 1.85-9 1.267-2.533 2.867-4.617 4.8-6.25 1.967-1.6 4.117-2.8 6.45-3.6 2.367-0.8 4.6-1.2 6.7-1.2 2.933 0 5.617 0.5 8.05 1.5C196.083 21.517 198.167 22.9 199.9 24.7zM177.35 44.2c0.433 1.533 1.017 2.85 1.75 3.95 0.767 1.133 1.717 2 2.85 2.6 1.1 0.6 2.316 0.9 3.65 0.9 1.433 0 2.7-0.333 3.8-1 1.1-0.633 2.034-1.517 2.8-2.65 0.733-1.133 1.284-2.467 1.65-4s0.55-3.167 0.55-4.9 -0.184-3.35-0.55-4.85 -0.917-2.817-1.65-3.95c-0.767-1.133-1.7-2.033-2.8-2.7 -1.1-0.667-2.367-1-3.8-1s-2.7 0.333-3.8 1c-1.133 0.667-2.067 1.566-2.8 2.7s-1.3 2.45-1.7 3.95c-0.367 1.5-0.55 3.117-0.55 4.85C176.75 40.967 176.95 42.667 177.35 44.2zM224.25 2.15v56.1H213.95V2.15H224.25zM33.85 5.95l-2.75 6.7c-2.233-0.633-4.233-1.083-6-1.35 -1.8-0.267-3.5-0.4-5.1-0.4 -2.233 0-4.017 0.533-5.35 1.6 -1.333 1.1-2 2.483-2 4.15 0 1.667 0.633 3.133 1.9 4.4 1.233 1.233 2.783 2.383 4.65 3.45 1.867 1.1 3.883 2.217 6.05 3.35 2.2 1.1 4.233 2.4 6.1 3.9 1.833 1.467 3.383 3.217 4.65 5.25s1.9 4.483 1.9 7.35c0 2.367-0.466 4.467-1.4 6.3 -0.9 1.867-2.183 3.417-3.85 4.65 -1.633 1.3-3.617 2.267-5.95 2.9 -2.3 0.7-4.867 1.05-7.7 1.05 -2.1 0-4.55-0.3-7.35-0.9 -2.767-0.533-5.867-1.6-9.3-3.199L5.2 48.3c2.667 1.267 5.167 2.133 7.5 2.6 2.333 0.467 4.433 0.7 6.3 0.7 1.333 0 2.55-0.184 3.65-0.55 1.133-0.367 2.1-0.867 2.9-1.5 0.833-0.667 1.466-1.417 1.9-2.25 0.433-0.833 0.65-1.75 0.65-2.75 0-1.767-0.6-3.3-1.8-4.6 -1.233-1.267-2.8-2.45-4.7-3.55 -1.867-1.1-3.867-2.2-6-3.3 -2.167-1.067-4.183-2.317-6.05-3.75 -1.867-1.4-3.417-3.05-4.65-4.95 -1.233-1.9-1.85-4.183-1.85-6.85 0-2.433 0.433-4.533 1.3-6.3 0.867-1.8 2.033-3.267 3.5-4.4s3.183-1.967 5.15-2.5c2-0.6 4.1-0.9 6.3-0.9 1.133 0 2.233 0.05 3.3 0.15 1.067 0.066 2.183 0.183 3.35 0.35 1.167 0.2 2.367 0.45 3.6 0.75C30.817 5 32.25 5.417 33.85 5.95zM72.15 20.65l-2.5 6.9c-1.2-0.3-2.367-0.517-3.5-0.65 -1.133-0.167-2.117-0.25-2.95-0.25 -2.667 0-4.817 1.117-6.45 3.35 -1.633 2.2-2.45 5.233-2.45 9.1 0 3.9 0.816 6.967 2.45 9.2 1.633 2.2 3.783 3.3 6.45 3.3 1.033 0 2.133-0.133 3.3-0.4 1.2-0.3 2.6-0.75 4.2-1.35l2.45 6.75c-1.9 0.9-3.7 1.567-5.4 2 -1.7 0.434-3.217 0.65-4.55 0.65 -2.567 0-5.05-0.4-7.45-1.2 -2.367-0.733-4.467-1.916-6.3-3.55 -1.833-1.634-3.317-3.717-4.45-6.25 -1.1-2.567-1.65-5.617-1.65-9.15 0-3.333 0.55-6.267 1.65-8.8 1.133-2.5 2.617-4.583 4.45-6.25 1.833-1.633 3.933-2.883 6.3-3.75 2.4-0.833 4.883-1.25 7.45-1.25 1.333 0 2.783 0.133 4.35 0.4C69.117 19.75 70.65 20.15 72.15 20.65zM109.5 22c0.967 1 1.733 2.233 2.3 3.7 0.6 1.5 0.9 3.25 0.9 5.25v27.3h-10.3V31.1c0-1.233-0.267-2.233-0.8-3 -0.5-0.8-1.317-1.2-2.45-1.2 -0.466 0-0.833 0.05-1.1 0.15 -0.3 0.1-0.784 0.167-1.45 0.2 -0.5 0.033-1.017-0.083-1.55-0.35 -0.467-0.233-0.917-0.6-1.35-1.1 -0.4-0.466-0.783-1-1.15-1.6 -0.4-0.567-0.767-1.2-1.1-1.9 2.4-1.367 4.483-2.267 6.25-2.7 1.767-0.367 3.333-0.55 4.7-0.55 1.267 0 2.534 0.233 3.8 0.7C107.434 20.283 108.533 21.033 109.5 22zM120.65 39.1c0-3.434 0.617-6.434 1.85-9 1.267-2.533 2.867-4.617 4.8-6.25 1.966-1.6 4.117-2.8 6.45-3.6 2.367-0.8 4.6-1.2 6.7-1.2 2.933 0 5.617 0.5 8.05 1.5 2.434 0.967 4.517 2.35 6.25 4.15 1.767 1.733 3.117 3.833 4.05 6.3 0.966 2.433 1.45 5.133 1.45 8.1 0 3.167-0.566 5.983-1.7 8.45 -1.167 2.5-2.684 4.617-4.55 6.351 -1.833 1.733-3.95 3.05-6.35 3.949 -2.367 0.934-4.767 1.4-7.2 1.4 -2.6 0-5.1-0.45-7.5-1.35 -2.4-0.9-4.5-2.2-6.3-3.9 -1.833-1.7-3.3-3.8-4.4-6.3C121.184 45.167 120.65 42.3 120.65 39.1zM136.65 27.6c-1.133 0.667-2.066 1.566-2.8 2.7s-1.3 2.45-1.7 3.95c-0.367 1.5-0.55 3.117-0.55 4.85 0 1.867 0.2 3.566 0.6 5.1 0.433 1.533 1.017 2.85 1.75 3.95 0.767 1.133 1.717 2 2.85 2.6 1.1 0.6 2.316 0.9 3.65 0.9 1.433 0 2.7-0.333 3.8-1 1.1-0.633 2.033-1.517 2.8-2.65 0.733-1.133 1.283-2.467 1.65-4s0.55-3.167 0.55-4.9 -0.183-3.35-0.55-4.85 -0.917-2.817-1.65-3.95c-0.767-1.133-1.7-2.033-2.8-2.7 -1.1-0.667-2.367-1-3.8-1C139.017 26.6 137.75 26.933 136.65 27.6zM88.8 2.15v56.1H78.5V2.15H88.8z'/></g></svg>");
+  margin-left: 15px;
+}
+
+/* line 451, ../../app/styles/theme-deepblue.scss */
+.main-nav-bar .main-nav-bar-closed {
+  height: inherit;
+  width: 40px;
+}
+
+/* line 456, ../../app/styles/theme-deepblue.scss */
+.main-nav-bar .main-nav-bar-profile {
+  /* must be padding (not margin) because if page height is too small, whitespace will fill between sections */
+  padding: 0;
+  margin: 30px 0 70px 0;
+  cursor: pointer;
+}
+
+/* line 463, ../../app/styles/theme-deepblue.scss */
+.main-nav-bar .profile-settings {
+  margin-top: 5px;
+}
+
+/* line 467, ../../app/styles/theme-deepblue.scss */
+.main-nav-bar .main-nav-bar-profile .down-arrow-icon {
+  height: 22px;
+  width: 22px;
+  background-image: url("data:image/svg+xml;uft8,<svg xmlns='http://www.w3.org/2000/svg' version='1.1' x='0' y='0' width='28' height='22' viewBox='0 0 28 22' enable-background='new 0 0 28 22' xml:space='preserve' fill='#FFFFFF'><polygon points='3,6 14,17 16,15 25,6 23,4 14,13 5,4 '/></svg>");
+  background-repeat: no-repeat;
+  background-position: center;
+  float: left;
+  margin: 5px 10px 0px 15px;
+}
+
+/* line 477, ../../app/styles/theme-deepblue.scss */
+.main-nav-bar .main-nav-bar-profile-active .down-arrow-icon {
+  transform: rotate(180deg);
+}
+
+/* line 481, ../../app/styles/theme-deepblue.scss */
+.main-nav-bar .main-nav-bar-profile h4 {
+  font-size: 14px;
+  margin-bottom: 5px;
+}
+
+/* line 486, ../../app/styles/theme-deepblue.scss */
+.main-nav-bar .main-nav-bar-profile h5 {
+  font-size: 12px;
+  color: #999;
+  font-weight: 400;
+}
+
+/* line 492, ../../app/styles/theme-deepblue.scss */
+.main-nav-bar .main-nav-bar-main-controls {
+  /* must be padding (not margin) because if page height is too small, whitespace will fill between sections */
+  padding: 0 0 40px 0;
+}
+
+/* line 497, ../../app/styles/theme-deepblue.scss */
+.main-nav-bar .profile-control {
+  font-size: 14px;
+  font-weight: 400;
+  height: 25px;
+  line-height: 25px;
+  margin-bottom: 1px;
+  padding: 0 15px 0 25px;
+}
+
+/* line 506, ../../app/styles/theme-deepblue.scss */
+.main-nav-bar .profile-control-active {
+  background-color: #324148;
+  /* fallback */
+  background-image: linear-gradient(to right, #324148 10%, #333 90%);
+  border-left: 10px solid #339ECC;
+  padding-left: 15px;
+}
+
+/* line 517, ../../app/styles/theme-deepblue.scss */
+.main-nav-bar .main-control {
+  font-size: 16px;
+  font-weight: 700;
+  height: 40px;
+  line-height: 40px;
+  margin-bottom: 1px;
+  padding: 0 15px;
+}
+
+/* line 526, ../../app/styles/theme-deepblue.scss */
+.main-nav-bar .main-control-active {
+  background-color: #339ECC;
+  /* fallback */
+  background-image: linear-gradient(to right, #339ECC 10%, #333 90%);
+}
+
+/* line 535, ../../app/styles/theme-deepblue.scss */
+.main-nav-bar .sub-control {
+  font-size: 14px;
+  font-weight: 400;
+  height: 40px;
+  line-height: 40px;
+  margin-bottom: 1px;
+  padding: 0 15px;
+}
+
+/* line 544, ../../app/styles/theme-deepblue.scss */
+.main-nav-bar .sub-control-active {
+  background-color: #324148;
+  /* fallback */
+  background-image: linear-gradient(to right, #324148 10%, #333 90%);
+  border-left: 10px solid #339ECC;
+}
+
+/* line 555, ../../app/styles/theme-deepblue.scss */
+.main-nav-bar .main-nav-bar-module-controls h3 {
+  color: #666;
+  text-transform: uppercase;
+  font-size: 16px;
+  font-weight: 400;
+  text-align: center;
+  padding-bottom: 10px;
+  margin-bottom: 10px;
+  border-bottom: 2px dotted #666;
+}
+
+/* line 566, ../../app/styles/theme-deepblue.scss */
+.main-nav-bar .dashboard-control {
+  border-top: 1px solid #666;
+  border-bottom: 1px solid #666;
+}
+
+/* END Main Nav Bar */
+/* View Header */
+/* line 573, ../../app/styles/theme-deepblue.scss */
+.view-header {
+  background-color: #F7F7F7;
+  border-bottom: 1px dotted #ccc;
+  padding: 10px 10px;
+}
+
+/* line 579, ../../app/styles/theme-deepblue.scss */
+.view-header h1 {
+  font-size: 18px;
+}
+
+/* line 582, ../../app/styles/theme-deepblue.scss */
+.view-header h2,
+.view-header h2 span {
+  margin-top: 7px;
+  font-size: 14px;
+  font-weight: 400;
+  color: #666;
+}
+
+/* line 590, ../../app/styles/theme-deepblue.scss */
+.view-header a {
+  color: #36A5E7;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+/* line 596, ../../app/styles/theme-deepblue.scss */
+.view-header a:hover {
+  text-decoration: underline;
+}
+
+/* END View Header */
+/* Suggestion List */
+/* line 602, ../../app/styles/theme-deepblue.scss */
+.suggestion-list {
+  width: 600px;
+}
+
+/* line 606, ../../app/styles/theme-deepblue.scss */
+.suggestion-list .suggestion-list-item {
+  height: 37px;
+  line-height: 37px;
+  padding-left: 15px;
+  border-left: 10px solid;
+}
+
+/* line 613, ../../app/styles/theme-deepblue.scss */
+.suggestion-list .suggestion-list-item p {
+  font-size: 14px;
+}
+
+/* line 617, ../../app/styles/theme-deepblue.scss */
+.suggestion-list .suggestion-list-item a {
+  color: #36A5E7;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+/* line 623, ../../app/styles/theme-deepblue.scss */
+.suggestion-list .suggestion-list-item a:hover {
+  text-decoration: underline;
+}
+
+/* line 627, ../../app/styles/theme-deepblue.scss */
+.suggestion-list .suggestion-list-more {
+  background-color: #DBE6EC;
+  background-image: linear-gradient(to right, #DBE6EC 30%, #FFF 90%);
+  padding-left: 10px;
+  border-bottom-left-radius: 10px;
+}
+
+/* line 638, ../../app/styles/theme-deepblue.scss */
+.suggestion-list .suggestion-list-more a {
+  height: 30px;
+  line-height: 30px;
+  color: #0F5580;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+/* line 646, ../../app/styles/theme-deepblue.scss */
+.suggestion-list .suggestion-list-more a:hover {
+  text-decoration: underline;
+}
+
+/* line 650, ../../app/styles/theme-deepblue.scss */
+.suggestion-list .suggestion-list-warning {
+  background-color: #FEF9E2;
+  background-image: linear-gradient(to right, #FEF9E2 30%, #FFF 90%);
+  border-color: #F7CA15;
+}
+
+/* line 660, ../../app/styles/theme-deepblue.scss */
+.suggestion-list .suggestion-list-alert {
+  background-color: #FFE5DE;
+  background-image: linear-gradient(to right, #FFE5DE 30%, #FFF 90%);
+  border-color: #F13E01;
+}
+
+/* line 670, ../../app/styles/theme-deepblue.scss */
+.suggestion-list .suggestion-list-alert:before {
+  width: 26px;
+  height: 22px;
+  content: '';
+  float: left;
+  margin: 8px 10px 0 0;
+  background-image: url("data:image/svg+xml;uft8,<svg xmlns='http://www.w3.org/2000/svg' version='1.1' x='0px' y='0px' width='26' height='22' viewBox='0 0 26 22' enable-background='new 0 0 26 22' xml:space='preserve'><g><circle fill-rule='evenodd' clip-rule='evenodd' fill='#F13E01' cx='13' cy='11' r='9'/></g><g><path fill-rule='evenodd' clip-rule='evenodd' fill='#FFFFFF' d='M14.2 15.05c0.2 0.2 0.3 0.5 0.3 0.9v0.6c0 0.4-0.1 0.7-0.3 0.9 -0.2 0.2-0.517 0.3-0.95 0.3H12.7c-0.4 0-0.7-0.1-0.9-0.3 -0.2-0.2-0.3-0.5-0.3-0.9v-0.6c0-0.4 0.1-0.7 0.3-0.9 0.2-0.2 0.5-0.3 0.9-0.3h0.55C13.683 14.75 14 14.85 14.2 15.05zM11.5 5.1c0.133-0.233 0.433-0.35 0.9-0.35h1.2c0.467 0 0.767 0.117 0.9 0.35 0.1 0.233 0.133 0.583 0.1 1.05l-0.4 6.3c-0.034 0.333-0.117 0.617-0.25 0.85 -0.067 0.1-0.167 0.183-0.3 0.25 -0.2 0.066-0.417 0.1-0.65 0.1s-0.433-0.034-0.6-0.1c-0.133-0.067-0.233-0.15-0.3-0.25 -0.167-0.233-0.25-0.517-0.25-0.85l-0.45-6.3C11.367 5.684 11.4 5.333 11.5 5.1z'/></g></svg>");
+}
+
+/* line 679, ../../app/styles/theme-deepblue.scss */
+.suggestion-list .suggestion-list-warning:before {
+  width: 26px;
+  height: 22px;
+  content: '';
+  float: left;
+  margin: 7px 10px 0 0;
+  background-image: url("data:image/svg+xml;uft8,<svg xmlns='http://www.w3.org/2000/svg' version='1.1' x='0px' y='0px' width='26' height='22' viewBox='0 0 26 22' enable-background='new 0 0 26 22' xml:space='preserve'><g><path fill-rule='evenodd' clip-rule='evenodd' fill='#F7CA15' d='M24.45 19.4c-0.4 0.4-1.133 0.6-2.2 0.6H3.8c-0.667 0-1.066-0.017-1.2-0.05 -0.367-0.067-0.7-0.25-1-0.55C1.2 19.034 1 18.567 1 18c0-0.433 0.117-0.8 0.35-1.1 0.033-0.034 0.217-0.3 0.55-0.8l8.8-13.25c0.466-0.7 0.767-1.117 0.9-1.25C12 1.2 12.483 1 13.05 1c0.534 0 1 0.2 1.4 0.6 0.167 0.167 0.417 0.5 0.75 1l9.15 13.8C24.783 17 25 17.534 25 18 25 18.567 24.817 19.034 24.45 19.4z'/></g><g><path fill-rule='evenodd' clip-rule='evenodd' fill='#FFFFFF' d='M14.2 15.05c0.2 0.2 0.3 0.5 0.3 0.9v0.6c0 0.4-0.1 0.7-0.3 0.9 -0.2 0.2-0.517 0.3-0.95 0.3H12.7c-0.4 0-0.7-0.1-0.9-0.3 -0.2-0.2-0.3-0.5-0.3-0.9v-0.6c0-0.4 0.1-0.7 0.3-0.9 0.2-0.2 0.5-0.3 0.9-0.3h0.55C13.683 14.75 14 14.85 14.2 15.05zM11.5 5.1c0.133-0.233 0.433-0.35 0.9-0.35h1.2c0.467 0 0.767 0.117 0.9 0.35 0.1 0.233 0.133 0.583 0.1 1.05l-0.4 6.3c-0.034 0.333-0.117 0.617-0.25 0.85 -0.067 0.1-0.167 0.183-0.3 0.25 -0.2 0.066-0.417 0.1-0.65 0.1s-0.433-0.034-0.6-0.1c-0.133-0.067-0.233-0.15-0.3-0.25 -0.167-0.233-0.25-0.517-0.25-0.85l-0.45-6.3C11.367 5.684 11.4 5.333 11.5 5.1z'/></g></svg>");
+}
+
+/* END Suggestion List */
+/* Main Views */
+/* line 692, ../../app/styles/theme-deepblue.scss */
+.main-container {
+  display: flex;
+  flex-wrap: nowrap;
+}
+
+/* line 697, ../../app/styles/theme-deepblue.scss */
+.main-views {
+  width: 100%;
+}
+
+/* line 701, ../../app/styles/theme-deepblue.scss */
+.main-view-content {
+  padding: 25px 10px 25px 25px;
+}
+
+/* line 708, ../../app/styles/theme-deepblue.scss */
+.main-view-content p {
+  max-width: 500px;
+  margin-bottom: 15px;
+  line-height: 20px;
+}
+
+/* line 714, ../../app/styles/theme-deepblue.scss */
+.main-view-content h3 {
+  font-size: 24px;
+  color: #666;
+  margin-bottom: 15px;
+}
+
+/* line 720, ../../app/styles/theme-deepblue.scss */
+.main-view-content h4 {
+  font-size: 16px;
+  color: #666;
+  margin-bottom: 15px;
+}
+
+/* line 726, ../../app/styles/theme-deepblue.scss */
+.main-view-content .input-row {
+  margin-bottom: 10px;
+  line-height: 25px;
+}
+
+/* line 731, ../../app/styles/theme-deepblue.scss */
+.main-view-content .input-row div {
+  font-size: 14px;
+  color: #666;
+  width: 150px;
+  display: inline-block;
+  vertical-align: top;
+}
+
+/* no required div class */
+/* line 740, ../../app/styles/theme-deepblue.scss */
+.main-view-content .input-row div div {
+  display: inline;
+}
+
+/* line 744, ../../app/styles/theme-deepblue.scss */
+.main-view-content .input-row div .required {
+  color: #F13E01;
+  font-weight: 700;
+}
+
+/* line 749, ../../app/styles/theme-deepblue.scss */
+.main-view-content .input-row input,
+.main-view-content .input-row select {
+  font-size: 14px;
+  height: 25px;
+  box-sizing: border-box;
+  border: solid #999 1px;
+  border-radius: 0;
+  padding: 0 5px;
+  width: 200px;
+}
+
+/* line 760, ../../app/styles/theme-deepblue.scss */
+.main-view-content .input-row .input-row-days label {
+  display: block;
+  height: 22px;
+}
+
+/* line 765, ../../app/styles/theme-deepblue.scss */
+.input-row .input-row-elective-course div {
+  display: inline;
+  height: 22px;
+  line-height: 22px;
+  text-transform: capitalize;
+}
+
+/* line 772, ../../app/styles/theme-deepblue.scss */
+.input-row .input-row-elective-course input {
+  width: auto;
+  display: inline;
+  height: 22px;
+  padding: 0;
+  margin: 0;
+}
+
+/* line 780, ../../app/styles/theme-deepblue.scss */
+.main-view-content .input-row .input-row-days div {
+  display: inline;
+  height: 22px;
+  line-height: 22px;
+  text-transform: capitalize;
+}
+
+/* line 787, ../../app/styles/theme-deepblue.scss */
+.main-view-content .input-row .input-row-days input {
+  width: auto;
+  display: inline;
+  height: 22px;
+  padding: 0;
+  margin: 0;
+}
+
+/* line 795, ../../app/styles/theme-deepblue.scss */
+.main-view-content .input-row .input-row-error {
+  background: none;
+  color: #F13E01;
+  width: 320px;
+  display: block;
+  padding: 2px 10px;
+  margin: 10px 0;
+  border: solid 1px #F13E01;
+  border-left-width: 10px;
+}
+
+/* line 806, ../../app/styles/theme-deepblue.scss */
+.main-view-content .view-sub-content {
+  margin-left: 20px;
+  margin-bottom: 30px;
+}
+
+/* line 811, ../../app/styles/theme-deepblue.scss */
+.main-view-content .header-input-row {
+  margin: 25px 0;
+  height: 25px;
+  line-height: 25px;
+}
+
+/* line 817, ../../app/styles/theme-deepblue.scss */
+.main-view-content .header-input-row div {
+  font-size: 16px;
+  font-weight: 700;
+  color: #666;
+  width: 170px;
+  display: inline-block;
+}
+
+/* line 825, ../../app/styles/theme-deepblue.scss */
+.main-view-content .header-input-row input,
+.main-view-content .header-input-row select {
+  font-size: 14px;
+  height: 25px;
+  box-sizing: border-box;
+  border: solid #999 1px;
+  padding: 0 5px;
+  width: 200px;
+}
+
+/* line 835, ../../app/styles/theme-deepblue.scss */
+.main-view-content .icon-option-row {
+  margin-bottom: 15px;
+}
+
+/* line 839, ../../app/styles/theme-deepblue.scss */
+.main-view-content .icon-option-row a div {
+  color: #36A5E7;
+  font-size: 14px;
+  font-weight: 700;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+/* line 847, ../../app/styles/theme-deepblue.scss */
+.main-view-content .icon-option-row a div:hover {
+  text-decoration: underline;
+}
+
+/* line 851, ../../app/styles/theme-deepblue.scss */
+.main-view-content .calendar-icon {
+  width: 20px;
+  height: 20px;
+  background-image: url("data:image/svg+xml;uft8,<svg xmlns='http://www.w3.org/2000/svg' version='1.1' x='0' y='0' width='20' height='20' viewBox='0 0 20 20' enable-background='new 0 0 20 20' xml:space='preserve'><path fill-rule='evenodd' clip-rule='evenodd' fill='#010101' d='M12.95 1.3c0.23-0.2 0.5-0.3 0.8-0.3 0.33 0 0.62 0.1 0.85 0.3 0.2 0.23 0.3 0.52 0.3 0.85v1.2c0 0.33-0.1 0.62-0.3 0.85 -0.23 0.2-0.52 0.3-0.85 0.3 -0.3 0-0.57-0.1-0.8-0.3C12.72 3.97 12.6 3.68 12.6 3.35v-1.2C12.6 1.82 12.72 1.53 12.95 1.3zM3.7 2.3h0.4v1.15c0 0.5 0.17 0.92 0.5 1.25 0.37 0.37 0.82 0.55 1.35 0.55S6.93 5.07 7.3 4.7s0.55-0.8 0.55-1.3V2.3h4.05v1.15c0 0.5 0.17 0.92 0.5 1.25 0.37 0.37 0.82 0.55 1.35 0.55s0.98-0.18 1.35-0.55c0.37-0.37 0.55-0.8 0.55-1.3V2.3h0.25c1.8 0 2.7 0.9 2.7 2.7v12.2c0 1.8-0.9 2.7-2.7 2.7H3.7C1.9 19.9 1 19 1 17.2V5C1 3.2 1.9 2.3 3.7 2.3zM5.15 1.3C5.38 1.1 5.65 1 5.95 1 6.28 1 6.57 1.1 6.8 1.3 7 1.53 7.1 1.82 7.1 2.15v1.2C7.1 3.68 7 3.97 6.8 4.2 6.57 4.4 6.28 4.5 5.95 4.5c-0.3 0-0.57-0.1-0.8-0.3C4.92 3.97 4.8 3.68 4.8 3.35v-1.2C4.8 1.82 4.92 1.53 5.15 1.3zM2.6 8v9.2c0 0.67 0.33 1 1 1h12.25c0.67 0 1-0.33 1-1V8H2.6zM15.55 12.4h-3.15V9.25h3.15V12.4zM11.25 12.4H8.1V9.25h3.15V12.4zM11.25 13.55v3.15H8.1v-3.15H11.25zM12.4 16.7v-3.15h3.15v3.15H12.4zM3.75 9.25H6.9v3.15H3.75V9.25zM6.9 13.55v3.15H3.75v-3.15H6.9z'/></svg>");
+  margin: 0 10px 0 0;
+}
+
+/* END Main Views */
+/* input:file */
+/* line 860, ../../app/styles/theme-deepblue.scss */
+.input-file-wrapper input {
+  display: none;
+  cursor: pointer;
+  outline: none;
+}
+
+/* line 866, ../../app/styles/theme-deepblue.scss */
+.fake-btn {
+  color: #FFF !important;
+  padding: 4px 8px;
+  cursor: pointer;
+}
+
+/* END input:file */
+/* table */
+/* line 874, ../../app/styles/theme-deepblue.scss */
+.table-wrapper {
+  margin: 10px 0;
+}
+
+/* line 878, ../../app/styles/theme-deepblue.scss */
+.dynamic-table {
+  min-width: 600px;
+  border: 1px solid #bac9d0;
+}
+
+/* table options */
+/* line 885, ../../app/styles/theme-deepblue.scss */
+.table-options-btn-container {
+  position: absolute;
+  left: 700px;
+  margin-top: -43px;
+}
+
+/* line 891, ../../app/styles/theme-deepblue.scss */
+.table-options-container {
+  margin: 10px 0;
+}
+
+/* line 895, ../../app/styles/theme-deepblue.scss */
+.table-options-container {
+  border: 1px solid #bac9d0;
+  width: 530px;
+  padding: 10px;
+}
+
+/* line 901, ../../app/styles/theme-deepblue.scss */
+.table-options-container h4 {
+  margin: 15px 0 0 0;
+}
+
+/* line 905, ../../app/styles/theme-deepblue.scss */
+.table-options-container table {
+  margin: 10px 0 15px 0;
+}
+
+/* line 909, ../../app/styles/theme-deepblue.scss */
+.table-options-container td {
+  padding: 0 5px;
+  line-height: 35px;
+}
+
+/* line 914, ../../app/styles/theme-deepblue.scss */
+.table-options-container label span,
+.table-options-container td {
+  font-size: 14px;
+}
+
+/* line 919, ../../app/styles/theme-deepblue.scss */
+.table-options-container tr:first-child {
+  border-top: none;
+}
+
+/* line 923, ../../app/styles/theme-deepblue.scss */
+.table-options-container tr {
+  border-top: 1px solid #ddd;
+}
+
+/* line 927, ../../app/styles/theme-deepblue.scss */
+.table-options-container td:first-child {
+  font-weight: 700;
+}
+
+/* line 931, ../../app/styles/theme-deepblue.scss */
+.table-options-container td:nth-child(2) {
+  padding-right: 15px;
+  border-right: 1px dotted #ddd;
+}
+
+/* line 936, ../../app/styles/theme-deepblue.scss */
+.table-options-container td:nth-child(3) {
+  padding-left: 15px;
+}
+
+/* END table options */
+/* line 942, ../../app/styles/theme-deepblue.scss */
+.dynamic-table .table-capitalize {
+  text-transform: capitalize;
+}
+
+/* line 946, ../../app/styles/theme-deepblue.scss */
+.dynamic-table .sortable-row {
+  cursor: move;
+}
+
+/* line 950, ../../app/styles/theme-deepblue.scss */
+.dynamic-table .required-row {
+  background-color: #f5f5f5;
+}
+
+/* line 954, ../../app/styles/theme-deepblue.scss */
+.dynamic-table .sortable-row td:first-child .row-property:before {
+  width: 12px;
+  height: 35px;
+  content: '';
+  display: inline-block;
+  float: left;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' version='1.1' x='0' y='0' width='12' height='35' viewBox='0 0 12 35' enable-background='new 0 0 12 35' xml:space='preserve' fill='#000'><circle cx='8.5' cy='10.5' r='1.5'/><circle cx='8.5' cy='17.5' r='1.5'/><circle cx='8.5' cy='24.5' r='1.5'/><circle cx='2.5' cy='10.5' r='1.5'/><circle cx='2.5' cy='17.5' r='1.5'/><circle cx='2.5' cy='24.5' r='1.5'/></svg>");
+  opacity: 0.2;
+  margin-right: 5px;
+}
+
+/* line 965, ../../app/styles/theme-deepblue.scss */
+.dynamic-table th {
+  text-align: left;
+  background-color: #dbe6ec;
+}
+
+/* line 970, ../../app/styles/theme-deepblue.scss */
+.dynamic-table thead tr {
+  border: 1px solid #bac9d0;
+}
+
+/* line 974, ../../app/styles/theme-deepblue.scss */
+.dynamic-table .header-row {
+  border: 1px solid #bac9d0;
+}
+
+/* line 978, ../../app/styles/theme-deepblue.scss */
+.dynamic-table tr {
+  border: 1px dotted #bac9d0;
+  height: 35px;
+  line-height: 35px;
+}
+
+/* line 984, ../../app/styles/theme-deepblue.scss */
+.dynamic-table th,
+.dynamic-table td {
+  font-size: 14px;
+  padding: 0 10px;
+}
+
+/* line 990, ../../app/styles/theme-deepblue.scss */
+.dynamic-table td span {
+  font-size: 14px;
+}
+
+/* line 994, ../../app/styles/theme-deepblue.scss */
+.dynamic-table td div,
+.dynamic-table th div {
+  white-space: nowrap;
+  min-width: 45px;
+  max-width: 150px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+/* line 1004, ../../app/styles/theme-deepblue.scss */
+.dynamic-table .table-within-table div {
+  max-width: 2000px;
+}
+
+/* line 1008, ../../app/styles/theme-deepblue.scss */
+.dynamic-table .table-editor div {
+  max-width: none;
+}
+
+/* line 1012, ../../app/styles/theme-deepblue.scss */
+.dynamic-table .delete-warning-row {
+  border: 1px solid #F13E01;
+  background-color: #FADCD2;
+}
+
+/* line 1017, ../../app/styles/theme-deepblue.scss */
+.dynamic-table .delete-warning-row:hover {
+  border: 1px solid #F13E01;
+  background-color: #F2C3B3;
+}
+
+/* line 1022, ../../app/styles/theme-deepblue.scss */
+.dynamic-table td div:hover,
+.dynamic-table th div:hover {
+  max-width: 300px;
+}
+
+/* line 1027, ../../app/styles/theme-deepblue.scss */
+.dynamic-table .table-within-table div:hover {
+  max-width: 2000px;
+}
+
+/* line 1031, ../../app/styles/theme-deepblue.scss */
+.dynamic-table .class-table {
+  margin: 5px 0;
+}
+
+/* line 1035, ../../app/styles/theme-deepblue.scss */
+.dynamic-table .table-editor .editor-prompt-text {
+  font-weight: 700;
+  font-size: 16px;
+  color: #666;
+}
+
+/* line 1041, ../../app/styles/theme-deepblue.scss */
+.dynamic-table .table-editor .editor-prompt-entry {
+  border: 1px solid #666;
+  border-left-width: 10px;
+  padding: 0 10px;
+}
+
+/* line 1047, ../../app/styles/theme-deepblue.scss */
+.dynamic-table .table-editor .prompt-entry-key {
+  font-weight: 700;
+}
+
+/* line 1051, ../../app/styles/theme-deepblue.scss */
+.dynamic-table .table-editor div:hover {
+  max-width: none;
+}
+
+/* line 1055, ../../app/styles/theme-deepblue.scss */
+.dynamic-table .delete-table-entry div {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' version='1.1' x='0' y='0' width='22' height='22' viewBox='0 0 22 22' enable-background='new 0 0 22 22' xml:space='preserve' fill='#ed4004'><path d='M19 5'/><polygon points='19 5 17 3 11 9 5 3 3 5 9 11 3 17 5 19 11 13 17 19 19 17 13 11 '/></svg>");
+  min-width: 22px;
+  width: 22px;
+  height: 22px;
+}
+
+/* line 1062, ../../app/styles/theme-deepblue.scss */
+.dynamic-table .table-icon {
+  vertical-align: middle;
+  cursor: pointer;
+}
+
+/* line 1067, ../../app/styles/theme-deepblue.scss */
+.dynamic-table div,
+.dynamic-table a {
+  font-size: 14px;
+  line-height: 35px;
+}
+
+/* line 1073, ../../app/styles/theme-deepblue.scss */
+.dynamic-table .table-cluster-open {
+  padding: 0;
+}
+
+/* line 1080, ../../app/styles/theme-deepblue.scss */
+.dynamic-table .entry {
+  cursor: pointer;
+}
+
+/* line 1084, ../../app/styles/theme-deepblue.scss */
+.dynamic-table .entry-editer-selection {
+  border: 3px solid #333;
+  background-color: #ddd;
+  padding: 0 5px;
+}
+
+/* line 1090, ../../app/styles/theme-deepblue.scss */
+.dynamic-table .entry span {
+  margin-left: 16px;
+}
+
+/* line 1094, ../../app/styles/theme-deepblue.scss */
+.dynamic-table .table-row-disabled,
+.dynamic-table .table-row-delete {
+  width: 20px;
+  height: 20px;
+  border: none;
+  cursor: pointer;
+  background-color: transparent;
+}
+
+/* line 1103, ../../app/styles/theme-deepblue.scss */
+.dynamic-table .table-row-delete {
+  opacity: 0;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' version='1.1' x='0' y='0' width='22' height='22' viewBox='0 0 22 22' enable-background='new 0 0 22 22' xml:space='preserve' fill='#ed4004'><path d='M19 5'/><polygon points='19 5 17 3 11 9 5 3 3 5 9 11 3 17 5 19 11 13 17 19 19 17 13 11 '/></svg>");
+}
+
+/* line 1108, ../../app/styles/theme-deepblue.scss */
+.dynamic-table .table-row-disabled:hover {
+  opacity: 1;
+}
+
+/* line 1112, ../../app/styles/theme-deepblue.scss */
+.dynamic-table .table-row-disabled-active {
+  background-image: url("data:image/svg+xml;uft8,<svg xmlns='http://www.w3.org/2000/svg' version='1.1' x='0px' y='0px' width='20' height='20' viewBox='0 0 20 20' enable-background='new 0 0 20 20' xml:space='preserve'><g><circle fill-rule='evenodd' clip-rule='evenodd' fill='#F13E01' cx='10' cy='10' r='9'/><rect x='4.5' y='8.5' fill-rule='evenodd' clip-rule='evenodd' fill='#FFFFFF' width='11' height='3'/></g></svg>");
+}
+
+/* line 1116, ../../app/styles/theme-deepblue.scss */
+.dynamic-table .table-row-disabled-inactive {
+  opacity: 0;
+  background-image: url("data:image/svg+xml;uft8,<svg xmlns='http://www.w3.org/2000/svg' version='1.1' x='0px' y='0px' width='20' height='20' viewBox='0 0 20 20' enable-background='new 0 0 20 20' xml:space='preserve'><g><circle fill-rule='evenodd' clip-rule='evenodd' fill='#ccc' cx='10' cy='10' r='9'/><rect x='4.5' y='8.5' fill-rule='evenodd' clip-rule='evenodd' fill='#FFFFFF' width='11' height='3'/></g></svg>");
+}
+
+/* line 1121, ../../app/styles/theme-deepblue.scss */
+.dynamic-table .entry:hover .entry-options {
+  display: inline-block;
+}
+
+/* line 1125, ../../app/styles/theme-deepblue.scss */
+.dynamic-table .entry-options {
+  display: none;
+  position: absolute;
+}
+
+/* line 1130, ../../app/styles/theme-deepblue.scss */
+.dynamic-table .entry-options button {
+  opacity: 0.2;
+  width: 18px;
+  height: 18px;
+  border: none;
+  cursor: pointer;
+  border-radius: 18px;
+}
+
+/* line 1139, ../../app/styles/theme-deepblue.scss */
+.dynamic-table .entry-options button:hover {
+  opacity: 1;
+}
+
+/* line 1143, ../../app/styles/theme-deepblue.scss */
+.dynamic-table .entry-options .entry-edit {
+  background-color: #36A5E7;
+}
+
+/* line 1146, ../../app/styles/theme-deepblue.scss */
+.dynamic-table .entry-options .entry-disable-active {
+  background-color: #F13E01;
+}
+
+/* line 1149, ../../app/styles/theme-deepblue.scss */
+.dynamic-table .entry-options .entry-disable-inactive {
+  background-color: #666;
+}
+
+/* line 1152, ../../app/styles/theme-deepblue.scss */
+.dynamic-table .entry-options .entry-delete {
+  background-color: #F13E01;
+}
+
+/* line 1156, ../../app/styles/theme-deepblue.scss */
+.dynamic-table .entry-options .entry-edit:hover {
+  background-image: url("data:image/svg+xml;uft8,<svg xmlns='http://www.w3.org/2000/svg' x='0px' y='0px' width='16' height='16' viewBox='-2 -2 22 22' xml:space='preserve' fill='#FFF'><g><polygon points='2 18 2.5 14.5 2.5 14.5 5.5 17.5 5.5 17.5 '/><polyline points='3.5 13.5 6.5 16.5 15.5 7.5 12.5 4.5 '/><path d='M16.5 6.5L17 6c0 0 1.25-1.25 0.5-2C17 3.5 16 2.5 16 2.5S15.25 1.75 14 3l-0.5 0.5'/></g></svg>");
+}
+
+/* line 1159, ../../app/styles/theme-deepblue.scss */
+.dynamic-table .entry-options .entry-disable:hover {
+  background-image: url("data:image/svg+xml;uft8,<svg xmlns='http://www.w3.org/2000/svg' x='0px' y='0px' width='18' height='18' viewBox='0 0 18 18' xml:space='preserve'><g><rect x='3.5' y='7.5' fill-rule='evenodd' clip-rule='evenodd' fill='#FFFFFF' width='11' height='3'/></g></svg>");
+}
+
+/* line 1162, ../../app/styles/theme-deepblue.scss */
+.dynamic-table .entry-options .entry-delete:hover {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' version='1.1' x='0' y='0' width='16' height='16' viewBox='-3 -3 25 25' xml:space='preserve' fill='#FFF'><path d='M19 5'/><polygon points='19 5 17 3 11 9 5 3 3 5 9 11 3 17 5 19 11 13 17 19 19 17 13 11 '/></svg>");
+}
+
+/* line 1166, ../../app/styles/theme-deepblue.scss */
+.dynamic-table .entry-disabled {
+  color: #F13E01;
+}
+
+/* line 1170, ../../app/styles/theme-deepblue.scss */
+.dynamic-table .no-entry .no-entry-edit {
+  background-image: url("data:image/svg+xml;uft8,<svg xmlns='http://www.w3.org/2000/svg' x='0px' y='0px' width='20' height='20' viewBox='0 0 20 20' enable-background='new 0 0 20 20' xml:space='preserve' fill='#36A5E7'><g><polygon points='2 18 2.5 14.5 2.5 14.5 5.5 17.5 5.5 17.5 '/><polyline points='3.5 13.5 6.5 16.5 15.5 7.5 12.5 4.5 '/><path d='M16.5 6.5L17 6c0 0 1.25-1.25 0.5-2C17 3.5 16 2.5 16 2.5S15.25 1.75 14 3l-0.5 0.5'/></g></svg>");
+  width: 20px;
+  height: 20px;
+  border: none;
+  cursor: pointer;
+  background-color: transparent;
+  opacity: 0;
+}
+
+/* line 1180, ../../app/styles/theme-deepblue.scss */
+.dynamic-table .table-cluster a {
+  color: #105681;
+  font-weight: 700;
+}
+
+/* line 1185, ../../app/styles/theme-deepblue.scss */
+.dynamic-table .table-cluster a:hover {
+  text-decoration: underline;
+}
+
+/* line 1189, ../../app/styles/theme-deepblue.scss */
+.dynamic-table .table-cluster-add {
+  cursor: pointer;
+}
+
+/* line 1193, ../../app/styles/theme-deepblue.scss */
+.dynamic-table .table-cluster .table-cluster-add-text {
+  opacity: 0;
+  color: #36A5E7;
+}
+
+/* line 1198, ../../app/styles/theme-deepblue.scss */
+.dynamic-table .table-cluster:hover .table-cluster-add-text {
+  text-decoration: underline;
+}
+
+/* line 1202, ../../app/styles/theme-deepblue.scss */
+.dynamic-table tr:hover .table-cluster-add-btn,
+.dynamic-table tr:hover .table-cluster-add-text,
+.dynamic-table tr:hover .table-row-delete,
+.dynamic-table tr:hover .table-row-disabled-inactive,
+.dynamic-table tr:hover .no-entry-edit {
+  opacity: 1;
+}
+
+/* line 1210, ../../app/styles/theme-deepblue.scss */
+.dynamic-table tr:hover {
+  background-color: #F0F9FF;
+}
+
+/* line 1214, ../../app/styles/theme-deepblue.scss */
+.dynamic-table .table-cluster .table-cluster-add-btn {
+  cursor: pointer;
+  width: 18px;
+  height: 18px;
+  background-image: url("data:image/svg+xml;uft8,<svg xmlns='http://www.w3.org/2000/svg' version='1.1' x='0px' y='0px' width='18' height='18' viewBox='0 0 18 18' enable-background='new 0 0 18 18' xml:space='preserve' fill='#FFF'><polygon points='8 3 10 3 10 8 15 8 15 10 10 10 10 15 8 15 8 10 3 10 3 8 8 8 '/></svg>");
+  background-color: #7CD845;
+  border-radius: 18px;
+  display: inline-block;
+  border: none;
+  margin-left: 10px;
+  opacity: 0;
+}
+
+/* line 1227, ../../app/styles/theme-deepblue.scss */
+.dynamic-table .table-editor {
+  border: 3px solid #333;
+  background-color: #ddd;
+}
+
+/* line 1232, ../../app/styles/theme-deepblue.scss */
+.dynamic-table .table-editor-flex {
+  display: flex;
+  justify-content: space-between;
+}
+
+/* line 1237, ../../app/styles/theme-deepblue.scss */
+.dynamic-table .table-editor .table-editor-left {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+/* line 1243, ../../app/styles/theme-deepblue.scss */
+.dynamic-table .table-editor .flex-bottom-btn {
+  margin: 8px 0;
+}
+
+/* line 1247, ../../app/styles/theme-deepblue.scss */
+.dynamic-table .table-editor label {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+/* line 1252, ../../app/styles/theme-deepblue.scss */
+.dynamic-table .table-editor label div {
+  display: inline;
+  margin-right: 20px;
+}
+
+/* line 1257, ../../app/styles/theme-deepblue.scss */
+.dynamic-table .table-editor .editor-min-max,
+.dynamic-table .table-editor .editor-min-max div {
+  margin-right: 0;
+}
+
+/* line 1262, ../../app/styles/theme-deepblue.scss */
+.dynamic-table .table-editor label input {
+  font-size: 14px;
+  height: 25px;
+  box-sizing: border-box;
+  border: solid #999 1px;
+  border-radius: 0;
+  padding: 0 5px;
+  width: 200px;
+}
+
+/* line 1272, ../../app/styles/theme-deepblue.scss */
+.dynamic-table .table-editor .table-editor-priority button {
+  font-family: 'Roboto Mono';
+  text-indent: -1px;
+  font-size: 14px;
+  font-weight: 500;
+  width: 18px;
+  height: 18px;
+  line-height: 0px;
+  border-radius: 0;
+  border: none;
+  color: #FFF;
+}
+
+/* line 1285, ../../app/styles/theme-deepblue.scss */
+.dynamic-table .priority-label {
+  display: inline;
+}
+
+/* line 1289, ../../app/styles/theme-deepblue.scss */
+.dynamic-table .priority-label div {
+  font-family: 'Roboto Mono';
+  text-indent: -1px;
+  font-size: 12px;
+  font-weight: 500;
+  min-width: 12px;
+  width: 12px;
+  height: 15px;
+  line-height: 15px;
+  margin-top: 10px;
+  margin-right: 2px;
+  border-radius: 0;
+  border: none;
+  color: #FFF;
+  float: left;
+  text-align: center;
+  position: absolute;
+}
+
+/* line 1308, ../../app/styles/theme-deepblue.scss */
+.dynamic-table .priority-label .priority-mandatory {
+  opacity: 0.2;
+}
+
+/* line 1312, ../../app/styles/theme-deepblue.scss */
+.dynamic-table .table-editor .table-editor-priority .priority-help {
+  border-radius: 18px;
+  background-color: #999;
+}
+
+/* line 1317, ../../app/styles/theme-deepblue.scss */
+.dynamic-table .table-editor .table-editor-priority .priority-help:hover + .priority-help-tooltip {
+  display: block;
+}
+
+/* line 1321, ../../app/styles/theme-deepblue.scss */
+.dynamic-table .table-editor .table-editor-priority .priority-help-tooltip {
+  position: absolute;
+  margin-left: -30px;
+  display: none;
+}
+
+/* line 1327, ../../app/styles/theme-deepblue.scss */
+.dynamic-table .table-editor .table-editor-priority .priority-help-tooltip .triangle-up {
+  width: 0 !important;
+  min-width: 0 !important;
+  height: 0 !important;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-bottom: 8px solid #333;
+  position: absolute;
+  top: -5px;
+  left: 31px;
+}
+
+/* line 1339, ../../app/styles/theme-deepblue.scss */
+.dynamic-table .table-editor .table-editor-priority .priority-help-tooltip .tooltip-text {
+  background-color: #333;
+  padding: 7px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.7);
+}
+
+/* line 1345, ../../app/styles/theme-deepblue.scss */
+.dynamic-table .table-editor .table-editor-priority .priority-help-tooltip .tooltip-text p {
+  color: #FFF;
+  line-height: 18px;
+  margin: 0;
+  padding: 0;
+}
+
+/* line 1352, ../../app/styles/theme-deepblue.scss */
+.dynamic-table .table-editor .priority-text {
+  font-size: 14px;
+  font-weight: 700;
+  margin-right: 10px;
+}
+
+/* line 1358, ../../app/styles/theme-deepblue.scss */
+.dynamic-table .table-editor .table-editor-priority .priority-active {
+  box-shadow: 2px 2px 0 #36A5E7, -2px -2px 0 #36A5E7, -2px 2px 0 #36A5E7, 2px -2px 0 #36A5E7;
+}
+
+/* line 1365, ../../app/styles/theme-deepblue.scss */
+.dynamic-table .priority-mandatory {
+  background-color: #333;
+}
+
+/* line 1369, ../../app/styles/theme-deepblue.scss */
+.dynamic-table .priority-high {
+  background-color: #7CD845;
+}
+
+/* line 1373, ../../app/styles/theme-deepblue.scss */
+.dynamic-table .priority-low {
+  background-color: #BFB88C;
+}
+
+/* line 1377, ../../app/styles/theme-deepblue.scss */
+.dynamic-table .priority-not {
+  background-color: #F13E01;
+}
+
+/* line 1381, ../../app/styles/theme-deepblue.scss */
+.dynamic-table .table-editor .table-editor-right a {
+  font-size: 14px;
+  font-weight: 700;
+  color: #105681;
+}
+
+/* line 1387, ../../app/styles/theme-deepblue.scss */
+.dynamic-table .table-editor .table-editor-right a:hover {
+  text-decoration: underline;
+}
+
+/* line 1391, ../../app/styles/theme-deepblue.scss */
+.dynamic-table .table-editor .table-editor-filters-hide {
+  opacity: 0;
+}
+
+/* line 1395, ../../app/styles/theme-deepblue.scss */
+.dynamic-table .table-editor .table-editor-filters label {
+  display: block;
+  line-height: 20px;
+}
+
+/* END table */
+/* user access */
+/* line 1403, ../../app/styles/theme-deepblue.scss */
+.user-access .user-access-group {
+  margin-bottom: 20px;
+}
+
+/* END user access */
+/* Scheduler */
+/* line 1410, ../../app/styles/theme-deepblue.scss */
+.error-box {
+  margin: 20px 0;
+  color: #F13E01;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+/* line 1418, ../../app/styles/theme-deepblue.scss */
+.add-fact-error,
+.editor-error {
+  font-size: 14px;
+  color: #F13E01;
+  background-color: none;
+  width: 265px;
+  line-height: 30px;
+  padding: 0 10px;
+  margin: 10px 0;
+  border: solid 1px #F13E01;
+  border-left: solid 10px #F13E01;
+}
+
+/* line 1431, ../../app/styles/theme-deepblue.scss */
+.editor-error {
+  background-color: #FADCD2 !important;
+}
+
+/* line 1435, ../../app/styles/theme-deepblue.scss */
+.input-row .input-row-min-max,
+.input-row .input-row-constraint {
+  width: 200px !important;
+}
+
+/* line 1440, ../../app/styles/theme-deepblue.scss */
+.input-row .input-row-min-max input,
+.dynamic-table .table-editor .editor-min-max input {
+  width: 60px;
+}
+
+/* line 1445, ../../app/styles/theme-deepblue.scss */
+.editor-min-max .editor-min {
+  margin-right: 10px;
+}
+
+/* line 1449, ../../app/styles/theme-deepblue.scss */
+.input-row .input-row-min-max .input-row-min {
+  margin-right: 5px;
+}
+
+/* line 1453, ../../app/styles/theme-deepblue.scss */
+.scheduler-container .schedule-list {
+  margin-top: 40px;
+}
+
+/* line 1457, ../../app/styles/theme-deepblue.scss */
+.scheduler-container .schedule-list div {
+  height: 35px;
+  line-height: 35px;
+}
+
+/* line 1462, ../../app/styles/theme-deepblue.scss */
+.scheduler-container .schedule-list div a {
+  font-size: 16px;
+  color: #36A5E7;
+  font-weight: 700;
+}
+
+/* line 1468, ../../app/styles/theme-deepblue.scss */
+.scheduler-container .schedule-list div a:hover {
+  text-decoration: underline;
+}
+
+/* line 1472, ../../app/styles/theme-deepblue.scss */
+.scheduler-container .export-options-tooltip {
+  position: absolute;
+  background-color: #333;
+  color: #FFF;
+}
+
+/* line 1478, ../../app/styles/theme-deepblue.scss */
+.scheduler-container .export-options-tooltip ul {
+  list-style: none;
+  cursor: pointer;
+  padding: 0px;
+  margin: 5px;
+}
+
+/* line 1485, ../../app/styles/theme-deepblue.scss */
+.scheduler-container .export-options-tooltip ul li {
+  color: #FFF;
+  pointer: cursor;
+  padding: 10px;
+  width: 90px;
+  text-align: center;
+}
+
+/* line 1493, ../../app/styles/theme-deepblue.scss */
+.scheduler-container .export-options-tooltip ul li:hover {
+  background-color: #36A5E7;
+}
+
+/* line 1497, ../../app/styles/theme-deepblue.scss */
+.scheduler-container .export-options-tooltip .triangle-up {
+  width: 0 !important;
+  height: 0 !important;
+  min-width: 0 !important;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-bottom: 8px solid #333;
+  position: absolute;
+  top: -5px;
+  left: 50px;
+}
+
+/* line 1509, ../../app/styles/theme-deepblue.scss */
+.schedule-log {
+  height: 100px;
+  width: 500px;
+  border: 1px solid #666;
+  padding: 5px;
+  overflow-y: scroll;
+}
+
+/* line 1517, ../../app/styles/theme-deepblue.scss */
+.schedule-log div {
+  margin-bottom: 5px;
+}
+
+/* line 1521, ../../app/styles/theme-deepblue.scss */
+.schedule-log .schedule-log-date {
+  color: #666;
+  margin-bottom: 0px;
+  font-size: 10px;
+}
+
+/* line 1527, ../../app/styles/theme-deepblue.scss */
+.manage-students-group {
+  margin-top: 20px;
+  cursor: pointer;
+}
+
+/* line 1532, ../../app/styles/theme-deepblue.scss */
+.manage-students-group div {
+  clear: both;
+}
+
+/* line 1536, ../../app/styles/theme-deepblue.scss */
+.manage-students-group .student-selection-active div {
+  border-color: #7CD845;
+  font-weight: 700;
+}
+
+/* line 1541, ../../app/styles/theme-deepblue.scss */
+.manage-students-group .student-selection-active .students-group-name {
+  border-left-width: 10px;
+  padding-left: 11px;
+}
+
+/* line 1546, ../../app/styles/theme-deepblue.scss */
+.manage-students-group .student-selection-active .students-group-school-id {
+  background-color: #7CD845;
+}
+
+/* line 1550, ../../app/styles/theme-deepblue.scss */
+.manage-students-group div div {
+  height: 35px;
+  line-height: 35px;
+  font-size: 14px;
+  border: 1px solid #999;
+  margin: 0 0 5px 0;
+  width: 200px;
+  padding: 0 0 0 20px;
+  overflow: hidden;
+  white-space: nowrap;
+  display: inline-block;
+  float: left;
+  clear: none;
+}
+
+/* line 1565, ../../app/styles/theme-deepblue.scss */
+.manage-students-group div .students-group-school-id {
+  background-color: #999;
+  color: #FFF;
+  width: 100px;
+}
+
+/*# sourceMappingURL=theme-deepblue.css.map */

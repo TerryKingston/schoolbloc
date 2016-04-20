@@ -151,9 +151,8 @@ angular.module('sbAngularApp').factory('commonService', ['$translate', '$window'
 		 * Renders the URL correctly with given port and absolute path if need be
 		 */
 		conformUrl: function(url) {
-			// port of backend
-			var port = "5000";
-			return $location.protocol() + "://" + $location.host() + ":" + port + "/" + url;
+			// port of backend - in production this is same as other port, served via nginx
+			return $location.protocol() + "://" + $location.host() + "/" + url;
 		},
 
 		/**

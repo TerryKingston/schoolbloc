@@ -6,13 +6,12 @@ using redis instead of an in memory dictionary for session
 storage
 """
 from schoolbloc import app, db
-from schoolbloc.scheduler.models import Day, Student, Parent, \
-    ParentStudentMapper
+from schoolbloc.scheduler.models import Day
 from schoolbloc.users.models import Role, User
 
 if __name__ == '__main__':
     # Set the log level to debug for development
-    app.logger.setLevel('DEBUG')
+    app.logger.setLevel('INFO')
 
     # Create the development sqlite databases if they don't already exist
     db.create_all()
@@ -24,11 +23,6 @@ if __name__ == '__main__':
         db.session.add(Role(role_type='student'))
         db.session.add(Role(role_type='parent'))
         db.session.add(User(username='admin', password='admin', role_type='admin'))
-        db.session.add(User(username='teacher', password='teacher', role_type='teacher'))
-        db.session.add(User(username='student', password='student', role_type='student'))
-        db.session.add(User(username='student2', password='student2', role_type='student'))
-        db.session.add(User(username='student3', password='student3', role_type='student'))
-        db.session.add(User(username='parent1', password='parent1', role_type='parent'))
         db.session.add(Day(name='Monday'))
         db.session.add(Day(name='Tuesday'))
         db.session.add(Day(name='Wednesday'))
@@ -37,21 +31,3 @@ if __name__ == '__main__':
         db.session.commit()
     except:
         db.session.rollback()
-
-    try:
-        #db.session.add(Role(role_type='parent'))
-        #db.session.add(User(username='parent1', password='parent1', role_type='parent'))
-        #db.session.commit()
-        #db.session.add(Student(uid='u026xxx', first_name='Landon', last_name='Bland'))
-        #db.session.add(Student(uid='u027xxx', first_name='Daelon', last_name='Bland'))
-        #db.session.commit()
-
-        #parent_user = User.query.filter_by(username='parent1').one()
-        #db.session.add(Parent(user_id=parent_user.id, first_name='Bob', last_name='Bland'))
-        #db.session.commit()
-        pass
-    except:
-        db.session.rollback()
-
-    # Run our application
-    app.run(host='0.0.0.0', port=5000, use_reloader=True)
