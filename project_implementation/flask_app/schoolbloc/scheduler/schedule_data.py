@@ -36,7 +36,7 @@ class ScheduleData:
                 end_time = self.timeblocks[c.timeblock_id].end_time
                 days = []
                 for td in self.timeblocks[c.timeblock_id].timeblocks_days:
-                    days += Day.query.get(td.day_id).name
+                    days.append(Day.query.get(td.day_id).name)
                 days_string = ", ".join(set(days))
 
                 cls = ScheduledClass(schedule_id=db_schedule.id, teacher_id=c.teacher_id, course_id=c.course_id, 
