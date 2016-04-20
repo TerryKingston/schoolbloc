@@ -13,7 +13,8 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 		DAY_URL = SERVER_ROOT + "days",
 		SUBJECT_URL = SERVER_ROOT + "subjects",
 		TEACHER_URL = SERVER_ROOT + "teachers",
-		TIME_URL = SERVER_ROOT + "timeblocks";
+		TIME_URL = SERVER_ROOT + "timeblocks",
+		oneMoreAttempt = false;
 
 
 	// never reinstantiate: reference will be lost with bound controllers
@@ -931,7 +932,7 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 		},
 
 		getTableFacts: function(factName) {
-			var url, manageStudents;
+			var url, manageStudents, self = this;
 			var deferred = $q.defer();
 
 			if (!factName) {
@@ -987,7 +988,22 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 			$http.get(url).then(function(data) {
 				deferred.resolve(data.data);
 			}, function(data) {
-				deferred.reject(data.data);
+				// race condition has caused the user_id not to be removed quick enough, try again
+				if (!oneMoreAttempt && factName === "student_course" && data.data.message === "Access denied") {
+					userAccessService.resetManagedStudents();
+					// make sure this isn't infinitely recursive
+					oneMoreAttempt = true;
+					self.getTableFacts(factName).then(function(data) {
+						oneMoreAttempt = false;
+						deferred.resolve(data);
+					}, function(data) {
+						oneMoreAttempt = false;
+						deferred.reject(data);
+					});
+				}
+				else {
+					deferred.reject(data.data);
+				}
 			});
 			return deferred.promise;
 		},
