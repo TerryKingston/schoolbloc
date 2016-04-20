@@ -103,11 +103,11 @@ angular.module('sbAngularApp')
 			getUsersStudents();
 
 		}, function(error) {
-			if (error.message === 'Student with requested access token not found') {
+			if (error && error.message === 'Student with requested user token not found') {
 				$scope.addStudent.form.error = "Invalid access token.";
 			}
 			else {
-				$scope.addStudent.form.error = error.message;
+				$scope.addStudent.form.error = "Unable to add student.";
 			}
 		});
 	}
