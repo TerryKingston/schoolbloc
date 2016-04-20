@@ -856,6 +856,7 @@ class ScheduledClass(db.Model, SqlalchemySerializer):
     id = db.Column(db.Integer, primary_key=True)
     start_time = db.Column(db.Integer, nullable=False)  # time in 24 hr format (i.e. 1454)
     end_time = db.Column(db.Integer, nullable=False)
+    days = db.Column(db.String(128))
     schedule_id = db.Column(db.Integer, db.ForeignKey('schedules.id', ondelete="CASCADE"), nullable=False)
     classroom_id = db.Column(db.Integer, db.ForeignKey('classrooms.id', ondelete="CASCADE"), nullable=False)
     teacher_id = db.Column(db.Integer, db.ForeignKey('teachers.id', ondelete="CASCADE"), nullable=False)
@@ -871,7 +872,7 @@ class ScheduledClass(db.Model, SqlalchemySerializer):
 
     students = association_proxy('scheduled_classes_student', 'student')
 
-    def __init__(self, schedule_id, course_id, classroom_id, teacher_id, start_time, end_time):
+    def __init__(self, schedule_id, course_id, classroom_id, teacher_id, start_time, end_time, days):
         # validate start and end time
         if start_time < 0 or start_time > 2359 or end_time < 0 or end_time > 2359:
             raise Exception("start_time and end_time must be between 0 and 2359")
@@ -882,6 +883,7 @@ class ScheduledClass(db.Model, SqlalchemySerializer):
         self.course_id = course_id
         self.classroom_id = classroom_id
         self.teacher_id = teacher_id
+        self.days = days
 
     def __repr__(self):
         return "<id: {}, start: {}, end: {}, course_id: {}, classroom_id: {}, teacher_id: {}>".format(
@@ -896,6 +898,7 @@ class ScheduledClass(db.Model, SqlalchemySerializer):
         ret['students'] = [{'value': str(s), 'id': s.id} for s in self.students]
         ret['start_time'] = self.start_time
         ret['end_time'] = self.end_time
+        ret['days'] = self.days
         return ret
 
 

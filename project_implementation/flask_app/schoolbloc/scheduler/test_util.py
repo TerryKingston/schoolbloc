@@ -54,18 +54,16 @@ class SchedulerTestUtilities():
         thursday = Day.query.filter_by(name="Thursday")[0]
         friday = Day.query.filter_by(name="Friday")[0]
         for t in time_blocks: 
-            mwTimeblock = Timeblock(start_time=t[0], end_time=t[1])
+            mwfTimeblock = Timeblock(start_time=t[0], end_time=t[1])
             ttTimeblock = Timeblock(start_time=t[0], end_time=t[1])
-            fTimeblock = Timeblock(start_time=t[0], end_time=t[1])
-            db.session.add(mwTimeblock)
+            db.session.add(mwfTimeblock)
             db.session.add(ttTimeblock)
-            db.session.add(fTimeblock)
             db.session.flush()
-            db.session.add(TimeblocksDay(day_id=monday.id, timeblock_id=mwTimeblock.id))
-            db.session.add(TimeblocksDay(day_id=wednesday.id, timeblock_id=mwTimeblock.id))
+            db.session.add(TimeblocksDay(day_id=monday.id, timeblock_id=mwfTimeblock.id))
+            db.session.add(TimeblocksDay(day_id=wednesday.id, timeblock_id=mwfTimeblock.id))
             db.session.add(TimeblocksDay(day_id=tuesday.id, timeblock_id=ttTimeblock.id))
             db.session.add(TimeblocksDay(day_id=thursday.id, timeblock_id=ttTimeblock.id))
-            db.session.add(TimeblocksDay(day_id=friday.id, timeblock_id=fTimeblock.id))
+            db.session.add(TimeblocksDay(day_id=friday.id, timeblock_id=mwfTimeblock.id))
 
         db.session.commit()
 
