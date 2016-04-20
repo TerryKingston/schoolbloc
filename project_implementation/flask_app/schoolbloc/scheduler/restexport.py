@@ -132,6 +132,9 @@ class TestRest(Resource):
         if not hasattr(self.orm, '__restconstraints__'):
             return ret
         if get_constraints and get_constraints.lower() == 'false':
+            # Hackish case for timeblocks call. Insert days if constraints=false
+            if orm_object.__tablename__ == 'timeblocks':
+                ret['days'] = [str(tbd.day) for tbd in orm_object.timeblocks_days]
             return ret
         for constraint in orm_object.__restconstraints__:
             foreign_name = _get_constraint_foreign_name(self.orm, constraint)
@@ -284,6 +287,8 @@ class TestRestList(Resource):
                 ret.append(tmp_ret)
                 continue
             if get_constraints and get_constraints.lower() == 'false':
+                if orm_object.__tablename__ == 'timeblocks':
+                    tmp_ret['days'] = [str(tbd.day) for tbd in orm_object.timeblocks_days]
                 ret.append(tmp_ret)
                 continue
             for constraint in orm_object.__restconstraints__:

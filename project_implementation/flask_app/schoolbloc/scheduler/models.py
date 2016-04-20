@@ -412,18 +412,6 @@ class Timeblock(db.Model, SqlalchemySerializer):
     def __str__(self):
         return "{} {}".format(self.start_time, self.end_time)
 
-    def serialize(self):
-        """ Special serializer for timeblocks to include their day """
-        results = OrderedDict()
-
-        # Serialize the list of columns. Don't print out foreign keys, as those
-        # get dereference into their full objects bellow
-        results['id'] = self.id
-        results['start_time'] = self.start_time
-        results['end_time'] = self.end_time
-        results['days'] = [str(tbd.day) for tbd in self.timeblocks_days]
-        return results
-
 
 ##############
 # Constraints
@@ -851,6 +839,7 @@ class Schedule(db.Model, SqlalchemySerializer):
                     'teacher_id': sch_class.teacher_id,
                     'start_time': sch_class.start_time,
                     'end_time': sch_class.end_time,
+                    #'days':
                 })
 
         # Where we convert it back into a list, for reasons mentioned above
