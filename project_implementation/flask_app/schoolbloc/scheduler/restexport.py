@@ -148,6 +148,11 @@ class TestRest(Resource):
                 for column in mapper_orm.__table__.columns.values():
                     if not column.foreign_keys and not column.primary_key:
                         serialized[column.name] = getattr(mapper_orm, column.name)
+
+                # Special case for timeblocks, we need to pass back the days this
+                # timeblock is associated with as well.
+                if foreign_orm.__tablename__ == 'timeblocks':
+                    serialized['days'] = [str(tbd.day) for tbd in foreign_orm.timeblocks_days]
                 foreign_serialized.append(serialized)
             ret[foreign_name] = foreign_serialized
         return ret
@@ -157,7 +162,6 @@ class TestRest(Resource):
         parser = _generate_parser(self.orm)
         request_json = request.get_json(force=True)
 
-        # TODO verify json datatype to what parser says it should be
         # As this is editing existing data, we will treat everything as optional
         to_remove = []  # Cannot remove elements from dict while iterating
         for key, value in request_json.items():
@@ -294,6 +298,8 @@ class TestRestList(Resource):
                     for column in mapper_orm.__table__.columns.values():
                         if not column.foreign_keys and not column.primary_key:
                             serialized[column.name] = getattr(mapper_orm, column.name)
+                    if foreign_orm.__tablename__ == 'timeblocks':
+                        serialized['days'] = [str(tbd.day) for tbd in foreign_orm.timeblocks_days]
                     foreign_serialized.append(serialized)
                 tmp_ret[foreign_name] = foreign_serialized
             ret.append(tmp_ret)
@@ -303,7 +309,6 @@ class TestRestList(Resource):
         parser = _generate_parser(self.orm)
         request_json = request.get_json(force=True)
 
-        # TODO verify json datatype to what parser says it should be
         # Verify received json has required data, and make orm object from said data
         kwargs = {}
         for param in parser['required_params']:
