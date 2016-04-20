@@ -3,7 +3,7 @@
 /**
  * Helps with basic user authentication and registration.
  */
-angular.module('sbAngularApp').factory('userAuthService', ['$q', '$http', '$window', 'commonService', '$timeout', function($q, $http, $window, commonService, $timeout) {
+angular.module('sbAngularApp').factory('userAuthService', ['$q', '$http', '$window', 'commonService', '$timeout', 'userAccessService', function($q, $http, $window, commonService, $timeout, userAccessService) {
   var SERVER_ROOT = "",
     REGISTER_URL = SERVER_ROOT + "api/register",
     LOGIN_URL = SERVER_ROOT + "auth";
@@ -98,6 +98,11 @@ angular.module('sbAngularApp').factory('userAuthService', ['$q', '$http', '$wind
         $window.localStorage.role = data.data.role;
         $window.localStorage.role_id = data.data.role_id;
         $window.localStorage.uid = data.data.uid;
+
+        // remove any previous student id used by a parent
+        if (data.data.role === 'student') {
+          userAccessService.resetManagedStudents();
+        }
 
         $timeout(function() {
           deferred.resolve(data.data);

@@ -839,6 +839,7 @@ class Schedule(db.Model, SqlalchemySerializer):
                     'teacher_id': sch_class.teacher_id,
                     'start_time': sch_class.start_time,
                     'end_time': sch_class.end_time,
+                    #'days':
                 })
 
         # Where we convert it back into a list, for reasons mentioned above
