@@ -102,9 +102,9 @@ class FullScheduleTests(unittest.TestCase):
         # get a list of sample names
         names = TestUtil.get_names(320)
         
-        stud_7th_list = TestUtil.generate_students(30, names=names[0:30])
-        stud_8th_list = TestUtil.generate_students(30, names=names[30:60])
-        stud_9th_list = TestUtil.generate_students(30, names=names[60:90])
+        stud_7th_list = TestUtil.generate_students(25, names=names[0:25])
+        stud_8th_list = TestUtil.generate_students(25, names=names[25:50])
+        stud_9th_list = TestUtil.generate_students(25, names=names[50:75])
 
         # Add the teachers
         # teacher_name_list = [("S", "Owen"),("M", "Evans"), ("S", "Evans"), ("J", "Green"),
@@ -372,6 +372,19 @@ class FullScheduleTests(unittest.TestCase):
         csubs = [ CoursesSubject(course_id=c.id, subject_id=sub_tech.id) for c in cl_tech ]
         for cs in csubs: db.session.add(cs)
 
+        sub_art = Subject(name="Art")
+        db.session.add(sub_art)
+        cl_art = [ Course(name=c_name, 
+                            min_student_count=5,
+                            max_student_count=20)  
+                        for c_name in ["Painting I", "Life Drawing", "Dance" "Drama", "Beg. Art", 
+                                       "Drafting", "Painting II", "Int. Art", "Pottery", "Crafts", "Woodworking"] ]
+        for c in cl_art: db.session.add(c)
+        db.session.flush()
+
+        csubs = [ CoursesSubject(course_id=c.id, subject_id=sub_art.id) for c in cl_art ]
+        for cs in csubs: db.session.add(cs)
+
         sub_learning = Subject(name="Learning")                               
         db.session.add(sub_learning)
         cl_learning = [ Course(name=c_name, 
@@ -394,7 +407,7 @@ class FullScheduleTests(unittest.TestCase):
         sg_7th_grade = StudentGroup(name="7th Grade")
         sg_8th_grade = StudentGroup(name="8th Grade")
         sg_9th_grade = StudentGroup(name="9th Grade")
-        sg_list = [sg_7th_grade, sg_8th_grade] #, sg_8th_grade, sg_9th_grade]
+        sg_list = [sg_7th_grade, sg_8th_grade, sg_9th_grade] #, sg_8th_grade, sg_9th_grade]
 
         db.session.add(sg_7th_grade)
         db.session.add(sg_8th_grade)
@@ -423,6 +436,9 @@ class FullScheduleTests(unittest.TestCase):
         # add course assignments to each student group
         # NOTE: This set pushes the student booking over the number of time blocks
         for sg in sg_list: db.session.add(StudentGroupsSubject(subject_id=sub_music.id, 
+                                                               student_group_id=sg.id,
+                                                               priority="low"))
+        for sg in sg_list: db.session.add(StudentGroupsSubject(subject_id=sub_art.id, 
                                                                student_group_id=sg.id,
                                                                priority="low"))
         for sg in sg_list: db.session.add(StudentGroupsSubject(subject_id=sub_soc_stud.id, 
