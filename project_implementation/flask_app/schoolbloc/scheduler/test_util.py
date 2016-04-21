@@ -32,20 +32,21 @@ class SchedulerTestUtilities():
         lunch_start_mins = SchedulerTestUtilities.convert_time_to_minutes(lunch_start)
         lunch_end_mins = SchedulerTestUtilities.convert_time_to_minutes(lunch_end)
 
-        time_blocks = [] # tuples as (start_time, end_time)
-        cur_time = day_start_mins
-        while cur_time < lunch_start_mins:
-            start_time = SchedulerTestUtilities.convert_minutes_to_time(cur_time)
-            end_time = SchedulerTestUtilities.convert_minutes_to_time(cur_time + class_duration)
-            time_blocks.append((start_time, end_time))
-            cur_time += class_duration + break_length
+        time_blocks = [(815, 905), (910, 1000), (1010, 1100), (1245, 1335), (1340, 1430)] # tuples as (start_time, end_time)
 
-        cur_time = lunch_end_mins
-        while cur_time < day_end_mins:
-            start_time = SchedulerTestUtilities.convert_minutes_to_time(cur_time)
-            end_time = SchedulerTestUtilities.convert_minutes_to_time(cur_time + class_duration)
-            time_blocks.append((start_time, end_time))
-            cur_time += class_duration + break_length
+        # cur_time = day_start_mins
+        # while cur_time < lunch_start_mins:
+        #     start_time = SchedulerTestUtilities.convert_minutes_to_time(cur_time)
+        #     end_time = SchedulerTestUtilities.convert_minutes_to_time(cur_time + class_duration)
+        #     time_blocks.append((start_time, end_time))
+        #     cur_time += class_duration + break_length
+
+        # cur_time = lunch_end_mins
+        # while cur_time < day_end_mins:
+        #     start_time = SchedulerTestUtilities.convert_minutes_to_time(cur_time)
+        #     end_time = SchedulerTestUtilities.convert_minutes_to_time(cur_time + class_duration)
+        #     time_blocks.append((start_time, end_time))
+        #     cur_time += class_duration + break_length
         
         # Right now, we just support the MW, TT, F timeblock sets
         monday = Day.query.filter_by(name="Monday")[0]
