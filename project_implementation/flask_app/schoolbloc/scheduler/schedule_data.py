@@ -41,21 +41,20 @@ class ScheduleData:
                     days.append(Day.query.get(td.day_id).name)
                 
                 sorted_days = []
-                for i in range(len(days)):
-                    if "Monday" in days:
-                        sorted_days.append("Monday")
-                    if "Tuesday" in days:
-                        sorted_days.append("Tuesday")
-                    if "Wednesday" in days:
-                        sorted_days.append("Wednesday")
-                    if "Thursday" in days:
-                        sorted_days.append("Thursday")
-                    if "Friday" in days:
-                        sorted_days.append("Friday")
-                    if "Saturday" in days:
-                        sorted_days.append("Saturday")
+                if "Monday" in days:
+                    sorted_days.append("Monday")
+                if "Tuesday" in days:
+                    sorted_days.append("Tuesday")
+                if "Wednesday" in days:
+                    sorted_days.append("Wednesday")
+                if "Thursday" in days:
+                    sorted_days.append("Thursday")
+                if "Friday" in days:
+                    sorted_days.append("Friday")
+                if "Saturday" in days:
+                    sorted_days.append("Saturday")
 
-                days_string = ", ".join(set(sorted_days))
+                days_string = ", ".join(sorted_days)
 
                 cls = ScheduledClass(schedule_id=db_schedule.id, teacher_id=c.teacher_id, course_id=c.course_id, 
                                      classroom_id=c.room_id, start_time=start_time, end_time=end_time, days=days_string)
