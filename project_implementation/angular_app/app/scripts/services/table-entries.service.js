@@ -13,7 +13,8 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 		DAY_URL = SERVER_ROOT + "days",
 		SUBJECT_URL = SERVER_ROOT + "subjects",
 		TEACHER_URL = SERVER_ROOT + "teachers",
-		TIME_URL = SERVER_ROOT + "timeblocks";
+		TIME_URL = SERVER_ROOT + "timeblocks",
+		oneMoreAttempt = false;
 
 
 	// never reinstantiate: reference will be lost with bound controllers
@@ -317,6 +318,7 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 				value: null,
 				error: null,
 				required: false,
+				canBeElective: true,
 				type: "constraint",
 				multipleValues: true,
 				facts: null
@@ -579,7 +581,7 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 	};
 
 	var mapFactObjectToValue = function (entity, constraintArr) {
-		var i,
+		var i, j, daysAbbr,
 			factValues = [],
 			// make an entity.factsMap object to map the constraintArr id to the unqiue factValues[x] that we create
 			factsMap = {},
@@ -600,6 +602,34 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 		// go through the array of objects and change the object into a value (obj.first_name + obj.last_name = factValues[x])
 		for (i = 0; i < constraintArr.length; i++) {
 			value = "";
+			// add in days of the week
+			if (constraintArr[i].days && constraintArr[i].days.length) {
+				daysAbbr = "";
+				for (j = 0; j < constraintArr[i].days.length; j++) {
+					if (constraintArr[i].days[j] === "Monday") {
+						daysAbbr = daysAbbr + "M";
+					}
+					else if (constraintArr[i].days[j] === "Tuesday") {
+						daysAbbr = daysAbbr + "T";
+					}
+					else if (constraintArr[i].days[j] === "Wednesday") {
+						daysAbbr = daysAbbr + "W";
+					}
+					else if (constraintArr[i].days[j] === "Thursday") {
+						daysAbbr = daysAbbr + "H";
+					}
+					else if (constraintArr[i].days[j] === "Friday") {
+						daysAbbr = daysAbbr + "F";
+					}
+					else if (constraintArr[i].days[j] === "Saturday") {
+						daysAbbr = daysAbbr + "Sa";
+					}
+					else if (constraintArr[i].days[j] === "Sunday") {
+						daysAbbr = daysAbbr + "Su";
+					}
+				}
+				value = value + daysAbbr + " ";
+			}
 			if (constraintArr[i].first_name) {
 				value = value + constraintArr[i].first_name + " ";
 			}
@@ -902,7 +932,7 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 		},
 
 		getTableFacts: function(factName) {
-			var url, manageStudents;
+			var url, manageStudents, self = this;
 			var deferred = $q.defer();
 
 			if (!factName) {
@@ -958,7 +988,22 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 			$http.get(url).then(function(data) {
 				deferred.resolve(data.data);
 			}, function(data) {
-				deferred.reject(data.data);
+				// race condition has caused the user_id not to be removed quick enough, try again
+				if (!oneMoreAttempt && factName === "student_course" && data.data.message === "Access denied") {
+					userAccessService.resetManagedStudents();
+					// make sure this isn't infinitely recursive
+					oneMoreAttempt = true;
+					self.getTableFacts(factName).then(function(data) {
+						oneMoreAttempt = false;
+						deferred.resolve(data);
+					}, function(data) {
+						oneMoreAttempt = false;
+						deferred.reject(data);
+					});
+				}
+				else {
+					deferred.reject(data.data);
+				}
 			});
 			return deferred.promise;
 		},
@@ -979,7 +1024,7 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 				// reset entries
 				tableConfig.entries = null;
 				self.getTableFacts(tableSelection).then(function (data) {
-					var i, j, timeSplit;
+					var i, j, k, daysAbbr, timeSplit;
 					// fix time to be in standard time
 					for (i = 0; i < data.length; i++) {
 						if (data[i].start_time || data[i].start_time === 0) {
@@ -988,10 +1033,44 @@ angular.module('sbAngularApp').factory('tableEntriesService', ['$q', '$http', 'c
 						if (data[i].end_time || data[i].end_time === 0) {
 							data[i].end_time = commonService.formatSingleTimeM2S(data[i].end_time);
 						}
+						if (data[i].avail_start_time || data[i].avail_start_time === 0) {
+							data[i].avail_start_time = commonService.formatSingleTimeM2S(data[i].avail_start_time);
+						}
+						if (data[i].avail_end_time || data[i].avail_end_time === 0) {
+							data[i].avail_end_time = commonService.formatSingleTimeM2S(data[i].avail_end_time);
+						}
 						if (data[i].timeblock && data[i].timeblock.length) {
 							for (j = 0; j < data[i].timeblock.length; j++) {
 								timeSplit = data[i].timeblock[j].value.split(" ");
 								data[i].timeblock[j].value = commonService.formatTimeM2S(timeSplit[0], timeSplit[1]);
+								// add in days of the week
+								if (data[i].timeblock[j].days && data[i].timeblock[j].days.length) {
+									daysAbbr = "";
+									for (k = 0; k < data[i].timeblock[j].days.length; k++) {
+										if (data[i].timeblock[j].days[k] === "Monday") {
+											daysAbbr = daysAbbr + "M";
+										}
+										else if (data[i].timeblock[j].days[k] === "Tuesday") {
+											daysAbbr = daysAbbr + "T";
+										}
+										else if (data[i].timeblock[j].days[k] === "Wednesday") {
+											daysAbbr = daysAbbr + "W";
+										}
+										else if (data[i].timeblock[j].days[k] === "Thursday") {
+											daysAbbr = daysAbbr + "H";
+										}
+										else if (data[i].timeblock[j].days[k] === "Friday") {
+											daysAbbr = daysAbbr + "F";
+										}
+										else if (data[i].timeblock[j].days[k] === "Saturday") {
+											daysAbbr = daysAbbr + "Sa";
+										}
+										else if (data[i].timeblock[j].days[k] === "Sunday") {
+											daysAbbr = daysAbbr + "Su";
+										}
+									}
+									data[i].timeblock[j].value = daysAbbr + " " + data[i].timeblock[j].value;
+								} 
 							}
 						}
 					}
