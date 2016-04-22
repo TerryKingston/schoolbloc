@@ -8,12 +8,21 @@ set -e
 # Install apt depedencies
 apt-get update
 apt-get install -y nginx
-apt-get install -y nodejs npm git git-core make
-apt-get install -y -qq ruby-dev
-apt-get -qy install ruby1.9.1 build-essential libpq-dev libv8-dev libsqlite3-dev
+apt-get install -y nodejs
+apt-get install -y npm
+apt-get install -y git
+apt-get install -y git-core
+apt-get install -y make
+apt-get install -y ruby-dev
+apt-get install -y ruby1.9.1
+apt-get install -y build-essential
+apt-get install -y libpq-dev
+apt-get install -y libsqlite3-dev
 apt-get install -y python3 python3-pip
-apt-get install -y uwsgi uwsgi-plugin-python3 uwsgi-plugin-python
-ln -s /usr/bin/nodejs /usr/bin/node
+apt-get install -y uwsgi
+apt-get install -y uwsgi-plugin-python3
+apt-get install -y uwsgi-plugin-python
+ln -sf /usr/bin/nodejs /usr/bin/node
 
 # Install system wide python packages
 pip3 install virtualenv
