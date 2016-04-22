@@ -140,3 +140,4 @@ service nginx restart
 
 # Pretty finish message
 echo "\n\n\n\nCongratulations! School block is now installed"
+echo "The default username/password is 'admin' and 'admin'"
