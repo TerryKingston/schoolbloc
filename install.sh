@@ -9,7 +9,7 @@ set -e
 apt-get update
 apt-get install -y nginx
 apt-get install -y nodejs npm git git-core make
-apt-get install -y apt-get install -y -qq ruby-dev
+apt-get install -y -qq ruby-dev
 apt-get -qy install ruby1.9.1 build-essential libpq-dev libv8-dev libsqlite3-dev
 apt-get install -y python3 python3-pip
 apt-get install -y uwsgi uwsgi-plugin-python3 uwsgi-plugin-python
