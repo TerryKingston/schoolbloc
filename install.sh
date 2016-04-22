@@ -2,8 +2,19 @@
 
 set -e
 
-# TODO verify run as root
-# TODO get domain from command line args
+# verify run as root
+if [[ $EUID -ne 0 ]]; then
+    echo "This script must be run as root" 1>&2
+    exit 1
+fi
+
+# get domain from command line args
+DOMAIN=$1
+if [ -z "$DOMAIN" ]; then
+    echo "Usage: ./install.sh <domain>"
+    echo "  example: ./install.sh schoolbloc.com"
+    exit 1
+fi
 
 # Install apt depedencies
 apt-get update
@@ -93,8 +104,8 @@ rm /etc/nginx/sites-enabled/*
 echo """server {
     listen 80;
     listen [::]:80;
-    server_name schoolbloc.com;
-    server_name www.schoolbloc.com;
+    server_name $DOMAIN.com;
+    server_name www.$DOMAIN.com;
 
     root /var/www/httpdocs/app;
     index index.html index.htm;
@@ -115,9 +126,9 @@ echo """server {
         uwsgi_modifier1 30;
         uwsgi_pass unix:/tmp/flask.sock;
     }
-}""" > /etc/nginx/sites-available/schoolbloc.com.conf
+}""" > /etc/nginx/sites-available/$DOMAIN.com.conf
 cd /etc/nginx/sites-enabled
-ln -s ../sites-available/schoolbloc.com.conf .
+ln -s ../sites-available/$DOMAIN.com.conf .
 
 
 # Fix permissions
