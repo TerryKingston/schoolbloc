@@ -3,6 +3,7 @@ from z3 import *
 from schoolbloc.scheduler.models import *
 from schoolbloc.config import config
 from schoolbloc.scheduler.class_constraint import ClassConstraint
+from schoolbloc.scheduler.student_constraint import StudentConstraint
 #from schoolbloc.scheduler.scheduler import SchedulerNoSolution
 import math
 import time
@@ -73,6 +74,7 @@ class ScheduleConstraints:
         self.course_time_constraints = {} # constraints generated from course-time collisions. student_id => constraint list
         self.course_index_list_cache = []
         self.class_constraints = {}
+        self.student_constraints = []
         self.student_requirement_set = [] # list of StudentRequirement objects
 
         self.prep_class_constraints()
@@ -146,10 +148,13 @@ class ScheduleConstraints:
         """
         self.class_constraints = {}
         self.class_count = 0
+        timeblock_count = Timeblock.query.count()
 
         for student in Student.query.all():
             # make a list of the required course ids for the student
-            req_courses = self.calc_student_courses(student.id)
+            student_constraint = StudentConstraint(student.id)
+
+            req_courses = student_constraint.get_course_ids(timeblock_count)
             student_reqs = StudentRequirements(student.id, req_courses, [])
             self.student_requirement_set.append(student_reqs)
 
@@ -373,49 +378,49 @@ class ScheduleConstraints:
 
 
 
-    def calc_student_courses(self, student_id):
-        """
-        Calculates the courses needed from the required corses for the student.
-        In the case of a Subject requirement, without a course requirement for the 
-        Subject, a course is arbritrarily assigned. This method also detects when
-        a student is assigned to more courses than there are time_blocks in the schedule
-        """
-        required_course_ids = []
-        for course_student in CoursesStudent.query.filter_by(student_id=student_id).all():
-            required_course_ids.append(course_student.course_id)
+    # def calc_student_courses(self, student_id):
+    #     """
+    #     Calculates the courses needed from the required corses for the student.
+    #     In the case of a Subject requirement, without a course requirement for the 
+    #     Subject, a course is arbritrarily assigned. 
+    #     """
+    #     required_course_ids = []
+    #     for course_student in CoursesStudent.query.filter_by(student_id=student_id).all():
+    #         required_course_ids.append(course_student.course_id)
 
 
-        # now add the courses that are required for all the student groups this student
-        # is part of
-        for sgrp in StudentsStudentGroup.query.filter_by(student_id=student_id).all():
-            for course_sgrp in CoursesStudentGroup.query.filter_by(student_group_id=sgrp.student_group_id):
+    #     # now add the courses that are required for all the student groups this student
+    #     # is part of
+    #     for sgrp in StudentsStudentGroup.query.filter_by(student_id=student_id).all():
+    #         for course_sgrp in CoursesStudentGroup.query.filter_by(student_group_id=sgrp.student_group_id):
                 
-                if course_sgrp.course_id not in required_course_ids:
-                    required_course_ids.append(course_sgrp.course_id)
+    #             # if the 
+    #             if course_sgrp.course_id not in required_course_ids:
+    #                 required_course_ids.append(course_sgrp.course_id)
 
-            # and pick a course in the subjects required for the student group
-            for sub_sgrp in StudentGroupsSubject.query.filter_by(student_group_id=sgrp.student_group_id).all():
-                cs_subs = CoursesSubject.query.filter_by(subject_id=sub_sgrp.subject_id).all()
-                if len(cs_subs) > 0:
-                    course_ids = [ cs.course_id for cs in cs_subs ]
-                    # if we don't already have a course for this subject then pick one and add it
-                    intersect = set(course_ids) & set(required_course_ids)
-                    # intersect = [ filter(lambda x: x in course_ids, sublist) for sublist in required_course_ids ]
-                    if len(intersect) == 0:
-                        required_course_ids.append(course_ids[0])
+    #         # and pick a course in the subjects required for the student group
+    #         for sub_sgrp in StudentGroupsSubject.query.filter_by(student_group_id=sgrp.student_group_id).all():
+    #             cs_subs = CoursesSubject.query.filter_by(subject_id=sub_sgrp.subject_id).all()
+    #             if len(cs_subs) > 0:
+    #                 course_ids = [ cs.course_id for cs in cs_subs ]
+    #                 # if we don't already have a course for this subject then pick one and add it
+    #                 intersect = set(course_ids) & set(required_course_ids)
+    #                 # intersect = [ filter(lambda x: x in course_ids, sublist) for sublist in required_course_ids ]
+    #                 if len(intersect) == 0:
+    #                     required_course_ids.append(course_ids[0])
 
 
-        # pick a course in the subjects required for the student
-        for sub_stud in StudentsSubject.query.filter_by(student_id=student_id).all():
-            cs_subs = CoursesSubject.query.filter_by(subject_id=sub_stud.subject_id).all()
-            if len(cs_subs) > 0:
-                course_ids = [ cs.course_id for cs in cs_subs ]
-                # if we don't already have a course for this subject then pick one and add it
-                intersect = set(course_ids) & set(required_course_ids)
-                if len(intersect) == 0:
-                    required_course_ids.append(course_ids[0])
+    #     # pick a course in the subjects required for the student
+    #     for sub_stud in StudentsSubject.query.filter_by(student_id=student_id).all():
+    #         cs_subs = CoursesSubject.query.filter_by(subject_id=sub_stud.subject_id).all()
+    #         if len(cs_subs) > 0:
+    #             course_ids = [ cs.course_id for cs in cs_subs ]
+    #             # if we don't already have a course for this subject then pick one and add it
+    #             intersect = set(course_ids) & set(required_course_ids)
+    #             if len(intersect) == 0:
+    #                 required_course_ids.append(course_ids[0])
 
-        return required_course_ids
+    #     return required_course_ids
 
     
 

@@ -10,7 +10,7 @@
  * Controller of the sbAngularApp
  */
 angular.module('sbAngularApp')
-.controller('SchedulerContainer', ['$scope', 'schedulerService', '$timeout', function($scope, schedulerService, $timeout) {
+.controller('SchedulerContainer', ['$scope', 'schedulerService', '$timeout', 'userAuthService', function($scope, schedulerService, $timeout, userAuthService) {
 	this.components = [
 		'HTML5 Boilerplate',
 		'AngularJS',
@@ -127,7 +127,10 @@ angular.module('sbAngularApp')
 					$scope.scheduleConfig.checkIfRunningSchedule = 2;
 				}
 
-				getGenerationUpdates();
+				// check if role is still valid (i.e. did admin sign out and log in as a student?)
+				if (userAuthService.getUserRole() === 'admin') {
+					getGenerationUpdates();
+				}
 			}, function(error) {
 				//$scope.scheduleConfig.loadingGenerate = false;
 				$scope.config.error = "Error: could not get updates."
@@ -140,15 +143,15 @@ angular.module('sbAngularApp')
 		schedulerService.updateScheduleList();
 
 		$timeout(function() {
-			console.log("prev: " + $scope.scheduleConfig.previousScheduleAmount + " cur: " + $scope.scheduleConfig.currentScheduleAmount);
 			if ($scope.scheduleConfig.previousScheduleAmount !== $scope.scheduleConfig.currentScheduleAmount) {
-				console.log("not same");
 				$scope.requestScheduleList = false;
 			}
 
 			if ($scope.requestScheduleList) {
-				console.log("hit");
-				updateScheduleList();
+				// check if role is still valid (i.e. did admin sign out and log in as a student?)
+				if (userAuthService.getUserRole() === 'admin') {
+					updateScheduleList();
+				}
 			}
 		}, 5000);
 	}

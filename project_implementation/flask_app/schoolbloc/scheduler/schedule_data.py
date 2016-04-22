@@ -30,6 +30,8 @@ class ScheduleData:
         db_schedule = Schedule(name="Sample Schedule", created_at=datetime.now())
         db.session.add(db_schedule)
         db.session.flush()
+        
+
         for course_id, cls_list in self.scheduled_classes.items():
             for c in cls_list:
                 start_time = self.timeblocks[c.timeblock_id].start_time
@@ -37,7 +39,22 @@ class ScheduleData:
                 days = []
                 for td in self.timeblocks[c.timeblock_id].timeblocks_days:
                     days.append(Day.query.get(td.day_id).name)
-                days_string = ", ".join(set(days))
+                
+                sorted_days = []
+                if "Monday" in days:
+                    sorted_days.append("Monday")
+                if "Tuesday" in days:
+                    sorted_days.append("Tuesday")
+                if "Wednesday" in days:
+                    sorted_days.append("Wednesday")
+                if "Thursday" in days:
+                    sorted_days.append("Thursday")
+                if "Friday" in days:
+                    sorted_days.append("Friday")
+                if "Saturday" in days:
+                    sorted_days.append("Saturday")
+
+                days_string = ", ".join(sorted_days)
 
                 cls = ScheduledClass(schedule_id=db_schedule.id, teacher_id=c.teacher_id, course_id=c.course_id, 
                                      classroom_id=c.room_id, start_time=start_time, end_time=end_time, days=days_string)
@@ -50,6 +67,7 @@ class ScheduleData:
                     db.session.add(cs)
 
         db.session.commit()
+
 
     # def schedule_student_required_classes(self, student):
     #     for course_id in student.required_course_ids:
