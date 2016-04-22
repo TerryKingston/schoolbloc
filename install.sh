@@ -39,6 +39,7 @@ cp -r /root/schoolbloc/project_implementation/flask_app /var/www/flask_app
 # Setup angular app
 npm install -g bower
 npm install -g grunt-cli
+cd /var/www/httpdocs
 npm install
 bower install --allow-root
 gem install --no-rdoc --no-ri compass
