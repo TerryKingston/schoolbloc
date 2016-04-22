@@ -18,6 +18,7 @@ fi
 
 # Install apt depedencies
 apt-get update
+apt-get install -y apg
 apt-get install -y nginx
 apt-get install -y nodejs
 apt-get install -y npm
@@ -60,9 +61,10 @@ ln -s ../node_modules/ .
 
 # Setup flask app
 cd /var/www/flask_app
-virtualenv-3.4 venv
+virtualenv venv
 source /var/www/flask_app/venv/bin/activate
 pip install -r /var/www/flask_app/requirements.txt
+sed -ie "s/^SECRET_KEY\s*=.*$/SECRET_KEY = $(apg -m 30 -x 35 -M NCL -a 1 -n 1)/" config.py
 
 # Install z3
 cd /root/
