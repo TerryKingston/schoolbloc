@@ -3,9 +3,9 @@ FROM    ubuntu:14.04
 RUN     apt-get update
 RUN     apt-get install -y nodejs npm git git-core
 RUN     ln -s /usr/bin/nodejs /usr/bin/node
-ADD . /app
 
-WORKDIR /app
+WORKDIR /var/www/httpdocs
+ADD . /var/www/httpdocs
 
 RUN     npm install -g bower 
 RUN     npm install -g grunt-cli

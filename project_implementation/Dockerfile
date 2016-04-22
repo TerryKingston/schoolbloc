@@ -1,5 +1,30 @@
+# Set the base image to Ubuntu
 FROM buildpack-deps:jessie
 
+# Update the repository
+RUN apt-get update
+
+# Install Nginx
+# Add application repository URL to the default sources
+RUN echo "deb http://archive.ubuntu.com/ubuntu/ raring main universe" >> /etc/apt/sources.list
+
+
+
+# Install necessary tools
+RUN apt-get install -y nano wget dialog net-tools
+
+# Download and Install Nginx
+RUN apt-get install -y nginx  
+
+# Define working directory.
+WORKDIR /etc/nginx
+
+RUN mkdir /var/www/flask_app
+ADD uwsgi.ini /var/www/flask_app
+ADD flask.conf /etc/init
+ADD school.conf /etc/nginx/sites-available/
+
+# Install Python, flask and all our project requirements
 # remove several traces of debian python
 RUN apt-get purge -y python.*
 
@@ -53,12 +78,31 @@ RUN pip install uwsgi
 WORKDIR /var/www/flask_app
 
 # Install our requirements.txt
-ADD requirements.txt /var/www/flask_app/requirements.txt
+ADD /flask_app/requirements.txt /var/www/flask_app/requirements.txt
 RUN pip install -r requirements.txt
 
 # Copy our code from the current folder to /app inside the container
-ADD . /var/www/flask_app
+ADD /flask_app/ . /var/www/flask_app/
 
-# Make port 80 available for links and/or publish
-EXPOSE 5000
+# Installing angular_app dependencies
+RUN     apt-get install -y nodejs npm git git-core
+RUN     ln -s /usr/bin/nodejs /usr/bin/node
+
+WORKDIR /var/www/httpdocs
+ADD /angular_app/ . /var/www/httpdocs/
+
+RUN     npm install -g bower 
+RUN     npm install -g grunt-cli
+RUN     npm install 
+RUN     bower install --allow-root
+
+# install ruby
+RUN 	apt-get install -y -qq ruby-dev
+RUN 	apt-get install make
+RUN 	apt-get -qy install ruby1.9.1 build-essential libpq-dev libv8-dev libsqlite3-dev
+
+#install compass
+RUN 	gem install --no-rdoc --no-ri compass
+
+
 

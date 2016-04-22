@@ -1,0 +1,11 @@
+
+py_backend:
+  build: ./flask_app
+ang_frontend:
+  build: ./angular_app 
+  command: "npm start"
+sc_nginx:
+  build: .
+  links:
+    - "py_backend"
+    - "ang_frontend"
