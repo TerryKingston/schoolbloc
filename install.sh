@@ -56,8 +56,8 @@ npm install
 bower install --allow-root
 gem install --no-rdoc --no-ri compass
 cd /var/www/httpdocs/app
-ln -s ../bower_components/ .
-ln -s ../node_modules/ .
+ln -sf ../bower_components/ .
+ln -sf ../node_modules/ .
 
 # Setup flask app
 cd /var/www/flask_app
@@ -89,7 +89,6 @@ uid = www-data
 gid = www-data
 logto = /tmp/flask-uwsgi.log""" > /var/www/flask_app/uwsgi.ini
 
-
 # Setup flask init script (using upstart)
 echo """description "Flask application driving schoolbloc"
 
@@ -97,10 +96,8 @@ start on runlevel [2345]
 stop on runlevel [!2345]
 exec /usr/bin/uwsgi -c /var/www/flask_app/uwsgi.ini""" > /etc/init/flask.conf
 
-
 # Disable any currently running nginx vhosts
 rm /etc/nginx/sites-enabled/*
-
 
 # Create the new nginx vhost
 echo """server {
@@ -130,8 +127,7 @@ echo """server {
     }
 }""" > /etc/nginx/sites-available/$DOMAIN.com.conf
 cd /etc/nginx/sites-enabled
-ln -s ../sites-available/$DOMAIN.com.conf .
-
+ln -sf ../sites-available/$DOMAIN.com.conf .
 
 # Fix permissions
 chown -R www-data:root /var/www/
