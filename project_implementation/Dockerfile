@@ -80,6 +80,7 @@ WORKDIR /var/www/flask_app
 # Install our requirements.txt
 ADD /flask_app/requirements.txt /var/www/flask_app/requirements.txt
 RUN pip install -r requirements.txt
+RUN pip install virtualenv
 
 # Copy our code from the current folder to /app inside the container
 ADD /flask_app/ . /var/www/flask_app/
@@ -103,6 +104,8 @@ RUN 	apt-get -qy install ruby1.9.1 build-essential libpq-dev libv8-dev libsqlite
 
 #install compass
 RUN 	gem install --no-rdoc --no-ri compass
+
+
 
 
 
