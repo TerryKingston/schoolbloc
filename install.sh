@@ -44,6 +44,9 @@ mkdir -p /var/www
 
 # Clone code, move it into correct location
 cd /root/
+if [ ! -f /root/schoolbloc ]; then
+    mv -f /root/schoolbloc /root/schoolbloc_old
+fi
 git clone -b production https://github.com/TerryKingston/schoolbloc.git
 cp -r /root/schoolbloc/project_implementation/angular_app /var/www/httpdocs
 cp -r /root/schoolbloc/project_implementation/flask_app /var/www/flask_app
