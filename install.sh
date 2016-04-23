@@ -11,7 +11,7 @@ fi
 # get domain from command line args
 DOMAIN=$1
 if [ -z "$DOMAIN" ]; then
-    echo "Usage: ./install.sh <domain>"
+    echo "Usage: ./install.sh <domain> (do not add www!)"
     echo "  example: ./install.sh schoolbloc.com"
     exit 1
 fi
@@ -64,7 +64,10 @@ cd /var/www/flask_app
 virtualenv venv
 source /var/www/flask_app/venv/bin/activate
 pip install -r /var/www/flask_app/requirements.txt
-sed -ie "s/^SECRET_KEY\s*=.*$/SECRET_KEY = $(apg -m 30 -x 35 -M NCL -a 1 -n 1)/" config.py
+sed -ie "s/^SECRET_KEY\s*=.*$/SECRET_KEY = '$(apg -m 30 -x 35 -M NCL -a 1 -n 1)'/" config.py
+
+# Install some demo data you can play around with
+cp /root/schoolbloc/project_implementation/flask_app/schoolbloc/testing/sample_schedule_75_students.db schoolbloc.db
 
 # Install z3
 cd /root/
@@ -103,14 +106,14 @@ rm /etc/nginx/sites-enabled/*
 echo """server {
     listen 80;
     listen [::]:80;
-    server_name $DOMAIN.com;
-    server_name www.$DOMAIN.com;
+    server_name $DOMAIN;
+    server_name www.$DOMAIN;
 
     root /var/www/httpdocs/app;
     index index.html index.htm;
 
     location / {
-        try_files $uri $uri/ =404;
+        try_files \$uri \$uri/ =404;
     }
 
     location /auth {
