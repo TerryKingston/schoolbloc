@@ -90,7 +90,7 @@ gid = www-data
 logto = /tmp/flask-uwsgi.log""" > /var/www/flask_app/uwsgi.ini
 
 # Setup flask init script (using upstart)
-echo """description "Flask application driving schoolbloc"
+echo """description \"Flask application driving schoolbloc\"
 
 start on runlevel [2345]
 stop on runlevel [!2345]
