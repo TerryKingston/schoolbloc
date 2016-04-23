@@ -16,6 +16,11 @@ if [ -z "$DOMAIN" ]; then
     exit 1
 fi
 
+if [[ "$DOMAIN" == "www."* ]]; then
+    echo "Domain cannot start with www (it will be automatically added"
+    exit 1
+fi
+
 # Install apt depedencies
 apt-get update
 apt-get install -y apg
